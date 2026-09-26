@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Keep the guest-timed repeat probe bounded and host-inspectable."""
 from pathlib import Path
+import json
 import re
 import unittest
 
@@ -25,12 +26,24 @@ class DosRepeatProbeTests(unittest.TestCase):
         commands = [line.strip() for line in script
                     if line.strip() and not line.lstrip().startswith('#')]
         self.assertEqual(commands[:4], ['@wait 240', '@enter', '@enter', 'DOSREPT'])
+        self.assertEqual(commands[4:6], ['@wait 240', '@text q'])
+        contract = json.loads((ROOT / 'tests/m16/dos_repeat_sequence.json').read_text())
+        self.assertEqual(contract['schema_version'], 1)
+        self.assertEqual(contract['clock']['initial_delay_edges'], 30)
+        self.assertEqual(contract['clock']['repeat_period_edges'], 4)
         self.assertEqual([line for line in commands if line.startswith('@hold ')],
-                         ['@hold a 90', '@hold b 38'])
-        second_hold = commands.index('@hold b 38')
+                         [f"@hold a {contract['inputs']['held_a']['guest_frames']}",
+                          f"@hold b {contract['inputs']['held_b']['guest_frames']}"])
+        self.assertEqual(commands[6], '@wait 120')
+        self.assertEqual(commands[8:11], ['@wait 120', '@text c', '@wait 120'])
+        second_hold = commands.index(
+            f"@hold b {contract['inputs']['held_b']['guest_frames']}")
         self.assertEqual(commands[second_hold - 1], '@wait 120')
         self.assertEqual(commands[-1], '@enter')
         self.assertGreaterEqual(len(re.findall(r'^@wait ', '\n'.join(commands), re.MULTILINE)), 3)
+        expected = (b'q' + b'a' * contract['inputs']['held_a']['events'] + b'c' +
+                    b'b' * contract['inputs']['held_b']['events'])
+        self.assertEqual(bytes.fromhex(contract['bytes_hex']), expected)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "clock": {
+    "source": "M10 VRTC rising edges",
+    "initial_delay_edges": 30,
+    "repeat_period_edges": 4
+  },
+  "inputs": {
+    "short_before": {"key": "q", "events": 1},
+    "held_a": {"guest_frames": 90, "events": 16},
+    "release_gap_frames": 120,
+    "short_after": {"key": "c", "events": 1},
+    "held_b": {"guest_frames": 38, "events": 3}
+  },
+  "bytes_hex": "71 61 61 61 61 61 61 61 61 61 61 61 61 61 61 61 61 63 62 62 62"
+}

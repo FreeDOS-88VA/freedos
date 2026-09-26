@@ -4,7 +4,11 @@
 @enter
 DOSREPT
 @wait 240
+@text q
+@wait 120
 @hold a 90
+@wait 120
+@text c
 @wait 120
 @hold b 38
 @wait 120

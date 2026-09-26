@@ -63,6 +63,14 @@ sampling service requires IF and DF clear. Repeat sampling brackets that
 bounded service call with the required flags and restores the original caller
 flags before returning.
 
+The source-built DOS probe captures the normal AH=07h stream while the frontend
+holds keys without synthesizing repeat events: one short `q`, `a` held for 90
+guest frames, a 120-frame release interval, one short `c`, then `b` held for 38
+guest frames. At the selected 30-edge delay and 4-edge period, the expected
+capture is one `q`, 16 `a` events, one `c`, and three `b` events. The exact
+byte fixture is `tests/m16/dos_repeat_sequence.json`; run it in paced and
+accelerated VAEG sessions on both VA and VA2.
+
 ## Cursor ownership
 
 The existing M09 Text BIOS remains the owner of text output, wrapping and
