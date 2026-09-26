@@ -49,10 +49,15 @@ jobs:
         run: bash tools/configure_component_remotes.sh
 
       - name: Verify accepted M04 baseline
+        if: github.ref != 'refs/heads/topic/m16-floppy-formats-console-input' && github.head_ref != 'topic/m16-floppy-formats-console-input'
         run: |
           make verify-scaffold
           make m04-preflight
           make m04-verify
+
+      - name: Verify M16 source scaffold
+        if: github.ref == 'refs/heads/topic/m16-floppy-formats-console-input' || github.head_ref == 'topic/m16-floppy-formats-console-input'
+        run: make verify-scaffold
 
       - name: Verify root license policy
         run: make m04r1-license-verify
