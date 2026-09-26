@@ -1,0 +1,11 @@
+# Capture one held key, its release interval, a second press, and a sentinel.
+@wait 240
+@enter
+@enter
+DOSREPT
+@wait 240
+@hold a 90
+@wait 120
+@hold b 38
+@wait 120
+@enter

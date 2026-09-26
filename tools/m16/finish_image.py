@@ -35,7 +35,7 @@ def main():
     (out / 'LOADER.BIN').write_bytes((loader / 'stage2.bin').read_bytes())
     payloads = {name: (out / name).read_bytes() for name in
                 ('KERNEL.SYS', 'LOADER.BIN', 'COMMAND.COM', 'COUNTRY.SYS', 'SYSVA.EXE',
-                 'COMPROBE.COM', 'DOSINPUT.COM', 'MZPROBE.EXE')}
+                 'COMPROBE.COM', 'DOSINPUT.COM', 'DOSREPT.COM', 'MZPROBE.EXE')}
     payloads['SYS.ID'] = b'M16SOURCE\r\n'
     payloads['TYPEA.TXT'] = b'M13-TYPE-A!\r\n'
     payloads['TYPEB.TXT'] = b'M13-TYPE-B!\r\n'

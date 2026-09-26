@@ -3,13 +3,13 @@
   "source": {
     "repository": "https://github.com/nakatamaho/vaeg.git",
     "branch": "topic/m16-vaeg-2d-native-console",
-    "commit": "7cf0e7c18ff6b844a0b2dc2046e461c916822457"
+    "commit": "6682ea123ba4f6257751ace4f58ce93aa49ec937"
   },
   "builds": {
     "linux": {
       "preset": "linux-ci-gcc",
       "build_date": "20260927",
-      "executable_sha256": "7b1237f655e95f19cb365efe85df0712e7fc96810746bfaf129cb9a7019f7cbb"
+      "executable_sha256": "bd6f874153b42802c144c1eae0604895d61836a3e6028ef32c06777b74abcbea"
     }
   }
 }
