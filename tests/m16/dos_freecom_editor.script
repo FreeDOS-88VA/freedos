@@ -17,3 +17,16 @@
 @wait 90
 @enter
 @wait 600
+@key f1
+@wait 90
+@key f3
+@wait 90
+@enter
+@wait 600
+@text DIR B:
+@key f5
+@wait 90
+@key f3
+@wait 90
+@enter
+@wait 600

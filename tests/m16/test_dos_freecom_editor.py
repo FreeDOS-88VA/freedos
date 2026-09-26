@@ -17,7 +17,11 @@ class DosFreecomEditorTests(unittest.TestCase):
                                         '@wait 120', '@key delete'])
         self.assertEqual(commands[9:14], ['@key help', '@key backspace', '@text :',
                                          '@enter', '@wait 600'])
-        self.assertEqual(commands[14:], ['@key f3', '@wait 90', '@enter', '@wait 600'])
+        self.assertEqual(commands[14:18], ['@key f3', '@wait 90', '@enter', '@wait 600'])
+        self.assertEqual(commands[18:24], ['@key f1', '@wait 90', '@key f3',
+                                           '@wait 90', '@enter', '@wait 600'])
+        self.assertEqual(commands[24:], ['@text DIR B:', '@key f5', '@wait 90',
+                                        '@key f3', '@wait 90', '@enter', '@wait 600'])
 
 
 if __name__ == '__main__':

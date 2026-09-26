@@ -58,7 +58,10 @@ whole event. If the queue is full, the repeat is dropped and its next deadline
 is set from the current tick, so missed intervals never produce a burst.
 Releasing the owning matrix key stops repeats; already queued input remains.
 F-keys, Enter, modifiers, control characters and all other extended keys do
-not repeat.
+not repeat. DOS CON may enter with interrupts enabled, while the M10 VRTC
+sampling service requires IF and DF clear. Repeat sampling brackets that
+bounded service call with the required flags and restores the original caller
+flags before returning.
 
 ## Cursor ownership
 

@@ -8,9 +8,25 @@ DOSINPUT
 @key ctrl-c
 @enter
 @key f1
+@key f2
 @key f3
+@key f4
 @key f5
+@key f6
+@key f7
+@key f8
+@key f9
 @key f10
+@key shift-f1
+@key shift-f2
+@key shift-f3
+@key shift-f4
+@key shift-f5
+@key shift-f6
+@key shift-f7
+@key shift-f8
+@key shift-f9
+@key shift-f10
 @key up
 @key down
 @key left
@@ -21,8 +37,6 @@ DOSINPUT
 @key delete
 @key ctrl-left
 @key ctrl-right
-@key shift-f1
-@key shift-f10
 @key shift-up
 @key shift-down
 @key shift-left

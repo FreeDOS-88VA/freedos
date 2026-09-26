@@ -3,7 +3,7 @@
 bits 16
 org 100h
 
-%define INPUT_BYTES 43
+%define INPUT_BYTES 71
 
 start:
         push cs
