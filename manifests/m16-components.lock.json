@@ -12,13 +12,13 @@
     },
     {
       "branch": "topic/m16-floppy-formats-console-input",
-      "commit": "6235260d4cc4108fbd02b72304dbecb0c556af7f",
+      "commit": "8233cae295ab55b25399fd967fc74902387ef23f",
       "name": "fdkernel",
       "parent_commit": "d8dbbf7111f86ea4800daeac84ac53ba601aaf32",
       "path": "components/fdkernel",
       "repository": "https://github.com/nakatamaho/fdkernel.git",
       "role": "M16 VA/VA2 floppy I/O, native console input, guest-timed repeat, and M13 staging ring support",
-      "source_archive_sha256": "4aa2ada021f17d711948f98b4644782224c2c62aacf0082b93129ae2b9282b0a",
+      "source_archive_sha256": "e69ac3d4dc3146a83f8c8e1f23ba9ec1cba1d32858a523a14a5ea012761e0d27",
       "upstream": "https://github.com/lpproj/fdkernel.git"
     },
     {
