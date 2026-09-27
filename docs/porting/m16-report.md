@@ -98,3 +98,13 @@ The public host checks alone do not establish VAEG PASS or HARDWARE PASS.
 - Private guest verification required by the RAM-dependent replacement rule is
   tracked separately; no private traces or derived observations appear here.
 - Hardware: **NOT RUN**; **DEFERRED HARDWARE VALIDATION**.
+
+## Resident footprint cleanup (2026-09-27)
+
+The PC-88VA build omits the already-disabled DOS CONFIG.SYS parser, its
+menu/INSTALL/line storage, and the unused legacy loader-service object.
+The pre-kernel LOADSEG directive remains owned by the loader. Other platforms
+retain their existing parser; buffer counts and transfer capacities are unchanged.
+This change does not relocate NEAR data across DS groups. Clean build results
+and the exact new placement are pending; previous boot evidence does not qualify
+this candidate. Emulator and hardware validation of this change are NOT RUN.
