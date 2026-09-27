@@ -62,6 +62,8 @@ cp command.com /work/result/COMMAND.COM
 cd /work/source/components/country
 nasm -f bin country.asm -o /work/result/COUNTRY.SYS
 cd /work/source
+nasm -f bin tests/m17/config_device.asm -o /work/result/CFGDEV.SYS
+nasm -f bin tests/m17/config_probe.asm -o /work/result/CFGPROBE.COM
 nasm -f bin tests/m17/system_com_probe.asm -o /work/result/COMPROBE.COM
 nasm -f bin tests/m17/dos_input_probe.asm -o /work/result/DOSINPUT.COM
 nasm -f bin tests/m17/dos_repeat_probe.asm -o /work/result/DOSREPT.COM

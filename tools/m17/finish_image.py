@@ -36,6 +36,7 @@ def main():
     payloads = {name: (out / name).read_bytes() for name in
                 ('KERNEL.SYS', 'LOADER.BIN', 'COMMAND.COM', 'COUNTRY.SYS', 'SYSVA.EXE',
                  'COMPROBE.COM', 'DOSINPUT.COM', 'DOSREPT.COM', 'MZPROBE.EXE')}
+    payloads['CONFIG.SYS'] = (ROOT / 'config/m17/CONFIG.SYS').read_text().replace('\n', '\r\n').encode('ascii')
     payloads['SYS.ID'] = b'M16SOURCE\r\n'
     payloads['TYPEA.TXT'] = b'M13-TYPE-A!\r\n'
     payloads['TYPEB.TXT'] = b'M13-TYPE-B!\r\n'
