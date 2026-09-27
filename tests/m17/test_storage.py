@@ -1,6 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 from pathlib import Path
 import struct
+import tempfile
+import shutil
+import json
 import sys
 import unittest
 ROOT=Path(__file__).resolve().parents[2]
@@ -8,6 +11,7 @@ sys.path.insert(0,str(ROOT/'tools/m17'))
 from contracts import load,validate
 from produce import build
 from inspect_storage import inspect
+from verify_source_audit import verify
 
 class StorageTests(unittest.TestCase):
     @classmethod
@@ -68,5 +72,25 @@ class StorageTests(unittest.TestCase):
             # Offset 8 is a reserved comment, not an identity field.
             if at==8:continue
             with self.subTest(offset=at),self.assertRaises(ValueError):inspect(bytes(changed),p)
+
+class AuditTests(unittest.TestCase):
+    def test_source_binding_negatives(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            audit=json.loads((ROOT/'config/m17/source-audit.json').read_text())
+            for path in ['config/m17/source-audit.json','manifests/m17-components.lock.json']+['components/fdkernel/'+p for p in audit['files']]:
+                target=root/path;target.parent.mkdir(parents=True,exist_ok=True)
+                shutil.copyfile(ROOT/path,target)
+            verify(root)
+            dest=root/'config/m17/source-audit.json'
+            for mutation in ('kernel','unknown','missing','hash','content'):
+                changed=json.loads(json.dumps(audit))
+                if mutation=='kernel':changed['kernel_commit']='0'*40
+                if mutation=='unknown':changed['files']['../other']='0'*64
+                if mutation=='missing':del changed['files']['kernel/config.c']
+                if mutation=='hash':changed['files']['kernel/config.c']='broken'
+                if mutation=='content':changed['files']['kernel/config.c']='0'*64
+                dest.write_text(json.dumps(changed))
+                with self.subTest(mutation=mutation),self.assertRaises(ValueError):verify(root)
 
 if __name__=='__main__':unittest.main()

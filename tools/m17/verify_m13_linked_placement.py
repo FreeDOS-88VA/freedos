@@ -326,7 +326,7 @@ def verify_bridge(kernel, link_map, carrier, record, selected=None, capacity=640
                              work_stack, work_ring, work_stack,
                              metadata['definitions']['M13_BRIDGE_STACK_SP'])
         assert bytes(cpu.mem_read(load * 16 + boot_at, 20)) == b'M16BOOT1' + wanted
-    
+
     if split:
         actual_descriptor = bytes(cpu.mem_read(split['descriptor'], 24))
         descriptor_words = struct.unpack_from('<8H', actual_descriptor, 8)
