@@ -180,3 +180,34 @@ Final guest operation qualification is recorded separately. Upgrade-board
 and VA3-specific guest/hardware execution are NOT RUN; synthetic branch checks
 do not establish those results. Hardware is NOT RUN. Record native CI against
 the publication tip after push. Overall milestone acceptance remains partial.
+
+## Legacy INIT and sector-buffer reduction (2026-09-27)
+
+Implementation parent: `27935afa16b5eaea0e19461dbfef814b2419235b`.
+Kernel: `6318d4c435c6f4ff48b5033bca3d910fe261b6f0`.
+The legacy INIT_TEXT assembly now joins the discardable M13_INIT_TEXT group;
+resident IRQ handlers retain their original lifetime. The resident VA disk
+transfer buffer is reduced from 4096 to 1024 bytes with a shared capacity
+constant and fail-closed read/write entry checks. The decompressor history
+ring and the twenty DOS cache buffers are unchanged.
+
+Linked resident bytes fall from 70032 to 66224. With 24144 bytes of final
+kernel work, the combined allocation falls from 94176 to 90368 bytes, or
+88.25 KiB: a reduction of 3808 bytes. Temporary INIT grows from 10139 to
+10955 bytes, including group alignment, and is released as before. At default
+LOADSEG the free payload begins at 26110h.
+
+Two complete clean exported-source builds produce identical artifact manifests
+and D88 bytes. The linked verifier confirms the moved assembly lifetimes and
+executes both real disk wrappers/cores with synthetic firmware callbacks:
+512/1024-byte success, oversized sector/count/capacity rejection, and buffer
+canaries. Carrier and maintained build gates also complete successfully.
+Candidate D88: 1331888 bytes, SHA-256
+`b072cbe825444bfaa28deafe4f74e5fcce0542cfdeea79669f6427cd3d73ee91`.
+Reproduce using the documented M16 build entry point and locked toolchain.
+This candidate is not a designated milestone distribution archive.
+
+Guest scope is recorded separately against the exact candidate; source-level
+and synthetic checks do not establish hardware behavior. Hardware is NOT RUN.
+Record native CI against the publication tip after push. Overall M16 acceptance
+remains partial.

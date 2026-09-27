@@ -124,7 +124,8 @@ The VA build does not retain storage or handlers for the DOS CONFIG.SYS parser
 while that parser is disabled. Its no-op DoConfig/DoInstall entry points retain
 the existing behavior; the loader's PC88VA_LOADSEG handling remains separate.
 The unused legacy loader-service object is excluded from the resident link.
-Disk cache counts, transfer buffer capacities and the NEAR arena are unchanged.
+The NEAR arena is unchanged. Disk cache and transfer buffer sizing is specified
+below.
 
 The nominal M16 INIT stack end is 3e000h, translated with measured RAM at
 runtime. Derive INIT start from its exact linked extent below that fixed stack
@@ -165,4 +166,10 @@ checks transfer lengths. DOS multi-sector requests are still split into
 single-sector operations; 512-byte and 1024-byte sectors remain supported.
 The decompressor's separate 4096-byte history ring is unaffected. The linked
 verifier checks INIT ownership and read/write success and rejection cases with
-buffer canaries. The ordinary DOS disk cache count remains twenty.
+buffer canaries.
+
+The VA build defaults to ten DOS cache buffers, each with 1024 bytes of sector
+data: 10 KiB of data in total. Buffer headers, paragraph alignment and the owned
+allocation header are additional; the total cache allocation is 10464 bytes.
+This platform default does not alter other targets' twenty-buffer default or
+the upstream cache algorithm.
