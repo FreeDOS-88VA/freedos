@@ -80,4 +80,5 @@ python3 -B -m unittest discover -s tests/m16 -p 'test_freecom_input_source.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_dos_input_probe.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_dos_freecom_editor.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_dos_repeat_probe.py'
+python3 -B -m unittest discover -s tests/m16 -p 'test_repeat_timing.py'
 fi
