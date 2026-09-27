@@ -233,7 +233,10 @@ def verify_bridge(kernel, link_map, carrier, record, selected=None, capacity=640
     def missing_ram(uc, access, address, size, value, _):
         if address >= capacity * 1024:
             uc.mem_write(address, b'\xff' * size)
-    cpu.hook_add(UC_HOOK_MEM_READ, missing_ram, None, 0x3ffff, 0x9ffff)
+    if capacity < 640:
+        # Intercept only the absent interval. A read hook on an installed
+        # RETF stack perturbs 16-bit far-return IP handling in Unicorn 2.1.4.
+        cpu.hook_add(UC_HOOK_MEM_READ, missing_ram, None, capacity * 1024, 0x9ffff)
     cpu.hook_add(UC_HOOK_INTR, lambda uc, interrupt, _: None)
     carrier_base = metadata['definitions']['M13_LOAD_SEG']
     cpu.mem_write(carrier_base * 16, carrier.read_bytes()[32:])
@@ -255,7 +258,10 @@ def verify_bridge(kernel, link_map, carrier, record, selected=None, capacity=640
         assert cpu.reg_read(r.UC_X86_REG_AX) == 0x1601, 'missing placement rejection'
         print(f'RUNTIME_PLACEMENT_REJECTED; base={load:04x}; capacity={capacity}')
         return
-    assert reached == [target], 'real carrier did not reach the MZ entry'
+    assert reached == [target], ('real carrier did not reach the MZ entry',
+                                hex(load), capacity,
+                                {name: hex(cpu.reg_read(getattr(r, 'UC_X86_REG_' + name)))
+                                 for name in ('CS', 'IP', 'AX', 'DS', 'ES', 'SS', 'SP')})
     boot_at = metadata['definitions'].get('M16_BOOT_RECORD_OFFSET')
     if boot_at is not None:
         work_file = metadata['definitions']['M13_FILE_SEG'] if not delta else capacity * 64 - 0x2000

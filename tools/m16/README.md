@@ -60,6 +60,9 @@ measurement. DOS uses the measured contiguous capacity.
 `CONFIG.SYS` may contain the pre-kernel directive `PC88VA_LOADSEG=2000` (hexadecimal
 paragraph address, optionally suffixed with `h`). It selects the expanded kernel
 layout base: 2000h means physical address 20000h. The default is 1000h/10000h.
+This is the beginning of the entire resident kernel, including its C code and
+data. `Resident asm` in the display is an internal relocated assembly-code
+part of that resident kernel, not a second meaning of LOADSEG.
 Resident code, INIT, initial stacks, MZ relocations, and placement records move
 by the same delta. The directive does not move the initial compressed-file
 staging buffer. Earlier M16 implementations that used it as a staging-buffer
