@@ -68,9 +68,18 @@ by the same delta. The directive does not move the initial compressed-file
 staging buffer. Earlier M16 implementations that used it as a staging-buffer
 selector implemented the wrong meaning; that behavior is superseded.
 
-Non-default placement uses a temporary unpack workspace in the last 128 KiB of
-measured RAM. The complete translated image and INIT/stack envelope must fit
-below that workspace and above firmware memory. Invalid, duplicate, wrapped,
+Before its first disk read, stage 2 measures RAM with the same probe and derives
+file/MZ staging as `RAM_end - 19000h`, history ring as `RAM_end - 8000h`,
+and bridge stack top as `RAM_end - 10h`. Thus staging is 27000h, 67000h,
+or 87000h for measured 256, 512, or 640 KiB. AX passes measured KiB to the
+carrier; CX passes staging. The carrier validates that CS and CX match this
+measured placement, avoiding a second carrier copy. Loader metadata and its
+own stack remain in the qualified low-memory intervals.
+
+The default kernel base retains the verified phased lifetimes of the 256 KiB
+profile: INIT can reuse temporary areas after their contents are consumed.
+For a non-default base, the complete translated image and INIT/stack envelope
+must fit below the carrier workspace and above firmware memory. Invalid, duplicate, wrapped,
 or overlapping requests fail closed. For example, 2000h and 3000h are qualified
 by the host verifier with 512 KiB; this does not imply that every paragraph
 address fits every RAM capacity. The startup display distinguishes the expanded

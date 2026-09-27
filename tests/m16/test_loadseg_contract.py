@@ -67,3 +67,37 @@ pc88va_stage2_root: times RT_SIZE db 0
                     self.assertEqual(struct.unpack('<H', cpu.mem_read(0x10000 + value, 2))[0], expected)
                 self.assertEqual(bytes(cpu.mem_read(0x10000 + file + segment, 2)), b'\x00\x27')
                 self.assertEqual(bytes(cpu.mem_read(0x10000 + mz + mzseg, 2)), b'\x00\x27')
+
+    def test_stage2_measures_before_first_disk_read(self):
+        from unicorn import Uc, UC_ARCH_X86, UC_MODE_16, UC_HOOK_CODE, UC_HOOK_MEM_READ
+        from unicorn import x86_const as r
+        from build_loader import build_stage
+        profile = json.loads((ROOT / 'config/m16/loader.json').read_text())
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            result = build_stage(profile, out, 2)
+            code = (out / 'stage2.bin').read_bytes()
+        symbols = result['symbols']
+        for capacity in (256, 384, 511, 512, 640):
+            with self.subTest(capacity=capacity):
+                cpu = Uc(UC_ARCH_X86, UC_MODE_16)
+                cpu.mem_map(0, 0x100000)
+                cpu.mem_write(0, b'\xa5' * 0x100000)
+                cpu.mem_write(0x12000, code)
+                def absent(uc, access, address, size, value, data):
+                    uc.mem_write(address, b'\xff' * size)
+                if capacity < 640:
+                    cpu.hook_add(UC_HOOK_MEM_READ, absent, None, capacity * 1024, 0x9ffff)
+                reached = []
+                def stop(uc, address, size, data):
+                    reached.append(address)
+                    uc.emu_stop()
+                for key in ('adapter', 'failure'):
+                    at = 0x12000 + symbols[key]
+                    cpu.hook_add(UC_HOOK_CODE, stop, begin=at, end=at)
+                cpu.reg_write(r.UC_X86_REG_CS, 0x1200)
+                cpu.emu_start(0x12000, 0xfffff, count=100000)
+                self.assertEqual(reached, [0x12000 + symbols['adapter']])
+                expected = struct.pack('<H', capacity * 64 - 0x1900)
+                for key, field in (('file', 10), ('mz', 4), ('mz', 8)):
+                    self.assertEqual(bytes(cpu.mem_read(0x12000 + symbols[key] + field, 2)), expected)

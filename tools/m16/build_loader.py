@@ -147,7 +147,7 @@ def build_stage(overlay, output, stage, extent=None, nasm="nasm"):
         os.chmod(include, 0o600)
         stream.write(text)
     command = [nasm, "-f", "bin", "-DPC88VA", "-DJAPAN", "-DDBCS", "-I"+str(BOOT)+"/",
-               "-p", str(include), "-o", str(binary), str(BOOT / ("stage"+str(stage)+".asm"))]
+               "-I"+str(BOOT.parent / "kernel")+"/", "-p", str(include), "-o", str(binary), str(BOOT / ("stage"+str(stage)+".asm"))]
     result = subprocess.run(command, capture_output=True)
     with (output / ("stage"+str(stage)+"-assemble.log")).open("xb") as stream:
         os.chmod(stream.name, 0o600)

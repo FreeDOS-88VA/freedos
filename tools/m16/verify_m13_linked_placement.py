@@ -238,12 +238,14 @@ def verify_bridge(kernel, link_map, carrier, record, selected=None, capacity=640
         # RETF stack perturbs 16-bit far-return IP handling in Unicorn 2.1.4.
         cpu.hook_add(UC_HOOK_MEM_READ, missing_ram, None, capacity * 1024, 0x9ffff)
     cpu.hook_add(UC_HOOK_INTR, lambda uc, interrupt, _: None)
-    carrier_base = metadata['definitions']['M13_LOAD_SEG']
+    carrier_base = (capacity * 64 - 0x1900 if 'M16_BOOT_RECORD_OFFSET' in metadata['definitions']
+                    else metadata['definitions']['M13_LOAD_SEG'])
     cpu.mem_write(carrier_base * 16, carrier.read_bytes()[32:])
     for reg, value in [(r.UC_X86_REG_CS, carrier_base), (r.UC_X86_REG_IP, 0),
                        (r.UC_X86_REG_SS, carrier_base), (r.UC_X86_REG_SP, metadata['carrier_stack_pointer']),
                        (r.UC_X86_REG_BX, 0 if selected is None else selected),
-                       (r.UC_X86_REG_CX, metadata['definitions']['M13_FILE_SEG']),
+                       (r.UC_X86_REG_CX, carrier_base),
+                       (r.UC_X86_REG_AX, capacity),
                        (r.UC_X86_REG_DX, 0x1234)]:
         cpu.reg_write(reg, value)
     reached = []
@@ -264,10 +266,10 @@ def verify_bridge(kernel, link_map, carrier, record, selected=None, capacity=640
                                  for name in ('CS', 'IP', 'AX', 'DS', 'ES', 'SS', 'SP')})
     boot_at = metadata['definitions'].get('M16_BOOT_RECORD_OFFSET')
     if boot_at is not None:
-        work_file = metadata['definitions']['M13_FILE_SEG'] if not delta else capacity * 64 - 0x2000
-        work_ring = metadata['definitions']['M13_RING_SEG'] if not delta else work_file + 0x1000
-        work_stack = metadata['definitions']['M13_BRIDGE_STACK_SEG'] if not delta else work_file + 0x1700
-        wanted = struct.pack('<6H', metadata['definitions']['M13_FILE_SEG'], work_file,
+        work_file = carrier_base
+        work_ring = work_file + 0x1100
+        work_stack = work_file + 0x1000
+        wanted = struct.pack('<6H', carrier_base, work_file,
                              work_stack, work_ring, work_stack,
                              metadata['definitions']['M13_BRIDGE_STACK_SP'])
         assert bytes(cpu.mem_read(load * 16 + boot_at, 20)) == b'M16BOOT1' + wanted
@@ -320,7 +322,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     verify(args.kernel, args.map)
     if args.carrier:
-        verify_bridge(args.kernel, args.map, args.carrier, args.placement, capacity=512)
+        for capacity in (256, 384, 511, 512, 640):
+            verify_bridge(args.kernel, args.map, args.carrier, args.placement, capacity=capacity)
         for selected in (0x2000, 0x3000):
             verify_bridge(args.kernel, args.map, args.carrier, args.placement, selected, 512)
         for selected, capacity in ((0x0800, 512), (0x4000, 512), (0x2000, 256)):
