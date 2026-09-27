@@ -101,10 +101,41 @@ The public host checks alone do not establish VAEG PASS or HARDWARE PASS.
 
 ## Resident footprint cleanup (2026-09-27)
 
+Implementation parent: `b138aaf0c6f5efaa7ef1dfbb7bb0ac41f5aecd97`.
+Kernel: `e7e81011ef0e0ce4cf2a1a5fd7e301fa7f7b7324`.
+The component lock records the exact public source archive identity.
+
 The PC-88VA build omits the already-disabled DOS CONFIG.SYS parser, its
-menu/INSTALL/line storage, and the unused legacy loader-service object.
-The pre-kernel LOADSEG directive remains owned by the loader. Other platforms
-retain their existing parser; buffer counts and transfer capacities are unchanged.
-This change does not relocate NEAR data across DS groups. Clean build results
-and the exact new placement are pending; previous boot evidence does not qualify
-this candidate. Emulator and hardware validation of this change are NOT RUN.
+menu/INSTALL/line storage and constants, and the unused legacy loader-service
+object. The pre-kernel LOADSEG directive remains owned by the loader. Other
+platforms retain their existing parser; buffer counts, transfer capacities and
+the bounded NEAR work arena are unchanged. No NEAR data is moved across DS groups.
+The smaller INIT exposed an incidental code-size dependency in the builder:
+M16 now explicitly preserves the nominal 3e000h stack-end anchor and checks
+that the exact INIT extent fits above live staging before runtime translation.
+
+Public linked-image accounting, with the same default work allocations:
+
+| Region | Previous bytes | Current bytes |
+| --- | ---: | ---: |
+| Resident kernel | 76480 | 69808 |
+| Final kernel work including allocator metadata | 24144 | 24144 |
+| Combined permanent allocation | 100624 | 93952 |
+| Temporary INIT code | 16146 | 10124 |
+
+The permanent allocation shrinks by 6672 bytes (6.515625 KiB), to 91.75 KiB.
+Remaining low bootstrap INIT, live fixed data, and transfer buffer sizing are
+not changed by this cleanup. This is not an exhaustive lifetime conversion.
+
+Two independent complete builds from allowlisted source exports produced
+identical artifact manifests and D88 bytes. The linked-placement/carrier checks
+and maintained M16 build gates completed successfully in both containers.
+Candidate D88: 1331888 bytes, SHA-256
+`c087bec3d98a36272d3598e57939553523dea71ffc9f312a85dd162440ded162`.
+Toolchain image: `sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df`.
+Rebuild with the documented `tools/m16/build_image.py` entry point at the
+implementation revision. This candidate is not a designated milestone archive.
+
+Native CI and guest qualification are pending at this documentation checkpoint.
+Hardware is NOT RUN. Overall M16 acceptance remains partial; this cleanup does
+not qualify the outstanding console and media matrix.
