@@ -366,13 +366,9 @@ def build(kernel: Path, bridge: Path, output: Path, *, load_segment: int,
     if b'M13PLAN1' in original_body and split_init:
         if link_map is None:
             raise ValueError('split image requires its matched link map')
-        # INIT must not be placed at the build machine's nominal RAM ceiling:
-        # the BIOS backup-memory selection can expose a lower runtime ceiling
-        # (for example, a 512 KiB VA configuration built with 640 KiB defaults).
-        # Reserve the full bounded carrier and scratch windows, then put INIT
-        # and its 4 KiB stack immediately above them.  The resulting fixed
-        # interval is independent of the selected runtime ceiling; the DOS
-        # arena still receives its actual ceiling from pc88va_memory_kb().
+        # Derive the linked INIT extent before assigning its workspace.
+        # M16 translates the complete nominal 256 KiB workspace at runtime
+        # from measured RAM; its stack-end anchor must not depend on code size.
         provisional_body, provisional_split = split_image(
             original_body, relocations, link_map, image_segment,
             memory_top=memory_top, init_top=memory_top, runtime_top=True)
@@ -387,6 +383,10 @@ def build(kernel: Path, bridge: Path, output: Path, *, load_segment: int,
         ring_end = ring_segment * 16 + ring_offset + RING_BYTES
         live_staging_end = max(carrier_end, scratch_end, ring_end)
         init_top = (live_staging_end + init_extent + 4096 + 0x0fff) & ~0x0fff
+        if b'M16BOOT1' in original_body:
+            init_top = 0x3e000
+            if live_staging_end > init_top - 4096 - init_extent:
+                raise ValueError('M16 INIT extent overlaps the live staging workspace')
         if external_ring:
             stack_start = bridge_stack_segment * 16 + bridge_stack_sp - bridge_stack_bytes
             if init_top > stack_start:

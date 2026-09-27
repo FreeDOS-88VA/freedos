@@ -117,3 +117,16 @@ the permanent kernel/work footprint.
 - [Kernel allocation](../../components/fdkernel/kernel/config.c)
 - [Temporary release](../../components/fdkernel/kernel/memmgr.c)
 - [Linked-image verifier](../../tools/m16/verify_m13_linked_placement.py)
+
+### Resident footprint policy
+
+The VA build does not retain storage or handlers for the DOS CONFIG.SYS parser
+while that parser is disabled. Its no-op DoConfig/DoInstall entry points retain
+the existing behavior; the loader's PC88VA_LOADSEG handling remains separate.
+The unused legacy loader-service object is excluded from the resident link.
+Disk cache counts, transfer buffer capacities and the NEAR arena are unchanged.
+
+The nominal M16 INIT stack end is 3e000h, translated with measured RAM at
+runtime. Derive INIT start from its exact linked extent below that fixed stack
+anchor, and reject overlap with staging. Shrinking INIT must not move the anchor
+or depend on incidental rounding of the former INIT size.
