@@ -150,3 +150,33 @@ in excluded storage. This does not extend to unrun configurations. Record the
 publication tip's own native CI result separately after pushing it.
 Hardware is NOT RUN. Overall M16 acceptance remains partial; this cleanup does
 not qualify the outstanding console and media matrix.
+
+## Discardable machine banner (2026-09-27)
+
+Implementation parent: `1de6e384d709779d6abb6afee0a2aa53374063a0`.
+Kernel: `d4ccada2c5042d584bda672573ae7e2562459e15`.
+The boot banner selects VA, VA2/3, VA + verup board (PC-88VA-91), or Unknown
+from the public interfaces documented in m16-memory-layout.md. The code,
+strings and call site are all discardable INIT inputs. No persistent model
+cache is allocated. The linked verifier covers all four branches and checks
+ROM-bank, flags and register preservation.
+
+Compared with the preceding cleanup candidate, the resident kernel remains
+70032 bytes, final kernel work remains 24144 bytes, and their combined
+allocation remains 94176 bytes. At default LOADSEG the free payload still begins
+at 26ff0h. INIT alone grows from 9939 to 10139 bytes; its stack-end anchor is
+unchanged. This addition therefore consumes no additional conventional memory
+after initialization.
+
+Two complete clean exported-source builds produced identical artifacts and
+D88 bytes, including successful linked placement, carrier and model-banner
+verification. Candidate D88: 1331888 bytes, SHA-256
+`f53a2d4f6e88091602498e3eff2995bc36d67c76ddeae52fcbef1f74e66bc2f4`.
+The documented build entry point and locked toolchain are unchanged.
+This candidate is not a designated milestone archive.
+
+VA and VA2 startup labels were visually confirmed in private emulator runs.
+Final guest operation qualification is recorded separately. Upgrade-board
+and VA3-specific guest/hardware execution are NOT RUN; synthetic branch checks
+do not establish those results. Hardware is NOT RUN. Record native CI against
+the publication tip after push. Overall milestone acceptance remains partial.
