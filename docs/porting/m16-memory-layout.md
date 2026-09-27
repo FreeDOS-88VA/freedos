@@ -130,3 +130,21 @@ The nominal M16 INIT stack end is 3e000h, translated with measured RAM at
 runtime. Derive INIT start from its exact linked extent below that fixed stack
 anchor, and reject overlap with staging. Shrinking INIT must not move the anchor
 or depend on incidental rounding of the former INIT size.
+
+### Boot machine banner
+
+The model banner and its strings live entirely in M13_INIT_TEXT. The startup
+call is also in INIT. No model string, cache or detector remains in DGROUP or
+the resident platform group. The banner preserves registers, flags and ROM bank
+selection; it restores the original bank before calling console firmware.
+
+The interface precedent is public VAEG revision
+`62a597f0ee81e2e036af740a3e79ad3da83e3fb7`,
+[`generic/np2info.c`](https://github.com/nakatamaho/vaeg/blob/62a597f0ee81e2e036af740a3e79ad3da83e3fb7/generic/np2info.c),
+[`io/memctrlva.c`](https://github.com/nakatamaho/vaeg/blob/62a597f0ee81e2e036af740a3e79ad3da83e3fb7/io/memctrlva.c), and
+[`io/va91.c`](https://github.com/nakatamaho/vaeg/blob/62a597f0ee81e2e036af740a3e79ad3da83e3fb7/io/va91.c).
+Internal ROM1 bank zero's identification word distinguishes VA from VA2/3;
+the shared ROM-bank-status port identifies the VA upgrade board. Unrecognized
+identification words display Unknown. This does not distinguish VA2 from VA3.
+The linked verifier exercises synthetic VA, VA2/3, upgrade and unknown cases,
+including bank and register restoration. Such checks are not hardware evidence.

@@ -28,7 +28,8 @@ def verify_init_ownership(syms, init_source, load):
     start, end = init_source
     if not 0 <= start < end < 0x100000:
         raise ValueError('invalid linked INIT interval')
-    disposable = ('DynAlloc_', 'DynFree_', 'DynLast_', 'dsk_init_')
+    disposable = ('DynAlloc_', 'DynFree_', 'DynLast_', 'dsk_init_',
+                  '_pc88va_print_model')
     resident = ('_P_0', 'init_fatal_', 'pc88va_release_boot_memory_')
     for name in disposable + resident:
         if name not in syms:
@@ -363,6 +364,68 @@ def verify_bridge(kernel, link_map, carrier, record, selected=None, capacity=640
     print(f'REAL_SPLIT_BRIDGE_AND_ALL_FINAL_FIXUPS_OK; base={load:04x}; capacity={capacity}')
 
 
+def verify_model_banner(kernel, link_map):
+    """Execute the linked INIT banner with synthetic model/board registers."""
+    from unicorn import Uc, UC_ARCH_X86, UC_MODE_16, UC_HOOK_CODE, UC_HOOK_INSN
+    from unicorn import x86_const as r
+    syms = symbols(link_map)
+    _, body, relocations = parse_mz(kernel.read_bytes())
+    load = 0x1000
+    body = bytearray(body)
+    for off, seg in struct.iter_unpack('<HH', relocations):
+        at = seg * 16 + off
+        struct.pack_into('<H', body, at, struct.unpack_from('<H', body, at)[0] + load)
+    entry_seg, entry_off = syms['_pc88va_print_model']
+    put_seg, put_off = syms['pc88va_diag_putc_']
+    put_address = (put_seg + load) * 16 + put_off
+    for model, board, expected in (
+            (0xffff, 0xff, 'Machine = VA\r\n'),
+            (0xfffe, 0xff, 'Machine = VA2/3\r\n'),
+            (0xffff, 0x7f, 'Machine = VA + verup board (PC-88VA-91)\r\n'),
+            (0x1234, 0xff, 'Machine = Unknown\r\n')):
+        cpu = Uc(UC_ARCH_X86, UC_MODE_16)
+        cpu.mem_map(0, 0x100000)
+        cpu.mem_write(load * 16, bytes(body))
+        cpu.mem_write(0xffffe, struct.pack('<H', model))
+        cpu.mem_write(put_address, b'\xcb')  # capture output, then FAR return
+        cpu.mem_write(0x60000, b'\x9a' + struct.pack('<HH', entry_off, entry_seg + load))
+        bank, writes, output = [0xa5], [], []
+        def port_in(uc, port, size, _):
+            assert size == 1 and port in (0x152, 0x156)
+            return bank[0] if port == 0x152 else board
+        def port_out(uc, port, size, value, _):
+            assert port == 0x152 and size == 1
+            assert not uc.reg_read(r.UC_X86_REG_EFLAGS) & 0x200
+            bank[0] = value
+            writes.append(value)
+        def capture(uc, at, size, _):
+            if at == put_address:
+                assert bank[0] == 0xa5
+                output.append(uc.reg_read(r.UC_X86_REG_AX) & 255)
+                uc.reg_write(r.UC_X86_REG_AX, 0)
+        cpu.hook_add(UC_HOOK_INSN, port_in, None, 1, 0, r.UC_X86_INS_IN)
+        cpu.hook_add(UC_HOOK_INSN, port_out, None, 1, 0, r.UC_X86_INS_OUT)
+        cpu.hook_add(UC_HOOK_CODE, capture)
+        saved = [(r.UC_X86_REG_AX, 0x1234), (r.UC_X86_REG_BX, 0x2345),
+                 (r.UC_X86_REG_CX, 0x3456), (r.UC_X86_REG_DX, 0x4567),
+                 (r.UC_X86_REG_SI, 0x5678), (r.UC_X86_REG_DI, 0x6789),
+                 (r.UC_X86_REG_BP, 0x789a), (r.UC_X86_REG_DS, 0x1070),
+                 (r.UC_X86_REG_ES, 0x8000), (r.UC_X86_REG_SS, 0x7000),
+                 (r.UC_X86_REG_SP, 0x1000), (r.UC_X86_REG_EFLAGS, 0x202)]
+        for reg, value in saved:
+            cpu.reg_write(reg, value)
+        cpu.reg_write(r.UC_X86_REG_CS, 0x6000)
+        cpu.reg_write(r.UC_X86_REG_IP, 0)
+        cpu.emu_start(0x60000, 0x60005, count=20000)
+        assert cpu.reg_read(r.UC_X86_REG_CS) == 0x6000
+        assert cpu.reg_read(r.UC_X86_REG_IP) == 5
+        assert bytes(output).decode('ascii') == expected
+        assert writes == [0x05, 0xa5]
+        for reg, value in saved:
+            assert cpu.reg_read(reg) == value, (expected, reg)
+    print('INIT_MODEL_BANNER_BRANCHES_AND_BANK_RESTORE_OK')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--kernel', type=Path, required=True)
@@ -372,6 +435,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     verify(args.kernel, args.map)
     verify_init_formatter(args.kernel, args.map)
+    verify_model_banner(args.kernel, args.map)
     if args.carrier:
         for capacity in (256, 384, 511, 512, 640):
             verify_bridge(args.kernel, args.map, args.carrier, args.placement, capacity=capacity)
