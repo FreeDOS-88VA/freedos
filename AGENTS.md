@@ -251,10 +251,11 @@ reported configuration or infer this coverage from a successful link, decoder
 test, or boot at another capacity. If the failing configuration was not run,
 state that explicitly and do not describe the replacement as verified for it.
 
-`PC88VA_LOADSEG` selects the paragraph address of the expanded kernel layout,
-including its resident and INIT placement, not the temporary KERNEL.SYS file
-buffer. Keep this meaning consistent in the loader, carrier, startup display,
-documentation, and tests. A changed base must translate all affected resident segment relocations,
+`PC88VA_LOADSEG` selects the paragraph address of the expanded resident kernel
+and the consecutive kernel work area. The temporary KERNEL.SYS buffer and INIT
+follow the measured RAM-top workspace plan. Keep this meaning consistent in the
+loader, carrier, startup display, documentation, and tests. A changed base must
+translate all affected resident segment relocations,
 placement records and bootstrap stack together. Temporary INIT and its stack
 follow measured RAM top independently; bind their segment fixups and descriptor
 to the same effective placement. Final kernel work must follow the resident
