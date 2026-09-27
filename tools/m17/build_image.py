@@ -114,7 +114,11 @@ def main():
         try:
             subprocess.run(['docker', 'cp', str(inputs) + '/.', cid + ':/input'], check=True)
             with (output / f'build-{number}.log').open('xb') as f:
-                subprocess.run(['docker', 'start', '-a', cid], stdout=f, stderr=subprocess.STDOUT, check=True)
+                try:
+                    subprocess.run(['docker', 'start', '-a', cid], stdout=f, stderr=subprocess.STDOUT, check=True)
+                except subprocess.CalledProcessError:
+                    subprocess.run(['docker', 'cp', cid + ':/work/result', str(output / f'failed-{number}')], check=False)
+                    raise
             target = output / f'run-{number}'
             subprocess.run(['docker', 'cp', cid + ':/work/result', str(target)], check=True)
             results.append(json.loads((target / 'artifacts.json').read_text()))
