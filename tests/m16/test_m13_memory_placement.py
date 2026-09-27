@@ -449,10 +449,11 @@ class PlacementTests(unittest.TestCase):
             self.assertEqual(output_256.read_bytes(), output_640.read_bytes())
 
     def test_backup_ram_capacity_decoder(self):
-        from unicorn import Uc, UC_ARCH_X86, UC_MODE_16, UC_HOOK_INSN
+        from unicorn import Uc, UC_ARCH_X86, UC_MODE_16, UC_HOOK_INSN, UC_HOOK_MEM_READ
         from unicorn.x86_const import (UC_X86_INS_IN, UC_X86_INS_OUT,
                                        UC_X86_REG_AX, UC_X86_REG_BX,
-                                       UC_X86_REG_CS, UC_X86_REG_DX,
+                                       UC_X86_REG_CS, UC_X86_REG_CX, UC_X86_REG_DX,
+                                       UC_X86_REG_DI,
                                        UC_X86_REG_EFLAGS, UC_X86_REG_ES,
                                        UC_X86_REG_SI, UC_X86_REG_SP,
                                        UC_X86_REG_SS)
@@ -470,16 +471,41 @@ class PlacementTests(unittest.TestCase):
                            check=True, capture_output=True)
             code = binary.read_bytes()
 
-        for code_value, expected_kb in ((1, 256), (2, 384), (3, 512), (4, 640),
-                                        (0, 0), (5, 0), (7, 0)):
-            with self.subTest(backup_ram_code=code_value):
+        cases = [(code, capacity, bus)
+                 for code in (1, 2, 3, 4, 0, 5, 7)
+                 for capacity in (128, 256, 384, 512, 640)
+                 for bus in (0xffff, 0x55aa, 0xaa55, 0x0000)]
+        for code_value, physical_kb, bus in cases:
+            selected_kb = (code_value + 1) * 128 if 1 <= code_value <= 4 else 0
+            expected_kb = min(selected_kb, physical_kb) if physical_kb >= 256 else 0
+            with self.subTest(backup_ram_code=code_value, physical_kb=physical_kb, bus=bus):
                 cpu = Uc(UC_ARCH_X86, UC_MODE_16)
                 cpu.mem_map(0, 0x100000)
                 code_segment, stack_segment = 0x1000, 0x2000
                 cpu.mem_write(code_segment * 16, code)
-                cpu.mem_write(0xB0000 + 0x1FC4, bytes((code_value,)))
+                cpu.mem_write(0xB0000 + 0x1FC4, bytes((0x60 | code_value,)))
                 cpu.mem_write(stack_segment * 16 + 0x1000, struct.pack('<HH', 0x0100, code_segment))
                 outputs = []
+                samples = [capacity * 1024 - 2 for capacity in (256, 384, 512, 640)]
+                original = {}
+                for index, sample in enumerate(samples):
+                    value = 0x1234 + index if sample < physical_kb * 1024 else bus
+                    original[sample] = struct.pack('<H', value)
+                    cpu.mem_write(sample, original[sample])
+                reads = set()
+
+                def probe_read(uc, access, address, size, value, _user):
+                    self.assertIn(address, samples)
+                    self.assertEqual(size, 2)
+                    self.assertLess(address, selected_kb * 1024)
+                    reads.add(address)
+                    if address >= physical_kb * 1024:
+                        # Model uninstalled/read-only storage: writes cannot
+                        # change the value subsequently returned by the bus.
+                        uc.mem_write(address, struct.pack('<H', bus))
+
+                cpu.hook_add(UC_HOOK_MEM_READ, probe_read, None,
+                             samples[0], samples[-1] + 1)
 
                 def port_in(_cpu, port, size, _user):
                     self.assertEqual((port, size), (0x152, 2))
@@ -495,20 +521,29 @@ class PlacementTests(unittest.TestCase):
                 cpu.reg_write(UC_X86_REG_SS, stack_segment)
                 cpu.reg_write(UC_X86_REG_SP, 0x1000)
                 cpu.reg_write(UC_X86_REG_BX, 0x5566)
+                cpu.reg_write(UC_X86_REG_CX, 0x3344)
+                cpu.reg_write(UC_X86_REG_DI, 0x8899)
                 cpu.reg_write(UC_X86_REG_DX, 0x7788)
                 cpu.reg_write(UC_X86_REG_ES, 0x3456)
                 cpu.reg_write(UC_X86_REG_SI, 0x1234)
                 cpu.reg_write(UC_X86_REG_EFLAGS, 0x602)
-                cpu.emu_start(code_segment * 16, code_segment * 16 + 0x0100, count=256)
+                cpu.emu_start(code_segment * 16, code_segment * 16 + 0x0100, count=1024)
 
                 self.assertEqual(cpu.reg_read(UC_X86_REG_AX), expected_kb)
                 self.assertEqual(cpu.reg_read(UC_X86_REG_SP), 0x1004)
                 self.assertEqual(cpu.reg_read(UC_X86_REG_BX), 0x5566)
+                self.assertEqual(cpu.reg_read(UC_X86_REG_CX), 0x3344)
+                self.assertEqual(cpu.reg_read(UC_X86_REG_DI), 0x8899)
                 self.assertEqual(cpu.reg_read(UC_X86_REG_DX), 0x7788)
                 self.assertEqual(cpu.reg_read(UC_X86_REG_ES), 0x3456)
                 self.assertEqual(cpu.reg_read(UC_X86_REG_SI), 0x1234)
                 self.assertEqual(cpu.reg_read(UC_X86_REG_EFLAGS) & 0x600, 0x600)
                 self.assertEqual(outputs, [0x4942, 0x4142])
+                expected_reads = {n * 1024 - 2 for n in (256, 384, 512, 640)
+                                  if n <= selected_kb and n <= physical_kb + 128}
+                self.assertEqual(reads, expected_reads)
+                for sample in samples:
+                    self.assertEqual(bytes(cpu.mem_read(sample, 2)), original[sample])
 
     def test_reset_actual_far_entry_and_register_contract(self):
         """Assemble the production entry, not a replacement implementation."""
