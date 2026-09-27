@@ -66,7 +66,9 @@ class FloppyMediaTests(unittest.TestCase):
                 record = records[name]
                 with self.subTest(profile=name):
                     self.assertEqual(record['raw_capacity_bytes'], capacity)
-                    self.assertEqual(profile['guest_media_id'], media_id)
+                    self.assertEqual(profile['format_id'], media_id)
+                    self.assertEqual(profile['filesystem']['media_descriptor'],
+                                     0xF9 if name == '2hc-1200' else media_id)
                     self.assertEqual(profile['d88_disk_type'], disk_type)
                     self.assertEqual(profile['geometry']['cylinders'], cylinders)
                     self.assertEqual(profile['geometry']['heads'], heads)

@@ -255,3 +255,18 @@ tests pass locally with Unicorn 2.1.4. The adapter test harnesses now consume
 the production transfer-buffer size definition. Clean media builds, guest
 qualification and exact-revision CI for this candidate remain pending.
 This is not M16 PASS or HANDOFF READY.
+
+## Corrected 2HC format contract
+
+Public FDFORM/2HCDRV source reconciliation distinguishes the F1h native format
+selector from the F9h BPB/FAT descriptor for the selected 15-sector 2HC format.
+The M16 adapter and fixture configuration now use the FAT descriptor correctly;
+see [the floppy contract](m16-floppy-contract.md) for exact public provenance.
+A synthetic production-getbpb test rejected F9h and accepted F1h before the
+correction; both positive and negative cases now pass. All 328 component tests
+pass locally. Earlier F1h 2HC images do not qualify this corrected contract.
+The preceding candidate completed both-model DOS key delivery, ordinary-key
+repeat at paced/fast settings, and three VA/B: boundary/persistence rows. These
+remain historical candidate results. The changed kernel requires a fresh clean
+build and relevant exact-candidate guest qualification before acceptance.
+M16 remains in progress; no final PASS or handoff is claimed.

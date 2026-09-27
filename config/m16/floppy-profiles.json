@@ -3,7 +3,6 @@
   "profiles": [
     {
       "name": "2d-320",
-      "guest_media_id": 255,
       "d88_disk_type": 0,
       "geometry": {
         "bytes_per_sector": 512,
@@ -23,11 +22,11 @@
       "image": {
         "volume_serial": 1295063552,
         "volume_label": "M16-2D320"
-      }
+      },
+      "format_id": 255
     },
     {
       "name": "2d-360",
-      "guest_media_id": 253,
       "d88_disk_type": 0,
       "geometry": {
         "bytes_per_sector": 512,
@@ -47,11 +46,11 @@
       "image": {
         "volume_serial": 1295063553,
         "volume_label": "M16-2D360"
-      }
+      },
+      "format_id": 253
     },
     {
       "name": "2dd-640",
-      "guest_media_id": 251,
       "d88_disk_type": 16,
       "geometry": {
         "bytes_per_sector": 512,
@@ -71,11 +70,11 @@
       "image": {
         "volume_serial": 1295063554,
         "volume_label": "M16-2DD64"
-      }
+      },
+      "format_id": 251
     },
     {
       "name": "2dd-720",
-      "guest_media_id": 249,
       "d88_disk_type": 16,
       "geometry": {
         "bytes_per_sector": 512,
@@ -95,11 +94,11 @@
       "image": {
         "volume_serial": 1295063555,
         "volume_label": "M16-2DD72"
-      }
+      },
+      "format_id": 249
     },
     {
       "name": "2hc-1200",
-      "guest_media_id": 241,
       "d88_disk_type": 32,
       "geometry": {
         "bytes_per_sector": 512,
@@ -114,12 +113,13 @@
         "fat_count": 2,
         "root_entries": 224,
         "sectors_per_fat": 7,
-        "media_descriptor": 241
+        "media_descriptor": 249
       },
       "image": {
         "volume_serial": 1295063556,
         "volume_label": "M16-2HC12"
-      }
+      },
+      "format_id": 241
     }
   ],
   "d88": {
@@ -134,13 +134,19 @@
   },
   "boot_record": {
     "oem_name": "FDPC88VA",
-    "placeholder_code": [235, 254, 144],
+    "placeholder_code": [
+      235,
+      254,
+      144
+    ],
     "extended_bpb_signature": 41,
     "filesystem_type": "FAT12",
-    "signature_offsets": [510]
+    "signature_offsets": [
+      510
+    ]
   },
   "test_file": {
     "dos_name": "M16TEST.TXT",
-    "content_template": "M16 DATA PROFILE={name}\r\nCYLINDERS={cylinders}\r\nHEADS={heads}\r\nSECTORS_PER_TRACK={sectors_per_track}\r\nBYTES_PER_SECTOR={bytes_per_sector}\r\nMEDIA_ID={guest_media_id:02X}\r\n"
+    "content_template": "M16 DATA PROFILE={name}\r\nCYLINDERS={cylinders}\r\nHEADS={heads}\r\nSECTORS_PER_TRACK={sectors_per_track}\r\nBYTES_PER_SECTOR={bytes_per_sector}\r\nFORMAT_ID={format_id:02X}\r\nFAT_MEDIA={fat_media_descriptor:02X}\r\n"
   }
 }

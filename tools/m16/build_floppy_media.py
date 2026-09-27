@@ -64,9 +64,8 @@ def profile_spec(profile, shared, source_date_epoch):
         'build': {'source_date_epoch': source_date_epoch},
     }
     derive_layout(spec)
-    if profile['guest_media_id'] != filesystem['media_descriptor']:
-        raise ValueError('Guest media ID and FAT media descriptor differ: ' +
-                         profile['name'])
+    if type(profile['format_id']) is not int or not 0 <= profile['format_id'] <= 255:
+        raise ValueError('Native format selector must be a byte')
     return spec
 
 
@@ -78,7 +77,8 @@ def profile_payload(profile, template):
         heads=geometry['heads'],
         sectors_per_track=geometry['sectors_per_track'],
         bytes_per_sector=geometry['bytes_per_sector'],
-        guest_media_id=profile['guest_media_id'],
+        format_id=profile['format_id'],
+        fat_media_descriptor=profile['filesystem']['media_descriptor'],
     ).encode('ascii')
 
 
@@ -198,7 +198,8 @@ def build_profiles(config_path, output, source_date_epoch, boundary=False):
             raise ValueError('Refusing to overwrite M16 floppy media: ' + str(target))
         target.write_bytes(image)
         records[name] = {
-            'guest_media_id': profile['guest_media_id'],
+            'format_id': profile['format_id'],
+            'fat_media_descriptor': profile['filesystem']['media_descriptor'],
             'geometry': profile['geometry'],
             'payload_bytes': len(content),
             'raw_capacity_bytes': spec['geometry']['total_bytes'],
