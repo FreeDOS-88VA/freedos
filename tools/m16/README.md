@@ -54,8 +54,10 @@ conventional memory and its effective placement addresses. The adapter restores
 one byte after testing it with 00h and FFh at each 1 KiB boundary from 256 KiB
 up to the conventional-memory ceiling of 640 KiB. It also checks the final byte
 below 256 KiB as a minimum-capacity guard. This is a capacity sample, not an
-exhaustive RAM integrity test. Retained BIOS selections do not replace the
-measurement. DOS uses the measured contiguous capacity.
+exhaustive RAM integrity test. Neither the loader nor the kernel reads backup
+RAM to determine, cap, or provide a fallback for conventional-memory capacity.
+DOS uses the measured contiguous capacity, independently of retained BIOS
+selections; firmware setup or a backup-memory update is not a prerequisite.
 
 `CONFIG.SYS` may contain the pre-kernel directive `PC88VA_LOADSEG=2000` (hexadecimal
 paragraph address, optionally suffixed with `h`). It selects the expanded kernel

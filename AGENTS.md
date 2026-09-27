@@ -199,7 +199,7 @@ paths, raw traces, or concrete derived values. Unrun hardware is NOT RUN.
 Fix recoverable harness, build, portability, and CI defects within the task.
 
 For PC-88VA M13 startup or kernel changes, treat the linked image, generated
-placement descriptor, MZ carrier, BIOS-derived memory ceiling, INIT stack,
+placement descriptor, MZ carrier, measured conventional-memory ceiling, INIT stack,
 resident text boundary, and startup banner as one layout contract. Any change
 that can alter the kernel bytes, linker map, section grouping, carrier input,
 or descriptor must rebuild from clean pinned inputs and rerun the carrier and
@@ -218,14 +218,19 @@ For variable-RAM M13 carriers, calculate the minimum runtime capacity from
 every live loader, carrier, scratch, expanded-image, INIT, and initial-stack
 interval. A runtime-detected DOS arena ceiling does not make an early fixed
 interval safe on a smaller machine. Bind the carrier profile to its loader
-profile and verify that the backup-RAM-selected 256, 384, 512, or 640 KiB
+profile and verify that the installed and measured 256, 384, 512, or 640 KiB
 capacity is supported before calling that capacity passed. When a low-memory
 profile is required, qualify its matching in-place loader and carrier together;
 do not transplant only the kernel carrier across incompatible profiles.
 
 For every active milestone, distinguish installed physical RAM from the RAM
-capacity retained in BIOS backup memory. A saved selection is not proof that
-the corresponding RAM is writable. Changes to RAM detection, DOS arena sizing,
+capacity retained in BIOS backup memory. The VA loader and kernel must measure
+writable conventional RAM at boot; they must not read backup RAM to determine,
+cap, or supply a fallback for that capacity. Do not require a firmware setup
+session or a backup-memory update before FreeDOS can detect installed RAM.
+Retained selections are regression-test inputs only, not a memory-size source.
+A saved selection is not proof that the corresponding RAM is writable.
+Changes to RAM detection, DOS arena sizing,
 or loader/carrier placement must cover both matching settings and a stale
 selection larger than installed RAM, including 512 KiB installed with a retained
 640 KiB selection. The adapter must bound or reject an unavailable arena before
