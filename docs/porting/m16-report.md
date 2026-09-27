@@ -4,8 +4,8 @@ Status: partial implementation; not milestone acceptance or HANDOFF READY.
 
 ## Source identities
 
-- Placement implementation parent: `bbb9873eda1aec323af8b256ccc408c8984e708e`.
-- Kernel: `4bd9556921b3d554012b05d90582c7b9060d8f59`.
+- Placement implementation parent: `9cb4c4d197fb73d39429679aa9d1638df8210310`.
+- Kernel: `0a5efdd58dfbd9f7852973b3782314f91fe5319b`.
 - FreeCOM: `29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e`.
 - COUNTRY.SYS: `23f189cca3420606eae8723884fa92ccd65eb307`.
 - Toolchain image: `sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df`.
@@ -49,11 +49,15 @@ Local **HOST PASS**, scoped to the source build and synthetic checks below:
   at 512 KiB and rejected unavailable/overlapping layouts.
 - Memory probes restored sampled bytes and preserved registers/flags without
   bank I/O, including synthetic unavailable RAM and stale saved selections.
+- The actual linked INIT formatter produced decimal and hexadecimal values
+  with SS different from DS. Its VA-specific far argument/buffer pointers and
+  Watcom separate-stack option are both required; the earlier binary fails
+  this regression. This corrects the VA layout integration, not upstream DOS.
 - The full build also ran the milestone-local carrier, loader, media and
   console regression suites.
 
 Candidate D88: 1,331,888 bytes; SHA-256
-`3d3bda2356bd6d59d48077c1190fe8d9e9d395f4bd0425c1d5ff7568207b8c63`.
+`bf9bcf1868f93cb186897104f4cf19a22d233efc843fc6ddf2b26e34ad9fbde3`.
 This is a source-built candidate, not a designated milestone distribution.
 No generated disk, binary or test log is committed by this checkpoint.
 
