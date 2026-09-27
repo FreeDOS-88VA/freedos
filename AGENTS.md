@@ -198,12 +198,13 @@ in persistent Git-excluded storage. Never publish private inputs, identities,
 paths, raw traces, or concrete derived values. Unrun hardware is NOT RUN.
 Fix recoverable harness, build, portability, and CI defects within the task.
 
-For PC-88VA M13 startup or kernel changes, treat the linked image, generated
+For PC-88VA startup or kernel changes in the active milestone, treat the linked
+image, generated
 placement descriptor, MZ carrier, measured conventional-memory ceiling, INIT stack,
 resident text boundary, and startup banner as one layout contract. Any change
 that can alter the kernel bytes, linker map, section grouping, carrier input,
 or descriptor must rebuild from clean pinned inputs and rerun the carrier and
-linked-placement verifiers plus the focused M13 placement tests. Inspect the
+linked-placement verifiers plus that milestone's maintained placement tests. Inspect the
 generated descriptor against the exact map and verify its version, image,
 resident, INIT, stack, and dynamic-or-explicit memory-top fields before
 accepting the build. A prior boot result applies only to the exact kernel
@@ -214,7 +215,7 @@ fix the source-level contract first, then boot the changed candidate in the
 reported failing mode and configuration. Preserve recorded results and never
 claim an unrun mode or configuration passed.
 
-For variable-RAM M13 carriers, calculate the minimum runtime capacity from
+For variable-RAM PC-88VA carriers, calculate the minimum runtime capacity from
 every live loader, carrier, scratch, expanded-image, INIT, and initial-stack
 interval. A runtime-detected DOS arena ceiling does not make an early fixed
 interval safe on a smaller machine. Bind the carrier profile to its loader
@@ -264,3 +265,11 @@ Check this adjacency and release temporary allocations before starting the shell
 Qualify a non-default setting through the actual CONFIG.SYS loader path and
 reject an unavailable or overlapping layout before expansion. Display measured
 conventional RAM and effective layout addresses from the runtime records.
+
+The active M16 memory contract is `docs/porting/m16-memory-layout.md`; its
+required gate is recorded in `docs/tasks/M16-floppy-formats-console-input-goal-Codex.md`.
+Historical M13-M15 sizing instructions and capacity results remain history and
+do not override it. Writable capacity does not establish free-memory ownership
+or a safe lower bound. Keep the LOADSEG lower-bound policy explicit. Validate
+INIT numeric diagnostics against the actual linked formatter with SS different
+from DS, and preserve the qualified VA stack-pointer/compiler contract.

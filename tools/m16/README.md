@@ -49,6 +49,9 @@ acceptance and publication checks are complete.
 
 ## Runtime memory and kernel placement
 
+See the [current memory contract](../../docs/porting/m16-memory-layout.md) for
+ownership, temporary lifetimes and the required qualification scope.
+
 At startup, immediately after its source SHA-1, the kernel prints measured
 conventional memory and its effective placement addresses. The adapter restores
 one byte after testing it with 00h and FFh at each 1 KiB boundary from 256 KiB

@@ -1,6 +1,7 @@
 # M16 goal: floppy formats, physical B: and native console input
 
-Revision: 2026-09-25, mandatory VAEG 2D support and joint emulator/guest acceptance.
+Revision: 2026-09-27, retaining the 2026-09-25 floppy/input scope and adding
+the owner-authorized measured-RAM and consecutive low-kernel layout contract.
 
 Repository placement: `docs/tasks/M16-floppy-formats-console-input-goal-Codex.md`
 inside the actual active parent worktree.
@@ -50,9 +51,11 @@ CI. No renewed approval is needed for these routine steps. Preserve unrelated
 work, private inputs, licenses and previously accepted repairs. Do not reset a
 dirty checkout, force-push, merge a shared main branch or publish private data.
 
-Early boot progress messages from the older temporary proposal remain separate;
-they were not re-added by this request. Do not make them an M16 acceptance gate.
-Existing valid implementations remain preserved. HDD/FAT16 runtime, SASI/SCSI
+The owner explicitly added RAM measurement, effective boot-layout diagnostics,
+LOADSEG semantics and consecutive low kernel/work placement on 2026-09-27.
+These are scoped VA integration corrections and have the M16-MEMORY gate below.
+They do not revive unrelated historical boot-progress proposals. Existing valid
+implementations remain preserved. HDD/FAT16 runtime, SASI/SCSI
 drivers, HDD boot, MO, NLS/Japanese conversion, LFN, FAT32 and a new memory manager
 belong to later work. Guest low-level FORMAT support and bootability of every new
 floppy format are not implied by data-volume read/write support.
@@ -91,10 +94,24 @@ hashes or completed status. Record old-to-new identity and preserve links to
 existing evidence. An earlier storage-contract result does not make new M16 PASS.
 Do not discard work already started for the now-renumbered M17.
 
-Use the existing native memory sizing/reservation/MCB contracts, including
-`docs/msdos211-memory-compat/` if present. Do not assume 640 KiB, reclaim unknown
-memory or add IBM INT 12h/15h sizing shims. Measure added resident data/code,
-transfer buffers, key queues and stacks against supported VA configurations.
+Use [the current M16 memory contract](../porting/m16-memory-layout.md), the
+matched component sources and AGENTS.md. Historical memory notes remain
+provenance; their saved-selection sizing and fixed staging/INIT addresses do not
+override the active contract. Preserve M15 as an immutable control rather than
+assigning its capacity results to a changed M16 binary.
+
+Measure RAM with restored byte probes; do not derive capacity from backup RAM,
+assume 640 KiB, reclaim unknown ownership, or add IBM INT 12h/15h sizing shims.
+LOADSEG specifies the low resident base. Kernel work must follow it consecutively,
+with paragraph alignment and owned MCB metadata only. Temporary staging and INIT
+follow measured RAM top and are released after their last uses. Verify effective
+numeric diagnostics, all relocations, low work/free boundaries and release.
+Exercise the retained-setting failure configuration, non-default LOADSEG via
+CONFIG.SYS, affected models, COM/MZ and guest write/readback on the exact candidate.
+Report individual low-memory workload failures; host placement is not guest PASS.
+Measure added resident data/code, transfer buffers, key queues and stacks against
+currently qualified configurations. This correction does not authorize a new DOS
+memory manager or changes solely to match MS-DOS behavior.
 
 All source code, comments, diagnostics, technical reports and committed
 documentation must be English. User-facing progress may be Japanese.
@@ -360,6 +377,7 @@ configuration limitations. It cannot justify skipping either 2D row, declaring
 | --- | --- |
 | M16-PLAN | New M16 and old M16-M30 -> M17-M31 migration applied exactly once to active records, preserving history |
 | M16-BASE | Identified M15 control, current sources/build/configuration and native memory/ABI baseline |
+| M16-MEMORY | Measured RAM independent of retained settings; actual LOADSEG path; consecutive resident/work/free boundaries; coherent temporary INIT fixups and release; exact-candidate layout, diagnostics, COM/MZ and file readback checks per the current memory contract |
 | M16-VAEG-2D | Production VAEG 2D 320/360 support, discriminating synthetic controller/media tests, writeback and existing-format regressions; exact source/executable identity and applicable VAEG CI |
 | M16-FORMATS | Exact 2D 320/360, 2DD 640/720 and 2HC profiles with independent layout validation and real guest reads/writes |
 | M16-B-DRIVE | Physical FDD2 is B:, independent concurrent media, bidirectional cross-drive copy and correct drive selection |

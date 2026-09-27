@@ -1,5 +1,11 @@
 # M14 completion goal: PC-88VA floppy writes and media changes
 
+Historical task notice (2026-09-27): the memory-sizing instructions below
+belong to this milestone's recorded baseline. For active M16 maintenance, use
+[the M16 memory contract](../porting/m16-memory-layout.md): measured writable
+RAM replaces saved-selection sizing, and current LOADSEG/temporary-lifetime
+rules apply. This notice does not change historical acceptance or source pins.
+
 Revision: 2026-09-20
 
 Repository placement: `docs/tasks/M14-floppy-write-media-change-goal-Codex.md`

@@ -45,7 +45,8 @@ Final FAR kernel work grows from the resident end, followed by the free MCB.
 The runtime invariant rejects a gap or malformed boundary. Early buffers,
 INIT and its stack remain reserved until P_0 releases them before the shell.
 Startup displays measured RAM, effective placement and the final low work range.
-See `tools/m16/README.md` for the formulas and configuration syntax.
+See [the current memory contract](m16-memory-layout.md) for ownership and
+qualification, and `tools/m16/README.md` for build/configuration usage.
 
 ## Public host verification
 

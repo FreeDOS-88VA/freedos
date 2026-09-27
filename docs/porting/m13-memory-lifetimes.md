@@ -1,5 +1,10 @@
 # M13 memory lifetime convergence
 
+Historical M13 design snapshot: references below to the then-current worktree,
+fixed placement or unresolved lifetime dependencies describe that stage only.
+For active M16 behavior and qualification, use [the M16 memory contract](m16-memory-layout.md).
+Historical status and results below are preserved, not transferred to M16.
+
 This is a source-level design note, not milestone acceptance. Private runtime
 qualification and hardware results are not published here.
 

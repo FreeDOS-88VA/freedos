@@ -1,5 +1,11 @@
 # M15 completion goal: FreeDOS PC-88VA port and a usable writable session
 
+Historical task notice (2026-09-27): the memory-sizing instructions below
+belong to this milestone's recorded baseline. For active M16 maintenance, use
+[the M16 memory contract](../porting/m16-memory-layout.md): measured writable
+RAM replaces saved-selection sizing, and current LOADSEG/temporary-lifetime
+rules apply. This notice does not change historical acceptance or source pins.
+
 Revision: 2026-09-24
 
 User scope amendment (2026-09-25): The goal is to port FreeDOS to PC-88VA, not
