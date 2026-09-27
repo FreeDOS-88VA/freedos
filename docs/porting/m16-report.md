@@ -2,6 +2,16 @@
 
 Status: partial implementation; not milestone acceptance or HANDOFF READY.
 
+## Low resident layout revision
+
+The conditional low-INIT experiment has been replaced. The resident kernel
+starts at LOADSEG and final kernel work grows consecutively after its resident
+hull. Runtime checks bind the resident end, system block, work end and free MCB.
+Temporary INIT follows measured RAM top independently of LOADSEG; all INIT
+fixups and descriptor fields follow that address. P_0 releases temporary memory
+before shell startup. The previous checkpoint below remains historical until
+this revision's complete clean build and affected guest checks finish.
+
 ## Source identities
 
 - Placement implementation parent: `9cb4c4d197fb73d39429679aa9d1638df8210310`.

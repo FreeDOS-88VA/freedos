@@ -253,6 +253,24 @@ def verify_bridge(kernel, link_map, carrier, record, selected=None, capacity=640
         memory_top=metadata['memory_top'],
         init_top=metadata['init_top'] + reference_delta,
         runtime_top=bool(metadata['definitions']['M13_RUNTIME_MEMORY_TOP']))
+    if 'M16_LOW_IMAGE_END_PARAS' in metadata['definitions']:
+        # Derive the live low envelope independently from the linked MZ.
+        extent = max(((len(linked) + 15) // 16 + h[5]) * 16,
+                     h[7] * 16 + h[8])
+        low_end = (max(reference_load * 16 + extent,
+                       split['resident_text'][1]) + 15) & ~15
+        assert metadata['definitions']['M16_LOW_IMAGE_END_PARAS'] == (
+            low_end // 16 - reference_load)
+        if succeeds:
+            # Temporary INIT tracks RAM top, not the resident image base.
+            # Derive its top independently from the bridge-stack boundary.
+            init_top = capacity * 1024 - 0x2000
+            transformed, split = split_image(
+                linked, fixups, link_map, reference_load,
+                memory_top=metadata['memory_top'], init_top=init_top,
+                runtime_top=bool(metadata['definitions']['M13_RUNTIME_MEMORY_TOP']))
+            assert split['init_stack'][1] == init_top
+            assert low_end <= capacity * 1024 - 0x19000
     expected = bytearray(transformed)
     for off, seg in struct.iter_unpack('<HH', fixups):
         at = seg * 16 + off
@@ -357,7 +375,7 @@ if __name__ == '__main__':
     if args.carrier:
         for capacity in (256, 384, 511, 512, 640):
             verify_bridge(args.kernel, args.map, args.carrier, args.placement, capacity=capacity)
-        for selected in (0x2000, 0x3000):
+        for selected in (0x2000, 0x3000, 0x4000, 0x5000):
             verify_bridge(args.kernel, args.map, args.carrier, args.placement, selected, 512)
-        for selected, capacity in ((0x0800, 512), (0x4000, 512), (0x2000, 256)):
+        for selected, capacity in ((0x0800, 512), (0x6000, 512), (0x2000, 256)):
             verify_bridge(args.kernel, args.map, args.carrier, args.placement, selected, capacity, False)

@@ -489,7 +489,18 @@ def build(kernel: Path, bridge: Path, output: Path, *, load_segment: int,
         definitions['M16_BOOT_RECORD_OFFSET'] = boot_record
         if not in_place or not external_ring or split is None:
             raise ValueError('M16 runtime placement requires the split external-ring carrier')
+        init_relative = split['init'][0] // 16 - image_segment
+        if any(item['translated'] == init_relative and item['domain'] != 'init'
+               for item in split['fixups']):
+            raise ValueError('runtime INIT relocation segment is ambiguous')
+        # Runtime INIT follows the same measured-RAM translation as staging.
+        # This checked profile leaves the final 8 KiB for the bridge stack.
+        if init_top != 0x3e000 or file_segment != 0x2700 or ring_segment != 0x3800:
+            raise ValueError('M16 requires the matched RAM-top-relative workspace profile')
         definitions['M16_LAYOUT_RECORD_OFFSET'] = split['descriptor'] - image_segment * 16
+        definitions['M16_LOW_IMAGE_END_PARAS'] = (
+            max(layout['ranges']['image'][1], split['resident_text'][1]) -
+            image_segment * 16 + 15) // 16
         definitions['M16_IMAGE_END_PARAS'] = (max(
             layout['ranges']['image'][1], split['init_stack'][1]) - image_segment * 16 + 15) // 16
     if split:

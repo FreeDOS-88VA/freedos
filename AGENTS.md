@@ -254,8 +254,12 @@ state that explicitly and do not describe the replacement as verified for it.
 `PC88VA_LOADSEG` selects the paragraph address of the expanded kernel layout,
 including its resident and INIT placement, not the temporary KERNEL.SYS file
 buffer. Keep this meaning consistent in the loader, carrier, startup display,
-documentation, and tests. A changed base must translate all affected segment
-relocations, placement records, resident/INIT targets, and stacks together.
+documentation, and tests. A changed base must translate all affected resident segment relocations,
+placement records and bootstrap stack together. Temporary INIT and its stack
+follow measured RAM top independently; bind their segment fixups and descriptor
+to the same effective placement. Final kernel work must follow the resident
+hull consecutively, with only paragraph alignment and owned MCB metadata.
+Check this adjacency and release temporary allocations before starting the shell.
 Qualify a non-default setting through the actual CONFIG.SYS loader path and
 reject an unavailable or overlapping layout before expansion. Display measured
 conventional RAM and effective layout addresses from the runtime records.

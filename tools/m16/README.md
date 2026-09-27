@@ -65,28 +65,38 @@ layout base: 2000h means physical address 20000h. The default is 1000h/10000h.
 This is the beginning of the entire resident kernel, including its C code and
 data. `Resident asm` in the display is an internal relocated assembly-code
 part of that resident kernel, not a second meaning of LOADSEG.
-Resident code, INIT, initial stacks, MZ relocations, and placement records move
-by the same delta. The directive does not move the initial compressed-file
-staging buffer. Earlier M16 implementations that used it as a staging-buffer
-selector implemented the wrong meaning; that behavior is superseded.
+The resident prefix contains code, data and the bounded NEAR work arena.
+Resident assembly follows that prefix. Final FAR kernel work (buffers, file
+and drive tables, and configured stacks) is allocated consecutively immediately
+after resident assembly through the upstream system-block/sub-MCB mechanism.
+Only paragraph alignment and owned MCB metadata separate these allocations.
+A startup invariant checks that the resident end equals the system-block start,
+that the work end equals the next free MCB, and that the free block reaches the
+temporary reservation. The display reports `Kernel low`, `Kernel work`, and
+`DOS free begins`; the free address excludes its MCB header.
 
-Before its first disk read, stage 2 measures RAM with the same probe and derives
-file/MZ staging as `RAM_end - 19000h`, history ring as `RAM_end - 8000h`,
-and bridge stack top as `RAM_end - 10h`. Thus staging is 27000h, 67000h,
-or 87000h for measured 256, 512, or 640 KiB. AX passes measured KiB to the
-carrier; CX passes staging. The carrier validates that CS and CX match this
-measured placement, avoiding a second carrier copy. Loader metadata and its
-own stack remain in the qualified low-memory intervals.
+Before its first disk read, stage 2 measures RAM and derives file/MZ staging
+as `RAM_end - 19000h`, history ring as `RAM_end - 8000h`, and bridge stack
+top as `RAM_end - 10h`. AX passes measured KiB and CX passes staging to the
+carrier. The complete expanded input image and bootstrap stack must fit below
+staging. The carrier rejects unsafe LOADSEG values before expansion.
+Loader code, stack and metadata use their qualified low intervals until handoff.
 
-The default kernel base retains the verified phased lifetimes of the 256 KiB
-profile: INIT can reuse temporary areas after their contents are consumed.
-For a non-default base, the complete translated image and INIT/stack envelope
-must fit below the carrier workspace and above firmware memory. Invalid, duplicate, wrapped,
-or overlapping requests fail closed. For example, 2000h and 3000h are qualified
-by the host verifier with 512 KiB; this does not imply that every paragraph
-address fits every RAM capacity. The startup display distinguishes the expanded
-kernel base, file staging buffer, working carrier, resident target, INIT, and
-both stacks. Half-open stack ranges end at the first byte beyond the stack.
+INIT and its 4 KiB stack are temporary. Their combined end is
+`RAM_end - 2000h`; INIT starts at that end minus its aligned linked size and
+4 KiB. They follow measured RAM independently of LOADSEG. Every INIT segment
+fixup and the runtime descriptor uses this same address. This replaces both
+the old fixed INIT slot and the unpublished conditional low-INIT experiment.
+The builder binds the carrier to the exact loader/workspace profile and checks
+all simultaneous lifetimes, including the history ring and bridge stack.
+
+Early filesystem buffers grow below temporary INIT. Once final low kernel work
+has been allocated and all pointers replaced, P_0 switches to its permanent
+stack, frees the temporary MCB and joins adjacent free memory before starting
+COMMAND.COM. INIT is never retained as a hole in the final conventional arena.
+Moving INIT alone does not change the size of final resident work. The final
+resident base is the explicit safe lower bound supplied by LOADSEG; writable
+RAM measurement supplies capacity, not ownership of firmware memory.
 
 RAM-dependent fixes require the failing persisted configuration, alternate-model
 coverage, and a working-capacity control before a replacement is described as
