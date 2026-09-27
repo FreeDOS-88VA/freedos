@@ -101,8 +101,8 @@ The public host checks alone do not establish VAEG PASS or HARDWARE PASS.
 
 ## Resident footprint cleanup (2026-09-27)
 
-Implementation parent: `b138aaf0c6f5efaa7ef1dfbb7bb0ac41f5aecd97`.
-Kernel: `e7e81011ef0e0ce4cf2a1a5fd7e301fa7f7b7324`.
+Implementation parent: `fa18bba6f9abbd1d8c3b942a8143d324e3171eac`.
+Kernel: `9573300a871adfa3d070102c8967cffbad1c5326`.
 The component lock records the exact public source archive identity.
 
 The PC-88VA build omits the already-disabled DOS CONFIG.SYS parser, its
@@ -118,12 +118,12 @@ Public linked-image accounting, with the same default work allocations:
 
 | Region | Previous bytes | Current bytes |
 | --- | ---: | ---: |
-| Resident kernel | 76480 | 69808 |
+| Resident kernel | 76480 | 70032 |
 | Final kernel work including allocator metadata | 24144 | 24144 |
-| Combined permanent allocation | 100624 | 93952 |
-| Temporary INIT code | 16146 | 10124 |
+| Combined permanent allocation | 100624 | 94176 |
+| Temporary INIT code | 16146 | 9939 |
 
-The permanent allocation shrinks by 6672 bytes (6.515625 KiB), to 91.75 KiB.
+The permanent allocation shrinks by 6448 bytes (6.296875 KiB), to 91.96875 KiB.
 Remaining low bootstrap INIT, live fixed data, and transfer buffer sizing are
 not changed by this cleanup. This is not an exhaustive lifetime conversion.
 
@@ -131,11 +131,22 @@ Two independent complete builds from allowlisted source exports produced
 identical artifact manifests and D88 bytes. The linked-placement/carrier checks
 and maintained M16 build gates completed successfully in both containers.
 Candidate D88: 1331888 bytes, SHA-256
-`c087bec3d98a36272d3598e57939553523dea71ffc9f312a85dd162440ded162`.
+`e80e918718f5d7c7b21fa5cb6b705a6121d684922c9f6cdc4b6be911c8cf8738`.
 Toolchain image: `sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df`.
 Rebuild with the documented `tools/m16/build_image.py` entry point at the
 implementation revision. This candidate is not a designated milestone archive.
 
-Native CI and guest qualification are pending at this documentation checkpoint.
+Shrinking DGROUP exposed the VA shell handoff's unreachable F5/F8 command-tail
+rewrite, which passed a stack-local buffer to NEAR memory/string helpers while
+INIT has SS different from DS. The VA path now omits that inactive rewrite.
+Resident release-barrier diagnostics identify the failing lifetime condition
+while preserving the error-return contract. Earlier cleanup candidates are
+superseded and must not be treated as guest-qualified replacements.
+
+Scoped VAEG PASS: shell startup, COM/MZ execution, file write/readback and
+runtime layout checks on the private qualification cases, including the pristine
+candidate. Exact machine configurations, retained settings and raw evidence stay
+in excluded storage. This does not extend to unrun configurations. Record the
+publication tip's own native CI result separately after pushing it.
 Hardware is NOT RUN. Overall M16 acceptance remains partial; this cleanup does
 not qualify the outstanding console and media matrix.

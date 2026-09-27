@@ -273,3 +273,11 @@ do not override it. Writable capacity does not establish free-memory ownership
 or a safe lower bound. Keep the LOADSEG lower-bound policy explicit. Validate
 INIT numeric diagnostics against the actual linked formatter with SS different
 from DS, and preserve the qualified VA stack-pointer/compiler contract.
+
+INIT executes with SS different from DS. Never pass an INIT stack-local buffer
+through a NEAR pointer to memset, strcpy, memcpy or another DS-based helper.
+Use explicit SS-based FAR pointers and matching FAR operations, or omit code
+that is unreachable under the VA platform policy. Audit this when shrinking
+DGROUP: removing unrelated arrays can expose an existing wrong-segment write
+against live allocation metadata. Preserve release-barrier error returns and
+keep their diagnostics resident.
