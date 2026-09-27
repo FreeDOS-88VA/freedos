@@ -27,6 +27,24 @@ class FloppyMediaTests(unittest.TestCase):
                 self.assertEqual(files, {'PATTERN.BIN': payload})
                 self.assertTrue(report['fat_copies_equal'])
 
+    def test_boundary_payload_reaches_last_sector_in_each_profile(self):
+        source = json.loads((ROOT / 'config/m16/floppy-profiles.json').read_text())
+        for profile in source['profiles']:
+            with self.subTest(profile=profile['name']):
+                spec = MEDIA.profile_spec(profile, source, 1787814827)
+                first, report = MEDIA.build_boundary_volume(spec, 1787814827)
+                second, _ = MEDIA.build_boundary_volume(spec, 1787814827)
+                self.assertEqual(first, second)
+                layout = MEDIA.derive_layout(spec)
+                record = report['files']['PATTERN.BIN']
+                self.assertEqual(record['clusters'][-1], layout['data_clusters'] + 1)
+                cb = spec['geometry']['bytes_per_sector'] * spec['filesystem']['sectors_per_cluster']
+                self.assertEqual(record['size'] % cb, 0)
+                self.assertGreater(record['clusters'][-1] - record['clusters'][-2], 1)
+                _, files = MEDIA.inspect(first, spec)
+                self.assertEqual(files['PATTERN.BIN'], bytes(
+                    (i * 37 + i // 251) & 255 for i in range(33792)))
+
     def test_five_public_profiles_build_as_exact_fat12_d88_volumes(self):
         config = ROOT / 'config/m16/floppy-profiles.json'
         source = json.loads(config.read_text())

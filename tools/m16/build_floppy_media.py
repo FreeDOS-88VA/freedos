@@ -10,7 +10,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/m16'))
 from media import (build_boot_record, build_d88, build_directory_entry,
-                   derive_layout, inspect, set_fat12_entry)
+                   derive_layout, inspect, parse_d88, set_fat12_entry)
 
 
 def profile_spec(profile, shared, source_date_epoch):
@@ -134,7 +134,45 @@ def build_volume(spec, dos_name, content, source_date_epoch):
     return image, report
 
 
-def build_profiles(config_path, output, source_date_epoch):
+def build_boundary_volume(spec, source_date_epoch):
+    """Place an original file across tracks and in the last data cluster."""
+    content = bytes((i * 37 + i // 251) & 255 for i in range(33792))
+    image, _ = build_volume(spec, 'PATTERN.BIN', content, source_date_epoch)
+    layout = derive_layout(spec)
+    _, raw_bytes = parse_d88(image, spec, layout)
+    raw = bytearray(raw_bytes)
+    fs = spec['filesystem']
+    bps = spec['geometry']['bytes_per_sector']
+    cluster_bytes = bps * fs['sectors_per_cluster']
+    if len(content) % cluster_bytes:
+        raise ValueError('Boundary payload must fill its last cluster')
+    count = len(content) // cluster_bytes
+    previous_last = count + 1
+    last = layout['data_clusters'] + 1
+    if count < 2 or previous_last >= last:
+        raise ValueError('Boundary fixture requires spare data clusters')
+    def offset(cluster):
+        return layout['first_data_sector'] * bps + (cluster - 2) * cluster_bytes
+    raw[offset(last):offset(last) + cluster_bytes] = raw[
+        offset(previous_last):offset(previous_last) + cluster_bytes]
+    raw[offset(previous_last):offset(previous_last) + cluster_bytes] = bytes(cluster_bytes)
+    fat_size = fs['sectors_per_fat'] * bps
+    for copy in range(fs['fat_count']):
+        start = (fs['reserved_sectors'] + copy * fs['sectors_per_fat']) * bps
+        fat = raw[start:start + fat_size]
+        set_fat12_entry(fat, previous_last - 1, last)
+        set_fat12_entry(fat, previous_last, 0)
+        set_fat12_entry(fat, last, 0xFFF)
+        raw[start:start + fat_size] = fat
+    image = build_d88(spec, bytes(raw))
+    report, files = inspect(image, spec)
+    if (files != {'PATTERN.BIN': content} or
+            report['files']['PATTERN.BIN']['clusters'][-1] != last):
+        raise ValueError('Boundary fixture readback differs')
+    return image, report
+
+
+def build_profiles(config_path, output, source_date_epoch, boundary=False):
     config = json.loads(Path(config_path).read_text())
     if config.get('schema_version') != 1 or len(config.get('profiles', [])) != 5:
         raise ValueError('M16 floppy profile set must contain the five required formats')
@@ -149,8 +187,12 @@ def build_profiles(config_path, output, source_date_epoch):
         names.add(name)
         spec = profile_spec(profile, config, source_date_epoch)
         content = profile_payload(profile, config['test_file']['content_template'])
-        image, report = build_volume(
-            spec, config['test_file']['dos_name'], content, source_date_epoch)
+        if boundary:
+            image, report = build_boundary_volume(spec, source_date_epoch)
+            content = inspect(image, spec)[1]['PATTERN.BIN']
+        else:
+            image, report = build_volume(
+                spec, config['test_file']['dos_name'], content, source_date_epoch)
         target = output / (name + '.d88')
         if target.exists():
             raise ValueError('Refusing to overwrite M16 floppy media: ' + str(target))
@@ -173,8 +215,10 @@ def main():
     parser.add_argument('--config', type=Path, default=ROOT / 'config/m16/floppy-profiles.json')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--source-date-epoch', type=int, default=1787814827)
+    parser.add_argument('--boundary', action='store_true',
+                        help='Generate fragmented files through the final data sector')
     args = parser.parse_args()
-    records = build_profiles(args.config, args.output, args.source_date_epoch)
+    records = build_profiles(args.config, args.output, args.source_date_epoch, args.boundary)
     for name, record in records.items():
         print(f"{name}: {record['raw_capacity_bytes']} bytes, D88 SHA-256 {record['d88_sha256']}")
 

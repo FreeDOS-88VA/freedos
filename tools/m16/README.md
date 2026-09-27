@@ -104,3 +104,20 @@ RAM measurement supplies capacity, not ownership of firmware memory.
 RAM-dependent fixes require the failing persisted configuration, alternate-model
 coverage, and a working-capacity control before a replacement is described as
 verified. See `AGENTS.md` for the evidence and handoff requirements.
+
+### Boundary data fixtures
+
+Generate original FAT12 files that cross tracks and end in the final data
+cluster with this milestone's own producer and independent inspector:
+
+```sh
+python3 tools/m16/build_floppy_media.py --boundary --output build/m16-boundary-media
+```
+
+Each of the five profiles contains `PATTERN.BIN` (33,792 bytes). Its final
+cluster is moved to the end of the data area, leaving a discontinuity in the
+FAT chain. The file fills that cluster, so a complete guest copy reads the
+last data sector as well as ordinary track/head boundaries. The manifest
+records exact image hashes and cluster chains. This command establishes host
+fixture validity only; DOS read/write and fresh-process persistence require
+separate guest qualification with disposable copies.
