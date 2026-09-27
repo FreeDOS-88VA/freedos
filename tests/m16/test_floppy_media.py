@@ -45,6 +45,18 @@ class FloppyMediaTests(unittest.TestCase):
                 self.assertEqual(files['PATTERN.BIN'], bytes(
                     (i * 37 + i // 251) & 255 for i in range(33792)))
 
+    def test_native_short_bpb_fixtures_keep_following_code_out_of_metadata(self):
+        source = json.loads((ROOT / 'config/m16/floppy-profiles.json').read_text())
+        source['boot_record']['bpb_layout'] = 'native_short'
+        for profile in source['profiles']:
+            with self.subTest(profile=profile['name']):
+                spec = MEDIA.profile_spec(profile, source, 1787814827)
+                image, _ = MEDIA.build_boundary_volume(spec, 1787814827)
+                _, raw = MEDIA.parse_d88(image, spec, MEDIA.derive_layout(spec))
+                self.assertEqual(raw[30:512], b'\x90' * 482)
+                _, files = MEDIA.inspect(image, spec)
+                self.assertEqual(len(files['PATTERN.BIN']), 33792)
+
     def test_five_public_profiles_build_as_exact_fat12_d88_volumes(self):
         config = ROOT / 'config/m16/floppy-profiles.json'
         source = json.loads(config.read_text())

@@ -172,8 +172,10 @@ def build_boundary_volume(spec, source_date_epoch):
     return image, report
 
 
-def build_profiles(config_path, output, source_date_epoch, boundary=False):
+def build_profiles(config_path, output, source_date_epoch, boundary=False, short_bpb=False):
     config = json.loads(Path(config_path).read_text())
+    if short_bpb:
+        config['boot_record']['bpb_layout'] = 'native_short'
     if config.get('schema_version') != 1 or len(config.get('profiles', [])) != 5:
         raise ValueError('M16 floppy profile set must contain the five required formats')
     output = Path(output)
@@ -198,6 +200,7 @@ def build_profiles(config_path, output, source_date_epoch, boundary=False):
             raise ValueError('Refusing to overwrite M16 floppy media: ' + str(target))
         target.write_bytes(image)
         records[name] = {
+            'bpb_layout': spec['boot_record'].get('bpb_layout', 'extended'),
             'format_id': profile['format_id'],
             'fat_media_descriptor': profile['filesystem']['media_descriptor'],
             'geometry': profile['geometry'],
@@ -218,8 +221,10 @@ def main():
     parser.add_argument('--source-date-epoch', type=int, default=1787814827)
     parser.add_argument('--boundary', action='store_true',
                         help='Generate fragmented files through the final data sector')
+    parser.add_argument('--short-bpb', action='store_true',
+                        help='Use the native short BPB without an MBR marker')
     args = parser.parse_args()
-    records = build_profiles(args.config, args.output, args.source_date_epoch, args.boundary)
+    records = build_profiles(args.config, args.output, args.source_date_epoch, args.boundary, args.short_bpb)
     for name, record in records.items():
         print(f"{name}: {record['raw_capacity_bytes']} bytes, D88 SHA-256 {record['d88_sha256']}")
 

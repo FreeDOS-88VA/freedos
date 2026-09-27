@@ -270,3 +270,11 @@ repeat at paced/fast settings, and three VA/B: boundary/persistence rows. These
 remain historical candidate results. The changed kernel requires a fresh clean
 build and relevant exact-candidate guest qualification before acceptance.
 M16 remains in progress; no final PASS or handoff is claimed.
+
+The same public formatter also supplies a short BPB followed by IPL code.
+The VA adapter now treats only its defined fields as metadata and validates
+FAT headers plus the geometry endpoint when the MBR marker is absent. Original
+short-BPB fixtures and positive/negative component tests cover the correction;
+all 330 component tests pass locally. The preceding corrected-FAT candidate
+completed the VA/B: 2HC boundary and fresh-process persistence row, but this
+additional kernel change requires renewed exact-candidate guest qualification.

@@ -55,6 +55,20 @@ The driver probes through the native firmware interface, validates the BPB
 against the selected geometry, and maintains separate per-drive profiles.
 Guest code does not inspect D88 host files.
 
+## Short BPBs
+
+The public formatter's `ipl_bpb` is followed by a two-byte head count and a
+16-bit hidden-sector count; IPL code follows at offset 30. Those instructions
+must not be treated as the upper hidden-sector word or a huge-sector count.
+For a short BPB the adapter normalizes those absent fields. A native short BPB
+without a 55AA marker additionally requires both FAT reserved-entry headers and
+the physical profile endpoint to be readable before access is enabled. Failed
+probes leave the unit inaccessible.
+
+Generate original short-BPB boundary fixtures using `--boundary --short-bpb`.
+The synthetic tail uses inert bytes rather than copying any formatter code.
+This fixture family is a data-volume test, not a bootable formatter product.
+
 ## Native regression and legacy recognition
 
 The existing 1024-byte-sector native control remains separate: 8 sectors per

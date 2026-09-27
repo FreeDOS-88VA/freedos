@@ -121,3 +121,7 @@ last data sector as well as ordinary track/head boundaries. The manifest
 records exact image hashes and cluster chains. This command establishes host
 fixture validity only; DOS read/write and fresh-process persistence require
 separate guest qualification with disposable copies.
+
+Add `--short-bpb` to generate the native 19-byte BPB form with original inert
+bytes after offset 30 and no MBR marker. The same independent file/FAT inspector
+checks these fixtures. The layout variant is recorded in the fixture manifest.

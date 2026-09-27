@@ -164,6 +164,16 @@ def build_boot_record(spec: dict) -> bytes:
     struct.pack_into("<H", sector, 24, geometry["sectors_per_track"])
     struct.pack_into("<H", sector, 26, geometry["heads"])
     struct.pack_into("<I", sector, 28, filesystem["hidden_sectors"])
+    variant = policy.get("bpb_layout", "extended")
+    if variant not in ("extended", "native_short"):
+        raise ValidationError("unknown BPB layout")
+    if variant == "native_short":
+        if filesystem["hidden_sectors"] > 0xffff:
+            raise ValidationError("short BPB hidden-sector field overflows")
+        # Original inert bytes model instructions after the 19-byte BPB.
+        # They deliberately are not zero extended-BPB fields or an MBR marker.
+        sector[30:] = b"\x90" * (len(sector) - 30)
+        return bytes(sector)
     struct.pack_into("<I", sector, 32, 0)
     sector[36] = 0
     sector[37] = 0
