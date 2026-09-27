@@ -12,13 +12,13 @@
     },
     {
       "branch": "topic/m17-storage-contracts-media-formats",
-      "commit": "ec72e67842cc0dd72b8fdd6a254db2b05e6492d7",
+      "commit": "957c2aa47222247a01f53a198509f28068922f51",
       "name": "fdkernel",
       "parent_commit": "d8dbbf7111f86ea4800daeac84ac53ba601aaf32",
       "path": "components/fdkernel",
       "repository": "https://github.com/nakatamaho/fdkernel.git",
       "role": "M16 VA/VA2 floppy I/O, native console input, guest-timed repeat, runtime RAM bounds, and M13 staging ring support",
-      "source_archive_sha256": "acd02fa3c35dd3b871dbe73d7157e1791022e99b2a5d29310ba18d10f0872c62",
+      "source_archive_sha256": "af11a6a22dd2da3aeb60839401f5addb9d562684a0ebcd7b63216345d140eef6",
       "upstream": "https://github.com/lpproj/fdkernel.git"
     },
     {
