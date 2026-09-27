@@ -123,6 +123,8 @@ def build_stage(overlay, output, stage, extent=None, nasm="nasm"):
         raise ProfileError("Unknown loader stage")
     check_sink(output, overlay["layout"]["profile_class"] == "private_observation_overlay")
     text = nasm_definitions(overlay["layout"]) + overlay["firmware_callback"] + "\n"
+    if stage == 2:
+        text += "%define PC88VA_RUNTIME_LOADSEG 1\n"
     if stage == 1:
         if not isinstance(extent, dict) or set(extent) != {"first_lba", "sector_count", "file_size"}:
             raise ProfileError("Stage 1 requires an explicit builder-derived stage-2 extent")

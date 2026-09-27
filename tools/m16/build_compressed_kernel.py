@@ -318,7 +318,7 @@ def assemble_bridge(source: Path, definitions: dict[str, int], output: Path) -> 
         include = Path(temporary) / "definitions.inc"
         include.write_text("".join(f"%define {name} {value}\n" for name, value in sorted(definitions.items())))
         result = subprocess.run(
-            ["nasm", "-f", "bin", "-DPC88VA", "-p", str(include), "-o", str(output), str(source)],
+            ["nasm", "-f", "bin", "-DPC88VA", "-I" + str(source.parent) + "/", "-p", str(include), "-o", str(output), str(source)],
             capture_output=True,
             text=True,
         )
@@ -396,6 +396,17 @@ def build(kernel: Path, bridge: Path, output: Path, *, load_segment: int,
         original_body, split = split_image(original_body, relocations, link_map,
                                            image_segment, memory_top=memory_top,
                                            init_top=init_top, runtime_top=True)
+    boot_record = None
+    if b'M16BOOT1' in original_body:
+        if original_body.count(b'M16BOOT1') != 1:
+            raise ValueError('ambiguous M16 boot diagnostics record')
+        boot_record = original_body.index(b'M16BOOT1')
+        if boot_record + 20 > 65536 or original_body[boot_record+8:boot_record+20] != bytes(12):
+            raise ValueError('M16 boot diagnostics record is not an unfilled near record')
+        patched = bytearray(original_body)
+        struct.pack_into('<6H', patched, boot_record + 8, 0, load_segment,
+                         scratch_segment, ring_segment, bridge_stack_segment, bridge_stack_sp)
+        original_body = bytes(patched)
     payload = compress(original_body)
     if source_offset < RING_BYTES or source_offset + len(payload) > 65520:
         raise ValueError("compressed source and history ring exceed one owned segment")
@@ -474,6 +485,13 @@ def build(kernel: Path, bridge: Path, output: Path, *, load_segment: int,
     }
     if compact_bridge:
         definitions['M13_COMPACT_BRIDGE'] = 1
+    if boot_record is not None:
+        definitions['M16_BOOT_RECORD_OFFSET'] = boot_record
+        if not in_place or not external_ring or split is None:
+            raise ValueError('M16 runtime placement requires the split external-ring carrier')
+        definitions['M16_LAYOUT_RECORD_OFFSET'] = split['descriptor'] - image_segment * 16
+        definitions['M16_IMAGE_END_PARAS'] = (max(
+            layout['ranges']['image'][1], split['init_stack'][1]) - image_segment * 16 + 15) // 16
     if split:
         definitions.update({
             'M13_INIT_SOURCE_SEG': split['init_source'][0] // 16,

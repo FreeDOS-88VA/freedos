@@ -222,3 +222,35 @@ profile and verify that the backup-RAM-selected 256, 384, 512, or 640 KiB
 capacity is supported before calling that capacity passed. When a low-memory
 profile is required, qualify its matching in-place loader and carrier together;
 do not transplant only the kernel carrier across incompatible profiles.
+
+For every active milestone, distinguish installed physical RAM from the RAM
+capacity retained in BIOS backup memory. A saved selection is not proof that
+the corresponding RAM is writable. Changes to RAM detection, DOS arena sizing,
+or loader/carrier placement must cover both matching settings and a stale
+selection larger than installed RAM, including 512 KiB installed with a retained
+640 KiB selection. The adapter must bound or reject an unavailable arena before
+constructing its MCB chain. Decoder-only tests with fully mapped RAM do not
+qualify this contract. Host regressions must model unavailable/read-only RAM
+and verify that any capacity probe restores sampled memory, registers, flags,
+and bank mappings.
+
+Before handing over a replacement disk for a reported RAM-dependent failure,
+clean-build the exact candidate and boot it in the reported machine model and
+RAM configuration, including persisted settings that trigger the failure.
+Record installed capacity and retained selection separately in private evidence,
+together with exact disk and emulator identities. Verify shell startup, COM/MZ
+execution, and guest file write/readback. Qualify affected alternate models and
+a previously working capacity as regression controls. Preserve the failing
+candidate and evidence; do not substitute a fresh backup-memory state for the
+reported configuration or infer this coverage from a successful link, decoder
+test, or boot at another capacity. If the failing configuration was not run,
+state that explicitly and do not describe the replacement as verified for it.
+
+`PC88VA_LOADSEG` selects the paragraph address of the expanded kernel layout,
+including its resident and INIT placement, not the temporary KERNEL.SYS file
+buffer. Keep this meaning consistent in the loader, carrier, startup display,
+documentation, and tests. A changed base must translate all affected segment
+relocations, placement records, resident/INIT targets, and stacks together.
+Qualify a non-default setting through the actual CONFIG.SYS loader path and
+reject an unavailable or overlapping layout before expansion. Display measured
+conventional RAM and effective layout addresses from the runtime records.

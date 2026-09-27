@@ -206,16 +206,20 @@ def verify(kernel, link_map):
     print('LINKED_PLATFORM_FRAME_AND_CON_CONTRACT_OK')
 
 
-def verify_bridge(kernel, link_map, carrier, record):
-    from unicorn import Uc, UC_ARCH_X86, UC_MODE_16, UC_HOOK_CODE
+def verify_bridge(kernel, link_map, carrier, record, selected=None, capacity=640, succeeds=True):
+    from unicorn import Uc, UC_ARCH_X86, UC_MODE_16, UC_HOOK_CODE, UC_HOOK_MEM_READ, UC_HOOK_INTR
     from unicorn import x86_const as r
     metadata = json.loads(record.read_text())
     h, linked, fixups = parse_mz(kernel.read_bytes())
-    load = metadata['definitions']['M13_IMAGE_SEG']
+    default_load = metadata['definitions']['M13_IMAGE_SEG']
+    load = default_load if selected is None else selected
+    delta = (load - default_load) * 16
+    reference_load = load if succeeds else default_load
+    reference_delta = delta if succeeds else 0
     transformed, split = split_image(
-        linked, fixups, link_map, load,
+        linked, fixups, link_map, reference_load,
         memory_top=metadata['memory_top'],
-        init_top=metadata['init_top'],
+        init_top=metadata['init_top'] + reference_delta,
         runtime_top=bool(metadata['definitions']['M13_RUNTIME_MEMORY_TOP']))
     expected = bytearray(transformed)
     for off, seg in struct.iter_unpack('<HH', fixups):
@@ -225,10 +229,18 @@ def verify_bridge(kernel, link_map, carrier, record):
     cpu = Uc(UC_ARCH_X86, UC_MODE_16)
     cpu.mem_map(0, 0x100000)
     cpu.mem_write(0, b'\xa5' * 0x100000)
+    cpu.mem_write(capacity * 1024, b'\xff' * (0x100000 - capacity * 1024))
+    def missing_ram(uc, access, address, size, value, _):
+        if address >= capacity * 1024:
+            uc.mem_write(address, b'\xff' * size)
+    cpu.hook_add(UC_HOOK_MEM_READ, missing_ram, None, 0x3ffff, 0x9ffff)
+    cpu.hook_add(UC_HOOK_INTR, lambda uc, interrupt, _: None)
     carrier_base = metadata['definitions']['M13_LOAD_SEG']
     cpu.mem_write(carrier_base * 16, carrier.read_bytes()[32:])
     for reg, value in [(r.UC_X86_REG_CS, carrier_base), (r.UC_X86_REG_IP, 0),
-                       (r.UC_X86_REG_SS, carrier_base), (r.UC_X86_REG_SP, 1024),
+                       (r.UC_X86_REG_SS, carrier_base), (r.UC_X86_REG_SP, metadata['carrier_stack_pointer']),
+                       (r.UC_X86_REG_BX, 0 if selected is None else selected),
+                       (r.UC_X86_REG_CX, metadata['definitions']['M13_FILE_SEG']),
                        (r.UC_X86_REG_DX, 0x1234)]:
         cpu.reg_write(reg, value)
     reached = []
@@ -238,7 +250,22 @@ def verify_bridge(kernel, link_map, carrier, record):
     target = load * 16 + h[11] * 16 + h[10]
     cpu.hook_add(UC_HOOK_CODE, entry, begin=target, end=target)
     cpu.emu_start(carrier_base * 16, 0xfffff, timeout=30000000, count=5000000)
+    if not succeeds:
+        assert not reached, 'unsafe placement reached the kernel'
+        assert cpu.reg_read(r.UC_X86_REG_AX) == 0x1601, 'missing placement rejection'
+        print(f'RUNTIME_PLACEMENT_REJECTED; base={load:04x}; capacity={capacity}')
+        return
     assert reached == [target], 'real carrier did not reach the MZ entry'
+    boot_at = metadata['definitions'].get('M16_BOOT_RECORD_OFFSET')
+    if boot_at is not None:
+        work_file = metadata['definitions']['M13_FILE_SEG'] if not delta else capacity * 64 - 0x2000
+        work_ring = metadata['definitions']['M13_RING_SEG'] if not delta else work_file + 0x1000
+        work_stack = metadata['definitions']['M13_BRIDGE_STACK_SEG'] if not delta else work_file + 0x1700
+        wanted = struct.pack('<6H', metadata['definitions']['M13_FILE_SEG'], work_file,
+                             work_stack, work_ring, work_stack,
+                             metadata['definitions']['M13_BRIDGE_STACK_SP'])
+        assert bytes(cpu.mem_read(load * 16 + boot_at, 20)) == b'M16BOOT1' + wanted
+    
     if split:
         actual_descriptor = bytes(cpu.mem_read(split['descriptor'], 24))
         descriptor_words = struct.unpack_from('<8H', actual_descriptor, 8)
@@ -275,7 +302,7 @@ def verify_bridge(kernel, link_map, carrier, record):
                 destination = split[target_name][0] + at - lo
                 break
         assert cpu.mem_read(destination, 2) == expected[at-load*16:at-load*16+2]
-    print('REAL_SPLIT_BRIDGE_AND_ALL_FINAL_FIXUPS_OK')
+    print(f'REAL_SPLIT_BRIDGE_AND_ALL_FINAL_FIXUPS_OK; base={load:04x}; capacity={capacity}')
 
 
 if __name__ == '__main__':
@@ -287,4 +314,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     verify(args.kernel, args.map)
     if args.carrier:
-        verify_bridge(args.kernel, args.map, args.carrier, args.placement)
+        verify_bridge(args.kernel, args.map, args.carrier, args.placement, capacity=512)
+        for selected in (0x2000, 0x3000):
+            verify_bridge(args.kernel, args.map, args.carrier, args.placement, selected, 512)
+        for selected, capacity in ((0x0800, 512), (0x4000, 512), (0x2000, 256)):
+            verify_bridge(args.kernel, args.map, args.carrier, args.placement, selected, capacity, False)

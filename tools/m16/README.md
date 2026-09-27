@@ -46,3 +46,34 @@ image produced by `toolchain.py`; their full artifact manifests must match.
 The output directory must stay Git-excluded. `build/m16-image/media.d88` is a
 freshly composed candidate and is not a milestone distribution until its guest
 acceptance and publication checks are complete.
+
+## Runtime memory and kernel placement
+
+At startup, immediately after its source SHA-1, the kernel prints measured
+conventional memory and its effective placement addresses. The adapter restores
+one byte after testing it with 00h and FFh at each 1 KiB boundary from 256 KiB
+up to the conventional-memory ceiling of 640 KiB. It also checks the final byte
+below 256 KiB as a minimum-capacity guard. This is a capacity sample, not an
+exhaustive RAM integrity test. Retained BIOS selections do not replace the
+measurement. DOS uses the measured contiguous capacity.
+
+`CONFIG.SYS` may contain the pre-kernel directive `PC88VA_LOADSEG=2000` (hexadecimal
+paragraph address, optionally suffixed with `h`). It selects the expanded kernel
+layout base: 2000h means physical address 20000h. The default is 1000h/10000h.
+Resident code, INIT, initial stacks, MZ relocations, and placement records move
+by the same delta. The directive does not move the initial compressed-file
+staging buffer. Earlier M16 implementations that used it as a staging-buffer
+selector implemented the wrong meaning; that behavior is superseded.
+
+Non-default placement uses a temporary unpack workspace in the last 128 KiB of
+measured RAM. The complete translated image and INIT/stack envelope must fit
+below that workspace and above firmware memory. Invalid, duplicate, wrapped,
+or overlapping requests fail closed. For example, 2000h and 3000h are qualified
+by the host verifier with 512 KiB; this does not imply that every paragraph
+address fits every RAM capacity. The startup display distinguishes the expanded
+kernel base, file staging buffer, working carrier, resident target, INIT, and
+both stacks. Half-open stack ranges end at the first byte beyond the stack.
+
+RAM-dependent fixes require the failing persisted configuration, alternate-model
+coverage, and a working-capacity control before a replacement is described as
+verified. See `AGENTS.md` for the evidence and handoff requirements.
