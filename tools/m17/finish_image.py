@@ -35,7 +35,7 @@ def main():
     (out / 'LOADER.BIN').write_bytes((loader / 'stage2.bin').read_bytes())
     payloads = {name: (out / name).read_bytes() for name in
                 ('KERNEL.SYS', 'LOADER.BIN', 'COMMAND.COM', 'COUNTRY.SYS', 'SYSVA.EXE',
-                 'COMPROBE.COM', 'DOSINPUT.COM', 'DOSREPT.COM', 'MZPROBE.EXE')}
+                 'COMPROBE.COM', 'CFGSTATE.COM', 'DOSINPUT.COM', 'DOSREPT.COM', 'MZPROBE.EXE')}
     payloads['CONFIG.SYS'] = (ROOT / 'config/m17/CONFIG.SYS').read_text().replace('\n', '\r\n').encode('ascii')
     payloads['SYS.ID'] = b'M16SOURCE\r\n'
     payloads['TYPEA.TXT'] = b'M13-TYPE-A!\r\n'
@@ -44,6 +44,10 @@ def main():
     compose(payloads, profile, out, 1787814827)
     from build_floppy_media import build_profiles
     build_profiles(ROOT / 'config/m17/floppy-profiles.json', out / 'floppy-media', 1787814827)
+    import subprocess
+    storage = out / 'storage-media'
+    subprocess.run([sys.executable, str(ROOT / 'tools/m17/produce.py'), '--profiles', str(ROOT / 'config/m17/media-profiles.json'), '--output', str(storage)], check=True)
+    subprocess.run([sys.executable, str(ROOT / 'tools/m17/inspect_storage.py'), '--profiles', str(ROOT / 'config/m17/media-profiles.json'), '--directory', str(storage)], check=True)
     artifacts = {p.relative_to(out).as_posix(): {
                      'size': p.stat().st_size,
                      'sha256': hashlib.sha256(p.read_bytes()).hexdigest()}

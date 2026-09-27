@@ -33,6 +33,18 @@
       "upstream": "https://github.com/lpproj/freecom_dbcs2.git"
     }
   ],
+  "historical_components_lock": {
+    "path": "manifests/components.lock.json",
+    "sha256": "440e481b28c740875489a6953a246ce5370c44074053c7aad3f80e79ec40c19c"
+  },
+  "m15_control": {
+    "components": {
+      "components/country": "23f189cca3420606eae8723884fa92ccd65eb307",
+      "components/fdkernel": "d8dbbf7111f86ea4800daeac84ac53ba601aaf32",
+      "components/freecom": "9cf57b28abf1d98fab7655fb811375a2aa16c6d9"
+    },
+    "parent_commit": "1af9974700cd4dd1164cc0df56cc062925376148"
+  },
   "milestone": "M17",
   "predecessor_ci": {
     "attempt": 1,
@@ -41,5 +53,6 @@
   },
   "predecessor_status": "partial; scoped host and guest checkpoint, not M16 acceptance",
   "schema_version": 1,
-  "start_sha": "fc891f3cd424c281680dd15b3f269bef4a4d2880"
+  "start_sha": "fc891f3cd424c281680dd15b3f269bef4a4d2880",
+  "status": "current-m17"
 }

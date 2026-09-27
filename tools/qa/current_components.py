@@ -14,6 +14,7 @@ from pathlib import Path
 M06_LOCK = Path("manifests/m08-components.lock.json")
 M09_LOCK = Path("manifests/m09-components.lock.json")
 M10_LOCK = Path("manifests/m10-components.lock.json")
+M17_LOCK = Path("manifests/m17-components.lock.json")
 M16_LOCK = Path("manifests/m16-components.lock.json")
 HISTORICAL_LOCK = Path("manifests/components.lock.json")
 HISTORICAL_LOCK_SHA256 = "440e481b28c740875489a6953a246ce5370c44074053c7aad3f80e79ec40c19c"
@@ -68,8 +69,9 @@ def resolve_current_components(root: Path, historical: dict[str, str]) -> dict[s
         raise CurrentComponentError("historical component path set is invalid")
     is_m09 = (root / M09_LOCK).exists()
     is_m10 = (root / M10_LOCK).exists()
-    is_m16 = (root / M16_LOCK).exists()
-    lock_path = root / (M16_LOCK if is_m16 else M10_LOCK if is_m10 else M09_LOCK if is_m09 else M06_LOCK)
+    is_m17 = (root / M17_LOCK).exists()
+    is_m16 = (root / M16_LOCK).exists() or is_m17
+    lock_path = root / (M17_LOCK if is_m17 else M16_LOCK if is_m16 else M10_LOCK if is_m10 else M09_LOCK if is_m09 else M06_LOCK)
     if not lock_path.exists():
         return dict(historical)
     if _sha256(root / HISTORICAL_LOCK) != HISTORICAL_LOCK_SHA256:
@@ -87,10 +89,13 @@ def resolve_current_components(root: Path, historical: dict[str, str]) -> dict[s
     if is_m16:
         expected_status = "current-m16"
         kernel_branch = "topic/m16-floppy-formats-console-input"
+    if is_m17:
+        expected_status = "current-m17"
+        kernel_branch = "topic/m17-storage-contracts-media-formats"
     if (
         data.get("schema_version") != 1
         or data.get("status") != expected_status
-        or (is_m16 and data.get("milestone") != "M16")
+        or (is_m16 and data.get("milestone") != ("M17" if is_m17 else "M16"))
     ):
         raise CurrentComponentError("current component lock schema or status is invalid")
     historical_record = data.get("historical_components_lock")

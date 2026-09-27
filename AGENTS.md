@@ -266,9 +266,9 @@ Qualify a non-default setting through the actual CONFIG.SYS loader path and
 reject an unavailable or overlapping layout before expansion. Display measured
 conventional RAM and effective layout addresses from the runtime records.
 
-The active M16 memory contract is `docs/porting/m16-memory-layout.md`; its
-required gate is recorded in `docs/tasks/M16-floppy-formats-console-input-goal-Codex.md`.
-Historical M13-M15 sizing instructions and capacity results remain history and
+The active M17 memory contract is `docs/porting/m17-memory-layout.md`; its
+required gate is recorded in `docs/tasks/M17-storage-contracts-media-formats-goal-Codex.md`.
+Historical M13-M16 sizing instructions and capacity results remain history and
 do not override it. Writable capacity does not establish free-memory ownership
 or a safe lower bound. Keep the LOADSEG lower-bound policy explicit. Validate
 INIT numeric diagnostics against the actual linked formatter with SS different
@@ -281,3 +281,10 @@ that is unreachable under the VA platform policy. Audit this when shrinking
 DGROUP: removing unrelated arrays can expose an existing wrong-segment write
 against live allocation metadata. Preserve release-barrier error returns and
 keep their diagnostics resident.
+
+The M17 kernel configuration passes are enabled. The loader reads only the
+PC88VA_LOADSEG selector; it does not replace DOS CONFIG.SYS processing. Preserve
+FDCONFIG.SYS precedence in the common kernel, and qualify settings through actual
+startup. Do not restore the historical M13 early return or classify disabled
+functionality as unused merely to shrink memory. Track unavailable native options
+explicitly and keep ordinary DOS parsing separate from platform BIOS interfaces.

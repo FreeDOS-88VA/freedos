@@ -3,14 +3,16 @@
     "hdr/device.h": "9603bd9ff4107e63df69f720038f2580bcaa6bbe36df2d02f4d9d18e06740b60",
     "hdr/fat.h": "a2046e885ce3e236b1ffe19eee5b386353b7c8dd51034f7da4cb021d3ee4e4fe",
     "kernel/blockio.c": "b7c9a43796bb4dcd2e75ad79f642fa38b2793309a310dca3355f4c39e10b2ae7",
-    "kernel/config.c": "4acb6d5259803f3ca21e24043c014bbaa5b9477b6c0278821e42f47b7ec2b3f3",
+    "kernel/config.c": "ffa6b7af8fd6a2258a5b3b746185e015d744033ffb010b27999f70e290276a63",
     "kernel/execrh.asm": "68164695c46b789ec4e94cb37280f1c816c90e095e907ab09ab0e58b6e5a292d",
     "kernel/fatfs.c": "2d320d209e15af47b8dfd80b604721c4b6ec44f565a66be0aac973b1e7196bfd",
+    "kernel/init-mod.h": "6e64a78cd185401e1af82e93e6b8f58de3cacd4aa4c5b231193ec6b1205c1c31",
     "kernel/initdisk.c": "714dfb34fd311f015043788cc7fd5d2af3783505e3e5de35985adb37be32c286",
-    "kernel/main.c": "dd6ec7ce907ba9bffe99501616102a8e6fc744aabf205fc826b4b131eeed1516",
+    "kernel/intr.asm": "be41a10eb7dcbca7f4b6aa2d28b6a632648ec3669f192d2002eedd56ef571111",
+    "kernel/main.c": "1c4fa6dc6f91d8f9d87557be0ed745d08f2e92e4de9fa241ef10d00b5341310b",
     "pc88va/kernel/m13_platform.asm": "4c6d09cc11bdfe2eeac070cbe358f36f31183fa7bd196984d2b49b6bcefe0dbb",
-    "pc88va/makefile.m13.wc": "72862abd0491a1936689325460f1f630d74d0f573c5e1a169b6e712568ff7933"
+    "pc88va/makefile.m13.wc": "5c0b84702a381021260bcaca5f2b8c696ee2c0911504f69f0602ef27af320440"
   },
-  "kernel_commit": "b17bd5a3a3ca095c194222a1d40cb709c28ef936",
+  "kernel_commit": "1527da489528367bb8028a8e9576375d35722f50",
   "schema_version": 1
 }

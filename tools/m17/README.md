@@ -21,7 +21,7 @@ Their M17 regression copies are under `tests/m17/`. They are retained because
 the active M17 kernel still uses the M13 carrier and placement contract. The
 M17 copies operate on the pinned component inputs and local fixture
 `config/m17/va-fixed-loader-profile-test.json`; they do not import, execute,
-or read any M15 runtime files. Generated test output belongs under `build/m16/`.
+or read any M15 runtime files. Generated test output belongs under `build/m17/`.
 
 This provenance records algorithm lineage only. M15 acceptance results and
 unrelated M15 tooling are not carried into M17.
@@ -43,20 +43,20 @@ Open Watcom 1.9 image, then build the complete disk twice from Git archives:
 
 ```sh
 python3 tools/m17/toolchain.py
-python3 tools/m17/build_image.py --output build/m16-image
+python3 tools/m17/build_image.py --output build/m17-image
 ```
 
 `build_image.py` downloads the configured Unicorn 2.1.4 verifier wheel and
 checks its filename and SHA-256 before starting network-disabled containers.
 Both builds use the committed parent inputs, exact component gitlinks, and the
 image produced by `toolchain.py`; their full artifact manifests must match.
-The output directory must stay Git-excluded. `build/m16-image/media.d88` is a
+The output directory must stay Git-excluded. `build/m17-image/media.d88` is a
 freshly composed candidate and is not a milestone distribution until its guest
 acceptance and publication checks are complete.
 
 ## Runtime memory and kernel placement
 
-See the [current memory contract](../../docs/porting/m16-memory-layout.md) for
+See the [current memory contract](../../docs/porting/m17-memory-layout.md) for
 ownership, temporary lifetimes and the required qualification scope.
 
 At startup, immediately after its source SHA-1, the kernel prints measured
@@ -111,3 +111,35 @@ RAM measurement supplies capacity, not ownership of firmware memory.
 RAM-dependent fixes require the failing persisted configuration, alternate-model
 coverage, and a working-capacity control before a replacement is described as
 verified. See `AGENTS.md` for the evidence and handoff requirements.
+
+## M17 configuration and storage
+
+See [configuration support](../../docs/porting/m17-configuration.md),
+[storage contracts](../../docs/porting/m17-storage-contracts.md), and the
+[M17 report](../../docs/porting/m17-report.md). The default disk includes an
+editable CONFIG.SYS. Ordinary kernel parsing is active; PC88VA_LOADSEG remains
+an earlier loader-only decision. Explicit platform limitations are documented.
+
+The full build also emits `run-1/storage-media/` and independently reads back
+all six data fixtures. These HDD images are nonbootable host fixtures, with no
+claim of SASI/SCSI guest support. Standalone reproduction:
+
+```sh
+python3 tools/m17/produce.py --profiles config/m17/media-profiles.json --output build/m17-storage
+python3 tools/m17/inspect_storage.py --profiles config/m17/media-profiles.json --directory build/m17-storage
+```
+
+Only Python's standard library is required for standalone fixtures. The full
+kernel/shell build uses the same pinned Linux/amd64 Open Watcom 1.9 container
+and Unicorn wheel as the predecessor, verified by M17's local tooling. Docker is
+the Linux host runtime. No other milestone's directory or private input is read.
+The shared compatible image tag still contains `m16`; it identifies the locked
+toolchain, not a runtime dependency on M16. No new dependency installation is
+needed on the current Ubuntu host.
+
+`SYS.ID` retains the `M16SOURCE` token required by the pinned SYSVA component;
+this is a component interface marker, not the current milestone identity.
+Qualification utilities CFGDEV.SYS, CFGNONE.SYS, CFGPROBE.COM and CFGSTATE.COM are
+built from tests/m17 source. They do not implement SASI/SCSI and are unnecessary
+for normal startup. Use pristine media and record source/validation image hashes
+separately when adding qualification AUTOEXEC or device settings.

@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+name: M17 isolated source build
+
+on:
+  push:
+    branches: ['topic/m17-storage-contracts-media-formats']
+  pull_request:
+    paths:
+      - '.github/workflows/m17-source-build.yml'
+      - 'components/country'
+      - 'components/fdkernel'
+      - 'components/freecom'
+      - 'config/m17/**'
+      - 'manifests/components.lock.json'
+      - 'manifests/m17-components.lock.json'
+      - 'manifests/toolchains.lock.json'
+      - 'tests/m17/**'
+      - 'tools/m17/**'
+      - 'tools/qa/current_components.py'
+      - 'tools/verify_scaffold.py'
+      - 'Makefile'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  isolated-build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Assert native x64 and configure component provenance
+        run: |
+          test "$(uname -m)" = x86_64
+          test "$(dpkg --print-architecture)" = amd64
+          bash tools/configure_component_remotes.sh
+      - name: Verify component lock
+        run: make verify-scaffold
+      - name: Build or verify the pinned Linux/amd64 Open Watcom toolchain
+        run: python3 -B tools/m17/toolchain.py
+      - name: Build the full distribution twice from clean source exports
+        run: python3 -B tools/m17/build_image.py --output build/m17-ci
+      - name: Confirm public source checkouts remain clean
+        run: |
+          git diff --check
+          git diff --exit-code
+          test -z "$(git status --porcelain --untracked-files=all)"

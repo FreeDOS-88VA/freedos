@@ -16,6 +16,7 @@ for name in fdkernel freecom country; do
 done
 cd /work/source
 python3 tools/m17/verify_isolation.py
+python3 tools/m17/verify_source_audit.py
 mkdir -p /work/pydeps
 python3 -m zipfile -e /input/unicorn-*.whl /work/pydeps
 export PYTHONPATH=/work/pydeps
@@ -63,6 +64,8 @@ cd /work/source/components/country
 nasm -f bin country.asm -o /work/result/COUNTRY.SYS
 cd /work/source
 nasm -f bin tests/m17/config_device.asm -o /work/result/CFGDEV.SYS
+nasm -f bin tests/m17/config_state.asm -o /work/result/CFGSTATE.COM
+nasm -f bin -DZERO_UNITS=1 tests/m17/config_device.asm -o /work/result/CFGNONE.SYS
 nasm -f bin tests/m17/config_probe.asm -o /work/result/CFGPROBE.COM
 nasm -f bin tests/m17/system_com_probe.asm -o /work/result/COMPROBE.COM
 nasm -f bin tests/m17/dos_input_probe.asm -o /work/result/DOSINPUT.COM
@@ -73,6 +76,7 @@ python3 tools/m17/finish_image.py --output /work/result
 mkdir -p build
 python3 tools/m17/verify_m13_linked_placement.py --kernel /work/result/kernel-linked.exe --map /work/result/kernel.map --carrier /work/result/KERNEL.SYS --placement /work/result/carrier.json
 if [ "${M17_BUILD_PASS:-1}" = 1 ]; then
+python3 -B -m unittest discover -s tests/m17 -p 'test_storage.py'
 python3 -B -m unittest discover -s tests/m17 -p 'test_m13_memory_placement.py'
 python3 -B -m unittest discover -s tests/m17 -p 'test_m13_carrier_tail.py'
 python3 -B -m unittest discover -s tests/m17 -p 'test_floppy_media.py'

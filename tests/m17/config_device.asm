@@ -5,7 +5,11 @@ cpu 8086
 org 0
 header:
     dd 0xffffffff
+%ifdef ZERO_UNITS
+    dw 0
+%else
     dw 0x8000
+%endif
     dw strategy, interrupt
     db 'VA17TEST'
 packet: dd 0
@@ -37,7 +41,12 @@ eof:
     mov word [es:bx+18], 0
     jmp done
 init:
+%ifdef ZERO_UNITS
+    mov byte [es:bx+13],0
+    mov word [es:bx+14],0
+%else
     mov word [es:bx+14], resident_end
+%endif
     mov [es:bx+16], cs
     push cs
     pop ds
@@ -51,5 +60,9 @@ done:
     pop bx
     pop ax
     retf
+%ifdef ZERO_UNITS
+message: db 'M17-DEVICE-DECLINED',13,10,'$'
+%else
 message: db 'M17-DEVICE-INIT',13,10,'$'
+%endif
 resident_end:

@@ -540,3 +540,13 @@ verify: verify-scaffold
 	else \
 		printf '%s\n' 'M01 verification is not run: no generated two-run evidence is present.'; \
 	fi
+
+# M17 owns its complete build and media tooling.
+.PHONY: m17-toolchain m17-build m17-fixtures
+m17-toolchain:
+	python3 -B tools/m17/toolchain.py
+m17-build:
+	python3 -B tools/m17/build_image.py --output $(if $(M17_OUTPUT),$(M17_OUTPUT),build/m17-image)
+m17-fixtures:
+	python3 -B tools/m17/produce.py --profiles config/m17/media-profiles.json --output $(if $(M17_FIXTURES),$(M17_FIXTURES),build/m17-storage)
+	python3 -B tools/m17/inspect_storage.py --profiles config/m17/media-profiles.json --directory $(if $(M17_FIXTURES),$(M17_FIXTURES),build/m17-storage)

@@ -37,13 +37,23 @@ def verifier_wheel_spec():
 
 def component_lock():
     lock = json.loads((ROOT / 'manifests/m17-components.lock.json').read_text())
-    if lock.get('schema_version') != 1 or lock.get('milestone') != 'M17':
+    if lock.get('schema_version') != 1 or lock.get('milestone') != 'M17' or lock.get('status') != 'current-m17':
         raise ValueError('Invalid M17 component lock')
+    if lock.get('start_sha') != 'fc891f3cd424c281680dd15b3f269bef4a4d2880':
+        raise ValueError('M17 baseline substitution')
     entries = lock['components']
     by_path = {item['path']: item for item in entries}
     if len(entries) != 3 or set(by_path) != {'components/fdkernel', 'components/freecom', 'components/country'}:
         raise ValueError('Invalid M17 component set')
-    for item in entries:
+    expected = {
+        'fdkernel': ('https://github.com/nakatamaho/fdkernel.git', 'topic/m17-storage-contracts-media-formats'),
+        'freecom': ('https://github.com/nakatamaho/freecom_dbcs2.git', 'topic/m16-floppy-formats-console-input'),
+        'country': ('https://github.com/FDOS/country.git', 'master'),
+    }
+    for path, item in by_path.items():
+        name = path.split('/')[-1]
+        if item['name'] != name or (item['repository'], item['branch']) != expected[name]:
+            raise ValueError('M17 source provenance mismatch')
         if not re.fullmatch(r'[0-9a-f]{40}', item['commit']) or not re.fullmatch(r'[0-9a-f]{64}', item['source_archive_sha256']):
             raise ValueError('Invalid M17 source identity')
     return by_path
@@ -51,7 +61,7 @@ def component_lock():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=ROOT / 'build/m16-image')
+    parser.add_argument('--output', type=Path, default=ROOT / 'build/m17-image')
     parser.add_argument('--image', default='freedos-pc88va-m16:local')
     args = parser.parse_args()
     if call('git', 'diff', 'HEAD', '--', '.', ':!components/fdkernel'):
@@ -72,7 +82,7 @@ def main():
     if subprocess.run(['git', 'check-ignore', '-q', str(output / 'probe')], cwd=ROOT).returncode:
         raise ValueError('Build output must be Git-excluded')
     if output.exists():
-        raise ValueError('Output already exists; choose a new M16_IMAGE_OUTPUT')
+        raise ValueError('Output already exists; choose a new M17_IMAGE_OUTPUT')
     info = json.loads(call('docker', 'image', 'inspect', args.image))[0]
     if (info['Os'], info['Architecture']) != ('linux', 'amd64'):
         raise ValueError('The pinned Linux/amd64 toolchain image is required')
