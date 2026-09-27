@@ -211,3 +211,35 @@ Guest scope is recorded separately against the exact candidate; source-level
 and synthetic checks do not establish hardware behavior. Hardware is NOT RUN.
 Record native CI against the publication tip after push. Overall M16 acceptance
 remains partial.
+
+## Ten KiB disk cache checkpoint (2026-09-27)
+
+Implementation parent: `e512bf33258a590ce72c47842206243cedaca361`.
+Kernel: `b17bd5a3a3ca095c194222a1d40cb709c28ef936`.
+This supersedes the preceding twenty-buffer candidate. The VA platform default
+is now ten 1024-byte cache buffers: 10240 bytes of sector data, 200 bytes of
+buffer headers, paragraph alignment and one allocation header, totaling 10464
+bytes. Other targets retain their existing default and the upstream cache
+algorithm is unchanged.
+
+The resident image remains 66224 bytes. Final kernel work falls from 24144 to
+13712 bytes; their total is 79936 bytes (78.0625 KiB), including the disk cache
+and 1024-byte firmware transfer buffer. Compared with the machine-banner
+checkpoint, the combined INIT, transfer-buffer and cache changes save 14240
+bytes (13.90625 KiB). Default LOADSEG gives consecutive resident/work bounds
+10000h-202b0h-23840h and free payload beginning at 23850h. Temporary INIT remains
+10955 bytes and retains the same stack anchor and release policy.
+
+Two clean exported-source builds produced identical artifact manifests and
+D88 bytes. Carrier, linked placement, INIT ownership, real read/write buffer
+bounds and the maintained host gates completed successfully. Candidate D88:
+1331888 bytes, SHA-256
+`b5fec8cc4d0f117ddc8e8cb0cd9c6222b387e2effb274d3f0a9c7adcae03f882`.
+Reproduce with the documented M16 build entry point and pinned toolchain.
+This is a work checkpoint, not a designated milestone archive.
+
+Native x64 CI run 36308460910, attempt 1, succeeded against the exact
+implementation parent above, including the full two-build distribution gate.
+Exact-candidate guest qualification and publication-tip CI bindings are retained
+separately. Hardware is NOT RUN. Overall M16 acceptance remains partial; this footprint
+change does not qualify the outstanding console and full media matrix.

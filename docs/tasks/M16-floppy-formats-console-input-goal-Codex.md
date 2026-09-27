@@ -113,6 +113,13 @@ Measure added resident data/code, transfer buffers, key queues and stacks agains
 currently qualified configurations. This correction does not authorize a new DOS
 memory manager or changes solely to match MS-DOS behavior.
 
+The current VA footprint configuration uses ten 1024-byte DOS cache buffers
+(10 KiB of sector data, plus allocation metadata) and a separate 1024-byte
+resident firmware transfer buffer. Legacy INIT assembly shares the discardable
+INIT group; resident interrupt handlers remain resident. Qualify both 512-byte
+and 1024-byte disk I/O, buffer bounds and INIT relocation/release when changing
+these sizes or lifetimes. Preserve the upstream cache algorithm.
+
 All source code, comments, diagnostics, technical reports and committed
 documentation must be English. User-facing progress may be Japanese.
 
