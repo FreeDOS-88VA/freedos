@@ -243,3 +243,15 @@ implementation parent above, including the full two-build distribution gate.
 Exact-candidate guest qualification and publication-tip CI bindings are retained
 separately. Hardware is NOT RUN. Overall M16 acceptance remains partial; this footprint
 change does not qualify the outstanding console and full media matrix.
+
+## Legacy native FAT12 recognition candidate
+
+The VA adapter now recognizes the explicit legacy native FAT12 profile without
+a boot BPB, using read-only FAT reserved-entry checks in both copies and a read
+of the profile endpoint before allowing normal block access. A plausible but
+malformed BPB does not fall back to this path. Other targets are unchanged.
+Original synthetic tests cover recognition and rejection; all 326 component
+tests pass locally with Unicorn 2.1.4. The adapter test harnesses now consume
+the production transfer-buffer size definition. Clean media builds, guest
+qualification and exact-revision CI for this candidate remain pending.
+This is not M16 PASS or HANDOFF READY.
