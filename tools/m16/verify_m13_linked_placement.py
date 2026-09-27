@@ -206,6 +206,38 @@ def verify(kernel, link_map):
     print('LINKED_PLATFORM_FRAME_AND_CON_CONTRACT_OK')
 
 
+def verify_init_formatter(kernel, link_map):
+    """Execute the linked INIT varargs formatter with a separate stack segment."""
+    from unicorn import Uc, UC_ARCH_X86, UC_MODE_16, UC_HOOK_INTR
+    from unicorn import x86_const as r
+    syms = symbols(link_map)
+    _, body, relocations = parse_mz(kernel.read_bytes())
+    load = 0x1000
+    body = bytearray(body)
+    for off, seg in struct.iter_unpack('<HH', relocations):
+        at = seg * 16 + off
+        struct.pack_into('<H', body, at, struct.unpack_from('<H', body, at)[0] + load)
+    cpu = Uc(UC_ARCH_X86, UC_MODE_16)
+    cpu.mem_map(0, 0x100000)
+    cpu.mem_write(load * 16, bytes(body))
+    output = bytearray()
+    def interrupt(uc, number, data):
+        assert number == 0x29, number
+        output.append(uc.reg_read(r.UC_X86_REG_AX) & 255)
+    cpu.hook_add(UC_HOOK_INTR, interrupt)
+    ds = syms['DATASTART'][0] + load
+    # The argument format is in data memory; varargs and local digit buffers
+    # are in SS. Neither near-stack aliases nor zero values can pass here.
+    cpu.mem_write(ds * 16 + 0xf000, b'%uKB %05lxh %04xh\0')
+    cpu.mem_write(0x70800, struct.pack('<HHHHIH', 0, 0x9000, 0xf000, 512, 0x67000, 0x2000))
+    seg, off = syms['_init_printf']
+    for name, value in dict(CS=seg + load, IP=off, DS=ds, SS=0x7000, SP=0x800).items():
+        cpu.reg_write(getattr(r, 'UC_X86_REG_' + name), value)
+    cpu.emu_start((seg + load) * 16 + off, 0x90000, count=100000)
+    assert output == b'512KB 67000h 2000h', output
+    print('LINKED_INIT_FORMATTER_SEPARATE_STACK_OK')
+
+
 def verify_bridge(kernel, link_map, carrier, record, selected=None, capacity=640, succeeds=True):
     from unicorn import Uc, UC_ARCH_X86, UC_MODE_16, UC_HOOK_CODE, UC_HOOK_MEM_READ, UC_HOOK_INTR
     from unicorn import x86_const as r
@@ -321,6 +353,7 @@ if __name__ == '__main__':
     parser.add_argument('--placement', type=Path)
     args = parser.parse_args()
     verify(args.kernel, args.map)
+    verify_init_formatter(args.kernel, args.map)
     if args.carrier:
         for capacity in (256, 384, 511, 512, 640):
             verify_bridge(args.kernel, args.map, args.carrier, args.placement, capacity=capacity)
