@@ -1,0 +1,45 @@
+{
+  "components": [
+    {
+      "branch": "master",
+      "commit": "23f189cca3420606eae8723884fa92ccd65eb307",
+      "name": "country",
+      "parent_commit": null,
+      "path": "components/country",
+      "repository": "https://github.com/FDOS/country.git",
+      "role": "Unchanged COUNTRY.SYS component",
+      "source_archive_sha256": "cf0b16ac57e661eeb7e19118cea2d2d200e4545507f15912e8a6462652c2cd9d"
+    },
+    {
+      "branch": "topic/m17-storage-contracts-media-formats",
+      "commit": "dab75c578a88eef4810a2c838046153d77d4dd18",
+      "name": "fdkernel",
+      "parent_commit": "d8dbbf7111f86ea4800daeac84ac53ba601aaf32",
+      "path": "components/fdkernel",
+      "repository": "https://github.com/nakatamaho/fdkernel.git",
+      "role": "M16 VA/VA2 floppy I/O, native console input, guest-timed repeat, runtime RAM bounds, and M13 staging ring support",
+      "source_archive_sha256": "572defab286b3e0354521b049a65191a4627055783444c422d598e17e4f8d6a2",
+      "upstream": "https://github.com/lpproj/fdkernel.git"
+    },
+    {
+      "branch": "topic/m16-floppy-formats-console-input",
+      "commit": "29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e",
+      "name": "freecom",
+      "parent_commit": "9cf57b28abf1d98fab7655fb811375a2aa16c6d9",
+      "path": "components/freecom",
+      "repository": "https://github.com/nakatamaho/freecom_dbcs2.git",
+      "role": "M16 NECPC88VA console input and cursor integration",
+      "source_archive_sha256": "e61d4e889a6b10f9e05903f9575bb1466dfc5b20cb232f5286219bc173bbb24a",
+      "upstream": "https://github.com/lpproj/freecom_dbcs2.git"
+    }
+  ],
+  "milestone": "M17",
+  "predecessor_ci": {
+    "attempt": 1,
+    "head_sha": "fc891f3cd424c281680dd15b3f269bef4a4d2880",
+    "run_id": 36308581599
+  },
+  "predecessor_status": "partial; scoped host and guest checkpoint, not M16 acceptance",
+  "schema_version": 1,
+  "start_sha": "fc891f3cd424c281680dd15b3f269bef4a4d2880"
+}

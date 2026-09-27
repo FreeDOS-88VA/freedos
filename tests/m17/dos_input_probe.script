@@ -1,0 +1,43 @@
+# M16 guest input acceptance, through normal frontend keyboard events.
+# Let the firmware and shell start, then accept their optional date/time prompts.
+@wait 240
+@enter
+@enter
+DOSINPUT
+@text q
+@key ctrl-c
+@enter
+@key f1
+@key f2
+@key f3
+@key f4
+@key f5
+@key f6
+@key f7
+@key f8
+@key f9
+@key f10
+@key shift-f1
+@key shift-f2
+@key shift-f3
+@key shift-f4
+@key shift-f5
+@key shift-f6
+@key shift-f7
+@key shift-f8
+@key shift-f9
+@key shift-f10
+@key up
+@key down
+@key left
+@key right
+@key home
+@key help
+@key insert
+@key delete
+@key ctrl-left
+@key ctrl-right
+@key shift-up
+@key shift-down
+@key shift-left
+@key shift-right

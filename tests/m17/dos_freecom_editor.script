@@ -1,0 +1,32 @@
+# Exercise DOS editing and FreeCOM history through normal guest key events.
+@wait 240
+@enter
+@enter
+@text DIXR A:
+@key home
+@key right
+@key right
+@wait 120
+@key delete
+@key help
+@key backspace
+@text :
+@enter
+@wait 600
+@key f3
+@wait 90
+@enter
+@wait 600
+@key f1
+@wait 90
+@key f3
+@wait 90
+@enter
+@wait 600
+@text DIR B:
+@key f5
+@wait 90
+@key f3
+@wait 90
+@enter
+@wait 600

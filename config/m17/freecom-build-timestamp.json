@@ -1,0 +1,11 @@
+{
+  "component": "freecom",
+  "date_macro": "FREECOM_BUILD_DATE",
+  "derivation": "Fixed timestamp retained for reproducible M16 FreeCOM component builds.",
+  "formatted_date": "Feb 22 2025",
+  "formatted_time": "14:17:52",
+  "source_date_epoch": 1740233872,
+  "time_macro": "FREECOM_BUILD_TIME",
+  "timezone": "UTC",
+  "wmake_configuration_variable": "CFLAGS2"
+}
