@@ -109,7 +109,8 @@ def build_volume(spec, dos_name, content, source_date_epoch):
         cluster = first_cluster + index
         following = cluster + 1 if index + 1 < allocation_count else 0xFFF
         set_fat12_entry(fat, cluster, following)
-        first_lba = layout['first_data_sector'] + cluster - 2
+        first_lba = (layout['first_data_sector'] +
+                     (cluster - 2) * filesystem['sectors_per_cluster'])
         start = first_lba * bps
         chunk = content[index * cluster_bytes:(index + 1) * cluster_bytes]
         raw[start:start + cluster_bytes] = chunk.ljust(cluster_bytes, b'\0')

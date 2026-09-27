@@ -15,6 +15,18 @@ SPEC.loader.exec_module(MEDIA)
 
 
 class FloppyMediaTests(unittest.TestCase):
+    def test_multicluster_payload_crosses_tracks_without_overlap(self):
+        source = json.loads((ROOT / 'config/m16/floppy-profiles.json').read_text())
+        payload = bytes((i * 37 + i // 251) & 255 for i in range(32771))
+        for profile in source['profiles']:
+            with self.subTest(profile=profile['name']):
+                spec = MEDIA.profile_spec(profile, source, 1787814827)
+                image, report = MEDIA.build_volume(
+                    spec, 'PATTERN.BIN', payload, 1787814827)
+                _, files = MEDIA.inspect(image, spec)
+                self.assertEqual(files, {'PATTERN.BIN': payload})
+                self.assertTrue(report['fat_copies_equal'])
+
     def test_five_public_profiles_build_as_exact_fat12_d88_volumes(self):
         config = ROOT / 'config/m16/floppy-profiles.json'
         source = json.loads(config.read_text())
