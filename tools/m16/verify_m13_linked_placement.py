@@ -230,7 +230,7 @@ def verify_init_formatter(kernel, link_map):
     # are in SS. Neither near-stack aliases nor zero values can pass here.
     cpu.mem_write(ds * 16 + 0xf000, b'%uKB %05lxh %04xh\0')
     cpu.mem_write(0x70800, struct.pack('<HHHHIH', 0, 0x9000, 0xf000, 512, 0x67000, 0x2000))
-    seg, off = syms['_init_printf']
+    seg, off = syms['init_printf_']
     for name, value in dict(CS=seg + load, IP=off, DS=ds, SS=0x7000, SP=0x800).items():
         cpu.reg_write(getattr(r, 'UC_X86_REG_' + name), value)
     cpu.emu_start((seg + load) * 16 + off, 0x90000, count=100000)
