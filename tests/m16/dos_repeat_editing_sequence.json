@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "description": "DOS Backspace and complete cursor-event repeat sequence; guest VRTC timing matches dos_repeat_sequence.json",
+  "bytes_hex": "71 08 08 08 08 08 08 08 08 08 08 08 08 08 08 08 08 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4b 00 4d 00 4d 00 4d 63"
+}

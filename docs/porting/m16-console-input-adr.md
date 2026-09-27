@@ -91,3 +91,10 @@ its enhanced line editor. Static source checks bind the target to DOS
 These checks do not establish actual VA or VA2 keyboard delivery, visible
 cursor placement, or shell-history behavior; those require the separate guest
 qualification on each model.
+
+The editing-repeat workload is `tests/m16/dos_repeat_editing.script`, using
+that same bounded DOS probe. It holds Backspace and Left for 90 guest frames
+and Right for 38, separated by release intervals. The expected byte fixture
+keeps every repeated extended key as a complete zero-prefix/second-byte pair.
+Qualification must record VA and VA2 at paced and accelerated settings;
+source-level fixture checks alone are not guest acceptance.
