@@ -29,7 +29,9 @@ def verify_init_ownership(syms, init_source, load):
     if not 0 <= start < end < 0x100000:
         raise ValueError('invalid linked INIT interval')
     disposable = ('DynAlloc_', 'DynFree_', 'DynLast_', 'dsk_init_',
-                  '_pc88va_print_model')
+                  '_pc88va_print_model', '_init_stacks', 'INIT_CALL_INTR',
+                  'INIT_PSPSET', 'SET_DTA', '_query_cpu', '_query_memdisk',
+                  'UMB_GET_LARGEST')
     resident = ('_P_0', 'init_fatal_', 'pc88va_release_boot_memory_')
     for name in disposable + resident:
         if name not in syms:
@@ -426,6 +428,72 @@ def verify_model_banner(kernel, link_map):
     print('INIT_MODEL_BANNER_BRANCHES_AND_BANK_RESTORE_OK')
 
 
+def verify_resident_disk_capacity(kernel, link_map):
+    """Check real linked read/write wrappers and cores against buffer guards."""
+    from unicorn import Uc, UC_ARCH_X86, UC_MODE_16, UC_HOOK_CODE
+    from unicorn import x86_const as r
+    syms = symbols(link_map)
+    _, body, relocations = parse_mz(kernel.read_bytes())
+    body = bytearray(body)
+    load = 0x1000
+    for off, seg in struct.iter_unpack('<HH', relocations):
+        at = seg * 16 + off
+        struct.pack_into('<H', body, at, struct.unpack_from('<H', body, at)[0] + load)
+    platform, buffer_off = syms['pc88va_m12_buffer_']
+    platform += load
+    def addr(name):
+        seg, off = syms[name]
+        return (seg + load) * 16 + off
+    buffer_at = platform * 16 + buffer_off
+    assert addr('pc88va_m12_storage_end') - buffer_at == 1024
+    request_at = addr('pc88va_m12_request_')
+    for operation in ('read', 'write'):
+        for sector, count, capacity, status in (
+                (512, 1, 1024, 0), (1024, 1, 1024, 0),
+                (1024, 2, 1024, 3), (2048, 1, 1024, 3),
+                (1024, 1, 4096, 1)):
+            cpu = Uc(UC_ARCH_X86, UC_MODE_16)
+            cpu.mem_map(0, 0x100000)
+            cpu.mem_write(load * 16, bytes(body))
+            cpu.mem_write(addr('pc88va_m10_state_'), b'\x02')
+            fields = [1, 0, count, buffer_off, platform, capacity,
+                      1280, 8, 2, sector, 0, 0, 0x6000, 0] + [0] * 10
+            cpu.mem_write(request_at, struct.pack('<24H', *fields))
+            # The preceding byte belongs to alignment/data; use a canary only
+            # inside this synthetic snapshot, without changing the executable.
+            cpu.mem_write(buffer_at - 1, b'\xa5')
+            cpu.mem_write(buffer_at, b'\x5a' * 1024)
+            cpu.mem_write(buffer_at + 1024, b'\xa5' * 16)
+            cpu.mem_write(0x60000, b'\x31\xc0\xb9' + struct.pack('<H', sector) + b'\xcb')
+            callbacks = []
+            def transfer(uc, at, size, _):
+                if at == 0x60000:
+                    off, seg = struct.unpack('<HH', uc.mem_read(request_at + 38, 4))
+                    target = seg * 16 + off
+                    assert buffer_at <= target and target + sector <= buffer_at + 1024
+                    callbacks.append(target)
+                    if operation == 'read':
+                        uc.mem_write(target, b'\x3c' * sector)
+                    else:
+                        assert uc.mem_read(target, sector) == b'\x5a' * sector
+            cpu.hook_add(UC_HOOK_CODE, transfer)
+            entry_seg, entry_off = syms['pc88va_kernel_disk_' + operation + '_']
+            assert entry_seg + load == platform
+            for reg, value in ((r.UC_X86_REG_CS, platform), (r.UC_X86_REG_IP, entry_off),
+                               (r.UC_X86_REG_DS, platform), (r.UC_X86_REG_SS, 0x7000),
+                               (r.UC_X86_REG_SP, 0x1000), (r.UC_X86_REG_EFLAGS, 2),
+                               (r.UC_X86_REG_AX, syms['pc88va_m12_request_'][1])):
+                cpu.reg_write(reg, value)
+            cpu.mem_write(0x71000, struct.pack('<H', 0xfff0))
+            cpu.emu_start(platform * 16 + entry_off, platform * 16 + 0xfff0, count=20000)
+            assert cpu.reg_read(r.UC_X86_REG_IP) == 0xfff0
+            assert cpu.reg_read(r.UC_X86_REG_AX) == status
+            assert len(callbacks) == (1 if status == 0 else 0)
+            assert cpu.mem_read(buffer_at - 1, 1) == b'\xa5'
+            assert cpu.mem_read(buffer_at + 1024, 16) == b'\xa5' * 16
+    print('RESIDENT_ONE_SECTOR_BUFFER_READ_WRITE_BOUNDS_OK')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--kernel', type=Path, required=True)
@@ -436,6 +504,7 @@ if __name__ == '__main__':
     verify(args.kernel, args.map)
     verify_init_formatter(args.kernel, args.map)
     verify_model_banner(args.kernel, args.map)
+    verify_resident_disk_capacity(args.kernel, args.map)
     if args.carrier:
         for capacity in (256, 384, 511, 512, 640):
             verify_bridge(args.kernel, args.map, args.carrier, args.placement, capacity=capacity)

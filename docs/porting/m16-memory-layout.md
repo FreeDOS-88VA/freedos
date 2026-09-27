@@ -148,3 +148,21 @@ the shared ROM-bank-status port identifies the VA upgrade board. Unrecognized
 identification words display Unknown. This does not distinguish VA2 from VA3.
 The linked verifier exercises synthetic VA, VA2/3, upgrade and unknown cases,
 including bank and register restoration. Such checks are not hardware evidence.
+
+### Legacy INIT assembly and the resident transfer buffer
+
+The VA assembler segment declarations redirect legacy INIT_TEXT sections to
+M13_INIT_TEXT after declaring the historical TGROUP. Startup, INIT interrupt
+wrappers, CPU probing and interrupt-stack installation therefore share the
+same relocated and discarded INIT lifetime as C initialization. Their resident
+interrupt handlers stay in the low code group. Do not put the new INIT segment
+in TGROUP or retain near calls across these independently placed groups.
+
+The resident firmware transfer buffer is one 1024-byte sector, with a shared
+assembly bound used by all request producers and the allocation. Read/write
+entry points reject capacities exceeding this storage before the shared core
+checks transfer lengths. DOS multi-sector requests are still split into
+single-sector operations; 512-byte and 1024-byte sectors remain supported.
+The decompressor's separate 4096-byte history ring is unaffected. The linked
+verifier checks INIT ownership and read/write success and rejection cases with
+buffer canaries. The ordinary DOS disk cache count remains twenty.
