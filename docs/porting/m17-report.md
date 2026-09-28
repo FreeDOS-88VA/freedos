@@ -1,6 +1,6 @@
 # M17 work report
 
-Status: **M17 PASS (STORAGE CONTRACTS AND SYNTHETIC FIXTURES); HANDOFF READY.**
+Status: **M17 PASS (CONTRACTS/FIXTURES); HANDOFF READY.**
 The qualification binds to the implementation and exact media identities below.
 The accepted M16 baseline remains PASS / HANDOFF READY. M17 does not claim HDD
 runtime, guest SASI/SCSI support, FAT16 guest access, HDD boot, or hardware
