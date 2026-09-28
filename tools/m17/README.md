@@ -1,14 +1,16 @@
 # M17 source build
 
-Maintained local build implementation copied from parent
-`fc891f3cd424c281680dd15b3f269bef4a4d2880` tools/m16, tests/m16 and config/m16.
-Historical component ABI names remain; no earlier milestone runtime directory
-is required. Historical acceptance does not transfer to changed M17 images.
+M17 starts from the accepted M16 parent tip
+`f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4`. Its source lock records the exact
+M16-derived component inputs and the M17 CONFIG/INIT integration candidate.
+A recovered M17 branch based on the obsolete `fc891f3cd424c281680dd15b3f269bef4a4d2880`
+is audit history only; its status and acceptance are not inherited. No build
+step imports, executes, or reads another milestone's tools/config/tests tree.
 
 # M17 host tooling
 
 The M13 carrier builder and linked-placement verifier in this directory are
-maintained M17 copies of the algorithms from parent revision
+maintained M17-local copies of algorithms from parent revision
 `1af9974700cd4dd1164cc0df56cc062925376148`:
 
 - `tools/m15/build_compressed_kernel.py`
@@ -38,21 +40,26 @@ tests as part of its build.
 ## Build
 
 The host needs Git, Python 3 with pip, Docker Buildx, and network access for the
-first acquisition of pinned public dependencies. Build the locked Linux/amd64
-Open Watcom 1.9 image, then build the complete disk twice from Git archives:
+first acquisition of pinned public dependencies. Unicorn is used only by the
+maintained real-mode placement/carrier regressions; it is not the guest emulator
+and is not VAEG. Build the locked Linux/amd64
+Open Watcom 1.9 image, then build the complete candidate twice from Git archives:
 
 ```sh
 python3 tools/m17/toolchain.py
 python3 tools/m17/build_image.py --output build/m17-image
+python3 tools/m17/verify_acceptance.py --build build/m17-image
 ```
 
-`build_image.py` downloads the configured Unicorn 2.1.4 verifier wheel and
-checks its filename and SHA-256 before starting network-disabled containers.
+`build_image.py` downloads the configured Unicorn 2.1.4 verifier wheel and the
+pinned JSON Schema validator wheels, checks every filename and SHA-256, then
+starts network-disabled containers.
 Both builds use the committed parent inputs, exact component gitlinks, and the
-image produced by `toolchain.py`; their full artifact manifests must match.
-The output directory must stay Git-excluded. `build/m17-image/media.d88` is a
-freshly composed candidate and is not a milestone distribution until its guest
-acceptance and publication checks are complete.
+image produced by `toolchain.py`; full artifact manifests, including the QA
+startup disks and six storage fixtures, must match byte-for-byte. The output
+directory must stay Git-excluded. `build/m17-image/media.d88` is an M17
+regression candidate, not a new milestone distribution; only the unchanged
+accepted M16 archive is designated.
 
 ## Runtime memory and kernel placement
 
@@ -116,13 +123,19 @@ verified. See `AGENTS.md` for the evidence and handoff requirements.
 
 See [configuration support](../../docs/porting/m17-configuration.md),
 [storage contracts](../../docs/porting/m17-storage-contracts.md), and the
-[M17 report](../../docs/porting/m17-report.md). The default disk includes an
-editable CONFIG.SYS. Ordinary kernel parsing is active; PC88VA_LOADSEG remains
-an earlier loader-only decision. Explicit platform limitations are documented.
+[M17 report](../../docs/porting/m17-report.md). The candidate disk includes an
+editable CONFIG.SYS. The common parser and DEVICE= path are present in the
+candidate source; actual guest CONFIG/INIT qualification remains gated by the
+exact VAEG run recorded in the report. PC88VA_LOADSEG remains an earlier
+loader-only decision. Explicit platform limitations are documented.
 
 The full build also emits `run-1/storage-media/` and independently reads back
 all six data fixtures. These HDD images are nonbootable host fixtures, with no
-claim of SASI/SCSI guest support. Standalone reproduction:
+claim of SASI/SCSI guest support. `run-1/config-qa/` contains separate pristine
+CONFIG.SYS/FDCONFIG.SYS startup candidates for default parsing, FDCONFIG
+precedence, positive character-driver INIT, zero-unit block-driver INIT, and
+`PC88VA_LOADSEG=2000` through the real loader path. They are QA inputs, not
+normal-use media. Standalone storage-fixture reproduction:
 
 ```sh
 python3 tools/m17/produce.py --profiles config/m17/media-profiles.json --output build/m17-storage
@@ -130,16 +143,19 @@ python3 tools/m17/inspect_storage.py --profiles config/m17/media-profiles.json -
 ```
 
 Only Python's standard library is required for standalone fixtures. The full
-kernel/shell build uses the same pinned Linux/amd64 Open Watcom 1.9 container
-and Unicorn wheel as the predecessor, verified by M17's local tooling. Docker is
-the Linux host runtime. No other milestone's directory or private input is read.
+kernel/shell build uses the pinned Linux/amd64 Open Watcom 1.9 container plus
+identity-pinned Unicorn and JSON Schema verifier wheels. Docker is the Linux host runtime. No other milestone's directory or private input is read.
 The shared compatible image tag still contains `m16`; it identifies the locked
 toolchain, not a runtime dependency on M16. No new dependency installation is
 needed on the current Ubuntu host.
 
 `SYS.ID` retains the `M16SOURCE` token required by the pinned SYSVA component;
 this is a component interface marker, not the current milestone identity.
-Qualification utilities CFGDEV.SYS, CFGNONE.SYS, CFGPROBE.COM and CFGSTATE.COM are
-built from tests/m17 source. They do not implement SASI/SCSI and are unnecessary
-for normal startup. Use pristine media and record source/validation image hashes
-separately when adding qualification AUTOEXEC or device settings.
+Qualification utilities CFGDEV.SYS, CFGNONE.SYS, CFGPROBE.COM, CFGSTATE.COM
+and CFGMEM.COM are built from `tests/m17` sources. CFGDEV is a disposable
+character device; CFGNONE is a zero-unit block-device negative case. Neither is
+a storage controller or production SCSI driver. Run the exact QA image/profile
+listed in `run-1/config-qa/manifest.json`; preserve each pristine image and record
+its digest separately from any VAEG-mutated runtime copy. SCSI boot is excluded:
+the owner confirms real PC-88VA hardware has no SCSI BIOS, so SCSI is data-only
+through a future external `DEVICE=` block driver.

@@ -13,17 +13,18 @@ def verify(root):
         for entry in (root / category).glob('m[0-9][0-9]'):
             if entry.name != 'm17':
                 raise ValueError('Historical milestone directory in isolated build: ' + str(entry))
-    for path in (root / 'tools/m17').rglob('*'):
-        if path.is_symlink():
-            raise ValueError('M17 runtime tooling cannot contain symlinks: ' + str(path))
-        if path.suffix in ('.py', '.sh') or path.name == 'Dockerfile':
-            source = path.read_text()
-            if re.search(r'(?:tools|tests|config|containers)/m(?!17)[0-9]{2}(?:/|\b)', source):
-                raise ValueError('Cross-milestone runtime path in ' + str(path))
-            component_helper = ('components/fdkernel/pc88va/' +
-                                r'(?:tools|tests)(?:/|\b)')
-            if re.search(component_helper, source):
-                raise ValueError('M17 tooling imports component helper/test code: ' + str(path))
+    for category in ('tools/m17', 'tests/m17'):
+        for path in (root / category).rglob('*'):
+            if path.is_symlink():
+                raise ValueError('M17 tools/tests cannot contain symlinks: ' + str(path))
+            if path.suffix in ('.py', '.sh') or path.name == 'Dockerfile':
+                source = path.read_text()
+                if re.search(r'(?:tools|tests|config|containers)/m(?!17)[0-9]{2}(?:/|\b)', source):
+                    raise ValueError('Cross-milestone runtime path in ' + str(path))
+                component_helper = ('components/fdkernel/pc88va/' +
+                                    r'(?:tools|tests)(?:/|\b)')
+                if re.search(component_helper, source):
+                    raise ValueError('M17 tools/tests import component helper/test code: ' + str(path))
 
 
 if __name__ == '__main__':

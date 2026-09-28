@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
-SPEC = importlib.util.spec_from_file_location('carrier_m16', ROOT / 'tools/m17/build_compressed_kernel.py')
+SPEC = importlib.util.spec_from_file_location('carrier_m17', ROOT / 'tools/m17/build_compressed_kernel.py')
 CARRIER = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(CARRIER)
 BRIDGE = ROOT / 'components/fdkernel/pc88va/kernel/m13_unpack.asm'

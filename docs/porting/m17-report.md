@@ -1,57 +1,92 @@
 # M17 work report
 
-Status: implementation and qualification in progress. M16 remains partial;
-this report does not upgrade its outstanding acceptance or claim HDD runtime.
+Status: **IN PROGRESS; not M17 PASS and not HANDOFF READY.** The accepted M16
+baseline remains PASS / HANDOFF READY. M17 does not claim HDD runtime, guest
+SASI/SCSI support, or hardware success.
 
-START_SHA: `fc891f3cd424c281680dd15b3f269bef4a4d2880`.
-Predecessor native CI: run 36308581599, attempt 1, successful at START_SHA.
-Kernel configuration implementation:
-`1527da489528367bb8028a8e9576375d35722f50`.
-FreeCOM: `29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e`.
-COUNTRY.SYS: `23f189cca3420606eae8723884fa92ccd65eb307`.
-The manifest and source audit bind exact component archives and reviewed files.
+START_SHA: `f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4`. The required M16
+predecessor CI runs 36381203803 and 36381203807 both succeeded at that exact
+head. Accepted fdkernel source: `7883c8fac11fab20cb467ad0a93c8799f35b565a`;
+FreeCOM: `29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e`; COUNTRY.SYS:
+`23f189cca3420606eae8723884fa92ccd65eb307`.
 
-## Implemented
+## Provenance in progress
 
-- Restored the selected common kernel configuration passes after the loader's
-  separate PC88VA_LOADSEG probe. FDCONFIG.SYS has normal kernel precedence.
-- Corrected the VA FAR Pascal READ, LSEEK and INIT_DOSEXEC interfaces, separate
-  stack pointer use, numeric argument outputs, command-tail storage and INSTALL
-  lifetime. Kept the common parser and non-VA platform behavior.
-- Added an editable default CONFIG.SYS. Unavailable native menu/BIOS/high-memory
-  options are explicit errors; see m17-configuration.md for the exact boundary.
-- Audited DEVICE/header/INIT/DPB/BPB/unit registration. Documented inherited
-  status handling, required external block acceptance and bounded M18/M20 work.
-- Added six deterministic public FAT12/FAT16 data fixtures, an independent
-  container/filesystem reader, malformed-input tests and source audit binding.
-- Maintained complete M17-local build/media tools and native CI. Historical
-  helper implementation provenance is recorded; historical acceptance is not
-  imported. SCSI remains external, native SCSI boot excluded and MO last.
+- Parent integration base: `0852dc543ca9c23829a8059776e2f77072ceb947`, with
+  original M17 work parent `6ef9a327d58e712e8470b5e6746c850c54852bcd` and
+  accepted M16 parent `f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4`.
+- fdkernel M17/M16 merge: `e87e8071c355a99a7f34a8758d4a3368b6523f3d`, with
+  parents `1527da489528367bb8028a8e9576375d35722f50` and
+  `7883c8fac11fab20cb467ad0a93c8799f35b565a`. Its deterministic source-archive
+  SHA-256 is
+  `887857e0c6706e47a9c8ea2055f74b3891138ed00564585a0053795e9e7dbc69`.
+  The merge was pushed to the `nakatamaho` origin branch and the exact remote
+  tip was verified. No push was made to upstream.
+- The parent M17 implementation, build verifier, and documentation remain
+  unpublished. The M17 lock retains `START_SHA` and the exact M16 predecessor
+  CI bindings.
 
-## Verification scope
+## Implemented and locally tested
 
-The preliminary CONFIG candidate completed two full clean builds and the
-maintained placement/carrier/buffer gates. Exact guest results remain in excluded
-storage. Publication requires the final integrated build and its exact-head CI.
-The six storage volumes also passed a supplemental host fsck.fat read-only check;
-this is filesystem evidence, not VA storage evidence.
+- Preserved common FreeDOS CONFIG.SYS/FDCONFIG.SYS behavior and the bounded VA
+  CONFIG/INIT integration. No operational external HDD driver was added.
+- Added strict schema-v2 storage profiles, checked unit/range conversions,
+  deterministic synthetic FAT12/FAT16 fixtures, explicit nonbootable and
+  unqualified status, and an independent read-only inspector.
+- Added five separate CONFIG/FDCONFIG QA image profiles and synthetic
+  character-device, zero-unit, state, and memory probes. These are test inputs,
+  not guest boot or storage-driver qualification.
+- Added fail-closed acceptance metadata and output checks for exact component
+  provenance, predecessor CI claims, clean source archives, pinned toolchain
+  and wheels, two-build artifact identity, D88 payload composition, M16 floppy
+  regressions, M17 storage fixture readback, and schema/instance validation.
+  Negative tests cover stale CI bindings, unknown/missing fields, malformed
+  hashes, path escape, extra/missing/tampered artifacts, and build-log drift.
+- Verified the pinned Linux/amd64 Open Watcom image:
+  `sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df`.
+- Focused host tests: storage **19 passed**; CONFIG QA **4 passed**; acceptance
+  verifier **7 passed**; component remote safety **2 passed**. The full host
+  discovery run executed 76 tests: **67 passed; 9 errored only because the
+  host lacks the pinned Unicorn dependency**. This host run is not acceptance.
+- The public VAEG `Main_RAM_Auto` MinGW static build was completed separately
+  from an isolated checkout. Its artifact and import audit are recorded in the
+  VAEG build report; Windows execution and emulator interaction were not run.
 
-The unchanged guest shell and final work policy retain the ten-buffer default.
-The default configuration's linked resident image is 71488 bytes and final
-kernel work is 13712 bytes, total 85200 bytes (83.203125 KiB). This is 5264 bytes
-more than the preceding CONFIG-disabled checkpoint; the increase restores
-configuration storage and required adapter code. INIT is 15835 bytes, temporary,
-with its stack anchor unchanged. Per-CONFIG buffers/files/drivers can change the
-final work size. Do not advertise a fixed footprint for all configurations.
+## Required verification still pending
 
-## Remaining scope and handoff
+Not yet run against a committed exact M17 parent candidate:
 
-Host-valid FAT16 images are not guest FAT16 support. SASI discovery/translation/
-registration and real data I/O remain M18; native SASI boot remains M19. Actual
-external SCSI block INIT/read-only access remains M20, writes M21 and integration
-M22. Native menu/high-memory settings and exhaustive interactive CONFIG choices
-are not qualified. M16's remaining full input/media acceptance is unchanged.
-Hardware is NOT RUN; retain DEFERRED HARDWARE VALIDATION. No milestone archive
-is designated by this work checkpoint. Exact implementation/publication/source
-and CI bindings must be recorded separately; this report cannot contain its own
-publication commit identity.
+- Complete allowlisted source export and two independent offline builds,
+  artifact-manifest comparison, and the linked carrier/placement regression
+  gate. The new end-to-end acceptance verifier has only had its focused unit
+  tests run; it has not yet checked full build outputs.
+- Full M17 tests in the pinned Linux/amd64 environment with the identity-pinned
+  Unicorn wheel, including actual CONFIG QA image and synthetic media
+  validation.
+- Guest boot of the exact candidate, including default CONFIG, FDCONFIG
+  precedence, character INIT, zero-unit INIT, and non-default LOADSEG. The
+  required VAEG ROM/firmware environment has not been identified; no guest
+  CONFIG/DEVICE result is claimed.
+- Parent publication, exact-tip public CI, final source/handoff bindings, and
+  final privacy review. No M17 distribution archive is designated.
+
+The storage fixtures do not establish SASI discovery, SCSI I/O, guest FAT16,
+HDD boot, or filesystem writes. Real PC-88VA SCSI boot remains excluded because
+there is no SCSI BIOS; the future SCSI profile is data-only through one external
+`DEVICE=` driver. SASI/SCSI runtime and hardware are NOT RUN. Hardware status is
+**DEFERRED HARDWARE VALIDATION**.
+
+## Next actions
+
+1. Commit the reviewed M17 source/build candidate locally, then execute the
+   complete clean double build from its exact committed allowlisted inputs.
+   Fix any build, test, placement, or acceptance-verifier defect and repeat the
+   affected gates.
+2. Keep guest CONFIG QA explicitly NOT RUN unless an authorized, identified
+   VAEG firmware environment is available; do not infer it from host tests.
+3. Reconcile the report and M19 SASI/M21 external-SCSI handoffs, complete
+   privacy and bounded-diff review, then publish the parent topic and verify
+   exact-tip CI, remote equality, and child-before-parent reachability.
+
+The accepted M16 archive remains unchanged. This report contains no
+self-referential future publication SHA or unrun guest/hardware claim.

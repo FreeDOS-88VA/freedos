@@ -17,7 +17,9 @@ def verify(root):
         raise ValueError('Source audit kernel drift')
     required={'kernel/config.c','kernel/main.c','kernel/initdisk.c','kernel/execrh.asm',
               'kernel/intr.asm','kernel/init-mod.h','kernel/blockio.c','kernel/fatfs.c',
-              'hdr/device.h','hdr/fat.h','pc88va/makefile.m13.wc','pc88va/kernel/m13_platform.asm'}
+              'kernel/dsk.c','kernel/kernel.asm','kernel/memmgr.c','hdr/device.h',
+              'hdr/fat.h','hdr/lol.h','pc88va/makefile.m13.wc',
+              'pc88va/kernel/m13_platform.asm'}
     if set(audit['files'])!=required:
         raise ValueError('Missing/unknown source audit input')
     for path,digest in audit['files'].items():

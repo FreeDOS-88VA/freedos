@@ -1,0 +1,5 @@
+REM QA profile: this file must override CONFIG.SYS options.
+BUFFERS=8
+FILES=12
+LASTDRIVE=E
+DOS=LOW

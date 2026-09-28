@@ -83,7 +83,7 @@ this milestone's working system. No renewed approval is needed for this scoped
 VAEG implementation.
 
 Apply the numbering map once to current plans, routing, active task filenames,
-future status entries, links and handoffs. Use the supplied M13-M31 roadmap and
+future status entries, links and handoffs. Use the current M13-M32 roadmap and
 `M17-storage-contracts-media-formats-goal-Codex.md`. Retire the old active
 `M16-storage-contracts-media-formats-goal-Codex.md` entry with an explicit redirect
 or supersession record. The older `M16-floppy-console-followup-goal-Codex.md`, if

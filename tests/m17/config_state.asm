@@ -12,6 +12,18 @@ org 0x100
     mov [last],ax
     mov al,[es:bx+0x20]
     mov [units],ax
+    mov ax,0x4800
+    mov bx,0xffff
+    int 0x21
+    jc .maxfree_ready
+    mov es,ax
+    mov ah,0x49
+    int 0x21
+    mov bx,0xffff
+.maxfree_ready:
+    mov [maxfree],bx
+    mov ah,0x52
+    int 0x21
     les bx,[es:bx+4]
     mov cx,16
     xor si,si
@@ -35,6 +47,9 @@ org 0x100
     call field
     mov dx,label_units
     mov ax,[units]
+    call field
+    mov dx,label_maxfree
+    mov ax,[maxfree]
     call field
     mov dx,newline
     mov ah,9
@@ -67,8 +82,10 @@ buffers: dw 0
 last: dw 0
 files: dw 0
 units: dw 0
+maxfree: dw 0
 label_buffers: db 'BUFFERS=$'
 label_last: db ' LAST=$'
 label_files: db ' FILES=$'
 label_units: db ' UNITS=$'
+label_maxfree: db ' MAXFREE_PARAS=$'
 newline: db 13,10,'$'

@@ -1,0 +1,6 @@
+REM QA profile: zero-unit block-device INIT must add no DOS unit or memory.
+BUFFERS=8
+FILES=12
+LASTDRIVE=E
+DOS=LOW
+DEVICE=CFGNONE.SYS

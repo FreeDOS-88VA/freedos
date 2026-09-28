@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pc88va:m17:media-profiles:v2",
+  "title": "M17 PC-88VA storage media profiles",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_id", "evidence", "profiles"],
+  "properties": {
+    "schema_version": {"const": 2},
+    "contract_id": {"const": "pc88va-storage-m17-v1"},
+    "evidence": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"$ref": "#/$defs/evidence"}
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/profile"}
+    }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "format": "uri"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "files": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "statement": {"type": "string", "minLength": 1}
+      }
+    },
+    "container": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "header_bytes", "payload_offset_bytes", "file_extension"],
+      "properties": {
+        "format": {"enum": ["raw", "anex86-hdi", "virtual98-vhd1"]},
+        "header_bytes": {"type": "integer", "minimum": 0},
+        "payload_offset_bytes": {"type": "integer", "minimum": 0},
+        "file_extension": {"type": "string", "pattern": "^[a-z]{3,4}$"}
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "controller_owner", "firmware_interface", "driver_filename", "load_method", "permitted_boot_sources", "bootable_fixture"],
+      "properties": {
+        "kind": {"enum": ["kernel-builtin", "kernel-builtin-native-sasi", "external-dos-block-driver"]},
+        "controller_owner": {"type": "string", "minLength": 1},
+        "firmware_interface": {"type": "string", "minLength": 1},
+        "driver_filename": {"type": ["string", "null"]},
+        "load_method": {"type": "string", "minLength": 1},
+        "permitted_boot_sources": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "bootable_fixture": {"const": false}
+      }
+    },
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["transport", "controller_model", "native_unit", "target_id", "lun", "block_bytes", "block_count", "cylinders", "heads", "blocks_per_track"],
+      "properties": {
+        "transport": {"enum": ["fdd", "sasi", "scsi"]},
+        "controller_model": {"type": "string", "minLength": 1},
+        "native_unit": {"type": ["integer", "null"], "minimum": 0, "maximum": 1},
+        "target_id": {"type": ["integer", "null"], "minimum": 0, "maximum": 6},
+        "lun": {"type": ["integer", "null"], "minimum": 0, "maximum": 7},
+        "block_bytes": {"type": "integer", "enum": [256, 512, 1024]},
+        "block_count": {"type": "integer", "minimum": 1, "maximum": 2147483647},
+        "cylinders": {"type": "integer", "minimum": 1, "maximum": 65535},
+        "heads": {"type": "integer", "minimum": 1, "maximum": 255},
+        "blocks_per_track": {"type": "integer", "minimum": 1, "maximum": 255}
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["m17", "guest", "hardware", "planned_data_milestone", "planned_boot_milestone", "planned_write_milestone"],
+      "properties": {
+        "m17": {"enum": ["HOST_VALIDATION_PENDING", "HOST_VALIDATED"]},
+        "guest": {"const": "NOT_QUALIFIED"},
+        "hardware": {"const": "NOT_RUN"},
+        "planned_data_milestone": {"type": "string", "minLength": 1},
+        "planned_boot_milestone": {"type": ["string", "null"]},
+        "planned_write_milestone": {"type": "string", "minLength": 1}
+      }
+    },
+    "volume": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["partition_scheme", "volume_start_device_blocks", "native_boot_reserved_device_blocks", "partition_start_logical_sectors", "partition_length_logical_sectors", "partition_type_code", "partition_entries", "partition_boot_indicator", "logical_sector_bytes", "bpb_sectors_per_track", "bpb_heads", "total_logical_sectors", "hidden_sectors", "reserved_sectors", "fat_count", "fat_bits", "sectors_per_cluster", "root_entries", "media_descriptor", "volume_serial", "volume_label"],
+      "properties": {
+        "partition_scheme": {"enum": ["none", "native-prefix-superfloppy", "mbr-primary"]},
+        "volume_start_device_blocks": {"type": "integer", "minimum": 0},
+        "native_boot_reserved_device_blocks": {"type": "integer", "minimum": 0},
+        "partition_start_logical_sectors": {"type": "integer", "minimum": 0},
+        "partition_length_logical_sectors": {"type": "integer", "minimum": 0},
+        "partition_type_code": {"type": ["integer", "null"], "minimum": 0, "maximum": 255},
+        "partition_entries": {"type": "integer", "minimum": 0, "maximum": 1},
+        "partition_boot_indicator": {"const": 0},
+        "logical_sector_bytes": {"type": "integer", "enum": [512, 1024]},
+        "bpb_sectors_per_track": {"type": "integer", "minimum": 1, "maximum": 255},
+        "bpb_heads": {"type": "integer", "minimum": 1, "maximum": 255},
+        "total_logical_sectors": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+        "hidden_sectors": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "reserved_sectors": {"const": 1},
+        "fat_count": {"const": 2},
+        "fat_bits": {"enum": [12, 16]},
+        "sectors_per_cluster": {"type": "integer", "enum": [1, 2, 4, 8, 16, 32, 64]},
+        "root_entries": {"type": "integer", "minimum": 16, "maximum": 512},
+        "media_descriptor": {"type": "integer", "minimum": 240, "maximum": 255},
+        "volume_serial": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+        "volume_label": {"type": "string", "pattern": "^[A-Z0-9-]{1,11}$"}
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "container", "deployment", "device", "volume", "qualification", "evidence_refs"],
+      "properties": {
+        "name": {"type": "string", "pattern": "^[a-z0-9-]{1,40}$"},
+        "container": {"$ref": "#/$defs/container"},
+        "deployment": {"$ref": "#/$defs/deployment"},
+        "device": {"$ref": "#/$defs/device"},
+        "volume": {"$ref": "#/$defs/volume"},
+        "qualification": {"$ref": "#/$defs/qualification"},
+        "evidence_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    }
+  }
+}

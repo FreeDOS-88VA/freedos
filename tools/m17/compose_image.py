@@ -14,8 +14,8 @@ from build_loader import build_stage, validate_overlay
 
 def compose(payloads, overlay, output, epoch):
     spec = json.loads((ROOT / 'config/m17/media.json').read_text())
-    spec['d88']['disk_name'] = 'FDOS-PC88VA-M16'
-    spec['image']['volume_label'] = 'PC88VA-M16'
+    spec['d88']['disk_name'] = 'FDOS-PC88VA-M17'
+    spec['image']['volume_label'] = 'PC88VA-M17'
     layout = derive_layout(spec)
     geo, fs = spec['geometry'], spec['filesystem']
     bps = geo['bytes_per_sector']

@@ -10,7 +10,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
-spec = importlib.util.spec_from_file_location('carrier_m16', ROOT / 'tools/m17/build_compressed_kernel.py')
+spec = importlib.util.spec_from_file_location('carrier_m17', ROOT / 'tools/m17/build_compressed_kernel.py')
 carrier = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(carrier)
 
@@ -26,7 +26,7 @@ def fixture(length=1024):
 class PlacementTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        (ROOT / 'build/m16').mkdir(parents=True, exist_ok=True)
+        (ROOT / 'build/m17').mkdir(parents=True, exist_ok=True)
 
     def plan(self, h=None, body=None, rel=None, **kw):
         fh, fb, fr = fixture()
@@ -44,7 +44,7 @@ class PlacementTests(unittest.TestCase):
             self.assertEqual(p['ranges']['image'][1], p['stack'][1])
 
     def test_in_place_handoff_frame_does_not_overwrite_relocation_tail(self):
-        with tempfile.TemporaryDirectory(prefix='m16-m13-frame-', dir=ROOT / 'build/m16') as tmp:
+        with tempfile.TemporaryDirectory(prefix='m17-m13-frame-', dir=ROOT / 'build/m17') as tmp:
             tmp = Path(tmp)
             for length in range(32, 64):
                 with self.subTest(length=length):
@@ -139,7 +139,7 @@ class PlacementTests(unittest.TestCase):
         return bytes(body), rel, '\n'.join(rows)
 
     def split_plan(self, body, rel, text, **kwargs):
-        with tempfile.TemporaryDirectory(prefix='m16-m13-split-', dir=ROOT / 'build/m16') as tmp:
+        with tempfile.TemporaryDirectory(prefix='m17-m13-split-', dir=ROOT / 'build/m17') as tmp:
             path = Path(tmp) / 'fixture.map'
             path.write_text(text)
             return carrier.split_image(body, rel, path, 0x1000, **kwargs)
@@ -205,7 +205,7 @@ class PlacementTests(unittest.TestCase):
             h = list(h)
             file_size = 48 + len(b)
             h[1], h[2] = file_size % 512, (file_size + 511) // 512
-            with tempfile.TemporaryDirectory(prefix='m16-m13-placement-', dir=ROOT / 'build/m16') as tmp:
+            with tempfile.TemporaryDirectory(prefix='m17-m13-placement-', dir=ROOT / 'build/m17') as tmp:
                 tmp = Path(tmp)
                 kernel = tmp / 'fixture.exe'
                 kernel.write_bytes(struct.pack('<14H', *h) + r + bytes(16) + b)
@@ -248,7 +248,7 @@ class PlacementTests(unittest.TestCase):
         h = list(h)
         file_size = 48 + len(b)
         h[1], h[2] = file_size % 512, (file_size + 511) // 512
-        with tempfile.TemporaryDirectory(prefix='m16-m13-in-place-', dir=ROOT / 'build/m16') as tmp:
+        with tempfile.TemporaryDirectory(prefix='m17-m13-in-place-', dir=ROOT / 'build/m17') as tmp:
             tmp = Path(tmp)
             kernel = tmp / 'fixture.exe'
             kernel.write_bytes(struct.pack('<14H', *h) + r + bytes(16) + b)
@@ -334,7 +334,7 @@ class PlacementTests(unittest.TestCase):
         h = list(h)
         file_size = 48 + len(b)
         h[1], h[2] = file_size % 512, (file_size + 511) // 512
-        with tempfile.TemporaryDirectory(prefix='m16-m13-low-capacities-', dir=ROOT / 'build/m16') as tmp:
+        with tempfile.TemporaryDirectory(prefix='m17-m13-low-capacities-', dir=ROOT / 'build/m17') as tmp:
             tmp = Path(tmp)
             kernel = tmp / 'fixture.exe'
             kernel.write_bytes(struct.pack('<14H', *h) + r + bytes(16) + b)
@@ -355,7 +355,7 @@ class PlacementTests(unittest.TestCase):
         file_size = 48 + len(body)
         h = list(h)
         h[1], h[2] = file_size % 512, (file_size + 511) // 512
-        with tempfile.TemporaryDirectory(prefix='m16-m13-low-split-', dir=ROOT / 'build/m16') as tmp:
+        with tempfile.TemporaryDirectory(prefix='m17-m13-low-split-', dir=ROOT / 'build/m17') as tmp:
             tmp = Path(tmp)
             kernel = tmp / 'fixture.exe'
             kernel.write_bytes(struct.pack('<14H', *h) + rel + bytes(8) + body)
@@ -377,7 +377,7 @@ class PlacementTests(unittest.TestCase):
         file_size = 48 + len(body)
         h = list(h)
         h[1], h[2] = file_size % 512, (file_size + 511) // 512
-        with tempfile.TemporaryDirectory(prefix='m16-m13-runtime-top-', dir=ROOT / 'build/m16') as tmp:
+        with tempfile.TemporaryDirectory(prefix='m17-m13-runtime-top-', dir=ROOT / 'build/m17') as tmp:
             tmp = Path(tmp)
             kernel = tmp / 'fixture.exe'
             kernel.write_bytes(struct.pack('<14H', *h) + rel + bytes(8) + body)
@@ -421,7 +421,7 @@ class PlacementTests(unittest.TestCase):
         file_size = 48 + len(body)
         h = list(h)
         h[1], h[2] = file_size % 512, (file_size + 511) // 512
-        with tempfile.TemporaryDirectory(prefix='m16-m13-runtime-256-', dir=ROOT / 'build/m16') as tmp:
+        with tempfile.TemporaryDirectory(prefix='m17-m13-runtime-256-', dir=ROOT / 'build/m17') as tmp:
             tmp = Path(tmp)
             kernel = tmp / 'fixture.exe'
             kernel.write_bytes(struct.pack('<14H', *h) + rel + bytes(8) + body)
@@ -453,7 +453,7 @@ class PlacementTests(unittest.TestCase):
         from unicorn import x86_const as r
         source = (ROOT / 'components/fdkernel/pc88va/kernel/m13_platform.asm').read_text()
         routine = source.split('PC88VA_MEMORY_KB:\n', 1)[1].split('; Return the segment', 1)[0]
-        with tempfile.TemporaryDirectory(dir=ROOT / 'build/m16') as tmp:
+        with tempfile.TemporaryDirectory(dir=ROOT / 'build/m17') as tmp:
             asm, binary = Path(tmp) / 'probe.asm', Path(tmp) / 'probe.bin'
             asm.write_text('bits 16\ncpu 8086\n%include "m16_memory_probe.inc"\n' + routine)
             subprocess.run(['nasm', '-f', 'bin', '-I' + str(ROOT / 'components/fdkernel/pc88va/kernel') + '/',
@@ -509,7 +509,7 @@ class PlacementTests(unittest.TestCase):
         from unicorn import x86_const as regs
         source = (ROOT / 'components/fdkernel/pc88va/kernel/m13_platform.asm').read_text()
         entry = source.split('FL_RESET:\n', 1)[1].split('global FL_DISKCHANGED', 1)[0]
-        with tempfile.TemporaryDirectory(prefix='m16-m13-reset-', dir=ROOT / 'build/m16') as tmp:
+        with tempfile.TemporaryDirectory(prefix='m17-m13-reset-', dir=ROOT / 'build/m17') as tmp:
             tmp = Path(tmp)
             asm = tmp / 'reset.asm'
             asm.write_text('bits 16\ncpu 8086\n' + entry)
@@ -550,5 +550,5 @@ class PlacementTests(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    (ROOT / 'build/m16').mkdir(parents=True, exist_ok=True)
+    (ROOT / 'build/m17').mkdir(parents=True, exist_ok=True)
     unittest.main()

@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "name": "baseline-config",
+      "config_source": "CONFIG.SYS",
+      "fdconfig_source": null,
+      "loadseg": "1000",
+      "device_driver": null,
+      "expected_config_file": "CONFIG.SYS"
+    },
+    {
+      "name": "fdconfig-precedence",
+      "config_source": "CONFIG.SYS",
+      "fdconfig_source": "FDCONFIG.control",
+      "loadseg": "1000",
+      "device_driver": null,
+      "expected_config_file": "FDCONFIG.SYS"
+    },
+    {
+      "name": "character-init",
+      "config_source": "CONFIG.SYS",
+      "fdconfig_source": "FDCONFIG.character",
+      "loadseg": "1000",
+      "device_driver": "CFGDEV.SYS",
+      "expected_config_file": "FDCONFIG.SYS"
+    },
+    {
+      "name": "zero-unit-init",
+      "config_source": "CONFIG.SYS",
+      "fdconfig_source": "FDCONFIG.zero-units",
+      "loadseg": "1000",
+      "device_driver": "CFGNONE.SYS",
+      "expected_config_file": "FDCONFIG.SYS"
+    },
+    {
+      "name": "loadseg-2000",
+      "config_source": "CONFIG.loadseg-2000.SYS",
+      "fdconfig_source": "FDCONFIG.control",
+      "loadseg": "2000",
+      "device_driver": null,
+      "expected_config_file": "FDCONFIG.SYS"
+    }
+  ]
+}

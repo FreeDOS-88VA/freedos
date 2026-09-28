@@ -29,7 +29,7 @@ for item in json.loads(sys.stdin.read()):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--image', default='freedos-pc88va-m16:local',
-                        help='Pinned Linux/amd64 image used for the M16 source build')
+                        help='Pinned Linux/amd64 image used for the M17 source build')
     parser.add_argument('--rebuild', action='store_true')
     args = parser.parse_args()
     lock = json.loads((ROOT / 'manifests/toolchains.lock.json').read_text())['canonical']
@@ -38,7 +38,7 @@ def main():
     if exists and not args.rebuild:
         print('Verified existing toolchain:', verify_image(args.image, lock))
         return
-    cache = ROOT / 'build/m16-toolchain-download'
+    cache = ROOT / 'build/m17-toolchain-download'
     cache.mkdir(parents=True, exist_ok=True)
     ow = lock['open_watcom']
     archive = cache / ow['package']

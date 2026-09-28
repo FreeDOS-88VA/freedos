@@ -12,13 +12,17 @@
     },
     {
       "branch": "topic/m17-storage-contracts-media-formats",
-      "commit": "1527da489528367bb8028a8e9576375d35722f50",
+      "commit": "e87e8071c355a99a7f34a8758d4a3368b6523f3d",
+      "merge_parents": [
+        "1527da489528367bb8028a8e9576375d35722f50",
+        "7883c8fac11fab20cb467ad0a93c8799f35b565a"
+      ],
       "name": "fdkernel",
-      "parent_commit": "d8dbbf7111f86ea4800daeac84ac53ba601aaf32",
+      "parent_commit": "1527da489528367bb8028a8e9576375d35722f50",
       "path": "components/fdkernel",
       "repository": "https://github.com/nakatamaho/fdkernel.git",
-      "role": "M16 VA/VA2 floppy I/O, native console input, guest-timed repeat, runtime RAM bounds, and M13 staging ring support",
-      "source_archive_sha256": "c6a42a33e74922f74621a708189da0b27b6cf602c46a0cab9f66592bf310d29f",
+      "role": "M16 accepted VA/VA2 floppy and memory source merged with M17 common CONFIG.SYS passes, VA INIT FAR-call/SS-DS corrections and source-audited DEVICE= support; no SASI/SCSI runtime driver",
+      "source_archive_sha256": "887857e0c6706e47a9c8ea2055f74b3891138ed00564585a0053795e9e7dbc69",
       "upstream": "https://github.com/lpproj/fdkernel.git"
     },
     {
@@ -46,13 +50,36 @@
     "parent_commit": "1af9974700cd4dd1164cc0df56cc062925376148"
   },
   "milestone": "M17",
-  "predecessor_ci": {
-    "attempt": 1,
-    "head_sha": "fc891f3cd424c281680dd15b3f269bef4a4d2880",
-    "run_id": 36308581599
+  "parent_integration": {
+    "merge_commit": "0852dc543ca9c23829a8059776e2f77072ceb947",
+    "preserved_work_parent": "6ef9a327d58e712e8470b5e6746c850c54852bcd",
+    "accepted_m16_parent": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4"
   },
-  "predecessor_status": "partial; scoped host and guest checkpoint, not M16 acceptance",
-  "schema_version": 1,
-  "start_sha": "fc891f3cd424c281680dd15b3f269bef4a4d2880",
-  "status": "current-m17"
+  "predecessor": {
+    "milestone": "M16",
+    "publication_tip": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4",
+    "status": "M16 PASS / HANDOFF READY; physical hardware NOT RUN",
+    "kernel_component": "7883c8fac11fab20cb467ad0a93c8799f35b565a",
+    "freecom_component": "29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e",
+    "country_component": "23f189cca3420606eae8723884fa92ccd65eb307"
+  },
+  "predecessor_ci": [
+    {
+      "workflow": "M16 isolated source build",
+      "run_id": 36381203803,
+      "attempt": 1,
+      "head_sha": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4",
+      "conclusion": "success"
+    },
+    {
+      "workflow": "M16 scaffold",
+      "run_id": 36381203807,
+      "attempt": 1,
+      "head_sha": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4",
+      "conclusion": "success"
+    }
+  ],
+  "schema_version": 2,
+  "start_sha": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4",
+  "status": "M17 implementation and qualification pending"
 }

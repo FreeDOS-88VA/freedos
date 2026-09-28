@@ -18,8 +18,22 @@ cd /work/source
 python3 tools/m17/verify_isolation.py
 python3 tools/m17/verify_source_audit.py
 mkdir -p /work/pydeps
-python3 -m zipfile -e /input/unicorn-*.whl /work/pydeps
+wheel_count=0
+for wheel in /input/*.whl; do
+    python3 -m zipfile -e "$wheel" /work/pydeps
+    wheel_count=$((wheel_count + 1))
+done
+test "$wheel_count" -eq 6
 export PYTHONPATH=/work/pydeps
+python3 - <<'PY'
+import json
+from importlib.metadata import version
+from pathlib import Path
+spec=json.loads(Path('config/m17/host-tooling.json').read_text())
+assert version(spec['verifier_wheel']['package']) == spec['verifier_wheel']['version']
+for item in spec['schema_wheels']:
+    assert version(item['package']) == item['version']
+PY
 python3 - <<'PY'
 import hashlib,json
 from pathlib import Path
@@ -65,6 +79,7 @@ nasm -f bin country.asm -o /work/result/COUNTRY.SYS
 cd /work/source
 nasm -f bin tests/m17/config_device.asm -o /work/result/CFGDEV.SYS
 nasm -f bin tests/m17/config_state.asm -o /work/result/CFGSTATE.COM
+nasm -f bin tests/m17/config_memory.asm -o /work/result/CFGMEM.COM
 nasm -f bin -DZERO_UNITS=1 tests/m17/config_device.asm -o /work/result/CFGNONE.SYS
 nasm -f bin tests/m17/config_probe.asm -o /work/result/CFGPROBE.COM
 nasm -f bin tests/m17/system_com_probe.asm -o /work/result/COMPROBE.COM
@@ -75,15 +90,24 @@ wlink system dos option quiet name /work/result/MZPROBE.EXE file /work/result/mz
 python3 tools/m17/finish_image.py --output /work/result
 mkdir -p build
 python3 tools/m17/verify_m13_linked_placement.py --kernel /work/result/kernel-linked.exe --map /work/result/kernel.map --carrier /work/result/KERNEL.SYS --placement /work/result/carrier.json
+run_suite() {
+    suite=$1
+    pattern=$2
+    printf '\nM17_TEST_BEGIN %s\n' "$suite"
+    python3 -B -m unittest discover -s tests/m17 -p "$pattern"
+    printf 'M17_TEST_PASS %s\n' "$suite"
+}
 if [ "${M17_BUILD_PASS:-1}" = 1 ]; then
-python3 -B -m unittest discover -s tests/m17 -p 'test_storage.py'
-python3 -B -m unittest discover -s tests/m17 -p 'test_m13_memory_placement.py'
-python3 -B -m unittest discover -s tests/m17 -p 'test_m13_carrier_tail.py'
-python3 -B -m unittest discover -s tests/m17 -p 'test_floppy_media.py'
-python3 -B -m unittest discover -s tests/m17 -p 'test_loader_builder.py'
-python3 -B -m unittest discover -s tests/m17 -p 'test_loadseg_contract.py'
-python3 -B -m unittest discover -s tests/m17 -p 'test_freecom_input_source.py'
-python3 -B -m unittest discover -s tests/m17 -p 'test_dos_input_probe.py'
-python3 -B -m unittest discover -s tests/m17 -p 'test_dos_freecom_editor.py'
-python3 -B -m unittest discover -s tests/m17 -p 'test_dos_repeat_probe.py'
+run_suite storage test_storage.py
+run_suite config-qa test_config_qa.py
+run_suite m13-memory-placement test_m13_memory_placement.py
+run_suite m13-carrier-tail test_m13_carrier_tail.py
+run_suite floppy-media test_floppy_media.py
+run_suite loader-builder test_loader_builder.py
+run_suite loadseg-contract test_loadseg_contract.py
+run_suite freecom-input-source test_freecom_input_source.py
+run_suite dos-input-probe test_dos_input_probe.py
+run_suite dos-freecom-editor test_dos_freecom_editor.py
+run_suite dos-repeat-probe test_dos_repeat_probe.py
+run_suite acceptance test_acceptance.py
 fi

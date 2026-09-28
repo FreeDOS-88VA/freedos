@@ -16,9 +16,6 @@ on:
       - 'manifests/toolchains.lock.json'
       - 'tests/m17/**'
       - 'tools/m17/**'
-      - 'tools/qa/current_components.py'
-      - 'tools/verify_scaffold.py'
-      - 'Makefile'
   workflow_dispatch:
 
 permissions:
@@ -36,17 +33,17 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
-      - name: Assert native x64 and configure component provenance
+      - name: Assert native x64 and configure M17-local component remotes
         run: |
           test "$(uname -m)" = x86_64
           test "$(dpkg --print-architecture)" = amd64
-          bash tools/configure_component_remotes.sh
-      - name: Verify component lock
-        run: make verify-scaffold
+          python3 -B tools/m17/component_remotes.py --configure
       - name: Build or verify the pinned Linux/amd64 Open Watcom toolchain
         run: python3 -B tools/m17/toolchain.py
       - name: Build the full distribution twice from clean source exports
         run: python3 -B tools/m17/build_image.py --output build/m17-ci
+      - name: Verify M17 host build acceptance from the exact clean-build outputs
+        run: python3 -B tools/m17/verify_acceptance.py --build build/m17-ci
       - name: Confirm public source checkouts remain clean
         run: |
           git diff --check

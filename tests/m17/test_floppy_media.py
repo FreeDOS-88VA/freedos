@@ -9,7 +9,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location(
-    'm16_floppy_media', ROOT / 'tools/m17/build_floppy_media.py')
+    'm17_floppy_media', ROOT / 'tools/m17/build_floppy_media.py')
 MEDIA = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MEDIA)
 
