@@ -303,6 +303,17 @@ multi-cluster kernel file.
 | 2HD 1232 KiB | 1024 | 1281968 | `82e8b8606382b5542603ce56bd1377556cba3fe666bd41f54481a0d100a2441d` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
 | 2HD 1280 KiB control | 1024 | 1331888 | `d4cba918550638bed324128e86fda0bf96d5a19f2371b7dbdf8cbcf55e3fea57` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
 
+VA2 screen confirmation for each boot profile:
+
+| Profile | FreeDOS startup screen | `DIR` screen | `COPY` result visible on screen | Result |
+| --- | --- | --- | --- | --- |
+| 2D 320 KiB (512 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+| 2D 360 KiB (512 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+| 2DD 640 KiB (512 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+| 2DD 720 KiB (512 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+| 2HD 1232 KiB (1024 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+| 2HD 1280 KiB control (1024 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+
 For each profile/model, the guest booted the pristine candidate with
 `RAMCHECK.TXT` absent, created it with DOS `COPY`, and displayed it with
 `TYPE`. Host inspection compared its bytes with `COMDATA.TXT`. A separate fresh
@@ -322,7 +333,8 @@ and Unicorn wheel SHA-256
 Scoped **VAEG PASS**: the six listed boot profiles on both VA and VA2, plus
 fresh-process file readback on both models. VAEG CI run 36277471921 succeeded at
 its exact source commit; kernel CI run 36360705941 succeeded at the exact kernel
-commit. Parent CI for this implementation is pending publication. Hardware is
-NOT RUN. These profile results do not complete the broader M16 physical B:,
+commit; parent M16 isolated-source-build CI run 36363378815 succeeded at parent
+report tip `be712ec153a6b0391fb9d19be0682e9501148bee`. Hardware is NOT RUN.
+These profile results do not complete the broader M16 physical B:,
 format-swap/error, cursor, repeat and function-key acceptance matrix. Overall
 M16 remains partial; this is not a designated milestone distribution.
