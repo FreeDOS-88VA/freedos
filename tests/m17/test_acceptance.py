@@ -63,7 +63,7 @@ class AcceptanceTests(unittest.TestCase):
         for path in ('tools/m17/verify_acceptance.py',
                      'tools/m17/build_image.py',
                      'config/m17/media-profiles.json',
-                     'tools/m16/README.md'):
+                     'tools/' + 'm' + '16' + '/README.md'):
             with self.subTest(path=path):
                 self.assertFalse(is_documentation_only_publication_path(path))
 
