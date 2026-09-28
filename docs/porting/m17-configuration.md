@@ -68,7 +68,7 @@ expected active filename:
 | Profile | Distinguishing path | Host artifact role |
 | --- | --- | --- |
 | `baseline-config` | Default `CONFIG.SYS`, LOADSEG 1000h | Normal parser/default regression |
-| `fdconfig-precedence` | Different BUFFERS/FILES in `FDCONFIG.SYS` | Proves FDCONFIG selection by observed kernel state |
+| `fdconfig-precedence` | BUFFERS=8 and FILES=24 in `FDCONFIG.SYS` versus 10/16 in `CONFIG.SYS` | Proves FDCONFIG selection through both observed kernel values |
 | `character-init` | `DEVICE=CFGDEV.SYS` | Positive CONFIG-loaded character-driver INIT/open test |
 | `zero-unit-init` | `DEVICE=CFGNONE.SYS` | Block-driver zero-unit case; must add no DOS unit or retained allocation |
 | `loadseg-2000` | LOADSEG 2000h in CONFIG plus FDCONFIG override | Exercises non-default LOADSEG through the real early loader and later parser |
@@ -82,6 +82,13 @@ count, LASTDRIVE, SFT capacity and registered DOS block-unit count through
 INT 21h/AH=52h. CFGMEM.COM requests the largest DOS MCB block, releases it, and
 prints the reported paragraph count. These are built from `tests/m17/*.asm` and
 are added only to the distinct QA disks, not the ordinary candidate image.
+
+The source-linked FreeDOS `Files()` handler retains `max(Config.cfgFiles,
+requested)`, with `NFILES=16` as the VA default. Therefore the separate character
+and zero-unit profiles' `FILES=12` does not lower the table; that is selected
+upstream behavior, not a FDCONFIG-selection failure. The precedence profile
+uses 24 so both its buffer and file-table values distinguish FDCONFIG from the
+default CONFIG.SYS.
 
 Host-side profile checks establish that every referenced configuration exists,
 that the LOADSEG directive agrees with its profile, and that the distinguishing

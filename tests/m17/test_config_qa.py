@@ -45,7 +45,7 @@ class ConfigQaTests(unittest.TestCase):
         self.assertIn('BUFFERS=10', default)
         self.assertIn('FILES=16', default)
         self.assertIn('BUFFERS=8', selected)
-        self.assertIn('FILES=12', selected)
+        self.assertIn('FILES=24', selected)
         self.assertEqual(self.by_name['fdconfig-precedence']['expected_config_file'],
                          'FDCONFIG.SYS')
         for name, driver in (('character-init', 'CFGDEV.SYS'),
