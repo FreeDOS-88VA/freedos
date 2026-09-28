@@ -278,3 +278,51 @@ short-BPB fixtures and positive/negative component tests cover the correction;
 all 330 component tests pass locally. The preceding corrected-FAT candidate
 completed the VA/B: 2HC boundary and fresh-process persistence row, but this
 additional kernel change requires renewed exact-candidate guest qualification.
+
+## Boot profiles and exact-candidate new-file verification (2026-09-28)
+
+Parent implementation: `d4552868de2494b6b311c8610d88e71d2732eafa`.
+Kernel component: `7883c8fac11fab20cb467ad0a93c8799f35b565a`.
+The 512-byte first stage now reads its contiguous stage-2 extent one sector at
+a time so the entire reader fits in the ROM-loaded boot sector. The 1024-byte
+path retains the shared disk reader. M16 boot profiles use 512-byte sectors for
+2D/2DD and 1024-byte sectors for 2HD. The 2HC 1200 KiB profile remains a data
+volume; it is not designated as a boot profile.
+
+Each row was built twice from the allowlisted committed inputs in separate
+Linux/amd64 containers. The independent artifact manifests and final D88 bytes
+matched. Host media readback verified every source payload, including the
+multi-cluster kernel file.
+
+| Boot profile | Sector bytes | Candidate D88 bytes | Candidate SHA-256 | VA and VA2 guest result |
+| --- | ---: | ---: | --- | --- |
+| 2D 320 KiB | 512 | 338608 | `602213713ec4df46255b447813abc2f1c1f06752eeccfd0a58a428b4d0fd5d0b` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+| 2D 360 KiB | 512 | 380848 | `69155cc74d7cb4e26ccc73164597a62961d5eb07c228b51aab628b403dd2b63b` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+| 2DD 640 KiB | 512 | 676528 | `207ddbd727a2df2cf87ee82cd8b5b302abdc3cf824a35a689d1754dadd2c75fe` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+| 2DD 720 KiB | 512 | 761008 | `08c060ecf9c3247d3437ac1c88f2b15f4bb918a1e4343cbe731eabf0d763c035` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+| 2HD 1232 KiB | 1024 | 1281968 | `82e8b8606382b5542603ce56bd1377556cba3fe666bd41f54481a0d100a2441d` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+| 2HD 1280 KiB control | 1024 | 1331888 | `d4cba918550638bed324128e86fda0bf96d5a19f2371b7dbdf8cbcf55e3fea57` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+
+For each profile/model, the guest booted the pristine candidate with
+`RAMCHECK.TXT` absent, created it with DOS `COPY`, and displayed it with
+`TYPE`. Host inspection compared its bytes with `COMDATA.TXT`. A separate fresh
+VAEG process reopened each VA and VA2 image, displayed the directory and file
+contents, and left the image unchanged. COM and relocated MZ output files also
+matched their expected bytes. These results bind to the VAEG source commit
+`62a597f0ee81e2e036af740a3e79ad3da83e3fb7` and Linux executable SHA-256
+`c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf` recorded
+in `config/m16/vaeg-candidate.json`.
+
+Scoped **HOST PASS**: six complete two-build profile runs from parent
+`d4552868de2494b6b311c8610d88e71d2732eafa`, kernel
+`7883c8fac11fab20cb467ad0a93c8799f35b565a`, toolchain image
+`sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df`,
+and Unicorn wheel SHA-256
+`9d6e6dea140560de4ebd8446661f7ef84a357d428c14a3ef09dacd306ec8c239`.
+Scoped **VAEG PASS**: the six listed boot profiles on both VA and VA2, plus
+fresh-process file readback on both models. VAEG CI run 36277471921 succeeded at
+its exact source commit; kernel CI run 36360705941 succeeded at the exact kernel
+commit. Parent CI for this implementation is pending publication. Hardware is
+NOT RUN. These profile results do not complete the broader M16 physical B:,
+format-swap/error, cursor, repeat and function-key acceptance matrix. Overall
+M16 remains partial; this is not a designated milestone distribution.
