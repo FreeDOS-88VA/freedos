@@ -54,13 +54,12 @@ entries used. The configured sample-workflow policy is 32 clusters, leaving
 measured; the build explicitly reports it pending and this policy is not guest
 qualification.
 
-The host-side corresponding source/license bundle from the same local candidate
-is 2,193,520 bytes, SHA-256
-`2d6483618998c68aa427c8b5fdce11cc7b61c635aad2d78a7bc4aa05e2cdb3e0`. It
+A host-side corresponding source/license bundle accompanies the D88 and
 contains the allowlisted parent build inputs and source archives for all pinned
-components. The local distribution contains a build manifest, package manifest,
-capacity record and two-build comparison. These artifacts are generated local
-candidates, not yet a designated or archived milestone release.
+components. Its exact size and SHA-256, along with the parent revision, are
+recorded in the generated build manifest. The local distribution contains a
+package manifest, capacity record and two-build comparison. These are generated
+local candidates, not yet a designated or archived milestone release.
 
 The same 53 M18 host tests passed in `make m18-host-tests` and in the clean
 build containers. The build also runs the M18 isolation and public-source
