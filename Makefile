@@ -164,6 +164,9 @@ help:
 		'  m15-loader-build  Build a loader twice from one explicit overlay and bind its inputs' \
 		'  m15-image         Build complete media twice from public source inputs' \
 		'  m15-toolchain     Prepare or verify the pinned M15 build environment' \
+		'  m18-toolchain     Prepare or verify the pinned M18 Linux/amd64 environment' \
+		'  m18-disk          Build and compare two isolated M18 native 2HD disks' \
+		'  m18-clean         Remove only marked M18 intermediate build output' \
 		'  help              Show this help' \
 		'  submodules        Initialize/update locked submodules' \
 		'  component-status  Show submodule status' \
@@ -550,3 +553,18 @@ m17-build:
 m17-fixtures:
 	python3 -B tools/m17/produce.py --profiles config/m17/media-profiles.json --output $(if $(M17_FIXTURES),$(M17_FIXTURES),build/m17-storage)
 	python3 -B tools/m17/inspect_storage.py --profiles config/m17/media-profiles.json --directory $(if $(M17_FIXTURES),$(M17_FIXTURES),build/m17-storage)
+
+M18_PYTHON ?= python3
+M18_IMAGE ?= freedos-pc88va-m18:local
+M18_OUTPUT ?= build/m18
+M18_DIST ?= dist/m18
+M18_WHEEL_CACHE ?= $(CURDIR)/build/m18-wheel-cache
+.PHONY: m18-toolchain m18-disk m18-clean m18-host-tests
+m18-toolchain:
+	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/toolchain.py --image "$(M18_IMAGE)"
+m18-disk: m18-toolchain
+	@M18_WHEEL_CACHE="$(M18_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/build_image.py --output "$(M18_OUTPUT)" --dist "$(M18_DIST)" --image "$(M18_IMAGE)"
+m18-clean:
+	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/clean.py --path "$(M18_OUTPUT)"
+m18-host-tests:
+	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B -m unittest discover -s tests/m18 -p 'test_*.py' -v

@@ -1,6 +1,8 @@
 # M18 goal: conventional memory and a compact PC-88VA basic disk
 
-Revision: 2026-09-27. The practical distribution is exactly one bootable 2HD floppy.
+Revision: 2026-09-28. Start from the integrated parent main commit identified by
+the user as `d81bba18...`. The practical distribution remains exactly one
+bootable 2HD floppy.
 Repository placement: `docs/tasks/M18-memory-layout-basic-disk-goal-Codex.md`
 in the active FreeDOS task worktree on `ryzen`.
 
@@ -61,6 +63,49 @@ goal. Code, comments, developer documentation, help and disk text use English
 ASCII. Existing native VA/V30 platform requirements remain intact.
 
 ## 1. Environment and preservation
+
+### 1.1. Required integrated-main baseline
+
+The user explicitly selected the integrated parent repository `main` commit
+whose supplied SHA prefix is `d81bba18` as the starting point for M18. This
+replaces the earlier generic instruction to select an M16/M17 task baseline.
+The full SHA has not been supplied here; resolve it from the actual repository
+and record it. The ellipsis is prose, not part of a Git revision argument.
+
+Before implementation:
+
+1. Identify the intended FreeDOS parent repository and its authoritative main
+   remote/tracking ref. Resolve `d81bba18` to exactly one commit object; verify
+   that it belongs to the integrated main history. Fetch the intended remote
+   normally if necessary, without resetting a worktree or changing shared main.
+   Record the full baseline SHA, relevant main ref/tip and the M16/M17 acceptance
+   records associated with this integrated state. A short prefix alone is not
+   a completed identity check.
+2. Create an isolated M18 topic branch/worktree from that exact resolved commit.
+   Do not silently substitute the current main tip if it has advanced, or an
+   older M16/M17 topic tip. Keep existing checkouts and dirty changes intact.
+   On resumption, reuse an existing M18 worktree descended from this baseline
+   after checking its recorded source identity; do not restart completed work.
+3. Resolve component gitlinks, locks, toolchain and required VAEG/control-image
+   identities from this baseline and its accepted records. Check out task-owned
+   component worktrees at those pins before scoped changes. Do not update a
+   component to its latest branch tip merely because parent main was integrated.
+4. Preserve any earlier unmerged M18 work separately. If it is needed, review
+   and port its scoped changes onto the selected baseline with explicit source
+   provenance and affected validation. Do not merge an unrelated old task tree
+   wholesale, drop dirty fixes or reset another user's worktree.
+5. If the prefix is absent/ambiguous after available normal retrieval, or cannot
+   be reconciled with the intended main history, report that exact discrepancy
+   with candidate identities. Do not invent the full SHA or choose a different
+   baseline silently. An unambiguous verified prefix needs no renewed permission.
+
+The user reports integration; actual acceptance and source relationships still
+need inspection. Reuse valid M16/M17 evidence tied to this integrated state;
+rerun affected checks for a concrete change or evidence gap, not the whole prior
+project merely to begin M18. All subsequent manifests must distinguish this
+fixed starting SHA from the final M18 parent/component revisions.
+
+### 1.2. Host paths and preservation
 
 The active host is `ryzen`, Ubuntu 24.04 amd64. Resolve its actual home directory:
 
@@ -509,7 +554,7 @@ contracts. The superseded broad M18 package requirements are not cumulative.
 
 | Gate | Required evidence |
 | --- | --- |
-| M18-BASELINE | Actual M16/M17 prerequisites, native memory contract, sources/toolchains and matched control identified |
+| M18-BASELINE | User-selected d81bba18 prefix resolves to one recorded full parent SHA in integrated main history; M18 descends from that exact baseline; actual M16/M17 prerequisites, component pins, native memory contract, toolchains and matched control identified |
 | M18-MEMORY-MAP | Before/after physical/resident/MCB ownership accounting; all proposed reclaimed or unavailable RAM explained |
 | M18-MEMORY-REPAIR | Demonstrated stale/wasteful reservations or allocator/lifetime defects resolved; any disproved suspicion documented without fabricated savings |
 | M18-ALLOC-EXEC | Real allocation/free/resize, fragmentation/coalescing, low-memory errors, COM/MZ EXEC and stable child termination |
@@ -628,5 +673,5 @@ implementation. These references establish upstream capabilities, not VA PASS.
 Invocation from the selected M18 task worktree:
 
 ```text
-/goal Read docs/tasks/M18-memory-layout-basic-disk-goal-Codex.md and docs/freedos-pc88va-milestones-M13-M32.md in full. Continue from the actual M16/M17 baseline on ryzen and complete the revised compact M18: account for conventional-memory/MCB ownership, repair proven waste/lifetime/fragmentation defects, provide MEMMAP, and build exactly one public-ready bootable native 2HD disk with the 8086-class selected MS-DOS 2.11-era tools and real-mode JWASMR. Preserve the common FreeDOS kernel and NECPC88VA FreeCOM and their DOS API level. Verify guest edit/assemble/COM-and-MZ-execute behavior on a writable copy on A: with B: empty; all mandatory tools must fit on that one disk. Keep companion sources/licenses outside the image and prohibit a supplemental tools disk. Preserve separate disposable QA media. Then implement isolated public-input-only make m18-disk, and deliver the exact tested single D88, sources/licenses, capacity budget and manifests, topic commits/pushes and applicable CI. Replace the earlier broad English-distribution goal; do not require full FreeDOS package parity or Japanese support. Keep current M13-M32 numbering, applying the older M18-M31 to M19-M32 mapping only if not yet adopted. Report every 30 minutes and use the consultation rules while continuing independent work. Preserve private/public separation and all earlier accepted behavior. Do not stop at a diagnostic result, weaken the mandatory gates or start M19.
+/goal Read docs/tasks/M18-memory-layout-basic-disk-goal-Codex.md and docs/freedos-pc88va-milestones-M13-M32.md in full. On ryzen, resolve the user-selected integrated main commit prefix d81bba18 to its unique full parent SHA, verify it is in the intended main history, and start or resume an isolated M18 topic worktree from that exact baseline and its component pins. Preserve existing work; do not substitute an advanced main tip or old M16/M17 branch. Complete the revised compact M18: account for conventional-memory/MCB ownership, repair proven waste/lifetime/fragmentation defects, provide MEMMAP, and build exactly one public-ready bootable native 2HD disk with the 8086-class selected MS-DOS 2.11-era tools and real-mode JWASMR. Preserve the common FreeDOS kernel and NECPC88VA FreeCOM and their DOS API level. Verify guest edit/assemble/COM-and-MZ-execute behavior on a writable copy on A: with B: empty; all mandatory tools must fit on that one disk. Keep companion sources/licenses outside the image and prohibit a supplemental tools disk. Preserve separate disposable QA media. Then implement isolated public-input-only make m18-disk, and deliver the exact tested single D88, sources/licenses, capacity budget and manifests, topic commits/pushes and applicable CI. Replace the earlier broad English-distribution goal; do not require full FreeDOS package parity or Japanese support. Keep current M13-M32 numbering, applying the older M18-M31 to M19-M32 mapping only if not yet adopted. Report every 30 minutes and use the consultation rules while continuing independent work. Preserve private/public separation and all earlier accepted behavior. Do not stop at a diagnostic result, weaken the mandatory gates or start M19.
 ```

@@ -1,0 +1,51 @@
+M18 QUICKSTART - edit, assemble, and run on A:
+
+1. Make room and copy the original examples into a work directory:
+
+   MD WORK
+   CD WORK
+   COPY A:\HELLO.ASM HELLO.ASM
+   COPY A:\MZDEMO.ASM MZDEMO.ASM
+   COPY A:\BUILD.BAT BUILD.BAT
+
+2. Edit a copy of the COM example with EDLIN:
+
+   EDLIN HELLO.ASM
+
+   At the EDLIN prompt, enter 1 to replace the first line. Type the replacement
+   comment line and press Enter. Enter E to save the file and quit. EDLIN keeps
+   the previous contents as HELLO.BAK when it rewrites HELLO.ASM. Reopen the
+   edited file with TYPE HELLO.ASM to confirm the saved text.
+
+3. Build and run both 8086 examples:
+
+   BUILD
+
+   BUILD.BAT deletes old outputs before assembly, stops on an assembler error,
+   runs the fresh COM and MZ executables, and finishes with MEMMAP /CHECK.
+   JWASMR -bin writes a raw binary for the .model tiny COM source. JWASMR -mz
+   writes a DOS MZ executable for the .model small source. Neither needs a
+   separate linker. Both examples use DOS INT 21h for output and termination.
+
+4. You can also run the individual commands:
+
+   JWASMR -0 -bin -Fo=HELLO.COM HELLO.ASM
+   HELLO.COM
+   JWASMR -0 -mz -Fo=MZDEMO.EXE MZDEMO.ASM
+   MZDEMO.EXE
+   MEMMAP /CHECK
+
+If assembly reports an error, BUILD.BAT does not run an old executable: it
+removes previous outputs first. Fix the source and run BUILD again. These
+small samples are not a promise that arbitrary large source files fit memory.
+
+Other useful commands:
+
+   MEMMAP /?             Show memory-map help.
+   MEMMAP                 List the checked DOS MCB chain.
+   MEMMAP > MEMORY.TXT    Redirect the map through DOS standard output.
+   MORE README.TXT        Page through text (Space, Enter, or Q).
+   CHKDSK A:              Check this disk without repairing it.
+
+Use FORMAT and SYS only on a disposable native 2HD target in B:. FORMAT does
+not low-level format tracks. Do not use A: or the release master as a target.

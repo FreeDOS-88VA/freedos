@@ -10,3 +10,10 @@
 	path = components/country
 	url = https://github.com/FDOS/country.git
 	branch = master
+[submodule "components/edlin"]
+	path = components/edlin
+	url = https://github.com/FDOS/edlin.git
+[submodule "components/jwasm"]
+	path = components/jwasm
+	url = https://github.com/nakatamaho/JWasm.git
+	branch = m18-corresponding-source-notice

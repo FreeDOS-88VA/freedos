@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "milestone": "M18",
+  "disk_profile": "PC-88VA native 2HD: 80 cylinders, 2 heads, 8 sectors/track, 1024 bytes/sector, 1280 logical sectors, FAT12",
+  "cpu_contract": "Native boot path uses the documented VA/V30 profile; required DOS applications and examples target 8086 real mode and require no FPU, XMS, EMS, or protected mode.",
+  "packages": [
+    {
+      "id": "fdkernel",
+      "version": "FreeDOS kernel DOS 6.22 interface, revision 43, OEM ID FD (pinned source commit supplies the image)",
+      "files": ["LOADER.BIN", "KERNEL.SYS"],
+      "source_lock": "fdkernel",
+      "license": "GPL-2.0-or-later",
+      "cpu": "Native PC-88VA V30 boot adapter; common FreeDOS kernel application interface",
+      "va_adaptation": "Pinned fdkernel PC-88VA loader/kernel integration and M18 native 2HD profile",
+      "tests": ["clean kernel/carrier build", "linked-placement verifier", "native guest boot pending"]
+    },
+    {
+      "id": "freecom",
+      "version": "FreeCOM 0.87",
+      "files": ["COMMAND.COM"],
+      "source_lock": "freecom",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 real mode",
+      "va_adaptation": "Pinned NECPC88VA FreeCOM configuration, English build, fixed reproducible timestamp",
+      "tests": ["clean source build", "normal prompt and command qualification pending"]
+    },
+    {
+      "id": "country",
+      "version": "COUNTRY.SYS 2.0",
+      "files": ["COUNTRY.SYS"],
+      "source_lock": "country",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 data file",
+      "va_adaptation": "Unmodified pinned public COUNTRY.SYS source; Japanese/NLS support is out of scope",
+      "tests": ["clean NASM build", "DOS use not enabled in default configuration"]
+    },
+    {
+      "id": "edlin",
+      "version": "EDLIN 2.10c",
+      "files": ["EDLIN.EXE"],
+      "source_lock": "edlin",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 DOS MZ",
+      "va_adaptation": "Pinned FreeDOS EDLIN source, English ASCII messages, Open Watcom large-model build",
+      "tests": ["clean build", "guest ASCII load/edit/save/reopen pending"]
+    },
+    {
+      "id": "more",
+      "version": "M18 project-authored DOS-service pager 1",
+      "files": ["MORE.EXE"],
+      "source": "tools/m18/programs/more.c",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 DOS MZ",
+      "va_adaptation": "Original small pager uses DOS file I/O, DOS stdout, and DOS console input; no IBM BIOS access",
+      "tests": ["clean build", "guest paging and redirected-output qualification pending"]
+    },
+    {
+      "id": "maintenance",
+      "version": "M18 project-authored native 2HD maintenance 1",
+      "files": ["CHKDSK.EXE", "FORMAT.EXE", "SYS.EXE"],
+      "source": "tools/m18/maintenance/",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 DOS MZ",
+      "va_adaptation": "Project-owned native 1024-byte-sector FAT12 maintenance for the explicitly declared 2HD profile; CHKDSK is read-only; FORMAT initializes filesystem metadata only on a readable B: volume with a valid native 2HD BPB from prior preparation; SYS transfers selected native system files and boot sector to disposable B: media",
+      "tests": ["synthetic FAT/volume tests pending", "disposable native guest media and boot test pending"]
+    },
+    {
+      "id": "memmap",
+      "version": "M18 MEMMAP 1",
+      "files": ["MEMMAP.EXE"],
+      "source": "tools/m18/memmap/",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 DOS MZ",
+      "va_adaptation": "FreeDOS-version/layout-checked AH=52h MCB-chain reader; no direct BIOS calls",
+      "tests": ["native synthetic MCB tests", "DOS resize/output and independent guest comparison pending"]
+    },
+    {
+      "id": "jwasm",
+      "version": "JWasm 2.20 real-mode DOS16 build",
+      "files": ["JWASMR.EXE", "JWASM.LIC"],
+      "source_lock": "jwasm",
+      "license": "Sybase Open Watcom Public License 1.0",
+      "cpu": "8086 real-mode DOS MZ; no protected-mode extender",
+      "va_adaptation": "Pinned JWasm DOS16 source recipe, Open Watcom 1.9 build with optional host/COFF/ELF/386 features disabled, plus reproducible M18 source/license notice",
+      "tests": ["clean build and MZ accounting", "guest help/COM/MZ/error/low-memory qualification pending"]
+    },
+    {
+      "id": "starter-material",
+      "version": "M18 original examples and quickstart 1",
+      "files": ["README.TXT", "QUICKSTR.TXT", "HELLO.ASM", "MZDEMO.ASM", "BUILD.BAT", "COPYING"],
+      "source": "config/m18/payload/ and public component license files",
+      "license": "GPL-2.0-or-later; sample assembly text is project-authored",
+      "cpu": "ASCII DOS text and 8086 assembly examples",
+      "va_adaptation": "Original English/ASCII instructions and linker-free COM/MZ examples",
+      "tests": ["8.3 names and source command inspection", "guest edit/build/run workflow pending"]
+    }
+  ],
+  "optional_tools": {
+    "FIND": "omitted: not needed for the selected workflow",
+    "SORT": "omitted: not needed for the selected workflow",
+    "DISKCOPY": "omitted: separate disk-copy utility is not required",
+    "DISKCOMP": "omitted: separate disk-compare utility is not required",
+    "FC_COMP": "omitted: not needed for the selected workflow",
+    "MEM": "omitted: MEMMAP supplies the required checked MCB view",
+    "DEBUG": "omitted: debugger is not required and would broaden scope",
+    "XCOPY_MOVE_REPLACE_CHOICE": "omitted: outside the fixed compact payload",
+    "FULLSCREEN_EDIT": "omitted: EDLIN is the selected small line editor",
+    "JAPANESE_NLS_LFN": "omitted: later milestone scope"
+  }
+}
