@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "milestone": "M16",
+  "status": "M16 PASS",
+  "identities": {
+    "START_SHA": "1af9974700cd4dd1164cc0df56cc062925376148",
+    "QUALIFIED_IMPLEMENTATION_SHA": "d4552868de2494b6b311c8610d88e71d2732eafa",
+    "DOWNSTREAM_BASE_SHA": "fc891f3cd424c281680dd15b3f269bef4a4d2880"
+  },
+  "components": {
+    "fdkernel": "7883c8fac11fab20cb467ad0a93c8799f35b565a",
+    "freecom": "29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e",
+    "country": "23f189cca3420606eae8723884fa92ccd65eb307"
+  },
+  "toolchain": {
+    "linux_amd64_image_sha256": "51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df",
+    "unicorn_version": "2.1.4",
+    "unicorn_wheel_sha256": "9d6e6dea140560de4ebd8446661f7ef84a357d428c14a3ef09dacd306ec8c239"
+  },
+  "vaeg": {
+    "repository": "https://github.com/nakatamaho/vaeg.git",
+    "branch": "topic/m16-vaeg-2d-native-console",
+    "commit": "62a597f0ee81e2e036af740a3e79ad3da83e3fb7",
+    "linux_executable_sha256": "c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf",
+    "mingw64_executable_sha256": "a331b4f8314a1f8c8f07cd6098b78b1e0f9986c66a4866d4419a2f0a74f616eb",
+    "mingw64_build": "mingw-release; SDL2 and non-system dependencies statically linked",
+    "ci_run_id": 36277471921
+  },
+  "distribution": {
+    "manifest_path": "images/milestones/m16/manifest.json",
+    "manifest_sha256": "2ae11685d7fd4ce4c302435fff8a7b5fbbe53e8b0a84df4175f29bb2438ecc8f",
+    "archive_path": "images/milestones/m16/freedos-pc88va-m16-2hd-1280.d88.xz",
+    "archive_bytes": 113672,
+    "archive_sha256": "6be8c3e0d85d2182cf5ad2c48cdffba8880b6b29026777c5e1bfc9df721e579b",
+    "image_bytes": 1331888,
+    "image_sha256": "d4cba918550638bed324128e86fda0bf96d5a19f2371b7dbdf8cbcf55e3fea57",
+    "profile": "2HD 1280 KiB, 1024 bytes per sector"
+  },
+  "report": {
+    "path": "docs/porting/m16-report.md",
+    "sha256": "1259d34a27f8111f18ba10f40f64c75912202bb765ea25da96b2df3bbd9d86bd"
+  },
+  "gates": {
+    "M16_PLAN": "PASS",
+    "M16_BASE": "PASS",
+    "M16_MEMORY": "PASS",
+    "M16_VAEG_2D": "PASS",
+    "M16_FORMATS": "PASS",
+    "M16_B_DRIVE": "PASS",
+    "M16_MEDIA": "PASS",
+    "M16_PERSIST": "PASS",
+    "M16_CURSOR": "PASS_WITH_UNQUALIFIED_CE_SW_EDGE",
+    "M16_REPEAT": "PASS",
+    "M16_FKEYS": "PASS",
+    "M16_NORMAL": "PASS",
+    "M16_REGRESS": "PASS",
+    "M16_HANDOFF": "HANDOFF READY"
+  },
+  "hardware": {
+    "status": "NOT RUN",
+    "disposition": "DEFERRED HARDWARE VALIDATION"
+  }
+}

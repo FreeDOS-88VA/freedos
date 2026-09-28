@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "repository", "remote", "branch", "identities", "ci"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "repository": {"const": "nakatamaho/freedos-pc88va"},
+    "remote": {"const": "origin"},
+    "branch": {"const": "topic/m16-floppy-formats-console-input"},
+    "identities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["START_SHA", "QUALIFIED_IMPLEMENTATION_SHA", "PUBLICATION_TIP_SHA", "DOWNSTREAM_BASE_SHA"],
+      "properties": {
+        "START_SHA": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "QUALIFIED_IMPLEMENTATION_SHA": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "PUBLICATION_TIP_SHA": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "DOWNSTREAM_BASE_SHA": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "ci": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["repository", "run_id", "attempt", "head_sha", "workflow_path", "required_jobs"],
+        "properties": {
+          "repository": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+          "run_id": {"type": "integer", "minimum": 1},
+          "attempt": {"type": "integer", "minimum": 1},
+          "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "workflow_path": {"type": "string", "pattern": "^\\.github/workflows/.+\\.ya?ml$"},
+          "required_jobs": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+        }
+      }
+    }
+  }
+}

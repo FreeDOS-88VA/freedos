@@ -1,6 +1,8 @@
 # M16 work checkpoint
 
-Status: partial implementation; not milestone acceptance or HANDOFF READY.
+Status: **M16 PASS**; **HANDOFF READY**. Exact publication-tip identity and CI
+attempts are recorded in the post-push handoff, because a commit cannot contain
+its own SHA.
 
 ## Low resident layout revision
 
@@ -243,3 +245,191 @@ implementation parent above, including the full two-build distribution gate.
 Exact-candidate guest qualification and publication-tip CI bindings are retained
 separately. Hardware is NOT RUN. Overall M16 acceptance remains partial; this footprint
 change does not qualify the outstanding console and full media matrix.
+
+## Legacy native FAT12 recognition candidate
+
+The VA adapter now recognizes the explicit legacy native FAT12 profile without
+a boot BPB, using read-only FAT reserved-entry checks in both copies and a read
+of the profile endpoint before allowing normal block access. A plausible but
+malformed BPB does not fall back to this path. Other targets are unchanged.
+Original synthetic tests cover recognition and rejection; all 326 component
+tests pass locally with Unicorn 2.1.4. The adapter test harnesses now consume
+the production transfer-buffer size definition. Clean media builds, guest
+qualification and exact-revision CI for this candidate remain pending.
+This is not M16 PASS or HANDOFF READY.
+
+## Corrected 2HC format contract
+
+Public FDFORM/2HCDRV source reconciliation distinguishes the F1h native format
+selector from the F9h BPB/FAT descriptor for the selected 15-sector 2HC format.
+The M16 adapter and fixture configuration now use the FAT descriptor correctly;
+see [the floppy contract](m16-floppy-contract.md) for exact public provenance.
+A synthetic production-getbpb test rejected F9h and accepted F1h before the
+correction; both positive and negative cases now pass. All 328 component tests
+pass locally. Earlier F1h 2HC images do not qualify this corrected contract.
+The preceding candidate completed both-model DOS key delivery, ordinary-key
+repeat at paced/fast settings, and three VA/B: boundary/persistence rows. These
+remain historical candidate results. The changed kernel requires a fresh clean
+build and relevant exact-candidate guest qualification before acceptance.
+M16 remains in progress; no final PASS or handoff is claimed.
+
+The same public formatter also supplies a short BPB followed by IPL code.
+The VA adapter now treats only its defined fields as metadata and validates
+FAT headers plus the geometry endpoint when the MBR marker is absent. Original
+short-BPB fixtures and positive/negative component tests cover the correction;
+all 330 component tests pass locally. The preceding corrected-FAT candidate
+completed the VA/B: 2HC boundary and fresh-process persistence row, but this
+additional kernel change requires renewed exact-candidate guest qualification.
+
+## Boot profiles and exact-candidate new-file verification (2026-09-28)
+
+Parent implementation: `d4552868de2494b6b311c8610d88e71d2732eafa`.
+Kernel component: `7883c8fac11fab20cb467ad0a93c8799f35b565a`.
+The 512-byte first stage now reads its contiguous stage-2 extent one sector at
+a time so the entire reader fits in the ROM-loaded boot sector. The 1024-byte
+path retains the shared disk reader. M16 boot profiles use 512-byte sectors for
+2D/2DD and 1024-byte sectors for 2HD. The 2HC 1200 KiB profile remains a data
+volume; it is not designated as a boot profile.
+
+Each row was built twice from the allowlisted committed inputs in separate
+Linux/amd64 containers. The independent artifact manifests and final D88 bytes
+matched. Host media readback verified every source payload, including the
+multi-cluster kernel file.
+
+| Boot profile | Sector bytes | Candidate D88 bytes | Candidate SHA-256 | VA and VA2 guest result |
+| --- | ---: | ---: | --- | --- |
+| 2D 320 KiB | 512 | 338608 | `602213713ec4df46255b447813abc2f1c1f06752eeccfd0a58a428b4d0fd5d0b` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+| 2D 360 KiB | 512 | 380848 | `69155cc74d7cb4e26ccc73164597a62961d5eb07c228b51aab628b403dd2b63b` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+| 2DD 640 KiB | 512 | 676528 | `207ddbd727a2df2cf87ee82cd8b5b302abdc3cf824a35a689d1754dadd2c75fe` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+| 2DD 720 KiB | 512 | 761008 | `08c060ecf9c3247d3437ac1c88f2b15f4bb918a1e4343cbe731eabf0d763c035` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+| 2HD 1232 KiB | 1024 | 1281968 | `82e8b8606382b5542603ce56bd1377556cba3fe666bd41f54481a0d100a2441d` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+| 2HD 1280 KiB control | 1024 | 1331888 | `d4cba918550638bed324128e86fda0bf96d5a19f2371b7dbdf8cbcf55e3fea57` | boot, DIR, COM/MZ, new-file write/read and fresh-process reopen passed |
+
+VA2 screen confirmation for each boot profile:
+
+| Profile | FreeDOS startup screen | `DIR` screen | `COPY` result visible on screen | Result |
+| --- | --- | --- | --- | --- |
+| 2D 320 KiB (512 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+| 2D 360 KiB (512 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+| 2DD 640 KiB (512 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+| 2DD 720 KiB (512 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+| 2HD 1232 KiB (1024 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+| 2HD 1280 KiB control (1024 B/sector) | FreeDOS prompt shown | Directory listing shown | `RAMCHECK.TXT` appears after `COPY`; `TYPE` shows its contents after a fresh boot | PASS |
+
+For each profile/model, the guest booted the pristine candidate with
+`RAMCHECK.TXT` absent, created it with DOS `COPY`, and displayed it with
+`TYPE`. Host inspection compared its bytes with `COMDATA.TXT`. A separate fresh
+VAEG process reopened each VA and VA2 image, displayed the directory and file
+contents, and left the image unchanged. COM and relocated MZ output files also
+matched their expected bytes. These results bind to the VAEG source commit
+`62a597f0ee81e2e036af740a3e79ad3da83e3fb7` and Linux executable SHA-256
+`c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf` recorded
+in `config/m16/vaeg-candidate.json`.
+
+Scoped **HOST PASS**: six complete two-build profile runs from parent
+`d4552868de2494b6b311c8610d88e71d2732eafa`, kernel
+`7883c8fac11fab20cb467ad0a93c8799f35b565a`, toolchain image
+`sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df`,
+and Unicorn wheel SHA-256
+`9d6e6dea140560de4ebd8446661f7ef84a357d428c14a3ef09dacd306ec8c239`.
+Scoped **VAEG PASS**: the six listed boot profiles on both VA and VA2, plus
+fresh-process file readback on both models. VAEG CI run 36277471921 succeeded at
+its exact source commit; kernel CI run 36360705941 succeeded at the exact kernel
+commit; parent M16 isolated-source-build CI run 36363378815 succeeded at parent
+report tip `be712ec153a6b0391fb9d19be0682e9501148bee`. Hardware is NOT RUN.
+The boot-profile checks do not complete the remaining console cursor, repeat,
+function-key, error-recovery, user-media, and handoff acceptance gates. Overall
+M16 remains partial; this is not a designated milestone distribution.
+
+## Data-media and memory regressions (2026-09-28)
+
+The same source-built candidate completed the full data-media matrix on VA and
+VA2. Each profile covered physical A: and B:, both BPB variants, cross-drive
+copy in both directions, directory and subdirectory operations, preservation
+of boot payloads, and fresh-process persistence readback.
+
+| Data profile | Scenarios | Result |
+| --- | ---: | --- |
+| 2D 320 KiB | 8 | PASS |
+| 2D 360 KiB | 8 | PASS |
+| 2DD 640 KiB | 8 | PASS |
+| 2DD 720 KiB | 8 | PASS |
+| 2HC 1200 KiB | 8 | PASS |
+| Total | 40 | PASS |
+
+The startup-memory regressions passed with 512 KiB installed and a retained
+640 KiB selection on VA and VA2, and with 640 KiB plus
+`PC88VA_LOADSEG=2000` through CONFIG.SYS on VA. Captured startup displays show
+the runtime-detected memory and effective kernel base; each case reached
+FreeDOS and passed COM/MZ and guest file-copy readback checks. These results
+qualify the active carrier, loader, and kernel candidate; they do not replace
+hardware validation.
+
+The remaining M16 gates at that checkpoint were normal console input/repeat,
+GUI cursor/editor, media swap and error-recovery checks, physical B: checks,
+the final handoff package, and the designated reproducible distribution archive.
+Hardware is NOT RUN.
+
+## Final candidate qualification checkpoint (2026-09-28)
+
+This section supersedes the earlier checkpoint lists of pending guest work.
+Those earlier sections remain as dated history. The exact qualified parent
+implementation is `d4552868de2494b6b311c8610d88e71d2732eafa`, with kernel
+`7883c8fac11fab20cb467ad0a93c8799f35b565a`, FreeCOM
+`29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e`, COUNTRY.SYS
+`23f189cca3420606eae8723884fa92ccd65eb307`, and VAEG
+`62a597f0ee81e2e036af740a3e79ad3da83e3fb7`. The exact Linux VAEG executable
+SHA-256 is `c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf`.
+
+The M15 starting revision is `1af9974700cd4dd1164cc0df56cc062925376148`.
+The qualified implementation, designated artifact, and report do not alter the
+M15 component baseline recorded by the M16 lock. The M17 task's preserved
+starting revision is `fc891f3cd424c281680dd15b3f269bef4a4d2880`. The exact
+publication tip and its post-push CI bindings belong in the post-push handoff;
+this report cannot contain its own commit identity.
+
+All guest and host checks below bind to the exact candidate hashes shown in the
+boot-profile table above. For each of the six boot profiles, an independent
+current-tip pair of clean builds produced byte-identical output and matched its
+previously guest-qualified D88. The designated 2HD 1280 KiB image is archived
+at `images/milestones/m16/freedos-pc88va-m16-2hd-1280.d88.xz`; the compressed
+SHA-256 is `6be8c3e0d85d2182cf5ad2c48cdffba8880b6b29026777c5e1bfc9df721e579b`,
+and the extracted D88 SHA-256 is
+`d4cba918550638bed324128e86fda0bf96d5a19f2371b7dbdf8cbcf55e3fea57`.
+`xz --test` passed, and decompression was compared byte-for-byte with the
+source-built candidate. Its reproduction instructions and source/toolchain
+binding are in the adjacent `README.md` and `manifest.json`.
+
+The final candidate gates are:
+
+| Gate | Evidence and result |
+| --- | --- |
+| M16-PLAN / M16-BASE | New M16 numbering is recorded; old M17 storage-contract work remains separately identified. The pinned M15 component baseline and M16 source lineage are retained. PASS |
+| M16-MEMORY | Writable RAM probe restores sampled memory; retained stale 640 KiB selection with 512 KiB installed passed on VA and VA2. `PC88VA_LOADSEG=2000h` through CONFIG.SYS passed on VA with 640 KiB. Resident/work adjacency, temporary INIT release, diagnostics, COM/MZ and guest file readback checks passed. PASS |
+| M16-VAEG-2D | VAEG commit `62a597f0ee81e2e036af740a3e79ad3da83e3fb7` includes native 2D D88 read/write and writeback coverage plus the VA TSP cursor change. Its CI run 36277471921 succeeded at that exact source revision. PASS |
+| M16-FORMATS / M16-B-DRIVE / M16-PERSIST | 2D 320/360, 2DD 640/720 and 2HC 1200 data profiles completed 40/40 combinations across VA/VA2, A:/B: and both BPB layouts. Cross-drive copies, directory operations, payload preservation and fresh-process readback passed. PASS |
+| M16-MEDIA | Media replacement/swap read and write checks passed on VA and VA2 for mixed profiles. The corrected not-ready and write-protect recovery matrix passed 12/12; each run returned to DOS, executed another command and preserved the boot/protected images. PASS |
+| M16-CURSOR | Real FreeDOS/FreeCOM editing on VA and VA2 showed visible cursor movement and correct logical edits, including cursor-key and history-driven commands. The NEC documentation distinguishes cursor enable from per-sprite switch, but does not establish that cursor enable overrides a cleared sprite switch. That CE/SW=0 interaction remains unqualified; no hardware-level claim is made. Guest behavior gate PASS with this interaction limitation. |
+| M16-REPEAT / M16-FKEYS / M16-NORMAL | Automated DOS byte-stream probes matched expected VA and VA2 input/repeat sequences at fast and paced settings. Normal FreeCOM exercised history/editing keys and returned correct commands on both models. PASS |
+| M16-REGRESS | M16-maintained placement, loader, media, input, repeat, acceptance-schema and FreeCOM regressions ran in the clean source build. Kernel CI run 36360705941 succeeded at `7883c8fac11fab20cb467ad0a93c8799f35b565a`. Parent M16 run 36378489202 and scaffold run 36378489349 succeeded at `f910e2c8ef8795ccc1dfd4734aa36e01de384140`. The exact publication-tip runs are bound in the post-push record. PASS |
+| M16-HANDOFF | Exact boot and data images, matching Linux VAEG, static MinGW64 build artifact, checksums, launch commands and test scope are assembled in Git-excluded local evidence storage. Publication topology, remote equality, bounded diff and exact CI attempts are checked by the post-push verifier. HANDOFF READY |
+
+The MinGW64 `mingw-release` artifact comes from VAEG CI run 36277471921 and
+statically links SDL2 and the configured non-system dependencies. It has not
+been run in a Windows guest acceptance session. VAEG guest qualification above
+uses the identified Linux executable.
+
+Evidence labels: **HOST PASS** for the source-built media,
+placement and maintained host regressions; **VAEG PASS** for the listed exact
+candidate guest checks on VA and VA2. Physical hardware is **NOT RUN** and is
+**DEFERRED HARDWARE VALIDATION**.
+
+The committed M16 acceptance record and all three strict M16 JSON Schemas are checked by
+[`tools/m16/verify_acceptance.py`](../../tools/m16/verify_acceptance.py). Local
+and native CI use the same candidate command. Its negative tests cover malformed
+and duplicate JSON, invalid schemas, missing and unknown fields, malformed
+identities, artifact size/digest drift, stale CI heads, failed jobs, and broken
+ancestry. The final publication operation also checks the pushed remote tip,
+the bounded diff from the qualified implementation, and exact CI attempts/jobs;
+its self-referential publication identity is retained in Git-excluded handoff
+metadata after push.

@@ -21,6 +21,16 @@ class DosRepeatProbeTests(unittest.TestCase):
         self.assertIn('mov ah, 40h', source)
         self.assertIn('mov ah, 3eh', source)
 
+    def test_editing_repeat_fixture_keeps_complete_extended_events(self):
+        script = (ROOT / 'tests/m16/dos_repeat_editing.script').read_text()
+        contract = json.loads((ROOT / 'tests/m16/dos_repeat_editing_sequence.json').read_text())
+        self.assertEqual(re.findall(r'^@hold .*', script, re.MULTILINE),
+                         ['@hold backspace 90', '@hold left 90', '@hold right 38'])
+        expected = b'q' + b'\x08' * 16 + b'\x00\x4b' * 16 + b'\x00\x4d' * 3 + b'c'
+        self.assertEqual(bytes.fromhex(contract['bytes_hex']), expected)
+        self.assertLessEqual(len(expected), 128)
+        self.assertTrue(script.endswith('@enter\n'))
+
     def test_script_uses_a_guest_time_hold_and_separate_repress(self):
         script = (ROOT / 'tests/m16/dos_repeat_probe.script').read_text().splitlines()
         commands = [line.strip() for line in script

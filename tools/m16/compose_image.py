@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Create fresh FAT12/D88 media from source-built payloads, without a seed."""
 import json
+import copy
 from pathlib import Path
 import sys
 
@@ -12,13 +13,19 @@ from media import derive_layout, inspect
 from build_loader import build_stage, validate_overlay
 
 
-def compose(payloads, overlay, output, epoch):
-    spec = json.loads((ROOT / 'config/m16/media.json').read_text())
-    spec['d88']['disk_name'] = 'FDOS-PC88VA-M16'
+def compose(payloads, overlay, output, epoch, spec=None):
+    spec = (json.loads((ROOT / 'config/m16/media.json').read_text())
+            if spec is None else copy.deepcopy(spec))
+    spec['d88'].setdefault('disk_name', 'FDOS-PC88VA-M16')
     spec['image']['volume_label'] = 'PC88VA-M16'
     layout = derive_layout(spec)
     geo, fs = spec['geometry'], spec['filesystem']
     bps = geo['bytes_per_sector']
+    cluster_bytes = bps * fs['sectors_per_cluster']
+    disk = overlay['layout']['disk']
+    if disk != dict(sector_bytes=bps, sectors_track=geo['sectors_per_track'],
+                    heads=geo['heads'], total_sectors=geo['total_sectors']):
+        raise ValueError('Loader profile and media geometry disagree')
     if len(payloads) > fs['root_entries']:
         raise ValueError('Too many directory entries')
     raw = bytearray(geo['total_bytes'])
@@ -31,18 +38,19 @@ def compose(payloads, overlay, output, epoch):
     names = ['LOADER.BIN'] + sorted(set(payloads) - {'LOADER.BIN'})
     for index, name in enumerate(names):
         data = payloads[name]
-        count = (len(data) + bps - 1) // bps
+        count = (len(data) + cluster_bytes - 1) // cluster_bytes
         if cluster + count > layout['data_clusters'] + 2:
             raise ValueError('Payloads exceed FAT12 capacity')
         first = cluster if count else 0
         for n in range(count):
             set_fat12_entry(fat, cluster + n, cluster + n + 1 if n + 1 < count else 0xfff)
-            offset = (layout['first_data_sector'] + cluster + n - 2) * bps
-            raw[offset:offset + bps] = data[n*bps:(n+1)*bps].ljust(bps, b'\0')
+            offset = (layout['first_data_sector'] * bps +
+                      (cluster + n - 2) * cluster_bytes)
+            raw[offset:offset + cluster_bytes] = data[n*cluster_bytes:(n+1)*cluster_bytes].ljust(cluster_bytes, b'\0')
         entry, _ = build_directory_entry(dict(dos_name=name, size=len(data), source_date_epoch=epoch), first)
         raw[root_start + index*32:root_start + (index+1)*32] = entry
-        allocations[name] = dict(first_lba=layout['first_data_sector'] + cluster - 2,
-                                 sector_count=count, file_size=len(data))
+        allocations[name] = dict(first_lba=layout['first_data_sector'] + (cluster - 2) * fs['sectors_per_cluster'],
+                                 sector_count=(len(data) + bps - 1) // bps, file_size=len(data))
         cluster += count
     for n in range(fs['fat_count']):
         offset = (fs['reserved_sectors'] + n * fs['sectors_per_fat']) * bps

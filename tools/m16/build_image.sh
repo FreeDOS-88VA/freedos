@@ -67,7 +67,7 @@ nasm -f bin tests/m16/dos_input_probe.asm -o /work/result/DOSINPUT.COM
 nasm -f bin tests/m16/dos_repeat_probe.asm -o /work/result/DOSREPT.COM
 nasm -f obj tests/m16/system_mz_probe.asm -o /work/result/mz_probe.obj
 wlink system dos option quiet name /work/result/MZPROBE.EXE file /work/result/mz_probe.obj
-python3 tools/m16/finish_image.py --output /work/result
+python3 tools/m16/finish_image.py --output /work/result --boot-profile "${M16_BOOT_PROFILE:-2hd-1280}"
 mkdir -p build
 python3 tools/m16/verify_m13_linked_placement.py --kernel /work/result/kernel-linked.exe --map /work/result/kernel.map --carrier /work/result/KERNEL.SYS --placement /work/result/carrier.json
 if [ "${M16_BUILD_PASS:-1}" = 1 ]; then
@@ -75,9 +75,12 @@ python3 -B -m unittest discover -s tests/m16 -p 'test_m13_memory_placement.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_m13_carrier_tail.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_floppy_media.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_loader_builder.py'
+python3 -B -m unittest discover -s tests/m16 -p 'test_boot_profiles.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_loadseg_contract.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_freecom_input_source.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_dos_input_probe.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_dos_freecom_editor.py'
 python3 -B -m unittest discover -s tests/m16 -p 'test_dos_repeat_probe.py'
+python3 -B -m unittest discover -s tests/m16 -p 'test_repeat_timing.py'
+python3 -B -m unittest discover -s tests/m16 -p 'test_acceptance.py'
 fi

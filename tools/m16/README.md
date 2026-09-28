@@ -47,6 +47,48 @@ The output directory must stay Git-excluded. `build/m16-image/media.d88` is a
 freshly composed candidate and is not a milestone distribution until its guest
 acceptance and publication checks are complete.
 
+## Acceptance operations
+
+Validate the committed candidate record, all three M16 schemas, source bindings,
+report and archive hashes, decompressed D88, and public privacy boundary with
+the same verifier used by native CI:
+
+```sh
+python3 -B tools/m16/verify_acceptance.py --mode candidate
+python3 -B -m unittest discover -s tests/m16 -p 'test_acceptance.py'
+```
+
+`build_image.py` performs two independent complete builds and runs the local
+media, loader, placement, input, repeat, and acceptance regressions. After
+pushing the final topic tip and obtaining its required CI runs, record the four
+full commit identities and exact CI attempts in the Git-excluded M16 handoff's
+`publication.json`, then run:
+
+```sh
+python3 -B tools/m16/verify_acceptance.py --mode publication \
+  --publication-record build/m16-publication.json
+```
+
+This final operation validates the pushed remote tip, ancestry, bounded
+publication diff, and successful CI jobs at their exact tested heads. Keep this
+local record out of Git because it contains the publication tip SHA that cannot
+be embedded in its own commit.
+
+### Boot-media profiles
+
+`build_image.py` accepts `--boot-profile` to select a bootable format. The
+supported profile IDs are `2d-320`, `2d-360`, `2dd-640`, `2dd-720`, and
+`2hd-1232`. The default `2hd-1280` is retained as a control. For example:
+
+```sh
+python3 tools/m16/build_image.py --output build/m16-2d-320 --boot-profile 2d-320
+```
+
+Each invocation performs the complete two-build reproducibility check and
+places the selected candidate at `build/m16-2d-320/media.d88`. The 2HC 1200 KiB
+profile remains a read/write data-volume target and has no designated M16 boot
+profile. Data-volume profiles are built separately by `build_floppy_media.py`.
+
 ## Runtime memory and kernel placement
 
 See the [current memory contract](../../docs/porting/m16-memory-layout.md) for
@@ -104,3 +146,24 @@ RAM measurement supplies capacity, not ownership of firmware memory.
 RAM-dependent fixes require the failing persisted configuration, alternate-model
 coverage, and a working-capacity control before a replacement is described as
 verified. See `AGENTS.md` for the evidence and handoff requirements.
+
+### Boundary data fixtures
+
+Generate original FAT12 files that cross tracks and end in the final data
+cluster with this milestone's own producer and independent inspector:
+
+```sh
+python3 tools/m16/build_floppy_media.py --boundary --output build/m16-boundary-media
+```
+
+Each of the five profiles contains `PATTERN.BIN` (33,792 bytes). Its final
+cluster is moved to the end of the data area, leaving a discontinuity in the
+FAT chain. The file fills that cluster, so a complete guest copy reads the
+last data sector as well as ordinary track/head boundaries. The manifest
+records exact image hashes and cluster chains. This command establishes host
+fixture validity only; DOS read/write and fresh-process persistence require
+separate guest qualification with disposable copies.
+
+Add `--short-bpb` to generate the native 19-byte BPB form with original inert
+bytes after offset 30 and no MBR marker. The same independent file/FAT inspector
+checks these fixtures. The layout variant is recorded in the fixture manifest.

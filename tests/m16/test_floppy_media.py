@@ -15,6 +15,48 @@ SPEC.loader.exec_module(MEDIA)
 
 
 class FloppyMediaTests(unittest.TestCase):
+    def test_multicluster_payload_crosses_tracks_without_overlap(self):
+        source = json.loads((ROOT / 'config/m16/floppy-profiles.json').read_text())
+        payload = bytes((i * 37 + i // 251) & 255 for i in range(32771))
+        for profile in source['profiles']:
+            with self.subTest(profile=profile['name']):
+                spec = MEDIA.profile_spec(profile, source, 1787814827)
+                image, report = MEDIA.build_volume(
+                    spec, 'PATTERN.BIN', payload, 1787814827)
+                _, files = MEDIA.inspect(image, spec)
+                self.assertEqual(files, {'PATTERN.BIN': payload})
+                self.assertTrue(report['fat_copies_equal'])
+
+    def test_boundary_payload_reaches_last_sector_in_each_profile(self):
+        source = json.loads((ROOT / 'config/m16/floppy-profiles.json').read_text())
+        for profile in source['profiles']:
+            with self.subTest(profile=profile['name']):
+                spec = MEDIA.profile_spec(profile, source, 1787814827)
+                first, report = MEDIA.build_boundary_volume(spec, 1787814827)
+                second, _ = MEDIA.build_boundary_volume(spec, 1787814827)
+                self.assertEqual(first, second)
+                layout = MEDIA.derive_layout(spec)
+                record = report['files']['PATTERN.BIN']
+                self.assertEqual(record['clusters'][-1], layout['data_clusters'] + 1)
+                cb = spec['geometry']['bytes_per_sector'] * spec['filesystem']['sectors_per_cluster']
+                self.assertEqual(record['size'] % cb, 0)
+                self.assertGreater(record['clusters'][-1] - record['clusters'][-2], 1)
+                _, files = MEDIA.inspect(first, spec)
+                self.assertEqual(files['PATTERN.BIN'], bytes(
+                    (i * 37 + i // 251) & 255 for i in range(33792)))
+
+    def test_native_short_bpb_fixtures_keep_following_code_out_of_metadata(self):
+        source = json.loads((ROOT / 'config/m16/floppy-profiles.json').read_text())
+        source['boot_record']['bpb_layout'] = 'native_short'
+        for profile in source['profiles']:
+            with self.subTest(profile=profile['name']):
+                spec = MEDIA.profile_spec(profile, source, 1787814827)
+                image, _ = MEDIA.build_boundary_volume(spec, 1787814827)
+                _, raw = MEDIA.parse_d88(image, spec, MEDIA.derive_layout(spec))
+                self.assertEqual(raw[30:512], b'\x90' * 482)
+                _, files = MEDIA.inspect(image, spec)
+                self.assertEqual(len(files['PATTERN.BIN']), 33792)
+
     def test_five_public_profiles_build_as_exact_fat12_d88_volumes(self):
         config = ROOT / 'config/m16/floppy-profiles.json'
         source = json.loads(config.read_text())
@@ -36,7 +78,9 @@ class FloppyMediaTests(unittest.TestCase):
                 record = records[name]
                 with self.subTest(profile=name):
                     self.assertEqual(record['raw_capacity_bytes'], capacity)
-                    self.assertEqual(profile['guest_media_id'], media_id)
+                    self.assertEqual(profile['format_id'], media_id)
+                    self.assertEqual(profile['filesystem']['media_descriptor'],
+                                     0xF9 if name == '2hc-1200' else media_id)
                     self.assertEqual(profile['d88_disk_type'], disk_type)
                     self.assertEqual(profile['geometry']['cylinders'], cylinders)
                     self.assertEqual(profile['geometry']['heads'], heads)

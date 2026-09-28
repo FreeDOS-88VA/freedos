@@ -47,6 +47,8 @@ jobs:
         run: python3 -B tools/m16/toolchain.py
       - name: Build the full distribution twice from clean source exports
         run: python3 -B tools/m16/build_image.py --output build/m16-ci
+      - name: Validate M16 acceptance record and archived distribution
+        run: python3 -B tools/m16/verify_acceptance.py --mode candidate
       - name: Confirm public source checkouts remain clean
         run: |
           git diff --check

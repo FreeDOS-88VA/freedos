@@ -89,6 +89,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=ROOT / 'build/m16-image')
     parser.add_argument('--image', default='freedos-pc88va-m16:local')
+    parser.add_argument('--boot-profile', default='2hd-1280')
     args = parser.parse_args()
     if call('git', 'diff', 'HEAD', '--', '.', ':!components/fdkernel'):
         raise ValueError('Commit parent changes before exporting the build')
@@ -143,10 +144,12 @@ def main():
     if wheel_sha256 != verifier['sha256']:
         raise ValueError('Downloaded M16 verifier wheel hash differs from its lock')
     results = []
-    command = 'mkdir -p /work/entry && tar -xf /input/parent.tar -C /work/entry tools/m16/build_image.sh && bash /work/entry/tools/m16/build_image.sh'
+    command = ('mkdir -p /work/entry && tar -xf /input/parent.tar -C /work/entry tools/m16/build_image.sh '
+               '&& bash /work/entry/tools/m16/build_image.sh')
     for number in (1, 2):
         cid = call('docker', 'create', '--platform', 'linux/amd64', '--network', 'none',
-                   '-e', f'M16_BUILD_PASS={number}', '--entrypoint', 'bash', info['Id'], '-ec', command)
+                   '-e', f'M16_BUILD_PASS={number}', '-e', f'M16_BOOT_PROFILE={args.boot_profile}',
+                   '--entrypoint', 'bash', info['Id'], '-ec', command)
         try:
             subprocess.run(['docker', 'cp', str(inputs) + '/.', cid + ':/input'], check=True)
             with (output / f'build-{number}.log').open('xb') as f:

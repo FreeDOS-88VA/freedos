@@ -1,0 +1,16 @@
+# Exercise held Backspace and cursor keys through the DOS byte-stream probe.
+@wait 240
+@enter
+@enter
+DOSREPT
+@wait 240
+@text q
+@wait 120
+@hold backspace 90
+@wait 120
+@hold left 90
+@wait 120
+@hold right 38
+@wait 120
+@text c
+@enter

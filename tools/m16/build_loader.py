@@ -33,7 +33,10 @@ def validate_overlay(value):
         raise ProfileError("Bootstrap schema differs")
     if any(type(v) is not int or not 0 <= v <= 65535 for v in bootstrap.values()):
         raise ProfileError("Bootstrap field is not a bounded word")
-    if bootstrap["loaded_bytes"] < 1024 or bootstrap["image_offset"]+1024 > 65536:
+    sector_bytes = value["layout"]["disk"]["sector_bytes"]
+    if sector_bytes not in (512, 1024):
+        raise ProfileError("Bootstrap requires 512 or 1024 byte sectors")
+    if bootstrap["loaded_bytes"] < sector_bytes or bootstrap["image_offset"]+sector_bytes > 65536:
         raise ProfileError("Initial loaded extent does not contain the bootstrap")
     start = bootstrap["image_segment"]*16+bootstrap["image_offset"]
     if start+bootstrap["loaded_bytes"] > 0x100000:
@@ -133,7 +136,7 @@ def build_stage(overlay, output, stage, extent=None, nasm="nasm"):
         layout = definitions(overlay["layout"])
         count, size, lba = extent["sector_count"], extent["file_size"], extent["first_lba"]
         bps = layout["S2_SECTOR_BYTES"]
-        if bps != 1024 or count != (size+bps-1)//bps or count*bps > layout["S2_STAGE2_CAPACITY"] or lba+count > layout["S2_TOTAL_SECTORS"]:
+        if count != (size+bps-1)//bps or count*bps > layout["S2_STAGE2_CAPACITY"] or lba+count > layout["S2_TOTAL_SECTORS"]:
             raise ProfileError("Stage-2 extent does not fit bootstrap media or ownership")
         b = overlay["bootstrap"]
         parameters = {"S1_IMAGE_OFFSET": b["image_offset"], "S1_ENTRY_SEGMENT": b["image_segment"],
@@ -157,7 +160,7 @@ def build_stage(overlay, output, stage, extent=None, nasm="nasm"):
     binary.chmod(0o600)
     image = binary.read_bytes()
     symbols = stage2_symbols(image) if stage == 2 else None
-    if stage == 1 and len(image) != 1024:
+    if stage == 1 and len(image) != overlay["layout"]["disk"]["sector_bytes"]:
         raise ProfileError("Bootstrap size differs")
     return {"stage": stage, "size": len(image), "sha256": hashlib.sha256(image).hexdigest(),
             "symbols": symbols, "overlay_class": overlay["layout"]["profile_class"],

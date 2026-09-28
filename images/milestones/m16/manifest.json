@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "milestone": "M16",
+  "artifact": {
+    "file": "freedos-pc88va-m16-2hd-1280.d88.xz",
+    "compression": {
+      "format": "xz",
+      "tool": "XZ Utils 5.4.5",
+      "arguments": ["--threads=1", "--extreme", "--check=sha256", "--stdout"]
+    },
+    "compressed": {
+      "bytes": 113672,
+      "sha256": "6be8c3e0d85d2182cf5ad2c48cdffba8880b6b29026777c5e1bfc9df721e579b"
+    },
+    "uncompressed": {
+      "file": "freedos-pc88va-m16-2hd-1280.d88",
+      "bytes": 1331888,
+      "sha256": "d4cba918550638bed324128e86fda0bf96d5a19f2371b7dbdf8cbcf55e3fea57"
+    },
+    "profile": {
+      "media": "2HD",
+      "payload_capacity_bytes": 1310720,
+      "bytes_per_sector": 1024,
+      "role": "bootable distribution"
+    }
+  },
+  "rebuild_source": {
+    "parent": "8253748a2a890d24c32a9eccc3027aad9aba67b3",
+    "fdkernel": "7883c8fac11fab20cb467ad0a93c8799f35b565a",
+    "freecom": "29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e",
+    "country": "23f189cca3420606eae8723884fa92ccd65eb307",
+    "qualified_implementation": "d4552868de2494b6b311c8610d88e71d2732eafa"
+  },
+  "source_archives_sha256": {
+    "parent": "23fbbb404d994d31137012b5d18c08024b622f6a32aeb88378d85d6f6ceb7be7",
+    "fdkernel": "c8f3af15b5b68a16066a01f4226b4e263b44f0c9bbac722ef1337c054808f58d",
+    "freecom": "e61d4e889a6b10f9e05903f9575bb1466dfc5b20cb232f5286219bc173bbb24a",
+    "country": "cf0b16ac57e661eeb7e19118cea2d2d200e4545507f15912e8a6462652c2cd9d"
+  },
+  "toolchain": {
+    "linux_amd64_image": "sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df",
+    "unicorn_version": "2.1.4",
+    "unicorn_wheel_sha256": "9d6e6dea140560de4ebd8446661f7ef84a357d428c14a3ef09dacd306ec8c239"
+  },
+  "reproducibility": {
+    "independent_clean_builds": 2,
+    "artifact_manifests_identical": true,
+    "d88_bytes_identical": true,
+    "compressed_archive_tested": true,
+    "decompression_matches_designated_d88": true
+  },
+  "validation": {
+    "host": "HOST PASS",
+    "vaeg": "VAEG PASS",
+    "hardware": "NOT RUN",
+    "hardware_status": "DEFERRED HARDWARE VALIDATION",
+    "scope": [
+      "The designated 2HD boot image started FreeDOS on VA and VA2 in VAEG.",
+      "The boot image passed directory, COM/MZ, guest file write/readback, and fresh-process reopen checks on VA and VA2.",
+      "The public report records the broader M16 floppy, memory, console, and error-recovery qualification scope."
+    ]
+  },
+  "licenses": {
+    "parent": ["COPYING", "LICENSE.md"],
+    "fdkernel": "components/fdkernel/COPYING",
+    "freecom": "components/freecom/license and SUPPL notices",
+    "country": "components/country/LICENSE"
+  }
+}
