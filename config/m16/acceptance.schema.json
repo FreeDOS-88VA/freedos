@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "milestone", "status", "identities", "components", "toolchain", "vaeg", "distribution", "report", "gates", "hardware"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "milestone": {"const": "M16"},
+    "status": {"const": "QUALIFIED_CANDIDATE"},
+    "identities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["START_SHA", "QUALIFIED_IMPLEMENTATION_SHA", "DOWNSTREAM_BASE_SHA"],
+      "properties": {
+        "START_SHA": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "QUALIFIED_IMPLEMENTATION_SHA": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "DOWNSTREAM_BASE_SHA": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fdkernel", "freecom", "country"],
+      "properties": {
+        "fdkernel": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "freecom": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "country": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["linux_amd64_image_sha256", "unicorn_version", "unicorn_wheel_sha256"],
+      "properties": {
+        "linux_amd64_image_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "unicorn_version": {"const": "2.1.4"},
+        "unicorn_wheel_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "vaeg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "branch", "commit", "linux_executable_sha256", "mingw64_executable_sha256", "mingw64_build", "ci_run_id"],
+      "properties": {
+        "repository": {"const": "https://github.com/nakatamaho/vaeg.git"},
+        "branch": {"const": "topic/m16-vaeg-2d-native-console"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "linux_executable_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "mingw64_executable_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "mingw64_build": {"const": "mingw-release; SDL2 and non-system dependencies statically linked"},
+        "ci_run_id": {"type": "integer", "minimum": 1}
+      }
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_path", "manifest_sha256", "archive_path", "archive_bytes", "archive_sha256", "image_bytes", "image_sha256", "profile"],
+      "properties": {
+        "manifest_path": {"const": "images/milestones/m16/manifest.json"},
+        "manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "archive_path": {"const": "images/milestones/m16/freedos-pc88va-m16-2hd-1280.d88.xz"},
+        "archive_bytes": {"type": "integer", "minimum": 1},
+        "archive_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "image_bytes": {"type": "integer", "minimum": 1},
+        "image_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "profile": {"const": "2HD 1280 KiB, 1024 bytes per sector"}
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": "docs/porting/m16-report.md"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["M16_PLAN", "M16_BASE", "M16_MEMORY", "M16_VAEG_2D", "M16_FORMATS", "M16_B_DRIVE", "M16_MEDIA", "M16_PERSIST", "M16_CURSOR", "M16_REPEAT", "M16_FKEYS", "M16_NORMAL", "M16_REGRESS", "M16_HANDOFF"],
+      "properties": {
+        "M16_PLAN": {"const": "PASS"},
+        "M16_BASE": {"const": "PASS"},
+        "M16_MEMORY": {"const": "PASS"},
+        "M16_VAEG_2D": {"const": "PASS"},
+        "M16_FORMATS": {"const": "PASS"},
+        "M16_B_DRIVE": {"const": "PASS"},
+        "M16_MEDIA": {"const": "PASS"},
+        "M16_PERSIST": {"const": "PASS"},
+        "M16_CURSOR": {"const": "PASS_WITH_UNQUALIFIED_CE_SW_EDGE"},
+        "M16_REPEAT": {"const": "PASS"},
+        "M16_FKEYS": {"const": "PASS"},
+        "M16_NORMAL": {"const": "PASS"},
+        "M16_REGRESS": {"const": "PASS"},
+        "M16_HANDOFF": {"const": "PENDING_PUBLICATION"}
+      }
+    },
+    "hardware": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "disposition"],
+      "properties": {
+        "status": {"const": "NOT RUN"},
+        "disposition": {"const": "DEFERRED HARDWARE VALIDATION"}
+      }
+    }
+  }
+}

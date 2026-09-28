@@ -1,6 +1,8 @@
 # M16 work checkpoint
 
-Status: partial implementation; not milestone acceptance or HANDOFF READY.
+Status at this checkpoint: candidate qualification complete; designated archive
+and final publication-tip checks are being closed. This is not yet M16 PASS or
+HANDOFF READY.
 
 ## Low resident layout revision
 
@@ -363,7 +365,72 @@ FreeDOS and passed COM/MZ and guest file-copy readback checks. These results
 qualify the active carrier, loader, and kernel candidate; they do not replace
 hardware validation.
 
-The remaining M16 gates are normal console input/repeat, GUI cursor/editor,
-media swap and error-recovery checks, PC-Engine B: reproduction, the final
-handoff package, and the designated reproducible distribution archive.
+The remaining M16 gates at that checkpoint were normal console input/repeat,
+GUI cursor/editor, media swap and error-recovery checks, physical B: checks,
+the final handoff package, and the designated reproducible distribution archive.
 Hardware is NOT RUN.
+
+## Final candidate qualification checkpoint (2026-09-28)
+
+This section supersedes the earlier checkpoint lists of pending guest work.
+Those earlier sections remain as dated history. The exact qualified parent
+implementation is `d4552868de2494b6b311c8610d88e71d2732eafa`, with kernel
+`7883c8fac11fab20cb467ad0a93c8799f35b565a`, FreeCOM
+`29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e`, COUNTRY.SYS
+`23f189cca3420606eae8723884fa92ccd65eb307`, and VAEG
+`62a597f0ee81e2e036af740a3e79ad3da83e3fb7`. The exact Linux VAEG executable
+SHA-256 is `c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf`.
+
+The M15 starting revision is `1af9974700cd4dd1164cc0df56cc062925376148`.
+The qualified implementation, designated artifact, and report do not alter the
+M15 component baseline recorded by the M16 lock. The M17 task's preserved
+starting revision is `fc891f3cd424c281680dd15b3f269bef4a4d2880`. The exact
+publication tip and its post-push CI bindings belong in the post-push handoff;
+this report cannot contain its own commit identity.
+
+All guest and host checks below bind to the exact candidate hashes shown in the
+boot-profile table above. For each of the six boot profiles, an independent
+current-tip pair of clean builds produced byte-identical output and matched its
+previously guest-qualified D88. The designated 2HD 1280 KiB image is archived
+at `images/milestones/m16/freedos-pc88va-m16-2hd-1280.d88.xz`; the compressed
+SHA-256 is `6be8c3e0d85d2182cf5ad2c48cdffba8880b6b29026777c5e1bfc9df721e579b`,
+and the extracted D88 SHA-256 is
+`d4cba918550638bed324128e86fda0bf96d5a19f2371b7dbdf8cbcf55e3fea57`.
+`xz --test` passed, and decompression was compared byte-for-byte with the
+source-built candidate. Its reproduction instructions and source/toolchain
+binding are in the adjacent `README.md` and `manifest.json`.
+
+The final candidate gates are:
+
+| Gate | Evidence and result |
+| --- | --- |
+| M16-PLAN / M16-BASE | New M16 numbering is recorded; old M17 storage-contract work remains separately identified. The pinned M15 component baseline and M16 source lineage are retained. PASS |
+| M16-MEMORY | Writable RAM probe restores sampled memory; retained stale 640 KiB selection with 512 KiB installed passed on VA and VA2. `PC88VA_LOADSEG=2000h` through CONFIG.SYS passed on VA with 640 KiB. Resident/work adjacency, temporary INIT release, diagnostics, COM/MZ and guest file readback checks passed. PASS |
+| M16-VAEG-2D | VAEG commit `62a597f0ee81e2e036af740a3e79ad3da83e3fb7` includes native 2D D88 read/write and writeback coverage plus the VA TSP cursor change. Its CI run 36277471921 succeeded at that exact source revision. PASS |
+| M16-FORMATS / M16-B-DRIVE / M16-PERSIST | 2D 320/360, 2DD 640/720 and 2HC 1200 data profiles completed 40/40 combinations across VA/VA2, A:/B: and both BPB layouts. Cross-drive copies, directory operations, payload preservation and fresh-process readback passed. PASS |
+| M16-MEDIA | Media replacement/swap read and write checks passed on VA and VA2 for mixed profiles. The corrected not-ready and write-protect recovery matrix passed 12/12; each run returned to DOS, executed another command and preserved the boot/protected images. PASS |
+| M16-CURSOR | Real FreeDOS/FreeCOM editing on VA and VA2 showed visible cursor movement and correct logical edits, including cursor-key and history-driven commands. The NEC documentation distinguishes cursor enable from per-sprite switch, but does not establish that cursor enable overrides a cleared sprite switch. That CE/SW=0 interaction remains unqualified; no hardware-level claim is made. Guest behavior gate PASS with this interaction limitation. |
+| M16-REPEAT / M16-FKEYS / M16-NORMAL | Automated DOS byte-stream probes matched expected VA and VA2 input/repeat sequences at fast and paced settings. Normal FreeCOM exercised history/editing keys and returned correct commands on both models. PASS |
+| M16-REGRESS | M16-maintained placement, loader, media, input, repeat and FreeCOM regressions ran in the clean source build. Kernel CI run 36360705941 succeeded at `7883c8fac11fab20cb467ad0a93c8799f35b565a`. Parent M16 run 36366637101 and scaffold run 36366637125 succeeded at `8253748a2a890d24c32a9eccc3027aad9aba67b3`. PASS for those exact heads. |
+| M16-HANDOFF | Exact boot and data images, matching Linux VAEG, static MinGW64 build artifact, checksums, launch commands and test scope are assembled in Git-excluded local evidence storage. Exact publication-tip CI and remote checks are pending. |
+
+The MinGW64 `mingw-release` artifact comes from VAEG CI run 36277471921 and
+statically links SDL2 and the configured non-system dependencies. It has not
+been run in a Windows guest acceptance session. VAEG guest qualification above
+uses the identified Linux executable.
+
+Evidence labels at this checkpoint: **HOST PASS** for the source-built media,
+placement and maintained host regressions; **VAEG PASS** for the listed exact
+candidate guest checks on VA and VA2. Physical hardware is **NOT RUN** and is
+**DEFERRED HARDWARE VALIDATION**. Overall M16 acceptance and HANDOFF READY remain
+pending final archive/publication review and exact-tip CI/remote verification.
+
+The committed candidate record and all three strict M16 JSON Schemas are checked by
+[`tools/m16/verify_acceptance.py`](../../tools/m16/verify_acceptance.py). Local
+and native CI use the same candidate command. Its negative tests cover malformed
+and duplicate JSON, invalid schemas, missing and unknown fields, malformed
+identities, artifact size/digest drift, stale CI heads, failed jobs, and broken
+ancestry. The final publication operation also checks the pushed remote tip,
+the bounded diff from the qualified implementation, and exact CI attempts/jobs;
+its self-referential publication identity is retained in Git-excluded handoff
+metadata after push.

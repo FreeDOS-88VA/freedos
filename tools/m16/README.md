@@ -47,6 +47,33 @@ The output directory must stay Git-excluded. `build/m16-image/media.d88` is a
 freshly composed candidate and is not a milestone distribution until its guest
 acceptance and publication checks are complete.
 
+## Acceptance operations
+
+Validate the committed candidate record, all three M16 schemas, source bindings,
+report and archive hashes, decompressed D88, and public privacy boundary with
+the same verifier used by native CI:
+
+```sh
+python3 -B tools/m16/verify_acceptance.py --mode candidate
+python3 -B -m unittest discover -s tests/m16 -p 'test_acceptance.py'
+```
+
+`build_image.py` performs two independent complete builds and runs the local
+media, loader, placement, input, repeat, and acceptance regressions. After
+pushing the final topic tip and obtaining its required CI runs, record the four
+full commit identities and exact CI attempts in the Git-excluded M16 handoff's
+`publication.json`, then run:
+
+```sh
+python3 -B tools/m16/verify_acceptance.py --mode publication \
+  --publication-record build/m16-publication.json
+```
+
+This final operation validates the pushed remote tip, ancestry, bounded
+publication diff, and successful CI jobs at their exact tested heads. Keep this
+local record out of Git because it contains the publication tip SHA that cannot
+be embedded in its own commit.
+
 ### Boot-media profiles
 
 `build_image.py` accepts `--boot-profile` to select a bootable format. The
