@@ -90,9 +90,15 @@ class AcceptanceSchemaTests(unittest.TestCase):
         record['distribution']['archive_sha256'] = 'sha256:bad'
         self.reject('INVALID_INSTANCE', lambda: gate.validate_instance(self.schema, record))
 
-    def test_pending_handoff_cannot_be_relabelled_pass(self):
+    def test_complete_m16_and_handoff_statuses_are_accepted(self):
         record = copy.deepcopy(self.record)
-        record['gates']['M16_HANDOFF'] = 'PASS'
+        record['status'] = 'M16 PASS'
+        record['gates']['M16_HANDOFF'] = 'HANDOFF READY'
+        gate.validate_instance(self.schema, record)
+
+    def test_unknown_handoff_status_is_rejected(self):
+        record = copy.deepcopy(self.record)
+        record['gates']['M16_HANDOFF'] = 'NOT RUN'
         self.reject('INVALID_INSTANCE', lambda: gate.validate_instance(self.schema, record))
 
     def test_hardware_cannot_be_claimed_as_pass(self):

@@ -6,7 +6,7 @@
   "properties": {
     "schema_version": {"const": 1},
     "milestone": {"const": "M16"},
-    "status": {"const": "QUALIFIED_CANDIDATE"},
+    "status": {"const": "M16 PASS"},
     "identities": {
       "type": "object",
       "additionalProperties": false,
@@ -93,7 +93,7 @@
         "M16_FKEYS": {"const": "PASS"},
         "M16_NORMAL": {"const": "PASS"},
         "M16_REGRESS": {"const": "PASS"},
-        "M16_HANDOFF": {"const": "PENDING_PUBLICATION"}
+        "M16_HANDOFF": {"const": "HANDOFF READY"}
       }
     },
     "hardware": {

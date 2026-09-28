@@ -1,8 +1,8 @@
 # M16 work checkpoint
 
-Status at this checkpoint: candidate qualification complete; designated archive
-and final publication-tip checks are being closed. This is not yet M16 PASS or
-HANDOFF READY.
+Status: **M16 PASS**; **HANDOFF READY**. Exact publication-tip identity and CI
+attempts are recorded in the post-push handoff, because a commit cannot contain
+its own SHA.
 
 ## Low resident layout revision
 
@@ -411,21 +411,20 @@ The final candidate gates are:
 | M16-MEDIA | Media replacement/swap read and write checks passed on VA and VA2 for mixed profiles. The corrected not-ready and write-protect recovery matrix passed 12/12; each run returned to DOS, executed another command and preserved the boot/protected images. PASS |
 | M16-CURSOR | Real FreeDOS/FreeCOM editing on VA and VA2 showed visible cursor movement and correct logical edits, including cursor-key and history-driven commands. The NEC documentation distinguishes cursor enable from per-sprite switch, but does not establish that cursor enable overrides a cleared sprite switch. That CE/SW=0 interaction remains unqualified; no hardware-level claim is made. Guest behavior gate PASS with this interaction limitation. |
 | M16-REPEAT / M16-FKEYS / M16-NORMAL | Automated DOS byte-stream probes matched expected VA and VA2 input/repeat sequences at fast and paced settings. Normal FreeCOM exercised history/editing keys and returned correct commands on both models. PASS |
-| M16-REGRESS | M16-maintained placement, loader, media, input, repeat and FreeCOM regressions ran in the clean source build. Kernel CI run 36360705941 succeeded at `7883c8fac11fab20cb467ad0a93c8799f35b565a`. Parent M16 run 36366637101 and scaffold run 36366637125 succeeded at `8253748a2a890d24c32a9eccc3027aad9aba67b3`. PASS for those exact heads. |
-| M16-HANDOFF | Exact boot and data images, matching Linux VAEG, static MinGW64 build artifact, checksums, launch commands and test scope are assembled in Git-excluded local evidence storage. Exact publication-tip CI and remote checks are pending. |
+| M16-REGRESS | M16-maintained placement, loader, media, input, repeat, acceptance-schema and FreeCOM regressions ran in the clean source build. Kernel CI run 36360705941 succeeded at `7883c8fac11fab20cb467ad0a93c8799f35b565a`. Parent M16 run 36378489202 and scaffold run 36378489349 succeeded at `f910e2c8ef8795ccc1dfd4734aa36e01de384140`. The exact publication-tip runs are bound in the post-push record. PASS |
+| M16-HANDOFF | Exact boot and data images, matching Linux VAEG, static MinGW64 build artifact, checksums, launch commands and test scope are assembled in Git-excluded local evidence storage. Publication topology, remote equality, bounded diff and exact CI attempts are checked by the post-push verifier. HANDOFF READY |
 
 The MinGW64 `mingw-release` artifact comes from VAEG CI run 36277471921 and
 statically links SDL2 and the configured non-system dependencies. It has not
 been run in a Windows guest acceptance session. VAEG guest qualification above
 uses the identified Linux executable.
 
-Evidence labels at this checkpoint: **HOST PASS** for the source-built media,
+Evidence labels: **HOST PASS** for the source-built media,
 placement and maintained host regressions; **VAEG PASS** for the listed exact
 candidate guest checks on VA and VA2. Physical hardware is **NOT RUN** and is
-**DEFERRED HARDWARE VALIDATION**. Overall M16 acceptance and HANDOFF READY remain
-pending final archive/publication review and exact-tip CI/remote verification.
+**DEFERRED HARDWARE VALIDATION**.
 
-The committed candidate record and all three strict M16 JSON Schemas are checked by
+The committed M16 acceptance record and all three strict M16 JSON Schemas are checked by
 [`tools/m16/verify_acceptance.py`](../../tools/m16/verify_acceptance.py). Local
 and native CI use the same candidate command. Its negative tests cover malformed
 and duplicate JSON, invalid schemas, missing and unknown fields, malformed

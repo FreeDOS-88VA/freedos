@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "milestone": "M16",
-  "status": "QUALIFIED_CANDIDATE",
+  "status": "M16 PASS",
   "identities": {
     "START_SHA": "1af9974700cd4dd1164cc0df56cc062925376148",
     "QUALIFIED_IMPLEMENTATION_SHA": "d4552868de2494b6b311c8610d88e71d2732eafa",
@@ -38,7 +38,7 @@
   },
   "report": {
     "path": "docs/porting/m16-report.md",
-    "sha256": "0e08cbbbef8cd4c99cac228a0f2183a679c49cf84adfc88078ef024d0edcb1fb"
+    "sha256": "1259d34a27f8111f18ba10f40f64c75912202bb765ea25da96b2df3bbd9d86bd"
   },
   "gates": {
     "M16_PLAN": "PASS",
@@ -54,7 +54,7 @@
     "M16_FKEYS": "PASS",
     "M16_NORMAL": "PASS",
     "M16_REGRESS": "PASS",
-    "M16_HANDOFF": "PENDING_PUBLICATION"
+    "M16_HANDOFF": "HANDOFF READY"
   },
   "hardware": {
     "status": "NOT RUN",
