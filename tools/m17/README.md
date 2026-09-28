@@ -125,9 +125,12 @@ See [configuration support](../../docs/porting/m17-configuration.md),
 [storage contracts](../../docs/porting/m17-storage-contracts.md), and the
 [M17 report](../../docs/porting/m17-report.md). The candidate disk includes an
 editable CONFIG.SYS. The common parser and DEVICE= path are present in the
-candidate source; actual guest CONFIG/INIT qualification remains gated by the
-exact VAEG run recorded in the report. PC88VA_LOADSEG remains an earlier
-loader-only decision. Explicit platform limitations are documented.
+candidate source. The exact-candidate VAEG guest checks are recorded in the
+report and configuration
+document; they qualify the listed FDD boot/CONFIG/INIT cases only. They do not
+qualify SASI/SCSI runtime or guest access to any HDD fixture. PC88VA_LOADSEG is
+still consumed by the earlier loader. Explicit platform limitations are
+documented.
 
 The full build also emits `run-1/storage-media/` and independently reads back
 all six data fixtures. These HDD images are nonbootable host fixtures, with no

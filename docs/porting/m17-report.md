@@ -1,92 +1,206 @@
 # M17 work report
 
-Status: **IN PROGRESS; not M17 PASS and not HANDOFF READY.** The accepted M16
-baseline remains PASS / HANDOFF READY. M17 does not claim HDD runtime, guest
-SASI/SCSI support, or hardware success.
+Status: **IN PROGRESS; not M17 PASS and not HANDOFF READY.** The last complete
+local HOST PASS is bound to `71908f4d664256402c19da31b4e8cc1d7fbcda27`; the
+current work adds only an acceptance-verifier documentation-path allowlist/test
+and associated documentation, so its complete build is pending. Scoped VAEG
+results bind to public candidate bytes and will be rebound to the next build by
+exact image comparison. The parent topic is unpublished and exact-tip public CI
+has not run. The accepted M16 baseline remains PASS / HANDOFF READY. M17 does
+not claim HDD runtime, guest SASI/SCSI support, FAT16 guest access, HDD boot, or
+hardware success.
 
-START_SHA: `f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4`. The required M16
-predecessor CI runs 36381203803 and 36381203807 both succeeded at that exact
-head. Accepted fdkernel source: `7883c8fac11fab20cb467ad0a93c8799f35b565a`;
-FreeCOM: `29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e`; COUNTRY.SYS:
-`23f189cca3420606eae8723884fa92ccd65eb307`.
+Evidence labels: **HOST PASS** (local reproducible build/fixture gates),
+**VAEG PASS** (the scoped boot/CONFIG/INIT checks below), and **DEFERRED
+HARDWARE VALIDATION** (hardware NOT RUN).
 
-## Provenance in progress
+START_SHA: `f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4`.
+QUALIFIED_IMPLEMENTATION_SHA: `71908f4d664256402c19da31b4e8cc1d7fbcda27`.
+The post-push handoff will record the distinct PUBLICATION_TIP_SHA,
+DOWNSTREAM_BASE_SHA and exact-tip CI attempts; they cannot be asserted before
+publication, and this report cannot contain its own future commit SHA.
 
-- Parent integration base: `0852dc543ca9c23829a8059776e2f77072ceb947`, with
-  original M17 work parent `6ef9a327d58e712e8470b5e6746c850c54852bcd` and
-  accepted M16 parent `f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4`.
-- fdkernel M17/M16 merge: `e87e8071c355a99a7f34a8758d4a3368b6523f3d`, with
-  parents `1527da489528367bb8028a8e9576375d35722f50` and
-  `7883c8fac11fab20cb467ad0a93c8799f35b565a`. Its deterministic source-archive
-  SHA-256 is
-  `887857e0c6706e47a9c8ea2055f74b3891138ed00564585a0053795e9e7dbc69`.
-  The merge was pushed to the `nakatamaho` origin branch and the exact remote
-  tip was verified. No push was made to upstream.
-- The parent M17 implementation, build verifier, and documentation remain
-  unpublished. The M17 lock retains `START_SHA` and the exact M16 predecessor
-  CI bindings.
+## Provenance
 
-## Implemented and locally tested
-
-- Preserved common FreeDOS CONFIG.SYS/FDCONFIG.SYS behavior and the bounded VA
-  CONFIG/INIT integration. No operational external HDD driver was added.
-- Added strict schema-v2 storage profiles, checked unit/range conversions,
-  deterministic synthetic FAT12/FAT16 fixtures, explicit nonbootable and
-  unqualified status, and an independent read-only inspector.
-- Added five separate CONFIG/FDCONFIG QA image profiles and synthetic
-  character-device, zero-unit, state, and memory probes. These are test inputs,
-  not guest boot or storage-driver qualification.
-- Added fail-closed acceptance metadata and output checks for exact component
-  provenance, predecessor CI claims, clean source archives, pinned toolchain
-  and wheels, two-build artifact identity, D88 payload composition, M16 floppy
-  regressions, M17 storage fixture readback, and schema/instance validation.
-  Negative tests cover stale CI bindings, unknown/missing fields, malformed
-  hashes, path escape, extra/missing/tampered artifacts, and build-log drift.
-- Verified the pinned Linux/amd64 Open Watcom image:
+- Accepted M16 predecessor: parent `f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4`;
+  required CI runs `36381203803` and `36381203807` succeeded at that exact head.
+  Accepted components: fdkernel
+  `7883c8fac11fab20cb467ad0a93c8799f35b565a`, FreeCOM
+  `29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e`, COUNTRY.SYS
+  `23f189cca3420606eae8723884fa92ccd65eb307`.
+- Parent integration base: `0852dc543ca9c23829a8059776e2f77072ceb947`;
+  original M17 parent: `6ef9a327d58e712e8470b5e6746c850c54852bcd`.
+- M17 fdkernel integration: `e87e8071c355a99a7f34a8758d4a3368b6523f3d`,
+  merging M17 `1527da489528367bb8028a8e9576375d35722f50` with accepted M16
+  `7883c8fac11fab20cb467ad0a93c8799f35b565a`. Deterministic source-archive
+  SHA-256: `887857e0c6706e47a9c8ea2055f74b3891138ed00564585a0053795e9e7dbc69`.
+  The child commit was pushed to the `nakatamaho` origin topic and verified;
+  nothing was pushed to upstream.
+- Parent M17 commits, in order: `b4d57bf5f87bfb5c03e1c508e0c37c74deca8d23`
+  (contracts, fixtures and gates),
+  `1a15cc9e9dad896b56f67c7caea9ab533ccafba0` (Markdown modes),
+  `f75d42cbe38a59a3588de091c1f118e64dacc595` (acceptance-verifier fixes),
+  `1e630e7db82330dff502414635c25359cf55a1c5` (FDCONFIG discriminating value),
+  and `71908f4d664256402c19da31b4e8cc1d7fbcda27` (host-validated profile
+  states). The parent topic is local only at this report revision.
+- The pinned Linux/amd64 Open Watcom image is
   `sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df`.
-- Focused host tests: storage **19 passed**; CONFIG QA **4 passed**; acceptance
-  verifier **7 passed**; component remote safety **2 passed**. The full host
-  discovery run executed 76 tests: **67 passed; 9 errored only because the
-  host lacks the pinned Unicorn dependency**. This host run is not acceptance.
-- The public VAEG `Main_RAM_Auto` MinGW static build was completed separately
-  from an isolated checkout. Its artifact and import audit are recorded in the
-  VAEG build report; Windows execution and emulator interaction were not run.
+  M17-local build and verifier inputs are documented in
+  [`tools/m17/README.md`](../../tools/m17/README.md); the build uses pinned
+  public wheels and network-disabled build/test containers.
 
-## Required verification still pending
+## HOST PASS — reproducible source build and fixtures
 
-Not yet run against a committed exact M17 parent candidate:
+From the exact qualified parent source above, the complete allowlisted source
+build was run twice with:
 
-- Complete allowlisted source export and two independent offline builds,
-  artifact-manifest comparison, and the linked carrier/placement regression
-  gate. The new end-to-end acceptance verifier has only had its focused unit
-  tests run; it has not yet checked full build outputs.
-- Full M17 tests in the pinned Linux/amd64 environment with the identity-pinned
-  Unicorn wheel, including actual CONFIG QA image and synthetic media
-  validation.
-- Guest boot of the exact candidate, including default CONFIG, FDCONFIG
-  precedence, character INIT, zero-unit INIT, and non-default LOADSEG. The
-  required VAEG ROM/firmware environment has not been identified; no guest
-  CONFIG/DEVICE result is claimed.
-- Parent publication, exact-tip public CI, final source/handoff bindings, and
-  final privacy review. No M17 distribution archive is designated.
+```sh
+python3 tools/m17/build_image.py --output build/m17-qualified-3
+python3 tools/m17/verify_acceptance.py --build build/m17-qualified-3
+```
 
-The storage fixtures do not establish SASI discovery, SCSI I/O, guest FAT16,
-HDD boot, or filesystem writes. Real PC-88VA SCSI boot remains excluded because
-there is no SCSI BIOS; the future SCSI profile is data-only through one external
-`DEVICE=` driver. SASI/SCSI runtime and hardware are NOT RUN. Hardware status is
-**DEFERRED HARDWARE VALIDATION**.
+Result: **M17 BUILD ACCEPTANCE VERIFIED**. Both independent builds, their
+artifact manifests and final D88 bytes match. The pinned build ran the
+storage-profile/schema/fixture suite, CONFIG QA tests, maintained M13
+placement/carrier tests, M16 floppy regressions and M17 acceptance negative
+cases. Linked carrier and placement gates passed. The verifier checked source
+archives, component pins, toolchain/dependency identities, actual schema and
+instance validation, storage readback, CONFIG QA images, and regression
+outputs. `build-1.log` and `build-2.log` are generated, excluded outputs; the
+build manifest correctly labels guest and hardware execution as outside the
+host build.
 
-## Next actions
+The unchanged M17 boot candidate is **not** a designated milestone
+ distribution and is not committed:
 
-1. Commit the reviewed M17 source/build candidate locally, then execute the
-   complete clean double build from its exact committed allowlisted inputs.
-   Fix any build, test, placement, or acceptance-verifier defect and repeat the
-   affected gates.
-2. Keep guest CONFIG QA explicitly NOT RUN unless an authorized, identified
-   VAEG firmware environment is available; do not infer it from host tests.
-3. Reconcile the report and M19 SASI/M21 external-SCSI handoffs, complete
-   privacy and bounded-diff review, then publish the parent topic and verify
-   exact-tip CI, remote equality, and child-before-parent reachability.
+| Artifact | Size | SHA-256 |
+| --- | ---: | --- |
+| `build/m17-qualified-3/media.d88` | 1,331,888 bytes | `b62adbaff3fba72decd5e8aceeeb7d55bdc762c7b9ca877515c21a361c868016` |
 
-The accepted M16 archive remains unchanged. This report contains no
-self-referential future publication SHA or unrun guest/hardware claim.
+The two build copies have the same size and digest. The same D88 bytes were
+produced by the preceding qualified source candidate; the later profile-state
+change affects only host qualification metadata, not this image.
+
+All six entries in `config/m17/media-profiles.json` now say `HOST_VALIDATED`.
+This means their public synthetic media contracts and bytes passed the host
+producer, independent inspector, schema/instance and acceptance gates. It does
+not mean guest or hardware qualification: each profile remains
+`guest: NOT_QUALIFIED`, `hardware: NOT_RUN`.
+
+Generated fixture identities from
+`build/m17-qualified-3/run-1/storage-media/manifest.json`:
+
+| Profile | File | Size | SHA-256 |
+| --- | --- | ---: | --- |
+| `fdd-360-fat12` | `fdd-360-fat12.img` | 368,640 | `03105ba26455734151356d79c8480ad265ce186fc4a91e10039cf1876a5cd3b0` |
+| `fdd-1280-fat12` | `fdd-1280-fat12.img` | 1,310,720 | `246ffc56a1b84da52e92789b5848d2703b292f1251a2d3f41f92cad437d97352` |
+| `sasi40-fat12` | `sasi40-fat12.hdi` | 41,568,256 | `935082a2ee1a972bd5261e99f80f23661ea102f22b5d4c01efd358074c2b6314` |
+| `sasi40-fat16` | `sasi40-fat16.hdi` | 41,568,256 | `bca99c7e3dd4e1f67b0f2358515c5182b0a1cf9c38ce932460b2e2e8f31f2568` |
+| `scsi40-256-fat16` | `scsi40-256-fat16.hdd` | 41,943,260 | `efe764b8b2c6cae5d8fe2867275cc34b6816a223a1343402cd306fa68c585fc3` |
+| `scsi40-512-fat16` | `scsi40-512-fat16.hdd` | 41,943,260 | `22d33db7f40ec20f3bbf4b3c5b97fd7575a55bbde109c346d16beed98248d443` |
+
+All fixture images are generated from committed public profile/source data and
+are nonbootable. Their bytes and file hashes are read back independently; no
+SASI/SCSI guest I/O is implied.
+
+The five pristine CONFIG QA disks are each 1,331,888 bytes and are recorded in
+`build/m17-qualified-3/run-1/config-qa/manifest.json`:
+
+| Profile | SHA-256 |
+| --- | --- |
+| `baseline-config` | `b62adbaff3fba72decd5e8aceeeb7d55bdc762c7b9ca877515c21a361c868016` |
+| `fdconfig-precedence` | `47e3dff4de7efd5d8c106bdf020fbe39be15174bdc313299bf0be8c85bb5cbb6` |
+| `character-init` | `b37699fc88e10edc0554fd3e0f3b3e0518a0ac072769184986e57700454e378a` |
+| `zero-unit-init` | `1767704a1116582d83330b10640dbc780627daf7e8a663fc238eaef1cb9f440b` |
+| `loadseg-2000` | `9b1568646ad4807746f8158fff0145b33edb7b67b2923ccbe1e1440a36413595` |
+
+The build is reproducible from the documented public inputs. The generated
+`build/m17-qualified-3/` directory and logs are excluded and are not required
+source inputs. No M17 distribution D88 is designated; the accepted M16 archive
+is unchanged.
+
+## VAEG PASS — scoped guest boot and CONFIG/INIT checks
+
+The exact bytes in the final host-qualified boot candidate and all five QA disks
+were run using the pinned public VAEG executable from source commit
+`62a597f0ee81e2e036af740a3e79ad3da83e3fb7` (executable SHA-256
+`c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf`). Local
+firmware-dependent screenshots, raw captures and logs remain in Git-excluded
+private evidence; no firmware identity, path or derived memory value is
+published.
+
+Scoped results:
+
+- The main M17 D88 reached FreeCOM on VA and VA2. COM and MZ execution and a
+  guest file write/readback succeeded on the VA run; an independent read-only
+  media check confirmed the file and consistent FAT copies. These tests apply
+  to the current D88 because its bytes are identical to the exact host-qualified
+  candidate above.
+- `baseline-config` booted with the default CONFIG path and ran `CFGSTATE.COM`.
+- `fdconfig-precedence` selected `FDCONFIG.SYS`; observed BUFFERS=8 and
+  FILES=24 match the deliberately distinguishing values. The test value is
+  above FreeDOS's built-in `NFILES=16` minimum. The common `Files()` handler
+  retains `max(current, requested)`; the lower `FILES=12` in the separate
+  character/zero-unit test inputs is therefore clamped by inherited FreeDOS
+  behavior. This behavior was not changed.
+- `character-init` loaded the synthetic `CFGDEV.SYS`, showed its INIT marker,
+  and `CFGPROBE.COM` opened the registered character device.
+- `zero-unit-init` ran the synthetic `CFGNONE.SYS` decline path. Its INIT
+  marker and expected failed character-device probe were observed; `CFGSTATE`
+  reported no additional DOS block unit. The pinned `init_device()` path
+  returns before allocating/linking a zero-unit block driver. This is a test
+  fixture, not a production storage driver.
+- `loadseg-2000` passed `PC88VA_LOADSEG=2000` through the actual CONFIG.SYS
+  loader path, displayed the corresponding effective placement and ran
+  `CFGSTATE.COM` from the shell.
+
+This is VAEG guest qualification only. It is not a hardware result and does
+not qualify the six synthetic HDD/FDD filesystem fixtures for guest access.
+
+## Storage scope and downstream handoff
+
+The source-linked CONFIG/INIT/device ABI audit, controller ownership, block
+unit mapping, limitations and M19/M21 test workloads are in
+[`m17-storage-contracts.md`](m17-storage-contracts.md). The exact reproducible
+fixture names, sizes and digests are tabulated above. In particular:
+
+- **M19 SASI data:** use `sasi40-fat16.hdi`
+  (`bca99c7e3dd4e1f67b0f2358515c5182b0a1cf9c38ce932460b2e2e8f31f2568`).
+  Keep the four 256-byte native prefix blocks separate, begin the filesystem
+  at device block 4, aggregate two physical blocks per 512-byte DOS sector,
+  and register from an accepted FDD boot. First distinguish a successful root
+  read and fragmented `PATTERN.BIN` comparison against the manifest. No M19
+  SASI runtime or boot operation is performed in M17.
+- **M21 external SCSI data:** begin with `scsi40-256-fat16.hdd`
+  (`efe764b8b2c6cae5d8fe2867275cc34b6816a223a1343402cd306fa68c585fc3`) and
+  the 512-byte variant
+  (`22d33db7f40ec20f3bbf4b3c5b97fd7575a55bbde109c346d16beed98248d443`).
+  Load one `VASCSI.SYS` via `DEVICE=` from an already accessible volume; start
+  with target 0/LUN 0 and the selected primary FAT16 partition. Preserve one
+  controller owner, bounded INIT/unit registration and the write-rejection,
+  no-device and malformed-media cases in the storage contract. There is no
+  driver or SCSI runtime claim in M17, and SCSI boot is excluded.
+- **M18 memory:** use the accepted native RAM/MCB and CONFIG/INIT residency
+  boundaries in `docs/porting/m17-memory-layout.md` and the exact M18 task.
+  M17 performs no M18 memory repair or tool distribution.
+
+## Remaining work and explicit deferrals
+
+1. Repeat the complete clean build and acceptance gates after the
+   acceptance-verifier documentation-path allowlist/test change; bind the
+   resulting exact candidate and verify its D88/QA bytes against the VAEG runs.
+2. Complete the bounded diff and privacy review, verify pushed child
+   reachability, publish the parent topic normally, and run the public M17
+   workflow on its exact final SHA. Record exact remote equality and CI
+   attempt/job/head bindings in the durable post-push handoff.
+3. Update the final handoff with distinct full START_SHA,
+   QUALIFIED_IMPLEMENTATION_SHA, PUBLICATION_TIP_SHA and DOWNSTREAM_BASE_SHA.
+   Keep the report free of a self-referential future publication SHA.
+4. Do not designate/archive a new M17 boot disk unless separately authorized
+   and the milestone distribution requirements are met.
+
+SASI/SCSI controller operations, guest FAT16 access to any HDD fixture, HDD
+boot, SASI boot, SCSI boot, storage writes/persistence through those controllers,
+MO, and physical hardware remain **NOT RUN**. Hardware status is
+**DEFERRED HARDWARE VALIDATION**. M17 overall remains IN PROGRESS until the
+publication, exact-tip public CI and final handoff gates pass.

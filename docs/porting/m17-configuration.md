@@ -92,13 +92,27 @@ default CONFIG.SYS.
 
 Host-side profile checks establish that every referenced configuration exists,
 that the LOADSEG directive agrees with its profile, and that the distinguishing
-options/drivers are present. They do not establish the guest results. For a
-configuration claim, boot that exact candidate under the recorded VAEG revision
-and model, verify the startup banner, run CFGSTATE/CFGMEM/CFGPROBE as applicable,
-then exercise a small COM and MZ return-to-shell control and guest file
-write/readback. Preserve the pristine candidate digest separately from any
-emulator-mutated copy. A test not run remains NOT RUN; a zero-unit host fixture
-or assembly-source test is not CONFIG/DEVICE guest qualification.
+options/drivers are present. The separate, exact-candidate VAEG run is recorded
+as scoped **VAEG PASS** in the [M17 report](m17-report.md); firmware-dependent
+captures remain private. The observed results are:
+
+- `baseline-config`: default CONFIG.SYS boot and CFGSTATE reported the configured
+  default buffers/file table and two existing floppy block units.
+- `fdconfig-precedence`: FDCONFIG.SYS was selected; CFGSTATE distinguished it
+  from CONFIG.SYS using BUFFERS=8 and FILES=24.
+- `character-init`: CFGDEV.SYS emitted its INIT marker and CFGPROBE opened the
+  registered character device.
+- `zero-unit-init`: CFGNONE.SYS followed its decline path, CFGPROBE could not
+  open it, and CFGSTATE showed no additional DOS block unit. The pinned kernel
+  returns from the zero-unit block-driver path before allocating/linking it.
+- `loadseg-2000`: the actual early loader consumed LOADSEG 2000h and the shell
+  ran CFGSTATE afterward.
+
+The ordinary candidate also reached FreeCOM on VA and VA2; COM/MZ execution and
+guest file write/readback were checked on VA. The pristine QA artifacts and
+emulator-mutated copies are distinct. This guest scope does not include HDD
+fixtures or SASI/SCSI runtime, which remain NOT RUN. See the report for exact
+public candidate hashes, host results and limits.
 
 ## Runtime/storage boundary
 
@@ -107,5 +121,6 @@ external block driver must not rely on it to prevent failed/partial
 registration. M17 qualifies only the source ABI, public profile contracts and
 host-generated fixtures. No operational SASI/SCSI driver, HDD filesystem read,
 FAT16 guest volume, SCSI runtime, SASI boot or HDD boot is established by this
-configuration work. See the [M17 report](m17-report.md) for exact current test,
-build, CI and guest status.
+configuration work. The VAEG result above qualifies only the FDD boot and
+CONFIG/INIT path; it does not qualify controller I/O or HDD mounting. See the
+[M17 report](m17-report.md) for exact current build, CI and guest status.

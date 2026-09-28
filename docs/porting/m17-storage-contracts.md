@@ -277,12 +277,13 @@ python3 tools/m17/inspect_storage.py --profiles config/m17/media-profiles.json \
 ```
 
 The full offline M17 build also creates and inspects these fixtures from its
-allowlisted source export. The acceptance report records each generated
-artifact's exact path, size and SHA-256. Host fixture validation does not
-qualify a DOS driver, FAT16 guest operation, SASI controller access, SCSI
-controller access, filesystem writes or HDD boot. Those guest storage checks
-are NOT RUN under M17. Physical hardware is NOT RUN; use **DEFERRED HARDWARE
-VALIDATION** unless actual hardware evidence is collected later.
+allowlisted source export. The report records each generated artifact's path,
+size and SHA-256. The scoped VAEG PASS covers the candidate's FDD boot,
+CONFIG/INIT profiles and guest file smoke test only; it does not qualify a DOS
+HDD driver, FAT16 guest operation, SASI controller access, SCSI controller
+access, HDD filesystem writes or HDD boot. All such guest storage checks are
+NOT RUN under M17. Physical hardware is NOT RUN; status remains
+**DEFERRED HARDWARE VALIDATION**.
 
 M19 handoff: implement built-in SASI native-unit discovery, measured capacity,
 checked two-block/one-DOS-sector translation, 4-block reserved-prefix mapping,

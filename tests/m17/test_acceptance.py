@@ -10,9 +10,10 @@ ROOT = Path(__file__).resolve().parents[2]
 import sys
 sys.path.insert(0, str(ROOT / 'tools/m17'))
 from verify_acceptance import (AcceptanceError, BUILD_FIELDS, LINKED_GATES,
-                               TEST_SUITES, read_json, validate_artifact_tree,
-                               validate_build_record, validate_m17_lock,
-                               validate_predecessor_ci, verify_build_log)
+                               TEST_SUITES, is_documentation_only_publication_path,
+                               read_json, validate_artifact_tree, validate_build_record,
+                               validate_m17_lock, validate_predecessor_ci,
+                               verify_build_log)
 
 
 START_SHA = 'f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4'
@@ -54,6 +55,18 @@ def complete_log():
 
 
 class AcceptanceTests(unittest.TestCase):
+    def test_post_build_documentation_allowlist_is_narrow(self):
+        self.assertTrue(is_documentation_only_publication_path(
+            'docs/porting/m17-report.md'))
+        self.assertTrue(is_documentation_only_publication_path(
+            'tools/m17/README.md'))
+        for path in ('tools/m17/verify_acceptance.py',
+                     'tools/m17/build_image.py',
+                     'config/m17/media-profiles.json',
+                     'tools/m16/README.md'):
+            with self.subTest(path=path):
+                self.assertFalse(is_documentation_only_publication_path(path))
+
     def test_m17_lock_has_closed_shape_and_exact_historical_bindings(self):
         source = ROOT / 'manifests/m17-components.lock.json'
         valid = read_json(source)

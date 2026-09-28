@@ -336,6 +336,11 @@ def _git_output(root, *args):
     return subprocess.check_output(['git', '-C', str(root), *args], text=True).strip()
 
 
+def is_documentation_only_publication_path(path):
+    """Allow report/docs publication without rebuilding qualified artifacts."""
+    return path.startswith('docs/') or path == 'tools/m17/README.md'
+
+
 def _archive_digest(repo, commit, paths=()):
     command = ['git', '-C', str(repo), 'archive', commit, *paths]
     digest = hashlib.sha256()
@@ -360,7 +365,7 @@ def verify_source_inputs(build_dir, root, record):
                        build_parent, head]).returncode:
         raise AcceptanceError('qualified parent source is not an ancestor of the current publication tip')
     changed = _git_output(root, 'diff', '--name-only', build_parent + '..' + head).splitlines()
-    if any(not path.startswith('docs/') for path in changed):
+    if any(not is_documentation_only_publication_path(path) for path in changed):
         raise AcceptanceError('source changed after clean build outside documentation-only publication')
 
     sources = {'parent': build_parent}
