@@ -12,10 +12,15 @@ on:
       - 'components/freecom'
       - 'config/m17/**'
       - 'manifests/components.lock.json'
+      - 'manifests/current-components.json'
       - 'manifests/m17-components.lock.json'
       - 'manifests/toolchains.lock.json'
       - 'tests/m17/**'
+      - 'tests/qa/test_current_components.py'
       - 'tools/m17/**'
+      - 'tools/qa/current_components.py'
+      - 'tools/verify_scaffold.py'
+      - 'Makefile'
   workflow_dispatch:
 
 permissions:
@@ -38,6 +43,10 @@ jobs:
           test "$(uname -m)" = x86_64
           test "$(dpkg --print-architecture)" = amd64
           python3 -B tools/m17/component_remotes.py --configure
+      - name: Verify the explicit current-component selector and scaffold
+        run: |
+          python3 -B -m unittest discover -s tests/qa -p 'test_current_components.py'
+          make verify-scaffold
       - name: Build or verify the pinned Linux/amd64 Open Watcom toolchain
         run: python3 -B tools/m17/toolchain.py
       - name: Build the full distribution twice from clean source exports

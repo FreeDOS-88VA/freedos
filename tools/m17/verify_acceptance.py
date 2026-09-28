@@ -133,7 +133,7 @@ def validate_m17_lock(lock, root=ROOT):
     if (type(lock['schema_version']) is not int or lock['schema_version'] != 2 or
             lock['milestone'] != 'M17' or
             lock['start_sha'] != 'f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4' or
-            lock['status'] != 'M17 implementation and qualification pending'):
+            lock['status'] != 'M17 PASS (CONTRACTS/FIXTURES); HANDOFF READY'):
         raise AcceptanceError('M17 component lock has a stale milestone binding')
     historic = lock['historical_components_lock']
     _object(historic, {'path', 'sha256'}, 'historical component lock binding')

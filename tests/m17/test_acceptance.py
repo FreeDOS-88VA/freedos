@@ -87,6 +87,9 @@ class AcceptanceTests(unittest.TestCase):
         stale_control = copy.deepcopy(valid)
         del stale_control['m15_control']['components']['components/country']
         mutations.append(stale_control)
+        stale_status = copy.deepcopy(valid)
+        stale_status['status'] = 'M17 implementation and qualification pending'
+        mutations.append(stale_status)
         for lock in mutations:
             with self.subTest(lock=lock), self.assertRaises(AcceptanceError):
                 validate_m17_lock(lock, ROOT)

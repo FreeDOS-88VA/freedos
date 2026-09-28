@@ -50,7 +50,8 @@ def host_wheel_specs():
 
 def component_lock():
     lock = json.loads((ROOT / 'manifests/m17-components.lock.json').read_text())
-    if lock.get('schema_version') != 2 or lock.get('milestone') != 'M17':
+    if (lock.get('schema_version') != 2 or lock.get('milestone') != 'M17' or
+            lock.get('status') != 'M17 PASS (CONTRACTS/FIXTURES); HANDOFF READY'):
         raise ValueError('Invalid M17 component lock')
     if lock.get('start_sha') != 'f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4':
         raise ValueError('M17 baseline substitution')

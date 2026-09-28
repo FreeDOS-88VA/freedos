@@ -1,0 +1,10 @@
+{
+  "kind": "current-component-source",
+  "milestone": "M17",
+  "schema_version": 1,
+  "source": {
+    "path": "manifests/m17-components.lock.json",
+    "schema_version": 2,
+    "sha256": "c0d30a867587dc7263d908761bd01ceb8e0d3a665658d49580534abe6cb0b084"
+  }
+}

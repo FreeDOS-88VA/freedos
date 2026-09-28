@@ -7,6 +7,13 @@ A recovered M17 branch based on the obsolete `fc891f3cd424c281680dd15b3f269bef4a
 is audit history only; its status and acceptance are not inherited. No build
 step imports, executes, or reads another milestone's tools/config/tests tree.
 
+The root scaffold resolver selects the M17 provenance lock only through the
+explicit, canonical `manifests/current-components.json` descriptor. That
+selector pins the provenance file's schema version and SHA-256; it does not
+reinterpret the M17 schema-v2 provenance record as a legacy schema-v1 overlay.
+M17 CI tests this boundary and runs `make verify-scaffold` before the isolated
+build.
+
 # M17 host tooling
 
 The M13 carrier builder and linked-placement verifier in this directory are
