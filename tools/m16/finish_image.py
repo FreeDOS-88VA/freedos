@@ -6,9 +6,11 @@ import hashlib
 import json
 from pathlib import Path
 import sys
-from compose_image import compose, ROOT
 
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/m16'))
+from build_boot_media import build as build_boot_media
+from compose_image import compose
 from build_compressed_kernel import build
 from build_loader import build_stage
 
@@ -16,7 +18,9 @@ from build_loader import build_stage
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path, required=True)
-    out = parser.parse_args().output
+    parser.add_argument('--boot-profile', default='2hd-1280')
+    args = parser.parse_args()
+    out = args.output
     profile = json.loads((ROOT / 'config/m16/loader.json').read_text())
     carrier = build(out / 'kernel-linked.exe',
                     ROOT / 'components/fdkernel/pc88va/kernel/m13_unpack.asm',
@@ -40,7 +44,16 @@ def main():
     payloads['TYPEA.TXT'] = b'M13-TYPE-A!\r\n'
     payloads['TYPEB.TXT'] = b'M13-TYPE-B!\r\n'
     payloads['COMDATA.TXT'] = b'M13-COM-DATA\r\n'
-    compose(payloads, profile, out, 1787814827)
+    boot_profiles = json.loads((ROOT / 'config/m16/boot-profiles.json').read_text())
+    selected = next((item for item in boot_profiles['profiles']
+                     if item['name'] == args.boot_profile), None)
+    if selected is None:
+        parser.error('Unknown M16 boot profile')
+    build_boot_media(payloads, selected,
+                     json.loads((ROOT / 'config/m16/media.json').read_text()),
+                     profile, out / 'boot-profile', 1787814827)
+    (out / 'media.d88').write_bytes((out / 'boot-profile/media.d88').read_bytes())
+    (out / 'media.json').write_bytes((out / 'boot-profile/boot-media.json').read_bytes())
     from build_floppy_media import build_profiles
     build_profiles(ROOT / 'config/m16/floppy-profiles.json', out / 'floppy-media', 1787814827)
     artifacts = {p.relative_to(out).as_posix(): {

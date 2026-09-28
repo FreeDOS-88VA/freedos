@@ -47,6 +47,21 @@ The output directory must stay Git-excluded. `build/m16-image/media.d88` is a
 freshly composed candidate and is not a milestone distribution until its guest
 acceptance and publication checks are complete.
 
+### Boot-media profiles
+
+`build_image.py` accepts `--boot-profile` to select a bootable format. The
+supported profile IDs are `2d-320`, `2d-360`, `2dd-640`, `2dd-720`, and
+`2hd-1232`. The default `2hd-1280` is retained as a control. For example:
+
+```sh
+python3 tools/m16/build_image.py --output build/m16-2d-320 --boot-profile 2d-320
+```
+
+Each invocation performs the complete two-build reproducibility check and
+places the selected candidate at `build/m16-2d-320/media.d88`. The 2HC 1200 KiB
+profile remains a read/write data-volume target and has no designated M16 boot
+profile. Data-volume profiles are built separately by `build_floppy_media.py`.
+
 ## Runtime memory and kernel placement
 
 See the [current memory contract](../../docs/porting/m16-memory-layout.md) for

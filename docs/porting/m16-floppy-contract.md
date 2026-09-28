@@ -55,6 +55,16 @@ The driver probes through the native firmware interface, validates the BPB
 against the selected geometry, and maintains separate per-drive profiles.
 Guest code does not inspect D88 host files.
 
+## Boot media profiles
+
+The committed boot-media producer supports 2D 320/360 KiB and 2DD 640/720 KiB
+with 512-byte sectors, plus the 2HD 1232 KiB (77-cylinder) profile with
+1024-byte sectors. The existing 2HD 1280 KiB image remains the default control.
+The 2HC 1200 KiB profile remains a data-volume target; M16 does not currently
+designate a 2HC boot profile. `config/m16/boot-profiles.json` lists the
+supported boot-media outputs. This distinction does not change the 2HC A:/B:
+read/write contract above.
+
 ## Short BPBs
 
 The public formatter's `ipl_bpb` is followed by a two-byte head count and a
