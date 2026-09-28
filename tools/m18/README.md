@@ -24,9 +24,10 @@ or prior milestone tool/config/test directory is a build input.
 - `make m18-clean` removes only the marker-validated Git-excluded `build/m18/`
   intermediate root. It preserves `dist/m18/`, the identity-pinned toolchain,
   and the host wheel cache.
-- `make m18-host-tests` runs the M18-local host suite. The placement-emulation
-  tests require the pinned Unicorn 2.1.4 wheel. The full clean-build script runs
-  all M18 tests inside the pinned container.
+- `make m18-host-tests` downloads/verifies the pinned Unicorn 2.1.4 wheel in
+  the Git-excluded cache and runs the M18-local suite on Linux/x86_64. On other
+  host architectures, `make m18-disk` runs all tests inside its pinned
+  Linux/amd64 build container.
 
 The topic branch must be committed and clean before `make m18-disk`. The build
 checks the exact baseline ancestry, component gitlinks, source-archive hashes,

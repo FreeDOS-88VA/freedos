@@ -567,4 +567,4 @@ m18-disk: m18-toolchain
 m18-clean:
 	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/clean.py --path "$(M18_OUTPUT)"
 m18-host-tests:
-	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B -m unittest discover -s tests/m18 -p 'test_*.py' -v
+	@M18_WHEEL_CACHE="$(M18_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/run_host_tests.py
