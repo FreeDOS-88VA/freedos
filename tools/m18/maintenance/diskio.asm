@@ -2,7 +2,7 @@
 bits 16
 cpu 8086
 segment _TEXT public class=CODE use16
-global _m18_abs_sector, _m18_critical
+global _m18_abs_sector, m18_critical_
 
 ; unsigned m18_abs_sector(unsigned writing, unsigned drive,
 ;                         unsigned sector, void __far *buffer)
@@ -53,6 +53,6 @@ _m18_abs_sector:
         pop bp
         retf
 
-_m18_critical:
+m18_critical_:
         mov al, 3               ; Fail; never recurse into DOS error handling.
         iret

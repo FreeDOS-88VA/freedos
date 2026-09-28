@@ -24,6 +24,17 @@ class MaintenanceCoreTests(unittest.TestCase):
                 [str(executable)], check=True, capture_output=True, text=True
             ).stdout
 
+    def test_dos_absolute_disk_adapter_matches_large_model_far_abi(self):
+        header = (ROOT / "tools/m18/maintenance/volume.h").read_text(encoding="ascii")
+        adapter = (ROOT / "tools/m18/maintenance/diskio.asm").read_text(encoding="ascii")
+        self.assertIn("unsigned __far __cdecl m18_abs_sector", header)
+        self.assertIn("unsigned sector, void __far *buffer", header)
+        self.assertIn("global _m18_abs_sector, m18_critical_", adapter)
+        self.assertIn("mov bx, [bp+12]", adapter)
+        self.assertIn("mov si, [bp+14]", adapter)
+        self.assertIn("m18_critical_:", adapter)
+        self.assertIn("retf", adapter)
+
     def test_native_profile_and_fat_chain_fixtures(self):
         output = self.compile_and_run(
             "fat12-test",
