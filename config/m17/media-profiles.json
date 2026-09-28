@@ -76,7 +76,7 @@
       "evidence_refs": ["m16-baseline", "fdkernel-m16"],
       "name": "fdd-360-fat12",
       "qualification": {
-        "m17": "HOST_VALIDATION_PENDING",
+        "m17": "HOST_VALIDATED",
         "guest": "NOT_QUALIFIED",
         "hardware": "NOT_RUN",
         "planned_data_milestone": "M16",
@@ -138,7 +138,7 @@
       "evidence_refs": ["m16-baseline", "fdkernel-m16"],
       "name": "fdd-1280-fat12",
       "qualification": {
-        "m17": "HOST_VALIDATION_PENDING",
+        "m17": "HOST_VALIDATED",
         "guest": "NOT_QUALIFIED",
         "hardware": "NOT_RUN",
         "planned_data_milestone": "M16",
@@ -200,7 +200,7 @@
       "evidence_refs": ["m16-baseline", "fdkernel-m16", "vaeg-storage-m16"],
       "name": "sasi40-fat12",
       "qualification": {
-        "m17": "HOST_VALIDATION_PENDING",
+        "m17": "HOST_VALIDATED",
         "guest": "NOT_QUALIFIED",
         "hardware": "NOT_RUN",
         "planned_data_milestone": "M19",
@@ -262,7 +262,7 @@
       "evidence_refs": ["m16-baseline", "fdkernel-m16", "vaeg-storage-m16"],
       "name": "sasi40-fat16",
       "qualification": {
-        "m17": "HOST_VALIDATION_PENDING",
+        "m17": "HOST_VALIDATED",
         "guest": "NOT_QUALIFIED",
         "hardware": "NOT_RUN",
         "planned_data_milestone": "M19",
@@ -324,7 +324,7 @@
       "evidence_refs": ["m16-baseline", "fdkernel-m16", "vaeg-storage-m16", "owner-scope"],
       "name": "scsi40-256-fat16",
       "qualification": {
-        "m17": "HOST_VALIDATION_PENDING",
+        "m17": "HOST_VALIDATED",
         "guest": "NOT_QUALIFIED",
         "hardware": "NOT_RUN",
         "planned_data_milestone": "M21",
@@ -386,7 +386,7 @@
       "evidence_refs": ["m16-baseline", "fdkernel-m16", "vaeg-storage-m16", "owner-scope"],
       "name": "scsi40-512-fat16",
       "qualification": {
-        "m17": "HOST_VALIDATION_PENDING",
+        "m17": "HOST_VALIDATED",
         "guest": "NOT_QUALIFIED",
         "hardware": "NOT_RUN",
         "planned_data_milestone": "M21",
