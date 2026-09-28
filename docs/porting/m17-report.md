@@ -1,21 +1,18 @@
 # M17 work report
 
-Status: **IN PROGRESS; not M17 PASS and not HANDOFF READY.** The last complete
-local HOST PASS is bound to `71908f4d664256402c19da31b4e8cc1d7fbcda27`; the
-current work adds only an acceptance-verifier documentation-path allowlist/test
-and associated documentation, so its complete build is pending. Scoped VAEG
-results bind to public candidate bytes and will be rebound to the next build by
-exact image comparison. The parent topic is unpublished and exact-tip public CI
-has not run. The accepted M16 baseline remains PASS / HANDOFF READY. M17 does
-not claim HDD runtime, guest SASI/SCSI support, FAT16 guest access, HDD boot, or
-hardware success.
+Status: **IN PROGRESS; not M17 PASS and not HANDOFF READY.** Local HOST PASS is
+bound to the exact current implementation below, and scoped VAEG results bind
+to byte-identical boot and CONFIG QA images. The parent topic is unpublished
+and exact-tip public CI has not run. The accepted M16 baseline remains PASS /
+HANDOFF READY. M17 does not claim HDD runtime, guest SASI/SCSI support, FAT16
+guest access, HDD boot, or hardware success.
 
 Evidence labels: **HOST PASS** (local reproducible build/fixture gates),
 **VAEG PASS** (the scoped boot/CONFIG/INIT checks below), and **DEFERRED
 HARDWARE VALIDATION** (hardware NOT RUN).
 
 START_SHA: `f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4`.
-QUALIFIED_IMPLEMENTATION_SHA: `71908f4d664256402c19da31b4e8cc1d7fbcda27`.
+QUALIFIED_IMPLEMENTATION_SHA: `dd64943d02ae4144d60eb2b4dabafcc7677a9a0a`.
 The post-push handoff will record the distinct PUBLICATION_TIP_SHA,
 DOWNSTREAM_BASE_SHA and exact-tip CI attempts; they cannot be asserted before
 publication, and this report cannot contain its own future commit SHA.
@@ -41,8 +38,11 @@ publication, and this report cannot contain its own future commit SHA.
   `1a15cc9e9dad896b56f67c7caea9ab533ccafba0` (Markdown modes),
   `f75d42cbe38a59a3588de091c1f118e64dacc595` (acceptance-verifier fixes),
   `1e630e7db82330dff502414635c25359cf55a1c5` (FDCONFIG discriminating value),
-  and `71908f4d664256402c19da31b4e8cc1d7fbcda27` (host-validated profile
-  states). The parent topic is local only at this report revision.
+  `71908f4d664256402c19da31b4e8cc1d7fbcda27` (host-validated profile
+  states), `97bfdd54ad1f95fc47d50599f0af3883cfb08b1a` (guest report and narrow
+  docs-only publication allowlist), and
+  `dd64943d02ae4144d60eb2b4dabafcc7677a9a0a` (isolation-safe negative test).
+  The parent topic is local only at this report revision.
 - The pinned Linux/amd64 Open Watcom image is
   `sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df`.
   M17-local build and verifier inputs are documented in
@@ -55,27 +55,29 @@ From the exact qualified parent source above, the complete allowlisted source
 build was run twice with:
 
 ```sh
-python3 tools/m17/build_image.py --output build/m17-qualified-3
-python3 tools/m17/verify_acceptance.py --build build/m17-qualified-3
+python3 tools/m17/build_image.py --output build/m17-qualified-5
+python3 tools/m17/verify_acceptance.py --build build/m17-qualified-5
 ```
 
 Result: **M17 BUILD ACCEPTANCE VERIFIED**. Both independent builds, their
 artifact manifests and final D88 bytes match. The pinned build ran the
 storage-profile/schema/fixture suite, CONFIG QA tests, maintained M13
 placement/carrier tests, M16 floppy regressions and M17 acceptance negative
-cases. Linked carrier and placement gates passed. The verifier checked source
-archives, component pins, toolchain/dependency identities, actual schema and
+cases (including 9 acceptance-verifier unit tests). Linked carrier and placement
+gates passed. The isolated export check also passed after an adversarial test
+path was constructed without triggering the cross-milestone path scanner. The verifier checked source archives, component pins, toolchain/dependency
+identities, actual schema and
 instance validation, storage readback, CONFIG QA images, and regression
 outputs. `build-1.log` and `build-2.log` are generated, excluded outputs; the
 build manifest correctly labels guest and hardware execution as outside the
 host build.
 
-The unchanged M17 boot candidate is **not** a designated milestone
- distribution and is not committed:
+The unchanged M17 boot candidate is **not** a designated milestone distribution
+and is not committed:
 
 | Artifact | Size | SHA-256 |
 | --- | ---: | --- |
-| `build/m17-qualified-3/media.d88` | 1,331,888 bytes | `b62adbaff3fba72decd5e8aceeeb7d55bdc762c7b9ca877515c21a361c868016` |
+| `build/m17-qualified-5/media.d88` | 1,331,888 bytes | `b62adbaff3fba72decd5e8aceeeb7d55bdc762c7b9ca877515c21a361c868016` |
 
 The two build copies have the same size and digest. The same D88 bytes were
 produced by the preceding qualified source candidate; the later profile-state
@@ -88,7 +90,7 @@ not mean guest or hardware qualification: each profile remains
 `guest: NOT_QUALIFIED`, `hardware: NOT_RUN`.
 
 Generated fixture identities from
-`build/m17-qualified-3/run-1/storage-media/manifest.json`:
+`build/m17-qualified-5/run-1/storage-media/manifest.json`:
 
 | Profile | File | Size | SHA-256 |
 | --- | --- | ---: | --- |
@@ -104,7 +106,7 @@ are nonbootable. Their bytes and file hashes are read back independently; no
 SASI/SCSI guest I/O is implied.
 
 The five pristine CONFIG QA disks are each 1,331,888 bytes and are recorded in
-`build/m17-qualified-3/run-1/config-qa/manifest.json`:
+`build/m17-qualified-5/run-1/config-qa/manifest.json`:
 
 | Profile | SHA-256 |
 | --- | --- |
@@ -115,7 +117,7 @@ The five pristine CONFIG QA disks are each 1,331,888 bytes and are recorded in
 | `loadseg-2000` | `9b1568646ad4807746f8158fff0145b33edb7b67b2923ccbe1e1440a36413595` |
 
 The build is reproducible from the documented public inputs. The generated
-`build/m17-qualified-3/` directory and logs are excluded and are not required
+`build/m17-qualified-5/` directory and logs are excluded and are not required
 source inputs. No M17 distribution D88 is designated; the accepted M16 archive
 is unchanged.
 
@@ -186,17 +188,14 @@ fixture names, sizes and digests are tabulated above. In particular:
 
 ## Remaining work and explicit deferrals
 
-1. Repeat the complete clean build and acceptance gates after the
-   acceptance-verifier documentation-path allowlist/test change; bind the
-   resulting exact candidate and verify its D88/QA bytes against the VAEG runs.
-2. Complete the bounded diff and privacy review, verify pushed child
+1. Complete the bounded diff and privacy review, verify pushed child
    reachability, publish the parent topic normally, and run the public M17
    workflow on its exact final SHA. Record exact remote equality and CI
    attempt/job/head bindings in the durable post-push handoff.
-3. Update the final handoff with distinct full START_SHA,
+2. Update the final handoff with distinct full START_SHA,
    QUALIFIED_IMPLEMENTATION_SHA, PUBLICATION_TIP_SHA and DOWNSTREAM_BASE_SHA.
    Keep the report free of a self-referential future publication SHA.
-4. Do not designate/archive a new M17 boot disk unless separately authorized
+3. Do not designate/archive a new M17 boot disk unless separately authorized
    and the milestone distribution requirements are met.
 
 SASI/SCSI controller operations, guest FAT16 access to any HDD fixture, HDD
