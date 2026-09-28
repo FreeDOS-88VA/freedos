@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Build MEMMAP.EXE and bind its own-MCB shrink size to the linked MZ image."""
+"""Build MEMMAP.EXE with DOS-load-time MZ memory bounded to its minimum."""
 import argparse
 import hashlib
 import json
@@ -18,7 +18,7 @@ SOURCES = (
 )
 
 
-def run_wcl(output_dir, exe_name, map_name, paragraphs):
+def run_wcl(output_dir, exe_name, map_name):
     compiler = shutil.which(os.environ.get("WCL", "wcl"))
     watcom = Path(os.environ.get("WATCOM", ""))
     if compiler is None or not watcom.is_dir():
@@ -29,7 +29,6 @@ def run_wcl(output_dir, exe_name, map_name, paragraphs):
     source_dir = ROOT / "tools/m18/memmap"
     command = [
         compiler, "-q", "-bt=dos", "-ml", "-0", "-k4096",
-        "-dM18_REQUIRED_BLOCK_PARAGRAPHS=" + str(paragraphs),
         "-i=" + str(source_dir),
         "-fm=" + map_name,
         "-fe=" + exe_name,
@@ -52,6 +51,8 @@ def parse_mz(path, map_path):
     if (declared_file_size != len(data) or header_bytes < 28 or
             header_bytes > declared_file_size or reloc_offset + relocations * 4 > header_bytes):
         raise ValueError("MEMMAP MZ file/header extent is inconsistent")
+    if max_allocation != min_allocation:
+        raise ValueError("MEMMAP MZ maximum allocation must equal its minimum")
     image_bytes = declared_file_size - header_bytes
     image_paragraphs = (image_bytes + 15) // 16
     required_paragraphs = 16 + image_paragraphs + min_allocation
@@ -104,39 +105,42 @@ def parse_mz(path, map_path):
     }
 
 
+def bound_maximum_allocation(path):
+    path = Path(path)
+    data = bytearray(path.read_bytes())
+    if len(data) < 28 or struct.unpack_from("<H", data)[0] != 0x5a4d:
+        raise ValueError("MEMMAP output is not a complete MZ executable")
+    minimum = struct.unpack_from("<H", data, 10)[0]
+    struct.pack_into("<H", data, 12, minimum)
+    path.write_bytes(data)
+    return minimum
+
+
 def build(output):
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=True)
-    probe = output / "probe"
     final = output / "final"
-    probe.mkdir(exist_ok=False)
     final.mkdir(exist_ok=False)
 
-    run_wcl(probe, "MEMMAP-PROBE.EXE", "MEMMAP-PROBE.MAP", 0)
-    probe_record = parse_mz(probe / "MEMMAP-PROBE.EXE",
-                            probe / "MEMMAP-PROBE.MAP")
-    required = probe_record["required_psp_block_paragraphs"]
-
-    run_wcl(final, "MEMMAP.EXE", "MEMMAP.MAP", required)
+    run_wcl(final, "MEMMAP.EXE", "MEMMAP.MAP")
+    bound_maximum_allocation(final / "MEMMAP.EXE")
     final_record = parse_mz(final / "MEMMAP.EXE", final / "MEMMAP.MAP")
-    if final_record["required_psp_block_paragraphs"] != required:
-        raise ValueError("MEMMAP self-sizing changed between linked passes")
     source_files = SOURCES + (ROOT / "tools/m18/memmap/mcb_parser.h",)
     final_record["source_sha256"] = {
         path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in source_files
     }
-    final_record["probe_mz_sha256"] = probe_record["file_sha256"]
-    final_record["shrink_method"] = (
-        "INT 21h/AH=4Ah to PSP size derived from MZ header image paragraphs, "
-        "minimum extra allocation, and the 256-byte PSP"
+    final_record["allocation_policy"] = (
+        "MZ maximum extra allocation equals minimum extra allocation; DOS "
+        "allocates the bounded MEMMAP block at EXEC without a later resize"
     )
     (final / "memmap-build.json").write_text(
         json.dumps(final_record, indent=2, sort_keys=True) + "\n", encoding="ascii"
     )
     shutil.copy2(final / "MEMMAP.EXE", output / "MEMMAP.EXE")
     shutil.copy2(final / "memmap-build.json", output / "memmap-build.json")
-    print("Built MEMMAP.EXE; required process block: {} paragraphs ({} bytes)".format(
-        required, required * 16
+    print("Built MEMMAP.EXE; bounded process block: {} paragraphs ({} bytes)".format(
+        final_record["required_psp_block_paragraphs"],
+        final_record["required_psp_block_bytes"]
     ))
     return final_record
 

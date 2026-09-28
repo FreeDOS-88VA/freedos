@@ -76,10 +76,12 @@ options, VA-specific adaptation and gate status; generated `package-manifest`
 records add exact hashes and DOS MZ allocation data.
 
 MEMMAP discovers the MCB list through the pinned FreeDOS interface, validates
-DOS version/layout and PSP ownership, shrinks only its own MZ block, and reports
-managed DOS MCB accounting. It explicitly labels physical/reserved memory as
-unavailable. CHKDSK is read-only. FORMAT writes filesystem metadata only to a
-B: volume with a readable, valid native 2HD BPB from prior preparation. SYS
+DOS version/layout and PSP ownership, and reports managed DOS MCB accounting.
+Its MZ `maximum allocation` equals `minimum allocation`, so DOS grants only the
+bounded process block at EXEC; MEMMAP does not resize memory at runtime. It
+explicitly labels physical/reserved memory as unavailable. CHKDSK is read-only.
+FORMAT writes filesystem metadata only to a B: volume with a readable, valid
+native 2HD BPB from prior preparation. SYS
 installs validated native boot files to prepared B: media and writes the boot
 sector last. None of the
 maintenance commands supports other floppy profiles, SASI/SCSI, hard-disk

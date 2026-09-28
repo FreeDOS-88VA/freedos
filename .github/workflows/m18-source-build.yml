@@ -44,6 +44,16 @@ jobs:
         run: |
           test "$(uname -m)" = x86_64
           test "$(dpkg --print-architecture)" = amd64
+      - name: Install the locked NASM host-test dependency
+        run: |
+          printf '%s\n' \
+            'deb [check-valid-until=no] https://snapshot.ubuntu.com/ubuntu/20260827T000000Z/ jammy main universe' \
+            'deb [check-valid-until=no] https://snapshot.ubuntu.com/ubuntu/20260827T000000Z/ jammy-updates main universe' \
+            'deb [check-valid-until=no] https://snapshot.ubuntu.com/ubuntu/20260827T000000Z/ jammy-security main universe' \
+            | sudo tee /etc/apt/sources.list.d/m18-snapshot.list
+          sudo apt-get -o Acquire::Check-Valid-Until=false update
+          sudo apt-get install --yes --no-install-recommends nasm=2.15.05-1
+          test "$(nasm -v)" = 'NASM version 2.15.05'
       - name: Run M18-local host suite and public source audit
         run: |
           make m18-host-tests

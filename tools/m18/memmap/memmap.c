@@ -5,10 +5,6 @@
 #include <string.h>
 #include "mcb_parser.h"
 
-#ifndef M18_REQUIRED_BLOCK_PARAGRAPHS
-#error M18_REQUIRED_BLOCK_PARAGRAPHS must be generated from the linked MZ header
-#endif
-
 #define DOS_MAJOR 6
 #define DOS_MINOR 22
 #define DOS_OEM_ID 0xfd
@@ -16,7 +12,6 @@
 
 static unsigned current_psp;
 static unsigned first_mcb;
-static unsigned block_resize_error;
 
 static int read_mcb(void *context, m18_u16 segment,
                     m18_u8 header[M18_MCB_HEADER_BYTES])
@@ -65,24 +60,6 @@ static int query_first_mcb(void)
   current_psp = outregs.x.bx;
   return first_mcb >= 0x1000U && current_psp != 0 &&
          current_psp != M18_MCB_SYSTEM_PSP;
-}
-
-static int shrink_process(void)
-{
-  union REGS inregs, outregs;
-  struct SREGS segregs;
-
-  memset(&inregs, 0, sizeof(inregs));
-  memset(&segregs, 0, sizeof(segregs));
-  inregs.x.ax = 0x4a00;
-  inregs.x.bx = M18_REQUIRED_BLOCK_PARAGRAPHS;
-  segregs.es = current_psp;
-  intdosx(&inregs, &outregs, &segregs);
-  if (outregs.x.cflag & 1U) {
-    block_resize_error = outregs.x.ax;
-    return 0;
-  }
-  return 1;
 }
 
 static void clean_name(const m18_u8 input[8], char output[9])
@@ -184,8 +161,8 @@ int main(int argc, char **argv)
     }
   }
 
-  /* Do this before output or MCB traversal. The linked MZ header binds the
-     resize to this executable's exact image and minalloc/stack requirement. */
+  /* Validate the pinned DOS interface before output or MCB traversal. The
+     MZ header bounds the process allocation before DOS executes this program. */
   if (!query_version()) {
     fputs("MEMMAP: unsupported DOS layout; requires FreeDOS VA 6.22, OEM FD, revision 43.\n",
           stderr);
@@ -195,12 +172,6 @@ int main(int argc, char **argv)
     fputs("MEMMAP: AH=52h/AH=62h returned an unsupported layout.\n", stderr);
     return 3;
   }
-  if (!shrink_process()) {
-    printf("MEMMAP: cannot retain the required %u paragraphs (DOS error %u).\n",
-           M18_REQUIRED_BLOCK_PARAGRAPHS, block_resize_error);
-    return 4;
-  }
-
   /* Prime standard output before validation so any library-owned output
      buffer is included in the observed process state. */
   if (check_only)

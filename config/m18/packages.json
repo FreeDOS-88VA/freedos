@@ -71,8 +71,8 @@
       "source": "tools/m18/memmap/",
       "license": "GPL-2.0-or-later",
       "cpu": "8086 DOS MZ",
-      "va_adaptation": "FreeDOS-version/layout-checked AH=52h MCB-chain reader; no direct BIOS calls",
-      "tests": ["native synthetic MCB tests", "DOS resize/output and independent guest comparison pending"]
+      "va_adaptation": "FreeDOS-version/layout-checked AH=52h MCB-chain reader; MZ maximum allocation equals minimum so DOS grants the bounded process block at EXEC without a runtime resize; no direct BIOS calls",
+      "tests": ["native synthetic MCB and bounded MZ allocation tests", "DOS chain/output and independent guest comparison pending"]
     },
     {
       "id": "jwasm",
