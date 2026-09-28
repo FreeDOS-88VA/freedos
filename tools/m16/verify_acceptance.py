@@ -357,6 +357,29 @@ def gh_json(*args):
     return json.loads(subprocess.check_output(['gh', 'api', *args], text=True))
 
 
+def gh_ci_jobs(repository, run_id, attempt):
+    jobs = []
+    page = 1
+    expected_total = None
+    while True:
+        path = (f'repos/{repository}/actions/runs/{run_id}/attempts/{attempt}/jobs'
+                f'?per_page=100&page={page}')
+        result = gh_json(path)
+        require(isinstance(result.get('jobs'), list) and
+                type(result.get('total_count')) is int, 'INVALID_CI_JOBS_RESPONSE')
+        if expected_total is None:
+            expected_total = result['total_count']
+        require(result['total_count'] == expected_total, 'CI_JOBS_CHANGED_DURING_READ')
+        jobs.extend(result['jobs'])
+        if len(jobs) >= expected_total:
+            break
+        require(result['jobs'], 'CI_JOBS_INCOMPLETE')
+        page += 1
+    require(len(jobs) == expected_total and len({job.get('id') for job in jobs}) == expected_total,
+            'CI_JOBS_INCOMPLETE')
+    return jobs
+
+
 def verify_publication(root, record_path):
     record = json_value(record_path.read_text())
     schema = json_value((root / 'config/m16/publication.schema.json').read_text())
@@ -412,9 +435,7 @@ def verify_publication(root, record_path):
                 'INVALID_CI_CLAIM')
         endpoint = f"repos/{repository}/actions/runs/{run_id}"
         run = gh_json(endpoint)
-        pages = gh_json('--paginate', '--slurp',
-                        endpoint + f'/attempts/{attempt}/jobs?per_page=100')
-        jobs = [job for page in pages for job in page.get('jobs', [])]
+        jobs = gh_ci_jobs(repository, run_id, attempt)
         verify_ci_claim(claim, run, jobs)
     candidate = verify_candidate(root)
     for key in ('START_SHA', 'QUALIFIED_IMPLEMENTATION_SHA', 'DOWNSTREAM_BASE_SHA'):
