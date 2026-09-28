@@ -1,21 +1,21 @@
 # M17 work report
 
-Status: **IN PROGRESS; not M17 PASS and not HANDOFF READY.** Local HOST PASS is
-bound to the exact current implementation below, and scoped VAEG results bind
-to byte-identical boot and CONFIG QA images. The parent topic is unpublished
-and exact-tip public CI has not run. The accepted M16 baseline remains PASS /
-HANDOFF READY. M17 does not claim HDD runtime, guest SASI/SCSI support, FAT16
-guest access, HDD boot, or hardware success.
+Status: **M17 PASS (STORAGE CONTRACTS AND SYNTHETIC FIXTURES); HANDOFF READY.**
+The qualification binds to the implementation and exact media identities below.
+The accepted M16 baseline remains PASS / HANDOFF READY. M17 does not claim HDD
+runtime, guest SASI/SCSI support, FAT16 guest access, HDD boot, or hardware
+success. The final publication-tip identity and exact CI binding are retained in
+the post-push handoff because this report cannot contain its own future SHA.
 
-Evidence labels: **HOST PASS** (local reproducible build/fixture gates),
-**VAEG PASS** (the scoped boot/CONFIG/INIT checks below), and **DEFERRED
-HARDWARE VALIDATION** (hardware NOT RUN).
+Evidence labels: **HOST PASS** (clean double build, fixtures, regressions, and
+exact-tip native CI), **VAEG PASS** (the scoped boot/CONFIG/INIT checks below),
+and **DEFERRED HARDWARE VALIDATION** (hardware NOT RUN).
 
 START_SHA: `f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4`.
 QUALIFIED_IMPLEMENTATION_SHA: `dd64943d02ae4144d60eb2b4dabafcc7677a9a0a`.
-The post-push handoff will record the distinct PUBLICATION_TIP_SHA,
-DOWNSTREAM_BASE_SHA and exact-tip CI attempts; they cannot be asserted before
-publication, and this report cannot contain its own future commit SHA.
+The post-push handoff records full PUBLICATION_TIP_SHA and DOWNSTREAM_BASE_SHA
+identities and exact-tip CI attempts. This report cannot contain its own commit
+SHA.
 
 ## Provenance
 
@@ -42,7 +42,8 @@ publication, and this report cannot contain its own future commit SHA.
   states), `97bfdd54ad1f95fc47d50599f0af3883cfb08b1a` (guest report and narrow
   docs-only publication allowlist), and
   `dd64943d02ae4144d60eb2b4dabafcc7677a9a0a` (isolation-safe negative test).
-  The parent topic is local only at this report revision.
+  The parent topic is published to `nakatamaho/origin`; exact remote equality
+  and final publication-tip CI bindings are in the post-push handoff.
 - The pinned Linux/amd64 Open Watcom image is
   `sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df`.
   M17-local build and verifier inputs are documented in
@@ -70,7 +71,11 @@ identities, actual schema and
 instance validation, storage readback, CONFIG QA images, and regression
 outputs. `build-1.log` and `build-2.log` are generated, excluded outputs; the
 build manifest correctly labels guest and hardware execution as outside the
-host build.
+host build. The pushed report candidate at
+`4c3c950fbae3fdf4fa47ccb21942d7f3c753f44b` passed exact-head GitHub Actions run
+`36415420212` (attempt 1), including native x64/amd64 assertion, two clean full
+builds, acceptance verification and clean public source checkouts. The final
+report-only publication tip's own run is bound in the post-push handoff.
 
 The unchanged M17 boot candidate is **not** a designated milestone distribution
 and is not committed:
@@ -186,20 +191,21 @@ fixture names, sizes and digests are tabulated above. In particular:
   boundaries in `docs/porting/m17-memory-layout.md` and the exact M18 task.
   M17 performs no M18 memory repair or tool distribution.
 
-## Remaining work and explicit deferrals
+## Acceptance record and explicit deferrals
 
-1. Complete the bounded diff and privacy review, verify pushed child
-   reachability, publish the parent topic normally, and run the public M17
-   workflow on its exact final SHA. Record exact remote equality and CI
-   attempt/job/head bindings in the durable post-push handoff.
-2. Update the final handoff with distinct full START_SHA,
-   QUALIFIED_IMPLEMENTATION_SHA, PUBLICATION_TIP_SHA and DOWNSTREAM_BASE_SHA.
-   Keep the report free of a self-referential future publication SHA.
-3. Do not designate/archive a new M17 boot disk unless separately authorized
-   and the milestone distribution requirements are met.
+The parent topic has been pushed after bounded-diff, privacy,
+component-reachability and exact-gitlink review. The durable post-push handoff
+records full START_SHA, QUALIFIED_IMPLEMENTATION_SHA, PUBLICATION_TIP_SHA and
+DOWNSTREAM_BASE_SHA identities, exact remote equality, and the final
+publication tip's CI attempt/job/head bindings. The report omits its own
+publication SHA. The generated fixture bundle and its integrity manifest are
+retained in Git-excluded handoff storage; the committed tools and profiles
+remain the source of truth and no generated fixture or QA disk is a build input.
+
+No new M17 boot disk is designated or archived. The accepted M16 distribution
+archive is unchanged.
 
 SASI/SCSI controller operations, guest FAT16 access to any HDD fixture, HDD
 boot, SASI boot, SCSI boot, storage writes/persistence through those controllers,
 MO, and physical hardware remain **NOT RUN**. Hardware status is
-**DEFERRED HARDWARE VALIDATION**. M17 overall remains IN PROGRESS until the
-publication, exact-tip public CI and final handoff gates pass.
+**DEFERRED HARDWARE VALIDATION**.
