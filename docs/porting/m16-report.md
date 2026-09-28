@@ -335,6 +335,35 @@ fresh-process file readback on both models. VAEG CI run 36277471921 succeeded at
 its exact source commit; kernel CI run 36360705941 succeeded at the exact kernel
 commit; parent M16 isolated-source-build CI run 36363378815 succeeded at parent
 report tip `be712ec153a6b0391fb9d19be0682e9501148bee`. Hardware is NOT RUN.
-These profile results do not complete the broader M16 physical B:,
-format-swap/error, cursor, repeat and function-key acceptance matrix. Overall
+The boot-profile checks do not complete the remaining console cursor, repeat,
+function-key, error-recovery, user-media, and handoff acceptance gates. Overall
 M16 remains partial; this is not a designated milestone distribution.
+
+## Data-media and memory regressions (2026-09-28)
+
+The same source-built candidate completed the full data-media matrix on VA and
+VA2. Each profile covered physical A: and B:, both BPB variants, cross-drive
+copy in both directions, directory and subdirectory operations, preservation
+of boot payloads, and fresh-process persistence readback.
+
+| Data profile | Scenarios | Result |
+| --- | ---: | --- |
+| 2D 320 KiB | 8 | PASS |
+| 2D 360 KiB | 8 | PASS |
+| 2DD 640 KiB | 8 | PASS |
+| 2DD 720 KiB | 8 | PASS |
+| 2HC 1200 KiB | 8 | PASS |
+| Total | 40 | PASS |
+
+The startup-memory regressions passed with 512 KiB installed and a retained
+640 KiB selection on VA and VA2, and with 640 KiB plus
+`PC88VA_LOADSEG=2000` through CONFIG.SYS on VA. Captured startup displays show
+the runtime-detected memory and effective kernel base; each case reached
+FreeDOS and passed COM/MZ and guest file-copy readback checks. These results
+qualify the active carrier, loader, and kernel candidate; they do not replace
+hardware validation.
+
+The remaining M16 gates are normal console input/repeat, GUI cursor/editor,
+media swap and error-recovery checks, PC-Engine B: reproduction, the final
+handoff package, and the designated reproducible distribution archive.
+Hardware is NOT RUN.
