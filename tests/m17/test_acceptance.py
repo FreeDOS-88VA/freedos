@@ -172,6 +172,19 @@ class AcceptanceTests(unittest.TestCase):
             with self.subTest(claim=claim), self.assertRaises(AcceptanceError):
                 validate_predecessor_ci(claim, START_SHA)
 
+    def test_second_clean_build_log_requires_gates_but_no_redundant_test_run(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'build-2.log'
+            path.write_text('\n'.join((
+                'M17 build export is isolated from other milestones',
+                'M17 reviewed sources match pinned kernel',
+                *LINKED_GATES,
+            )) + '\n')
+            verify_build_log(path, tests_required=False)
+            path.write_text(path.read_text() + 'M17_TEST_BEGIN storage\n')
+            with self.assertRaises(AcceptanceError):
+                verify_build_log(path, tests_required=False)
+
     def test_build_log_requires_every_named_suite_once_in_order(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'build.log'

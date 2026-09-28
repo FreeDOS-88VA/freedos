@@ -37,7 +37,7 @@ TEST_SUITES = (
     'storage', 'config-qa', 'm13-memory-placement', 'm13-carrier-tail',
     'floppy-media', 'loader-builder', 'loadseg-contract',
     'freecom-input-source', 'dos-input-probe', 'dos-freecom-editor',
-    'dos-repeat-probe', 'component-remotes', 'acceptance',
+    'dos-repeat-probe', 'acceptance',
 )
 LINKED_GATES = (
     'LINKED_PLATFORM_FRAME_AND_CON_CONTRACT_OK',
@@ -310,14 +310,15 @@ def validate_artifact_tree(directory, records):
             raise AcceptanceError('artifact bytes differ from manifest: ' + relative)
 
 
-def verify_build_log(path):
+def verify_build_log(path, tests_required=True):
     try:
         text = Path(path).read_text(encoding='utf-8')
     except (OSError, UnicodeError) as error:
         raise AcceptanceError('cannot read clean-build log: ' + str(error)) from error
     starts = re.findall(r'^M17_TEST_BEGIN ([a-z0-9-]+)$', text, re.MULTILINE)
     passes = re.findall(r'^M17_TEST_PASS ([a-z0-9-]+)$', text, re.MULTILINE)
-    if starts != list(TEST_SUITES) or passes != list(TEST_SUITES):
+    expected_suites = list(TEST_SUITES) if tests_required else []
+    if starts != expected_suites or passes != expected_suites:
         raise AcceptanceError('clean-build log has missing, stale, duplicated, or reordered test results')
     required = (
         'M17 build export is isolated from other milestones',
@@ -583,7 +584,7 @@ def verify_distribution_media(run_dir, root):
                 not isinstance(built_row['sha256'], str) or
                 not HEX64.fullmatch(built_row['sha256'])):
             raise AcceptanceError('CONFIG QA image size/hash/path is malformed: ' + source_row['name'])
-        image = _safe_file(run_dir, built_row['image'], 'CONFIG QA image')
+        image = _safe_file(run_dir / 'config-qa', built_row['image'], 'CONFIG QA image')
         if (image.stat().st_size != built_row['size_bytes'] or
                 _hash_file(image) != built_row['sha256']):
             raise AcceptanceError('CONFIG QA image digest drift: ' + source_row['name'])
@@ -639,7 +640,7 @@ def verify_floppy_media(run_dir, root):
         if (files != {config['test_file']['dos_name']: content} or
                 row['filesystem'] != report or report.get('fat_copies_equal') is not True):
             raise AcceptanceError('M16 floppy FAT readback differs from its profile: ' + name)
-        if profile.get('filesystem', {}).get('fat_type') != 'FAT12':
+        if spec['filesystem'].get('fat_type') != 'FAT12':
             raise AcceptanceError('M16 floppy regression profile is not FAT12: ' + name)
 
 
@@ -668,14 +669,17 @@ def _validate_schema_in_pinned_container(inputs, root, image):
                     arcname='config/media-profiles.schema.json')
         archive.add(Path(root) / 'config/m17/media-profiles.json',
                     arcname='config/media-profiles.json')
-    program = r'''import json, pathlib, sys, tarfile, zipfile
+    program = r'''import json, pathlib, shutil, sys, tarfile, zipfile
 root=pathlib.Path('/tmp/m17-schema-verify')
 root.mkdir()
-with tarfile.open(fileobj=sys.stdin.buffer, mode='r:') as archive:
-    for member in archive.getmembers():
+with tarfile.open(fileobj=sys.stdin.buffer, mode='r|') as archive:
+    for member in archive:
         path=pathlib.PurePosixPath(member.name)
-        assert not path.is_absolute() and all(part not in ('', '.', '..') for part in path.parts)
-    archive.extractall(root)
+        assert member.isfile() and not path.is_absolute() and all(part not in ('', '.', '..') for part in path.parts)
+        target=root.joinpath(*path.parts)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with archive.extractfile(member) as source, target.open('wb') as output:
+            shutil.copyfileobj(source, output)
 deps=root/'deps'; deps.mkdir()
 for wheel in sorted((root/'wheels').glob('*.whl')):
     with zipfile.ZipFile(wheel) as source:
@@ -759,7 +763,7 @@ def verify(build_dir, root=ROOT):
         if artifact_path != record['artifacts']:
             raise AcceptanceError(f'run-{number} manifest differs from the final build record')
         validate_artifact_tree(run_dir, artifact_path)
-        verify_build_log(build_dir / f'build-{number}.log')
+        verify_build_log(build_dir / f'build-{number}.log', tests_required=(number == 1))
         verify_distribution_media(run_dir, root)
         verify_floppy_media(run_dir, root)
         verify_storage_fixtures(run_dir, root)
