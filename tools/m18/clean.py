@@ -24,7 +24,15 @@ def clean(path: Path) -> None:
         print("M18 intermediate build root is already absent")
         return
     marker = path / ".m18-generated-root"
-    if not path.is_dir() or not marker.is_file() or marker.read_text(encoding="ascii") != MARKER:
+    if not path.is_dir() or marker.is_symlink():
+        raise ValueError("refusing to remove a symlink or non-directory")
+    if not marker.is_file():
+        if any(path.iterdir()):
+            raise ValueError("refusing to remove an unmarked or nonempty path")
+        path.rmdir()
+        print("Removed empty M18 intermediate root: " + str(path))
+        return
+    if marker.read_text(encoding="ascii") != MARKER:
         raise ValueError("refusing to remove an unmarked or mismatched path")
     shutil.rmtree(path)
     print("Removed generated M18 intermediates: " + str(path))

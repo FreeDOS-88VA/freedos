@@ -68,6 +68,14 @@ class PublicBuildPipelineTests(unittest.TestCase):
         with self.assertRaises(verify_source_audit.AuditError):
             verify_source_audit.verify(self.root)
 
+    def test_fresh_empty_build_root_is_supported(self):
+        root = self.root / "empty-build"
+        root.mkdir()
+        build_image.safe_recreate(root, ".m18-generated-root",
+                                  build_image.BUILD_MARKER, "test build")
+        self.assertEqual((root / ".m18-generated-root").read_text(encoding="ascii"),
+                         build_image.BUILD_MARKER)
+
     def test_generated_build_cleanup_is_marker_guarded(self):
         root = self.root / "build/m18"
         root.mkdir(parents=True)

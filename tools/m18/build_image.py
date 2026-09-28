@@ -126,9 +126,16 @@ def safe_recreate(path: Path, marker: str, content: str, label: str) -> None:
         if path.is_symlink() or not path.is_dir():
             raise ValueError(label + " path exists but is not a regular generated directory")
         marker_path = path / marker
-        if not marker_path.is_file() or marker_path.read_text(encoding="ascii") != content:
-            raise ValueError("refusing to remove unmarked or mismatched {} directory".format(label))
-        shutil.rmtree(path)
+        if marker_path.is_symlink():
+            raise ValueError("refusing to follow a generated-root marker symlink")
+        if marker_path.is_file():
+            if marker_path.read_text(encoding="ascii") != content:
+                raise ValueError("refusing to remove mismatched {} directory".format(label))
+            shutil.rmtree(path)
+        elif any(path.iterdir()):
+            raise ValueError("refusing to remove nonempty unmarked {} directory".format(label))
+        else:
+            path.rmdir()
     path.mkdir(parents=True)
     (path / marker).write_text(content, encoding="ascii")
 
@@ -136,6 +143,7 @@ def safe_recreate(path: Path, marker: str, content: str, label: str) -> None:
 def stage_distribution(path: Path) -> tuple[Path, bool]:
     if path.exists():
         if (path.is_symlink() or not path.is_dir() or
+                (path / ".m18-generated-root").is_symlink() or
                 not (path / ".m18-generated-root").is_file() or
                 (path / ".m18-generated-root").read_text(encoding="ascii") != DIST_MARKER):
             raise ValueError("refusing to replace an unmarked M18 distribution directory")
