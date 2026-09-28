@@ -41,8 +41,10 @@ SHA.
   `71908f4d664256402c19da31b4e8cc1d7fbcda27` (host-validated profile
   states), `97bfdd54ad1f95fc47d50599f0af3883cfb08b1a` (guest report and narrow
   docs-only publication allowlist), and
-  `dd64943d02ae4144d60eb2b4dabafcc7677a9a0a` (isolation-safe negative test).
-  The parent topic is published to `nakatamaho/origin`; exact remote equality
+  `dd64943d02ae4144d60eb2b4dabafcc7677a9a0a` (isolation-safe negative test),
+  and `cafcc19cb492400ddae456bc010338aced978917` (typed provenance selection,
+  lock/schema/hash binding, scaffold integration and negative tests). The parent
+  topic is published to `nakatamaho/origin`; exact remote equality
   and final publication-tip CI bindings are in the post-push handoff.
 - The pinned Linux/amd64 Open Watcom image is
   `sha256:51a0b466cdc32377f3d2bec8e6e5432428fce13813723de3ce185eac989698df`.
@@ -76,6 +78,34 @@ host build. The pushed report candidate at
 `36415420212` (attempt 1), including native x64/amd64 assertion, two clean full
 builds, acceptance verification and clean public source checkouts. The final
 report-only publication tip's own run is bound in the post-push handoff.
+
+The main-merge checks exposed a lock-type integration defect: the shared
+scaffold resolver treated the M17 schema-v2 provenance record as a canonical
+schema-v1 current overlay. M17 now selects its provenance record through the
+canonical `manifests/current-components.json` descriptor, which pins its path,
+schema version and SHA-256; the resolver validates and normalizes the declared
+M17 schema rather than selecting by file existence. Six integration tests
+cover actual component/archive resolution and reject stale status, wrong schema,
+unknown fields, merge drift, selector drift and a missing selector. The M17 CI
+runs those tests and `make verify-scaffold` before its isolated build.
+
+After this correction, a clean local build from published parent commit
+`cafcc19cb492400ddae456bc010338aced978917` passed
+`tools/m17/verify_acceptance.py`; its parent source-archive SHA-256 is
+`93d19a018a1a4e4e69d183782d9b65e6b800d63bf10d753f60c6ce5ad421c51f`. Both
+independent builds match, including the unchanged 1,331,888-byte candidate D88
+(`b62adbaff3fba72decd5e8aceeeb7d55bdc762c7b9ca877515c21a361c868016`). The
+exact-head native M17 CI run `36422294920` (attempt 1, job
+`108927710783`) succeeded at `cafcc19cb492400ddae456bc010338aced978917`,
+including selector negatives, scaffold validation, full double build and
+acceptance verification.
+
+Some M00–M16 workflows also ran against the later M17 tree in the main PR and
+remain red; they are not counted as M17 passes. For example, M03 rejects the
+advanced FreeCOM gitlink, M16's build rejects the later M17 kernel pin, and
+M15's legacy test entry point runs M15 tooling against M17 component sources.
+These historical statuses were not rewritten. M17's own maintained placement
+regressions and exact M17 build gates passed as recorded above.
 
 The unchanged M17 boot candidate is **not** a designated milestone distribution
 and is not committed:
