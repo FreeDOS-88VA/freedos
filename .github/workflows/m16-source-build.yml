@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+name: M16 isolated source build
+
+on:
+  push:
+    branches: ['topic/m16-floppy-formats-console-input']
+  pull_request:
+    paths:
+      - '.github/workflows/m16-source-build.yml'
+      - 'components/country'
+      - 'components/fdkernel'
+      - 'components/freecom'
+      - 'config/m16/**'
+      - 'manifests/components.lock.json'
+      - 'manifests/m16-components.lock.json'
+      - 'manifests/toolchains.lock.json'
+      - 'tests/m16/**'
+      - 'tools/m16/**'
+      - 'tools/qa/current_components.py'
+      - 'tools/verify_scaffold.py'
+      - 'Makefile'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+
+jobs:
+  isolated-build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Assert native x64 and configure component provenance
+        run: |
+          test "$(uname -m)" = x86_64
+          test "$(dpkg --print-architecture)" = amd64
+          bash tools/configure_component_remotes.sh
+      - name: Verify component lock
+        run: make verify-scaffold
+      - name: Build or verify the pinned Linux/amd64 Open Watcom toolchain
+        run: python3 -B tools/m16/toolchain.py
+      - name: Build the full distribution twice from clean source exports
+        run: python3 -B tools/m16/build_image.py --output build/m16-ci
+      - name: Validate M16 acceptance record and archived distribution
+        run: python3 -B tools/m16/verify_acceptance.py --mode candidate
+      - name: Confirm public source checkouts remain clean
+        run: |
+          git diff --check
+          git diff --exit-code
+          test -z "$(git status --porcelain --untracked-files=all)"

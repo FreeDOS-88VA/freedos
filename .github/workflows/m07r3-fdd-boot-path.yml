@@ -4,7 +4,7 @@ name: M07R3 public FDD boot-path diagnosis record
 on:
   push:
     # M14 runs its active gate plus immutable historical regressions.
-    branches-ignore: ['topic/m14-floppy-write-media-change', 'topic/m15-dos-api-writable-session']
+    branches-ignore: ['topic/m14-floppy-write-media-change', 'topic/m15-dos-api-writable-session', 'topic/m16-floppy-formats-console-input']
     paths:
       - ".github/workflows/m07r3-fdd-boot-path.yml"
       - "Makefile"

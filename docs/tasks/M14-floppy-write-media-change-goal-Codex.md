@@ -1,5 +1,11 @@
 # M14 completion goal: PC-88VA floppy writes and media changes
 
+Historical task notice (2026-09-27): the memory-sizing instructions below
+belong to this milestone's recorded baseline. For active M16 maintenance, use
+[the M16 memory contract](../porting/m16-memory-layout.md): measured writable
+RAM replaces saved-selection sizing, and current LOADSEG/temporary-lifetime
+rules apply. This notice does not change historical acceptance or source pins.
+
 Revision: 2026-09-20
 
 Repository placement: `docs/tasks/M14-floppy-write-media-change-goal-Codex.md`
@@ -62,7 +68,7 @@ may be Japanese.
 
 ## 1. Find and preserve the actual starting state
 
-The normal repository root is `/Users/Shared/freedos-pc88va`. Discover the actual
+The normal repository root is `<repository-root>`. Discover the actual
 active parent and component worktrees, branches, remotes, gitlinks, toolchain,
 and task status. Do not assume the main checkout is the implementation worktree
 or reset it to a historical SHA copied from an earlier prompt.
@@ -77,7 +83,7 @@ Read the applicable root/scoped AGENTS.md files and the current:
   `docs/msdos211-memory-compat/` when present.
 
 The user supplied the following documentation root:
-`/Users/Shared/pc88va-private-docs`.
+`<repository-root>`.
 Inventory relevant text with `rg --files`, then inspect `tekumani/`,
 `chip-databooks/`, and the other directories only as needed. `nec98-databook/`
 explains NEC98 assumptions; it does not define VA hardware. `pc-engine/` refers
@@ -181,7 +187,7 @@ demonstrated contract failure.
 ## 4. Disposable fixtures and trustworthy observations
 
 Use a persistent private root such as:
-`/Users/Shared/freedos-pc88va/.private-evidence/m14/`.
+`<repository-root>`.
 Verify its Git exclusion. Preserve immutable inputs, controls, snapshots, concise
 reports, final images, and reproducible commands outside temporary storage.
 
@@ -520,7 +526,7 @@ Reuse equivalent established record paths. Suggested records are:
 - Private `progress.md`, `acceptance.md`, identified run directories, focused
   diffs/snapshots, and `M14-consult-current.md` when consultation is needed.
 - Private handoff under
-  `/Users/Shared/freedos-pc88va/.private-evidence/m14/handoff/`.
+  `<repository-root>`.
 
 Deliver uniquely named files such as:
 

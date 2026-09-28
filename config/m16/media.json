@@ -1,0 +1,63 @@
+{
+  "geometry": {
+    "bytes_per_sector": 1024,
+    "cylinders": 80,
+    "encoding": "MFM",
+    "heads": 2,
+    "physical_sector_id_base": 1,
+    "sectors_per_track": 8,
+    "total_bytes": 1310720,
+    "total_sectors": 1280,
+    "track_order": "cylinder_major_head_minor"
+  },
+  "filesystem": {
+    "data_clusters": 1269,
+    "fat_bytes_required": 1907,
+    "fat_count": 2,
+    "fat_timestamp_policy": "per_payload_m02_source_date_epoch_utc_truncated_to_even_second",
+    "fat_type": "FAT12",
+    "first_data_sector": 11,
+    "hidden_sectors": 0,
+    "media_descriptor": 254,
+    "reserved_sectors": 1,
+    "root_directory_sectors": 6,
+    "root_entries": 192,
+    "sectors_per_cluster": 1,
+    "sectors_per_fat": 2,
+    "unallocated_data_policy": "zero"
+  },
+  "d88": {
+    "declared_size": 1331888,
+    "deleted_data": 0,
+    "disk_name": "FDOS-PC88VA-M16",
+    "disk_type": 32,
+    "error_status": 0,
+    "header_size": 688,
+    "mfm_density_field": 0,
+    "populated_tracks": 160,
+    "rpm_field": 0,
+    "sector_header_size": 16,
+    "sector_size_code": 3,
+    "track_table_entries": 164,
+    "write_protect": 0
+  },
+  "boot_record": {
+    "extended_bpb_signature": 41,
+    "filesystem_type": "FAT12",
+    "oem_name": "FDPC88VA",
+    "placeholder_code": [
+      235,
+      254,
+      144
+    ],
+    "placeholder_semantics": "x86_short_jump_minus_2_self_loop_then_unreached_nop",
+    "signature_offsets": [510, 1022],
+    "unassigned_byte_policy": "zero"
+  },
+  "image": {
+    "d88_filename": "media.d88",
+    "raw_filename": "media.img",
+    "volume_label": "PC88VA-M16",
+    "volume_serial": 1295060480
+  }
+}

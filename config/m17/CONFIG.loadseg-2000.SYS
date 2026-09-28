@@ -1,0 +1,6 @@
+REM QA profile: stage 2 must apply this selector before loading KERNEL.SYS.
+PC88VA_LOADSEG=2000
+BUFFERS=10
+FILES=16
+LASTDRIVE=E
+DOS=LOW

@@ -1,0 +1,6 @@
+REM QA profile: positive character-device INIT through the common parser.
+BUFFERS=8
+FILES=12
+LASTDRIVE=E
+DOS=LOW
+DEVICE=CFGDEV.SYS

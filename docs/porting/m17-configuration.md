@@ -1,0 +1,126 @@
+# M17 kernel configuration
+
+## Two readers, different responsibilities
+
+1. The stage-2 loader examines `CONFIG.SYS` for `PC88VA_LOADSEG` before loading
+   the carrier. This selects the paragraph base of the whole expanded resident
+   kernel and its consecutive work area.
+2. The common FreeDOS kernel opens `FDCONFIG.SYS` preferentially, otherwise
+   `CONFIG.SYS`. `DoConfig(0)`, `DoConfig(1)` and `DoConfig(2)` process the
+   existing common command table in order. The last pass runs after `PreConfig2`
+   establishes MCBs and can load `DEVICE=` drivers. `PostConfig` allocates final
+   buffers, file tables, drive tables and stacks. `DoInstall` executes queued
+   `INSTALL` commands while the VA temporary INIT allocation remains reserved.
+
+`PC88VA_LOADSEG` is a no-op to the later kernel parser because relocation has
+already happened. Put it in `CONFIG.SYS`, not just `FDCONFIG.SYS`, even when
+normal DOS options are supplied in `FDCONFIG.SYS`. A missing configuration file
+leaves the common defaults. The committed default `CONFIG.SYS` has
+`BUFFERS=10`, `FILES=16`, `LASTDRIVE=E` and `DOS=LOW`. BUFFERS counts 1,024-byte
+sector buffers; management bytes are additional.
+
+The temporary M13 early return is removed. This uses the selected common
+FreeDOS parser, not a replacement parser or a promise of exact MS-DOS behavior.
+The actual VA source audit and INIT ABI are bound by
+`config/m17/source-audit.json` and described in
+[`m17-storage-contracts.md`](m17-storage-contracts.md).
+
+## VA integration corrections and limits
+
+The medium-model INIT caller has a FAR return frame and SS differs from DS.
+READ accepts a FAR buffer; INIT_DOSEXEC accepts a FAR parameter block and a
+NEAR filename; LSEEK uses its correct FAR Pascal frame. Numeric parser outputs
+use FAR pointers on VA. NEAR interrupt blocks and the shell-tail work area are
+in DGROUP. The compiler is told that SS and DS differ. The existing release
+barrier protects temporary INIT storage through INSTALL execution.
+
+GetBiosKey uses DOS console/time services on VA rather than IBM INT 16h and
+`0040:006Ch`. The common skip/stepping command-tail behavior is retained with a
+DS-addressable buffer. This source change does not qualify every interactive
+F5/F8/conditional-key sequence; those require their own guest results.
+
+Ordinary portable command handlers are enabled, including BUFFERS, FILES,
+LASTDRIVE, FCBS, STACKS, BREAK, SHELL/COMMAND, SET, ECHO, COUNTRY, DEVICE,
+INSTALL, CHAIN, VERSION, ANYDOS, IDLEHALT and SWITCHAR. Enabled code is not a
+claim that every argument or combination has been exercised. These currently
+report a configuration error on VA:
+
+- MENUCOLOR, MENUDEFAULT and MENU (no qualified native menu interface).
+- SCREEN, NUMLOCK and KEYBUF (the original handlers use IBM firmware or BIOS
+  data areas).
+- BUFFERSHIGH, FILESHIGH, LASTDRIVEHIGH, SHELLHIGH, STACKSHIGH, DEVICEHIGH,
+  INSTALLHIGH and DOSDATA (no selected VA high-memory allocation contract).
+- DOS options other than LOW, NOUMB, and LOW,NOUMB.
+
+These are unavailable features, not unused features. INIT size is a placement
+constraint, not justification for silently dropping DOS functionality. The
+native replacements/high-memory policy remain follow-up work. The underlying
+non-VA implementations are preserved. No 640-KiB assumption, HMA, UMB or IBM
+BIOS shim is introduced. Existing FreeDOS parser quirks are not repaired as part
+of the port.
+
+## CONFIG/DEVICE qualification inputs
+
+`config/m17/config-qa.json` defines five separate pristine candidate disks and
+records the exact `CONFIG.SYS`/`FDCONFIG.SYS` source, effective LOADSEG and
+expected active filename:
+
+| Profile | Distinguishing path | Host artifact role |
+| --- | --- | --- |
+| `baseline-config` | Default `CONFIG.SYS`, LOADSEG 1000h | Normal parser/default regression |
+| `fdconfig-precedence` | BUFFERS=8 and FILES=24 in `FDCONFIG.SYS` versus 10/16 in `CONFIG.SYS` | Proves FDCONFIG selection through both observed kernel values |
+| `character-init` | `DEVICE=CFGDEV.SYS` | Positive CONFIG-loaded character-driver INIT/open test |
+| `zero-unit-init` | `DEVICE=CFGNONE.SYS` | Block-driver zero-unit case; must add no DOS unit or retained allocation |
+| `loadseg-2000` | LOADSEG 2000h in CONFIG plus FDCONFIG override | Exercises non-default LOADSEG through the real early loader and later parser |
+
+The positive and zero-unit drivers are synthetic test fixtures only:
+CFGDEV.SYS is a disposable character device for strategy/interrupt, INIT and
+open. CFGNONE.SYS returns zero block units and no retained extent. Neither is a
+SASI/SCSI implementation or substitute for `VASCSI.SYS`. CFGPROBE.COM opens the
+character fixture after the shell starts. CFGSTATE.COM reads configured buffer
+count, LASTDRIVE, SFT capacity and registered DOS block-unit count through
+INT 21h/AH=52h. CFGMEM.COM requests the largest DOS MCB block, releases it, and
+prints the reported paragraph count. These are built from `tests/m17/*.asm` and
+are added only to the distinct QA disks, not the ordinary candidate image.
+
+The source-linked FreeDOS `Files()` handler retains `max(Config.cfgFiles,
+requested)`, with `NFILES=16` as the VA default. Therefore the separate character
+and zero-unit profiles' `FILES=12` does not lower the table; that is selected
+upstream behavior, not a FDCONFIG-selection failure. The precedence profile
+uses 24 so both its buffer and file-table values distinguish FDCONFIG from the
+default CONFIG.SYS.
+
+Host-side profile checks establish that every referenced configuration exists,
+that the LOADSEG directive agrees with its profile, and that the distinguishing
+options/drivers are present. The separate, exact-candidate VAEG run is recorded
+as scoped **VAEG PASS** in the [M17 report](m17-report.md); firmware-dependent
+captures remain private. The observed results are:
+
+- `baseline-config`: default CONFIG.SYS boot and CFGSTATE reported the configured
+  default buffers/file table and two existing floppy block units.
+- `fdconfig-precedence`: FDCONFIG.SYS was selected; CFGSTATE distinguished it
+  from CONFIG.SYS using BUFFERS=8 and FILES=24.
+- `character-init`: CFGDEV.SYS emitted its INIT marker and CFGPROBE opened the
+  registered character device.
+- `zero-unit-init`: CFGNONE.SYS followed its decline path, CFGPROBE could not
+  open it, and CFGSTATE showed no additional DOS block unit. The pinned kernel
+  returns from the zero-unit block-driver path before allocating/linking it.
+- `loadseg-2000`: the actual early loader consumed LOADSEG 2000h and the shell
+  ran CFGSTATE afterward.
+
+The ordinary candidate also reached FreeCOM on VA and VA2; COM/MZ execution and
+guest file write/readback were checked on VA. The pristine QA artifacts and
+emulator-mutated copies are distinct. This guest scope does not include HDD
+fixtures or SASI/SCSI runtime, which remain NOT RUN. See the report for exact
+public candidate hashes, host results and limits.
+
+## Runtime/storage boundary
+
+The M17 source audit records the inherited INIT status predicate caveat; an
+external block driver must not rely on it to prevent failed/partial
+registration. M17 qualifies only the source ABI, public profile contracts and
+host-generated fixtures. No operational SASI/SCSI driver, HDD filesystem read,
+FAT16 guest volume, SCSI runtime, SASI boot or HDD boot is established by this
+configuration work. The VAEG result above qualifies only the FDD boot and
+CONFIG/INIT path; it does not qualify controller I/O or HDD mounting. See the
+[M17 report](m17-report.md) for exact current build, CI and guest status.

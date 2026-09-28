@@ -1,0 +1,421 @@
+{
+  "schema_version": 2,
+  "contract_id": "pc88va-storage-m17-v1",
+  "evidence": {
+    "fdkernel-m16": {
+      "commit": "7883c8fac11fab20cb467ad0a93c8799f35b565a",
+      "files": [
+        "kernel/dsk.c",
+        "kernel/initdisk.c",
+        "kernel/config.c",
+        "kernel/main.c",
+        "hdr/device.h"
+      ],
+      "kind": "public-source",
+      "repository": "https://github.com/nakatamaho/fdkernel"
+    },
+    "m16-baseline": {
+      "commit": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4",
+      "files": [
+        "docs/porting/m16-report.md",
+        "images/milestones/m16/manifest.json"
+      ],
+      "kind": "accepted-public-parent-baseline",
+      "repository": "https://github.com/nakatamaho/freedos-pc88va"
+    },
+    "owner-scope": {
+      "kind": "owner-confirmed-scope",
+      "statement": "Real PC-88VA SCSI boot is excluded because the hardware has no SCSI BIOS; SCSI is data-only through the external DEVICE= block driver."
+    },
+    "vaeg-storage-m16": {
+      "commit": "62a597f0ee81e2e036af740a3e79ad3da83e3fb7",
+      "files": [
+        "fdd/sxsi.h",
+        "fdd/sxsi.c",
+        "fdd/newdisk.c",
+        "cbus/sasiio.c",
+        "cbus/scsiio.c",
+        "cbus/scsiio.tbl",
+        "romimage/sasibios.asm",
+        "bios/sxsibios.c",
+        "tools/pc88va/build-sasi-utility-disk.py"
+      ],
+      "kind": "public-emulator-source-facts-not-hardware-qualification",
+      "repository": "https://github.com/nakatamaho/vaeg"
+    }
+  },
+  "profiles": [
+    {
+      "container": {
+        "format": "raw",
+        "header_bytes": 0,
+        "payload_offset_bytes": 0,
+        "file_extension": "img"
+      },
+      "deployment": {
+        "kind": "kernel-builtin",
+        "controller_owner": "FreeDOS VA FDD adapter",
+        "firmware_interface": "existing M16 floppy adapter",
+        "driver_filename": null,
+        "load_method": "built-in",
+        "permitted_boot_sources": ["FDD"],
+        "bootable_fixture": false
+      },
+      "device": {
+        "transport": "fdd",
+        "controller_model": "PC-88VA floppy controller adapter",
+        "native_unit": 0,
+        "target_id": null,
+        "lun": null,
+        "block_bytes": 512,
+        "block_count": 720,
+        "cylinders": 40,
+        "heads": 2,
+        "blocks_per_track": 9
+      },
+      "evidence_refs": ["m16-baseline", "fdkernel-m16"],
+      "name": "fdd-360-fat12",
+      "qualification": {
+        "m17": "HOST_VALIDATED",
+        "guest": "NOT_QUALIFIED",
+        "hardware": "NOT_RUN",
+        "planned_data_milestone": "M16",
+        "planned_boot_milestone": null,
+        "planned_write_milestone": "M16"
+      },
+      "volume": {
+        "partition_scheme": "none",
+        "volume_start_device_blocks": 0,
+        "native_boot_reserved_device_blocks": 0,
+        "partition_start_logical_sectors": 0,
+        "partition_length_logical_sectors": 0,
+        "partition_type_code": null,
+        "partition_entries": 0,
+        "partition_boot_indicator": 0,
+        "logical_sector_bytes": 512,
+        "total_logical_sectors": 720,
+        "hidden_sectors": 0,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "fat_bits": 12,
+        "sectors_per_cluster": 2,
+        "root_entries": 112,
+        "bpb_sectors_per_track": 9,
+        "bpb_heads": 2,
+        "media_descriptor": 253,
+        "volume_serial": 1293352960,
+        "volume_label": "VA17-00"
+      }
+    },
+    {
+      "container": {
+        "format": "raw",
+        "header_bytes": 0,
+        "payload_offset_bytes": 0,
+        "file_extension": "img"
+      },
+      "deployment": {
+        "kind": "kernel-builtin",
+        "controller_owner": "FreeDOS VA FDD adapter",
+        "firmware_interface": "existing M16 floppy adapter",
+        "driver_filename": null,
+        "load_method": "built-in",
+        "permitted_boot_sources": ["FDD"],
+        "bootable_fixture": false
+      },
+      "device": {
+        "transport": "fdd",
+        "controller_model": "PC-88VA floppy controller adapter",
+        "native_unit": 1,
+        "target_id": null,
+        "lun": null,
+        "block_bytes": 1024,
+        "block_count": 1280,
+        "cylinders": 80,
+        "heads": 2,
+        "blocks_per_track": 8
+      },
+      "evidence_refs": ["m16-baseline", "fdkernel-m16"],
+      "name": "fdd-1280-fat12",
+      "qualification": {
+        "m17": "HOST_VALIDATED",
+        "guest": "NOT_QUALIFIED",
+        "hardware": "NOT_RUN",
+        "planned_data_milestone": "M16",
+        "planned_boot_milestone": null,
+        "planned_write_milestone": "M16"
+      },
+      "volume": {
+        "partition_scheme": "none",
+        "volume_start_device_blocks": 0,
+        "native_boot_reserved_device_blocks": 0,
+        "partition_start_logical_sectors": 0,
+        "partition_length_logical_sectors": 0,
+        "partition_type_code": null,
+        "partition_entries": 0,
+        "partition_boot_indicator": 0,
+        "logical_sector_bytes": 1024,
+        "total_logical_sectors": 1280,
+        "hidden_sectors": 0,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "fat_bits": 12,
+        "sectors_per_cluster": 1,
+        "root_entries": 192,
+        "bpb_sectors_per_track": 8,
+        "bpb_heads": 2,
+        "media_descriptor": 254,
+        "volume_serial": 1293352961,
+        "volume_label": "VA17-01"
+      }
+    },
+    {
+      "container": {
+        "format": "anex86-hdi",
+        "header_bytes": 4096,
+        "payload_offset_bytes": 4096,
+        "file_extension": "hdi"
+      },
+      "deployment": {
+        "kind": "kernel-builtin-native-sasi",
+        "controller_owner": "FreeDOS PC-88VA SASI adapter",
+        "firmware_interface": "native SASI BIOS service modeled at INT 1Bh by pinned VAEG source",
+        "driver_filename": null,
+        "load_method": "built-in",
+        "permitted_boot_sources": ["FDD", "SASI-after-M20"],
+        "bootable_fixture": false
+      },
+      "device": {
+        "transport": "sasi",
+        "controller_model": "PC-88VA native SASI interface",
+        "native_unit": 0,
+        "target_id": null,
+        "lun": null,
+        "block_bytes": 256,
+        "block_count": 162360,
+        "cylinders": 615,
+        "heads": 8,
+        "blocks_per_track": 33
+      },
+      "evidence_refs": ["m16-baseline", "fdkernel-m16", "vaeg-storage-m16"],
+      "name": "sasi40-fat12",
+      "qualification": {
+        "m17": "HOST_VALIDATED",
+        "guest": "NOT_QUALIFIED",
+        "hardware": "NOT_RUN",
+        "planned_data_milestone": "M19",
+        "planned_boot_milestone": "M20",
+        "planned_write_milestone": "M19"
+      },
+      "volume": {
+        "partition_scheme": "native-prefix-superfloppy",
+        "volume_start_device_blocks": 4,
+        "native_boot_reserved_device_blocks": 4,
+        "partition_start_logical_sectors": 0,
+        "partition_length_logical_sectors": 0,
+        "partition_type_code": null,
+        "partition_entries": 0,
+        "partition_boot_indicator": 0,
+        "logical_sector_bytes": 512,
+        "total_logical_sectors": 81178,
+        "hidden_sectors": 0,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "fat_bits": 12,
+        "sectors_per_cluster": 32,
+        "root_entries": 512,
+        "bpb_sectors_per_track": 32,
+        "bpb_heads": 8,
+        "media_descriptor": 248,
+        "volume_serial": 1293352962,
+        "volume_label": "VA17-02"
+      }
+    },
+    {
+      "container": {
+        "format": "anex86-hdi",
+        "header_bytes": 4096,
+        "payload_offset_bytes": 4096,
+        "file_extension": "hdi"
+      },
+      "deployment": {
+        "kind": "kernel-builtin-native-sasi",
+        "controller_owner": "FreeDOS PC-88VA SASI adapter",
+        "firmware_interface": "native SASI BIOS service modeled at INT 1Bh by pinned VAEG source",
+        "driver_filename": null,
+        "load_method": "built-in",
+        "permitted_boot_sources": ["FDD", "SASI-after-M20"],
+        "bootable_fixture": false
+      },
+      "device": {
+        "transport": "sasi",
+        "controller_model": "PC-88VA native SASI interface",
+        "native_unit": 0,
+        "target_id": null,
+        "lun": null,
+        "block_bytes": 256,
+        "block_count": 162360,
+        "cylinders": 615,
+        "heads": 8,
+        "blocks_per_track": 33
+      },
+      "evidence_refs": ["m16-baseline", "fdkernel-m16", "vaeg-storage-m16"],
+      "name": "sasi40-fat16",
+      "qualification": {
+        "m17": "HOST_VALIDATED",
+        "guest": "NOT_QUALIFIED",
+        "hardware": "NOT_RUN",
+        "planned_data_milestone": "M19",
+        "planned_boot_milestone": "M20",
+        "planned_write_milestone": "M19"
+      },
+      "volume": {
+        "partition_scheme": "native-prefix-superfloppy",
+        "volume_start_device_blocks": 4,
+        "native_boot_reserved_device_blocks": 4,
+        "partition_start_logical_sectors": 0,
+        "partition_length_logical_sectors": 0,
+        "partition_type_code": null,
+        "partition_entries": 0,
+        "partition_boot_indicator": 0,
+        "logical_sector_bytes": 512,
+        "total_logical_sectors": 81178,
+        "hidden_sectors": 0,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "fat_bits": 16,
+        "sectors_per_cluster": 2,
+        "root_entries": 512,
+        "bpb_sectors_per_track": 32,
+        "bpb_heads": 8,
+        "media_descriptor": 248,
+        "volume_serial": 1293352963,
+        "volume_label": "VA17-03"
+      }
+    },
+    {
+      "container": {
+        "format": "virtual98-vhd1",
+        "header_bytes": 220,
+        "payload_offset_bytes": 220,
+        "file_extension": "hdd"
+      },
+      "deployment": {
+        "kind": "external-dos-block-driver",
+        "controller_owner": "VASCSI.SYS",
+        "firmware_interface": "none; direct PC-88VA C-bus SCSI controller access",
+        "driver_filename": "VASCSI.SYS",
+        "load_method": "CONFIG.SYS DEVICE= from an already accessible FDD or qualified SASI volume",
+        "permitted_boot_sources": ["FDD", "SASI-after-M20"],
+        "bootable_fixture": false
+      },
+      "device": {
+        "transport": "scsi",
+        "controller_model": "PC-88VA C-bus SCSI register interface modeled by VAEG",
+        "native_unit": null,
+        "target_id": 0,
+        "lun": 0,
+        "block_bytes": 256,
+        "block_count": 163840,
+        "cylinders": 640,
+        "heads": 8,
+        "blocks_per_track": 32
+      },
+      "evidence_refs": ["m16-baseline", "fdkernel-m16", "vaeg-storage-m16", "owner-scope"],
+      "name": "scsi40-256-fat16",
+      "qualification": {
+        "m17": "HOST_VALIDATED",
+        "guest": "NOT_QUALIFIED",
+        "hardware": "NOT_RUN",
+        "planned_data_milestone": "M21",
+        "planned_boot_milestone": null,
+        "planned_write_milestone": "M22"
+      },
+      "volume": {
+        "partition_scheme": "mbr-primary",
+        "volume_start_device_blocks": 4096,
+        "native_boot_reserved_device_blocks": 0,
+        "partition_start_logical_sectors": 2048,
+        "partition_length_logical_sectors": 79872,
+        "partition_type_code": 6,
+        "partition_entries": 1,
+        "partition_boot_indicator": 0,
+        "logical_sector_bytes": 512,
+        "total_logical_sectors": 79872,
+        "hidden_sectors": 2048,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "fat_bits": 16,
+        "sectors_per_cluster": 2,
+        "root_entries": 512,
+        "bpb_sectors_per_track": 32,
+        "bpb_heads": 8,
+        "media_descriptor": 248,
+        "volume_serial": 1293352964,
+        "volume_label": "VA17-04"
+      }
+    },
+    {
+      "container": {
+        "format": "virtual98-vhd1",
+        "header_bytes": 220,
+        "payload_offset_bytes": 220,
+        "file_extension": "hdd"
+      },
+      "deployment": {
+        "kind": "external-dos-block-driver",
+        "controller_owner": "VASCSI.SYS",
+        "firmware_interface": "none; direct PC-88VA C-bus SCSI controller access",
+        "driver_filename": "VASCSI.SYS",
+        "load_method": "CONFIG.SYS DEVICE= from an already accessible FDD or qualified SASI volume",
+        "permitted_boot_sources": ["FDD", "SASI-after-M20"],
+        "bootable_fixture": false
+      },
+      "device": {
+        "transport": "scsi",
+        "controller_model": "PC-88VA C-bus SCSI register interface modeled by VAEG",
+        "native_unit": null,
+        "target_id": 0,
+        "lun": 0,
+        "block_bytes": 512,
+        "block_count": 81920,
+        "cylinders": 320,
+        "heads": 8,
+        "blocks_per_track": 32
+      },
+      "evidence_refs": ["m16-baseline", "fdkernel-m16", "vaeg-storage-m16", "owner-scope"],
+      "name": "scsi40-512-fat16",
+      "qualification": {
+        "m17": "HOST_VALIDATED",
+        "guest": "NOT_QUALIFIED",
+        "hardware": "NOT_RUN",
+        "planned_data_milestone": "M21",
+        "planned_boot_milestone": null,
+        "planned_write_milestone": "M22"
+      },
+      "volume": {
+        "partition_scheme": "mbr-primary",
+        "volume_start_device_blocks": 2048,
+        "native_boot_reserved_device_blocks": 0,
+        "partition_start_logical_sectors": 2048,
+        "partition_length_logical_sectors": 79872,
+        "partition_type_code": 6,
+        "partition_entries": 1,
+        "partition_boot_indicator": 0,
+        "logical_sector_bytes": 512,
+        "total_logical_sectors": 79872,
+        "hidden_sectors": 2048,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "fat_bits": 16,
+        "sectors_per_cluster": 2,
+        "root_entries": 512,
+        "bpb_sectors_per_track": 32,
+        "bpb_heads": 8,
+        "media_descriptor": 248,
+        "volume_serial": 1293352965,
+        "volume_label": "VA17-05"
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+REM Loader placement is read before the kernel configuration passes.
+PC88VA_LOADSEG=1000
+REM Ten 1024-byte cache buffers; headers are additional.
+BUFFERS=10
+FILES=16
+LASTDRIVE=E
+DOS=LOW

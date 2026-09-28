@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "name": "2d-320",
+      "guest_media_id": 255,
+      "d88_disk_type": 0,
+      "geometry": {
+        "bytes_per_sector": 512,
+        "cylinders": 40,
+        "heads": 2,
+        "sectors_per_track": 8,
+        "physical_sector_id_base": 1
+      },
+      "filesystem": {
+        "sectors_per_cluster": 2,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "root_entries": 112,
+        "sectors_per_fat": 1,
+        "media_descriptor": 255
+      },
+      "image": {
+        "volume_serial": 1295063552,
+        "volume_label": "M16-2D320"
+      }
+    },
+    {
+      "name": "2d-360",
+      "guest_media_id": 253,
+      "d88_disk_type": 0,
+      "geometry": {
+        "bytes_per_sector": 512,
+        "cylinders": 40,
+        "heads": 2,
+        "sectors_per_track": 9,
+        "physical_sector_id_base": 1
+      },
+      "filesystem": {
+        "sectors_per_cluster": 2,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "root_entries": 112,
+        "sectors_per_fat": 2,
+        "media_descriptor": 253
+      },
+      "image": {
+        "volume_serial": 1295063553,
+        "volume_label": "M16-2D360"
+      }
+    },
+    {
+      "name": "2dd-640",
+      "guest_media_id": 251,
+      "d88_disk_type": 16,
+      "geometry": {
+        "bytes_per_sector": 512,
+        "cylinders": 80,
+        "heads": 2,
+        "sectors_per_track": 8,
+        "physical_sector_id_base": 1
+      },
+      "filesystem": {
+        "sectors_per_cluster": 2,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "root_entries": 112,
+        "sectors_per_fat": 2,
+        "media_descriptor": 251
+      },
+      "image": {
+        "volume_serial": 1295063554,
+        "volume_label": "M16-2DD64"
+      }
+    },
+    {
+      "name": "2dd-720",
+      "guest_media_id": 249,
+      "d88_disk_type": 16,
+      "geometry": {
+        "bytes_per_sector": 512,
+        "cylinders": 80,
+        "heads": 2,
+        "sectors_per_track": 9,
+        "physical_sector_id_base": 1
+      },
+      "filesystem": {
+        "sectors_per_cluster": 2,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "root_entries": 112,
+        "sectors_per_fat": 3,
+        "media_descriptor": 249
+      },
+      "image": {
+        "volume_serial": 1295063555,
+        "volume_label": "M16-2DD72"
+      }
+    },
+    {
+      "name": "2hc-1200",
+      "guest_media_id": 241,
+      "d88_disk_type": 32,
+      "geometry": {
+        "bytes_per_sector": 512,
+        "cylinders": 80,
+        "heads": 2,
+        "sectors_per_track": 15,
+        "physical_sector_id_base": 1
+      },
+      "filesystem": {
+        "sectors_per_cluster": 1,
+        "reserved_sectors": 1,
+        "fat_count": 2,
+        "root_entries": 224,
+        "sectors_per_fat": 7,
+        "media_descriptor": 241
+      },
+      "image": {
+        "volume_serial": 1295063556,
+        "volume_label": "M16-2HC12"
+      }
+    }
+  ],
+  "d88": {
+    "header_size": 688,
+    "sector_header_size": 16,
+    "sector_size_code": 2,
+    "write_protect": 0,
+    "mfm_density_field": 0,
+    "deleted_data": 0,
+    "error_status": 0,
+    "rpm_field": 0
+  },
+  "boot_record": {
+    "oem_name": "FDPC88VA",
+    "placeholder_code": [235, 254, 144],
+    "extended_bpb_signature": 41,
+    "filesystem_type": "FAT12",
+    "signature_offsets": [510]
+  },
+  "test_file": {
+    "dos_name": "M16TEST.TXT",
+    "content_template": "M16 DATA PROFILE={name}\r\nCYLINDERS={cylinders}\r\nHEADS={heads}\r\nSECTORS_PER_TRACK={sectors_per_track}\r\nBYTES_PER_SECTOR={bytes_per_sector}\r\nMEDIA_ID={guest_media_id:02X}\r\n"
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "milestone", "artifact", "rebuild_source", "source_archives_sha256", "toolchain", "reproducibility", "validation", "licenses"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "milestone": {"const": "M16"},
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "compression", "compressed", "uncompressed", "profile"],
+      "properties": {
+        "file": {"const": "freedos-pc88va-m16-2hd-1280.d88.xz"},
+        "compression": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["format", "tool", "arguments"],
+          "properties": {
+            "format": {"const": "xz"},
+            "tool": {"const": "XZ Utils 5.4.5"},
+            "arguments": {
+              "type": "array",
+              "minItems": 4,
+              "items": {"type": "string"}
+            }
+          }
+        },
+        "compressed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bytes", "sha256"],
+          "properties": {
+            "bytes": {"type": "integer", "minimum": 1},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "uncompressed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file", "bytes", "sha256"],
+          "properties": {
+            "file": {"const": "freedos-pc88va-m16-2hd-1280.d88"},
+            "bytes": {"type": "integer", "minimum": 1},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["media", "payload_capacity_bytes", "bytes_per_sector", "role"],
+          "properties": {
+            "media": {"const": "2HD"},
+            "payload_capacity_bytes": {"const": 1310720},
+            "bytes_per_sector": {"const": 1024},
+            "role": {"const": "bootable distribution"}
+          }
+        }
+      }
+    },
+    "rebuild_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parent", "fdkernel", "freecom", "country", "qualified_implementation"],
+      "properties": {
+        "parent": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "fdkernel": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "freecom": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "country": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "qualified_implementation": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "source_archives_sha256": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parent", "fdkernel", "freecom", "country"],
+      "properties": {
+        "parent": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "fdkernel": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "freecom": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "country": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["linux_amd64_image", "unicorn_version", "unicorn_wheel_sha256"],
+      "properties": {
+        "linux_amd64_image": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "unicorn_version": {"const": "2.1.4"},
+        "unicorn_wheel_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "reproducibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["independent_clean_builds", "artifact_manifests_identical", "d88_bytes_identical", "compressed_archive_tested", "decompression_matches_designated_d88"],
+      "properties": {
+        "independent_clean_builds": {"const": 2},
+        "artifact_manifests_identical": {"const": true},
+        "d88_bytes_identical": {"const": true},
+        "compressed_archive_tested": {"const": true},
+        "decompression_matches_designated_d88": {"const": true}
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "vaeg", "hardware", "hardware_status", "scope"],
+      "properties": {
+        "host": {"const": "HOST PASS"},
+        "vaeg": {"const": "VAEG PASS"},
+        "hardware": {"const": "NOT RUN"},
+        "hardware_status": {"const": "DEFERRED HARDWARE VALIDATION"},
+        "scope": {"type": "array", "minItems": 3, "items": {"type": "string"}}
+      }
+    },
+    "licenses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parent", "fdkernel", "freecom", "country"],
+      "properties": {
+        "parent": {"type": "array", "minItems": 2, "items": {"type": "string"}},
+        "fdkernel": {"type": "string"},
+        "freecom": {"type": "string"},
+        "country": {"type": "string"}
+      }
+    }
+  }
+}

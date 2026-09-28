@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "bootstrap": {
+    "image_segment": 12288,
+    "image_offset": 0,
+    "loaded_bytes": 1024,
+    "drive_context": 0,
+    "call_flags": 581
+  },
+  "firmware_callback": "%macro PC88VA_FIRMWARE_READ_ONE 0\nmov ax, [si+0x28]\nmov es, ax\nmov bp, [si+0x26]\nmov bh, [si+0x20]\nmov bl, [si+0x22]\nmov cx, [si+0x20]\nshl cx, 1\nor cx, [si+0x22]\nmov ax, [si+0x14]\nmov ch, al\nmov dh, [si+0x24]\nmov dl, 3\nmov ax, 0x8101\npush word [cs:PC88VA_CALL_FLAGS]\npopf\nint 0x80\njc %%fail\nor ah, ah\njnz %%fail\nxor ax, ax\nmov cx, [si+0x12]\nretf\n%%fail:\nmov ax, 5\nxor cx, cx\nretf\n%endmacro\n",
+  "layout": {
+    "schema_version": 1,
+    "profile_class": "public_platform_profile",
+    "regions": {
+      "stage2": [
+        73728,
+        90112
+      ],
+      "loader_stack": [
+        98304,
+        102400
+      ],
+      "scratch": [
+        225280,
+        241664
+      ],
+      "kernel_file": [
+        159744,
+        225264
+      ],
+      "kernel_allocation": [
+        159744,
+        225264
+      ]
+    },
+    "firmware_regions": [
+      [
+        0,
+        65536
+      ],
+      [
+        983040,
+        1048576
+      ]
+    ],
+    "stack": {
+      "segment": 6144,
+      "pointer": 4080,
+      "reserve": 3072
+    },
+    "disk": {
+      "sector_bytes": 1024,
+      "sectors_track": 8,
+      "heads": 2,
+      "total_sectors": 1280
+    },
+    "cache": {
+      "fat_bytes": 2048,
+      "root_bytes": 6144,
+      "bitmap_bytes": 256
+    }
+  }
+}

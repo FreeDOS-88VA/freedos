@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "source": {
+    "repository": "https://github.com/nakatamaho/vaeg.git",
+    "branch": "topic/m16-vaeg-2d-native-console",
+    "commit": "62a597f0ee81e2e036af740a3e79ad3da83e3fb7"
+  },
+  "builds": {
+    "linux": {
+      "preset": "linux-ci-gcc",
+      "build_date": "20260927",
+      "executable_sha256": "c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf"
+    },
+    "windows_mingw64": {
+      "preset": "mingw-release",
+      "workflow_run_id": 36277471921,
+      "artifact": "vaeg-windows-mingw64-release",
+      "artifact_id": 10916829810,
+      "executable_sha256": "a331b4f8314a1f8c8f07cd6098b78b1e0f9986c66a4866d4419a2f0a74f616eb"
+    }
+  }
+}

@@ -483,7 +483,7 @@ preflight() {
     validate_contract_inputs
     python3 tools/verify_scaffold.py
     local metadata amd64_name
-    metadata=$(docker buildx imagetools inspect "$M01_BASE_IMAGE")
+    metadata=$(docker buildx imagetools inspect "$M01_BASE_IMAGE@$M01_BASE_INDEX_DIGEST")
     printf '%s\n' "$metadata" | grep -F "Digest:    $M01_BASE_INDEX_DIGEST" >/dev/null || fail "Ubuntu index digest does not match the lock"
     amd64_name=$(printf '%s\n' "$metadata" | awk '/^  Name:/ {name=$0} /^  Platform:[[:space:]]+linux\/amd64$/ {print name}')
     printf '%s\n' "$amd64_name" | grep -F "$M01_BASE_AMD64_DIGEST" >/dev/null || fail "Ubuntu amd64 manifest digest does not match the lock"

@@ -3,8 +3,8 @@ name: M08 PC-88VA loader public contract
 
 on:
   push:
-    # M14 runs its active gate plus immutable historical regressions.
-    branches-ignore: ['topic/m14-floppy-write-media-change', 'topic/m15-dos-api-writable-session']
+    # Later milestones use their own gates and run historical regressions separately.
+    branches-ignore: ['topic/m14-floppy-write-media-change', 'topic/m15-dos-api-writable-session', 'topic/m16-floppy-formats-console-input']
     paths:
       - ".github/workflows/m08-loader.yml"
       - "Makefile"

@@ -2,18 +2,19 @@
 
 This is an experimental FreeDOS integration project for NEC PC-88VA. M15 is
 owner-accepted with the deferred work listed in its
-[acceptance report](docs/porting/m15-report.md).
+[acceptance report](docs/porting/m15-report.md). M16 is the active milestone.
 
-For a complete build from public source and configuration, see
-[M15 build from source](docs/porting/m15-source-build.md):
+For the active M16 source build and toolchain setup, see
+[M16 build instructions](tools/m16/README.md):
 
 ```sh
-make m15-toolchain   # Prepare or verify the pinned toolchain.
-make m15-image
+python3 tools/m16/toolchain.py
+python3 tools/m16/build_image.py --output build/m16-image
 ```
 
-This produces `build/m15-image/media.d88` without an old candidate D88 or
-saved DOS binaries. Initialize the pinned submodules first as shown below.
+This builds the complete M16 candidate twice from source archives and compares
+the results. It does not use an old candidate D88 or saved DOS binaries.
+Initialize the pinned submodules first as shown below.
 
 Kernel-only is not a complete distribution. The three foundational components
 are:
@@ -23,14 +24,15 @@ are:
 - `components/country`: the read-only upstream NLS/DBCS data component,
   `FDOS/country:master`.
 
-The parent gitlinks pin the exact M15 component commits. The M01 manifests
-retain their historical baseline identities. The kernel and FreeCOM forks
-are experimental; branch names do not imply PC-88VA boot success.
+The parent gitlinks and `manifests/m16-components.lock.json` pin the exact M16
+component commits and their M15 control lineage. The M01 manifests retain their
+historical baseline identities. The kernel and FreeCOM forks are experimental;
+branch names do not imply PC-88VA boot success.
 
 Clone the repository with its components:
 
 ```sh
-git clone --branch topic/m15-dos-api-writable-session --recurse-submodules https://github.com/nakatamaho/freedos-pc88va.git
+git clone --branch topic/m16-floppy-formats-console-input --recurse-submodules https://github.com/nakatamaho/freedos-pc88va.git
 ```
 
 For an existing clone, initialize the components with:

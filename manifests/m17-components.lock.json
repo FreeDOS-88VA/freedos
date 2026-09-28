@@ -1,0 +1,85 @@
+{
+  "components": [
+    {
+      "branch": "master",
+      "commit": "23f189cca3420606eae8723884fa92ccd65eb307",
+      "name": "country",
+      "parent_commit": null,
+      "path": "components/country",
+      "repository": "https://github.com/FDOS/country.git",
+      "role": "Unchanged COUNTRY.SYS component",
+      "source_archive_sha256": "cf0b16ac57e661eeb7e19118cea2d2d200e4545507f15912e8a6462652c2cd9d"
+    },
+    {
+      "branch": "topic/m17-storage-contracts-media-formats",
+      "commit": "e87e8071c355a99a7f34a8758d4a3368b6523f3d",
+      "merge_parents": [
+        "1527da489528367bb8028a8e9576375d35722f50",
+        "7883c8fac11fab20cb467ad0a93c8799f35b565a"
+      ],
+      "name": "fdkernel",
+      "parent_commit": "1527da489528367bb8028a8e9576375d35722f50",
+      "path": "components/fdkernel",
+      "repository": "https://github.com/nakatamaho/fdkernel.git",
+      "role": "M16 accepted VA/VA2 floppy and memory source merged with M17 common CONFIG.SYS passes, VA INIT FAR-call/SS-DS corrections and source-audited DEVICE= support; no SASI/SCSI runtime driver",
+      "source_archive_sha256": "887857e0c6706e47a9c8ea2055f74b3891138ed00564585a0053795e9e7dbc69",
+      "upstream": "https://github.com/lpproj/fdkernel.git"
+    },
+    {
+      "branch": "topic/m16-floppy-formats-console-input",
+      "commit": "29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e",
+      "name": "freecom",
+      "parent_commit": "9cf57b28abf1d98fab7655fb811375a2aa16c6d9",
+      "path": "components/freecom",
+      "repository": "https://github.com/nakatamaho/freecom_dbcs2.git",
+      "role": "M16 NECPC88VA console input and cursor integration",
+      "source_archive_sha256": "e61d4e889a6b10f9e05903f9575bb1466dfc5b20cb232f5286219bc173bbb24a",
+      "upstream": "https://github.com/lpproj/freecom_dbcs2.git"
+    }
+  ],
+  "historical_components_lock": {
+    "path": "manifests/components.lock.json",
+    "sha256": "440e481b28c740875489a6953a246ce5370c44074053c7aad3f80e79ec40c19c"
+  },
+  "m15_control": {
+    "components": {
+      "components/country": "23f189cca3420606eae8723884fa92ccd65eb307",
+      "components/fdkernel": "d8dbbf7111f86ea4800daeac84ac53ba601aaf32",
+      "components/freecom": "9cf57b28abf1d98fab7655fb811375a2aa16c6d9"
+    },
+    "parent_commit": "1af9974700cd4dd1164cc0df56cc062925376148"
+  },
+  "milestone": "M17",
+  "parent_integration": {
+    "merge_commit": "0852dc543ca9c23829a8059776e2f77072ceb947",
+    "preserved_work_parent": "6ef9a327d58e712e8470b5e6746c850c54852bcd",
+    "accepted_m16_parent": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4"
+  },
+  "predecessor": {
+    "milestone": "M16",
+    "publication_tip": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4",
+    "status": "M16 PASS / HANDOFF READY; physical hardware NOT RUN",
+    "kernel_component": "7883c8fac11fab20cb467ad0a93c8799f35b565a",
+    "freecom_component": "29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e",
+    "country_component": "23f189cca3420606eae8723884fa92ccd65eb307"
+  },
+  "predecessor_ci": [
+    {
+      "workflow": "M16 isolated source build",
+      "run_id": 36381203803,
+      "attempt": 1,
+      "head_sha": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4",
+      "conclusion": "success"
+    },
+    {
+      "workflow": "M16 scaffold",
+      "run_id": 36381203807,
+      "attempt": 1,
+      "head_sha": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4",
+      "conclusion": "success"
+    }
+  ],
+  "schema_version": 2,
+  "start_sha": "f3e30e2aae1ce2e32c9877ff2d98fa6043bd9ca4",
+  "status": "M17 PASS (CONTRACTS/FIXTURES); HANDOFF READY"
+}

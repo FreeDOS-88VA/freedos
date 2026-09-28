@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "verifier_wheel": {
+    "package": "unicorn",
+    "version": "2.1.4",
+    "filename": "unicorn-2.1.4-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+    "sha256": "9d6e6dea140560de4ebd8446661f7ef84a357d428c14a3ef09dacd306ec8c239",
+    "python_tag": "310",
+    "abi_tag": "cp310",
+    "platform_tag": "manylinux2014_x86_64"
+  }
+}
