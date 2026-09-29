@@ -50,10 +50,27 @@ class ExecChildTests(unittest.TestCase):
         self.assertEqual(len(exits), 1)
         return exits[0]
 
-    def test_com_has_complete_paragraph_and_real_exit_code(self):
+    def load_com_frame(self, data):
+        # task.c:load_transfer writes hdr/pcb.h's twelve-word iregs BEFORE
+        # executing the COM entry point. Merely decoding the file misses this.
+        stack = 0x100 + len(data) - 2
+        frame = struct.pack('<12H', 0, 0, 0xff, 0x2000, 0x100, stack,
+                            0x91e, 0x2000, 0x2000, 0x100, 0x2000, 0x200)
+        frame_offset = stack - len(frame) - 0x100
+        if frame_offset < 5:
+            raise ValueError('initial DOS register frame overlaps live COM code')
+        loaded = bytearray(data)
+        loaded[frame_offset:frame_offset + len(frame)] = frame
+        return loaded, stack
+
+    def test_com_has_owned_startup_stack_and_real_exit_code(self):
         data = self.images['COM']
-        self.assertEqual(len(data), 16)
-        self.assertEqual(self.execute(data, 0x2000, 0x100, 0x10e), 42)
+        self.assertEqual(len(data), 128)
+        loaded, stack = self.load_com_frame(data)
+        self.assertEqual(loaded[:5], data[:5])
+        self.assertEqual(self.execute(loaded, 0x2000, 0x100, stack), 42)
+        with self.assertRaisesRegex(ValueError, 'overlaps'):
+            self.load_com_frame(data[:16])
 
     def test_mz_requires_relocation_and_has_bounded_live_stack(self):
         data = self.images['EXE']

@@ -61,6 +61,9 @@ start:
         mov word [es:0], 0a55ah
         jmp .reserve
 .reserved:
+        mov dx, exhaustion_text
+        mov ah, 09h
+        int 21h
         inc word [stage]              ; 5: no-memory rejection for both formats
         mov dx, com_name
         call execute
@@ -75,6 +78,17 @@ start:
         inc word [budget]
         cmp word [budget], 128
         ja fail
+        test word [budget], 15
+        jnz .resize
+        mov dx, boundary_text
+        mov ah, 09h
+        int 21h
+        mov bx, [budget]
+        call hex_word
+        mov dx, newline
+        mov ah, 09h
+        int 21h
+.resize:
         mov es, [blocks]
         mov bx, [baseline]
         sub bx, [budget]
@@ -111,15 +125,18 @@ start:
         cmp ax, [com_min]
         jbe fail                     ; this MZ requests additional stack memory
         ; Pinned FreeDOS ChildEnv: ceil((2 + ENV_KEEPFREE=83)/16) = 6.
-        ; COM: 6 env + 1 split MCB + 16 PSP + 1 image = 24.
+        ; COM: 6 env + 1 split MCB + 16 PSP + 8 image/stack = 31.
         ; MZ: 6 + 1 + 16 PSP + (1*32 - 4 header) + 32 minalloc = 83.
         ; The pinned MZ loader reserves the whole last file page. Preserve
         ; that FreeDOS behavior; do not substitute a compact-image formula.
-        cmp word [com_min], 24
+        cmp word [com_min], 31
         jne fail
         cmp word [mz_min], 83
         jne fail
         mov word [stage], 8
+        mov dx, repetition_text
+        mov ah, 09h
+        int 21h
         mov word [rounds], 32
 .repeat:
         mov dx, com_name
@@ -268,6 +285,9 @@ hex_word:
 
 com_name db 'CHILD.COM',0
 mz_name db 'CHILD.EXE',0
+exhaustion_text db 'EXEC: exhaustion checks',13,10,'$'
+boundary_text db 'EXEC: scanning tail (hex paragraphs): $'
+repetition_text db 'EXEC: boundary found; running 32 COM/MZ pairs',13,10,'$'
 com_text db 'EXEC COM minimum free tail (hex paragraphs): $'
 mz_text db 13,10,'EXEC MZ minimum free tail (hex paragraphs): $'
 passed db 13,10,'EXEC: PASS (32 COM/MZ pairs; exhaustion rejection; capacity restored)',13,10,'$'

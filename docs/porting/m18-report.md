@@ -223,7 +223,15 @@ Precise runtime measurements and identities remain in private evidence.
 A further separate QA EXEC probe now implements exhaustion rejection, measured
 COM/MZ boundary overhead and 32 repeated pairs while preserving guard ownership
 and capacity. Its initial-shrink failure path and child relocation are tested
-synthetically. Real guest qualification of this additional probe is pending.
+synthetically. Initial guest runs of this additional probe did not complete and are not PASS.
+Source review found a QA fixture defect: the 16-byte COM's live code overlapped
+`load_transfer`'s 24-byte initial register frame at the bare minimum allocation.
+The fixture now owns explicit trailing stack space. A new host regression models
+that pre-entry write and rejects the old fixture. The expected COM boundary is
+31 tail paragraphs, including environment, split MCB, PSP, image and stack;
+the MZ boundary remains 83 under the pinned FreeDOS page-rounding policy.
+Bounded progress output was added to the QA parent. Fresh real guest validation
+of the corrected probe is pending; no common-kernel change was made.
 The dedicated CI now composes the separate QA media after the complete normal
 two-build gate. Neither QA implementation nor the scoped allocator results close
 the remaining full memory-ownership and per-tool acceptance gates.

@@ -39,7 +39,9 @@ org 100h
 image:
         mov ax, 4c2ah
         int 21h
-        ; A complete paragraph keeps the pinned COM loader's minimum at
-        ; least 17 paragraphs, including the PSP and initial stack word.
-        times 16 - ($ - image) db 0
+        ; COM has no minalloc field. Own enough trailing space for the
+        ; loader's 24-byte iregs frame, initial word and live interrupt stack.
+        ; A tiny file at its bare minimum would have its code overwritten by
+        ; load_transfer's frame BEFORE its entry point executes.
+        times 128 - ($ - image) db 0
 %endif

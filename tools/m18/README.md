@@ -81,7 +81,10 @@ its stack, reserves free holes through DOS and gradually releases a controlled
 tail. Both formats must fail with DOS error 8 at exhaustion, then really execute
 with exit 42 at their first sufficient budget. With an explicitly empty child
 environment, the pinned FreeDOS contract predicts 6 environment paragraphs,
-1 splitting MCB, and 17 COM process paragraphs: 24 tail paragraphs in total.
+1 splitting MCB, and 24 COM process paragraphs: 31 tail paragraphs in total.
+The COM fixture owns trailing startup-stack space: the loader writes a 24-byte
+register frame before entry. Host tests reproduce that write and reject the old
+16-byte fixture because its entry code overlaps the frame.
 For the fixture MZ, the pinned loader counts the entire last 512-byte page:
 6 + 1 + 16 PSP + (32 - 4 header) + 32 minalloc = 83 paragraphs. This existing
 FreeDOS behavior is preserved rather than replaced by an MS-DOS or compact-image
