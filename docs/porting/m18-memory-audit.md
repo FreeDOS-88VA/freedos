@@ -69,11 +69,24 @@ Consequently:
   without establishing current stack/heap ownership; that can free live storage.
 - Prime stdout before measurement so its buffering is represented consistently.
 - Compare matching redirected/unredirected observation points and warmup state.
-- A future footprint reduction must use audited runtime ownership, clean source
-  builds and exact guest checks. No speculative trimming is accepted here.
+- Footprint reduction must use audited runtime ownership, clean source builds
+  and exact guest checks. No speculative trimming is accepted here.
 
-This is an observer-footprint investigation, not evidence of a kernel leak or
-proof that a reported maximum block equals practical child capacity.
+The original initial-allocation policy did not meet the goal's runtime trimming
+requirement. The next implementation uses the pinned Open Watcom 1.9 C Library
+Reference, page 393: `_nheapshrink` and `_fheapshrink` return only free entries at
+heap ends to DOS; zero is success and nonzero is error. Both run after stdout
+priming and before traversal, with an error exit instead of a validity claim if
+trimming fails. No MCB is edited and no numerical linked minimum is passed to
+AH=4Ah. A synthetic integration test enforces prime/trim/walk ordering and both
+failure paths; it is not a reimplementation of the Watcom heap manager. Actual
+guest validation of this change is pending.
+
+The build record also distinguishes the compact linked-image requirement from
+`DosExeLoader`'s initial whole-file-page allocation. That existing FreeDOS
+rounding policy is preserved, not changed to match MS-DOS or an estimate.
+This is an observer-footprint correction, not evidence of a permanent kernel
+leak or proof that a reported maximum block equals practical child capacity.
 
 ## Still required
 

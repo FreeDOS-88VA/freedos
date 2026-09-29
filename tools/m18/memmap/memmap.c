@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /* Read-only FreeDOS VA MCB map; stdout is DOS standard output. */
 #include <dos.h>
+#include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 #include "mcb_parser.h"
@@ -179,6 +180,14 @@ int main(int argc, char **argv)
   else
     fputs("MEMMAP: validating DOS MCB chain\n", stdout);
   fflush(stdout);
+  /* OW 1.9 startup can expand DGROUP and create library heap blocks even
+     with a bounded MZ maxalloc. Use its ownership-aware APIs to return only
+     unused heap tails, retaining the active stack, stdio buffer and all live
+     allocations. Never resize to a guessed linked-image minimum. */
+  if (_nheapshrink() != 0 || _fheapshrink() != 0) {
+    fputs("MEMMAP: unable to trim unused runtime heap safely.\n", stderr);
+    return 3;
+  }
 
   status = m18_mcb_walk((m18_u16)first_mcb, (m18_u16)current_psp,
                         read_mcb, check_only ? 0 : print_entry,

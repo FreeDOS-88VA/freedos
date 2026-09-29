@@ -56,7 +56,10 @@ def parse_mz(path, map_path):
     image_bytes = declared_file_size - header_bytes
     image_paragraphs = (image_bytes + 15) // 16
     required_paragraphs = 16 + image_paragraphs + min_allocation
-    if required_paragraphs > 0xffff:
+    # The pinned common FreeDOS DosExeLoader reserves whole file pages before
+    # subtracting the header; it does not use the compact last-page remainder.
+    dos_initial_paragraphs = 16 + page_count * 32 - header_paragraphs + min_allocation
+    if required_paragraphs > 0xffff or dos_initial_paragraphs > 0xffff:
         raise ValueError("MEMMAP required PSP block exceeds the DOS paragraph limit")
     stack_end_bytes = (16 + stack_segment) * 16 + stack_pointer
     allocated_bytes = required_paragraphs * 16
@@ -90,6 +93,9 @@ def parse_mz(path, map_path):
         "mz_maximum_extra_paragraphs": max_allocation,
         "required_psp_block_paragraphs": required_paragraphs,
         "required_psp_block_bytes": allocated_bytes,
+        "pinned_freedos_initial_psp_block_paragraphs": dos_initial_paragraphs,
+        "pinned_freedos_initial_psp_block_bytes": dos_initial_paragraphs * 16,
+        "pinned_freedos_page_rounding_overhead_bytes": (dos_initial_paragraphs - required_paragraphs) * 16,
         "linker_memory_size_bytes": map_memory_bytes,
         "bounded_stack_bytes": stack_bytes,
         "initial_stack_segment": stack_segment,
@@ -130,17 +136,21 @@ def build(output):
         path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in source_files
     }
     final_record["allocation_policy"] = (
-        "MZ maximum extra allocation equals minimum extra allocation; DOS "
-        "allocates the bounded MEMMAP block at EXEC without a later resize"
+        "MZ maximum extra allocation equals minimum extra allocation; required_psp_block "
+        "is the linked-image lower bound, not runtime footprint. Pinned FreeDOS "
+        "initial allocation rounds the last file page. CRT may grow its heaps; "
+        "after stdout priming, _nheapshrink/_fheapshrink return only unused tails "
+        "before MCB observation; failure exits nonzero. MCB ownership includes "
+        "the retained stack, library data and environment."
     )
     (final / "memmap-build.json").write_text(
         json.dumps(final_record, indent=2, sort_keys=True) + "\n", encoding="ascii"
     )
     shutil.copy2(final / "MEMMAP.EXE", output / "MEMMAP.EXE")
     shutil.copy2(final / "memmap-build.json", output / "memmap-build.json")
-    print("Built MEMMAP.EXE; bounded process block: {} paragraphs ({} bytes)".format(
+    print("Built MEMMAP.EXE; linked minimum {} paragraphs; pinned FreeDOS initial {} paragraphs; runtime footprint is measured separately".format(
         final_record["required_psp_block_paragraphs"],
-        final_record["required_psp_block_bytes"]
+        final_record["pinned_freedos_initial_psp_block_paragraphs"]
     ))
     return final_record
 

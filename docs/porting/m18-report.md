@@ -236,6 +236,19 @@ The dedicated CI now composes the separate QA media after the complete normal
 two-build gate. Neither QA implementation nor the scoped allocator results close
 the remaining full memory-ownership and per-tool acceptance gates.
 
+## Runtime observer trimming (guest validation pending)
+
+The next MEMMAP implementation replaces the incomplete initial-MZ-only policy
+with the pinned Watcom runtime's documented `_nheapshrink`/`_fheapshrink` calls.
+After stdout is primed, only unused heap tails are returned; active stack, data,
+stdio storage and environments remain owned. Failure is a nonzero exit before
+MCB traversal. No kernel reservation, foreign owner or guessed linked minimum
+is resized. A synthetic integration test checks ordering and both failure
+returns. Build records now separate linked requirements, FreeDOS whole-page
+initial allocation and actual runtime ownership; they no longer claim the
+linked minimum is the complete process footprint. Local host tests total 67;
+clean builds and exact new-disk guest comparison must still qualify this change.
+
 ## Remaining qualification and scope
 
 The following required guest gates remain **NOT RUN or incomplete**: JWASMR

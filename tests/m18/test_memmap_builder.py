@@ -35,6 +35,20 @@ class MemmapBuilderTests(unittest.TestCase):
             self.assertEqual(record["mz_minimum_extra_paragraphs"], 256)
             self.assertEqual(record["mz_maximum_extra_paragraphs"], 256)
             self.assertEqual(record["required_psp_block_paragraphs"], 274)
+            self.assertEqual(record["pinned_freedos_initial_psp_block_paragraphs"], 302)
+            self.assertEqual(record["pinned_freedos_page_rounding_overhead_bytes"], 448)
+
+    def test_full_final_page_has_no_extra_page_rounding_cost(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            executable, map_file, original = self.make_mz(temporary)
+            data = bytearray(original.ljust(512, b'\0'))
+            struct.pack_into('<H', data, 2, 0)
+            executable.write_bytes(data)
+            build_memmap.bound_maximum_allocation(executable)
+            record = build_memmap.parse_mz(executable, map_file)
+            self.assertEqual(record['required_psp_block_paragraphs'], 302)
+            self.assertEqual(record['pinned_freedos_initial_psp_block_paragraphs'], 302)
+            self.assertEqual(record['pinned_freedos_page_rounding_overhead_bytes'], 0)
 
     def test_unbounded_mz_is_rejected_before_launch_policy_is_accepted(self):
         with tempfile.TemporaryDirectory() as temporary:
