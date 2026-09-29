@@ -64,8 +64,8 @@ jobs:
           python3 -B tools/m18/verify_source_audit.py
       - name: Build or verify the pinned Linux/amd64 Open Watcom toolchain
         run: make m18-toolchain
-      - name: Build the complete disk twice from clean public source exports
-        run: make m18-disk
+      - name: Build the complete disk twice and compose separate allocator QA media
+        run: make m18-allocator-qa
       - name: Confirm public source checkouts remain clean
         run: |
           git diff --check

@@ -19,10 +19,16 @@ import build_allocator_qa as qa
 
 class AllocatorQaTests(unittest.TestCase):
     def test_probe_initial_resize_failure_cannot_print_pass(self):
+        self.check_resize_failure('alloc.asm', b'ALLOC: FAIL stage 01\r\n')
+
+    def test_exec_initial_resize_failure_cannot_print_pass(self):
+        self.check_resize_failure('exec.asm', b'EXEC: FAIL stage 0001\r\n')
+
+    def check_resize_failure(self, source, expected):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'ALLOC.COM'
             subprocess.run(['nasm', '-f', 'bin',
-                            str(ROOT / 'tools/m18/qa/alloc.asm'), '-o', str(path)],
+                            str(ROOT / 'tools/m18/qa' / source), '-o', str(path)],
                            check=True)
             data = path.read_bytes()
         self.assertLess(len(data), 4096)
@@ -66,7 +72,7 @@ class AllocatorQaTests(unittest.TestCase):
         uc.emu_start(0x10100, 0xfffff, count=1000)
         self.assertEqual(len(resized), 1)
         self.assertEqual(exit_codes, [1])
-        self.assertEqual(output, b'ALLOC: FAIL stage 01\r\n')
+        self.assertEqual(output, expected)
 
     def test_qa_rejects_stale_sources_and_payload_drift(self):
         with tempfile.TemporaryDirectory() as directory:

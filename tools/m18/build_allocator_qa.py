@@ -65,21 +65,29 @@ def main():
     # Never overwrite a failed or guest-written candidate.
     output.mkdir(exist_ok=False, parents=True)
     source = ROOT / 'tools/m18/qa/alloc.asm'
-    # Use the exact clean build's compiler container for the QA executable.
-    subprocess.run([
-        'docker', 'run', '--rm', '--network', 'none', '--platform', 'linux/amd64',
-        '--entrypoint', 'nasm',
-        '--user', '{}:{}'.format(os.getuid(), os.getgid()),
-        '-v', str(source.parent) + ':/source:ro',
-        '-v', str(output) + ':/output', manifest['toolchain_image'],
-        '-f', 'bin', '/source/alloc.asm', '-o', '/output/ALLOC.COM',
-    ], check=True)
-    payloads['ALLOC.COM'] = (output / 'ALLOC.COM').read_bytes()
-    if len(payloads['ALLOC.COM']) >= 0xff00:
-        raise ValueError('QA COM image exceeds its segment')
+    # Use the exact clean build's compiler container for every QA executable.
+    programs = {}
+    for name, filename, definitions in (
+            ('ALLOC.COM', 'alloc.asm', []), ('QAEXEC.COM', 'exec.asm', []),
+            ('CHILD.COM', 'child.asm', []), ('CHILD.EXE', 'child.asm', ['-dM18_MZ=1'])):
+        subprocess.run([
+            'docker', 'run', '--rm', '--network', 'none', '--platform', 'linux/amd64',
+            '--entrypoint', 'nasm',
+            '--user', '{}:{}'.format(os.getuid(), os.getgid()),
+            '-v', str(source.parent) + ':/source:ro',
+            '-v', str(output) + ':/output', manifest['toolchain_image'],
+            '-f', 'bin', *definitions, '/source/' + filename, '-o', '/output/' + name,
+        ], check=True)
+        payloads[name] = (output / name).read_bytes()
+        if len(payloads[name]) >= 0xff00:
+            raise ValueError('QA image exceeds its segment')
+        programs[name] = {'source': 'tools/m18/qa/' + filename,
+                          'source_sha256': digest((source.parent / filename).read_bytes()),
+                          'definitions': definitions, 'sha256': digest(payloads[name]),
+                          'size_bytes': len(payloads[name])}
     for name, path in (('CONFIG.SYS', 'config/m18/CONFIG.SYS'), ('COPYING', 'COPYING')):
         payloads[name] = (ROOT / path).read_text(encoding='ascii').replace('\n', '\r\n').encode('ascii')
-    payloads['QA.TXT'] = b'QA ONLY: run ALLOC > RESULT.TXT, then MEMMAP /CHECK.\r\n'
+    payloads['QA.TXT'] = b'QA ONLY: run ALLOC > RESULT.TXT, QAEXEC > EXEC.TXT, then MEMMAP /CHECK.\r\n'
     epoch = json.loads((ROOT / 'config/m18/host-tooling.json').read_text())['source_date_epoch']
     profile = json.loads((ROOT / 'config/m18/loader.json').read_text())
     image = compose(payloads, profile, output, epoch)
@@ -93,6 +101,7 @@ def main():
               'toolchain_image': manifest['toolchain_image'],
               'assembler_source_sha256': digest(source.read_bytes()),
               'probe_sha256': digest(payloads['ALLOC.COM']),
+              'programs': programs,
               'image_sha256': digest(image), 'image_size': len(image),
               'guest_result': 'NOT RUN'}
     (output / 'qa-manifest.json').write_text(json.dumps(record, indent=2) + '\n')

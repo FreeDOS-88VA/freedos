@@ -75,6 +75,24 @@ The reported baseline is actual AH=48h output in hexadecimal paragraphs.
 Host tests prove an initial resize failure cannot be reported as success; they
 do not substitute for running the complete probe under the real DOS kernel.
 
+The same QA disk includes `QAEXEC.COM`, `CHILD.COM` and `CHILD.EXE`. From its
+root directory run `QAEXEC > EXEC.TXT`, then `MEMMAP /CHECK`. The parent retains
+its stack, reserves free holes through DOS and gradually releases a controlled
+tail. Both formats must fail with DOS error 8 at exhaustion, then really execute
+with exit 42 at their first sufficient budget. With an explicitly empty child
+environment, the pinned FreeDOS contract predicts 6 environment paragraphs,
+1 splitting MCB, and 17 COM process paragraphs: 24 tail paragraphs in total.
+For the fixture MZ, the pinned loader counts the entire last 512-byte page:
+6 + 1 + 16 PSP + (32 - 4 header) + 32 minalloc = 83 paragraphs. This existing
+FreeDOS behavior is preserved rather than replaced by an MS-DOS or compact-image
+formula. The fixture tests an actual MZ segment relocation and a bounded stack.
+After reaching the boundary, 32 COM/MZ pairs must preserve guard owners/data and
+recover identical capacity after each child, then restore the original largest
+block and allocation strategy. These are fixture-specific thresholds, not
+minimum RAM claims for other applications. Host child tests deliberately omit
+the relocation and require a failing exit. Only real DOS guest execution can
+qualify the parent's complete allocation/EXEC assertions.
+
 ## Milestone-local layout
 
 - `build_image.py`, `build_image.sh`, and `finish_image.py` own the complete

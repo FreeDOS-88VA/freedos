@@ -175,7 +175,7 @@ read-only checks; FORMAT failed and returned to a usable shell, with both disk
 hashes unchanged. These scoped results do not replace the remaining media-change,
 capacity, alternate-model and memory qualification gates.
 
-## Kernel date reproducibility correction (qualification pending)
+## Kernel date reproducibility correction
 
 A later clean build exposed a wall-clock-dependent `__DATE__` in the linked
 kernel's display string. Comparing the retained linked image and the new image
@@ -188,6 +188,15 @@ rejects missing, duplicate or drifted dates. This is declared non-semantic build
 metadata, not a linked-binary patch or a component source change. The changed
 kernel identity requires clean carrier/placement verification and fresh guest
 qualification before any acceptance claim.
+
+At `cf5ea87f1c06dfb254bd5d31ae6dffca3af5e56b`, all 62 local host tests and two
+complete clean builds passed, including carrier/placement and linked-date checks.
+Dedicated native CI run `36544910571`, attempt 1, passed at that exact head.
+The separately composed allocator QA media also matched across two compositions.
+Fresh automated VA/VA2 guest runs of the new normal bytes completed the A:-only
+EDLIN edit/backup/save, JWASMR COM/MZ build, execution and independent file
+readback sequence, with valid matching before/after MCB summaries. These are
+scoped results, not full M18 acceptance.
 
 The new QA producer also explicitly selects NASM as the compiler-container
 entrypoint rather than passing its executable to the image's Bash entrypoint.
@@ -203,9 +212,21 @@ capacity across 16 rounds. The QA target first clean-builds the complete public
 normal disk, then verifies source/archive/payload bindings before composing a
 separate QA disk. It never reads an old D88 template. The probe is not included
 on the normal disk. Synthetic tests reject stale QA inputs and check that initial
-shrink failure produces a failure exit rather than a PASS marker. Guest results
-for this new probe are pending; implementation alone does not close allocation
-or memory-lifetime acceptance.
+shrink failure produces a failure exit rather than a PASS marker. The original allocator probe then passed under the actual pinned DOS kernel
+on VA and VA2 at the lowest/highest configured capacities, with unchanged valid
+before/after MCB reports. Both models also passed with installed RAM reduced
+while retaining an unmodified larger-capacity backup-memory selection from a
+preceding guest session. The retained selection was checked separately before
+and after; no setup session or backup edit was used to make detection succeed.
+Precise runtime measurements and identities remain in private evidence.
+
+A further separate QA EXEC probe now implements exhaustion rejection, measured
+COM/MZ boundary overhead and 32 repeated pairs while preserving guard ownership
+and capacity. Its initial-shrink failure path and child relocation are tested
+synthetically. Real guest qualification of this additional probe is pending.
+The dedicated CI now composes the separate QA media after the complete normal
+two-build gate. Neither QA implementation nor the scoped allocator results close
+the remaining full memory-ownership and per-tool acceptance gates.
 
 ## Remaining qualification and scope
 
