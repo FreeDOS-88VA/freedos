@@ -37,6 +37,19 @@ checkout's local Git configuration; it never changes component source or pushes
 to a remote. Parent build inputs are exported from Git, not the mutable working
 tree.
 
+## Reproducible kernel banner date
+
+Open Watcom 1.9 does not apply `SOURCE_DATE_EPOCH` to `__DATE__`. M18 uses
+`kernel_cc.py` to pass the pinned component's existing `KERNEL_BUILD_DATE`
+interface, derived in UTC from `config/m18/host-tooling.json`. The fixed-width
+English month/day/year is build metadata, not the actual wall-clock build date.
+The compiler path and every existing platform/INIT flag (including `-zu`) are
+preserved. `finish_image.py` requires exactly one matching date in the linked
+kernel and records the policy in the package manifest. No linked bytes are
+patched and no component source is copied or modified. Earlier same-day
+comparisons did not detect this banner-date defect; their old disk identities
+remain history, not the new reproducible candidate.
+
 ## Separate allocator QA media
 
 `make m18-allocator-qa` first performs the complete normal source build, then

@@ -68,10 +68,11 @@ def main():
     # Use the exact clean build's compiler container for the QA executable.
     subprocess.run([
         'docker', 'run', '--rm', '--network', 'none', '--platform', 'linux/amd64',
+        '--entrypoint', 'nasm',
         '--user', '{}:{}'.format(os.getuid(), os.getgid()),
         '-v', str(source.parent) + ':/source:ro',
         '-v', str(output) + ':/output', manifest['toolchain_image'],
-        'nasm', '-f', 'bin', '/source/alloc.asm', '-o', '/output/ALLOC.COM',
+        '-f', 'bin', '/source/alloc.asm', '-o', '/output/ALLOC.COM',
     ], check=True)
     payloads['ALLOC.COM'] = (output / 'ALLOC.COM').read_bytes()
     if len(payloads['ALLOC.COM']) >= 0xff00:

@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "tools/m18"))
 from build_compressed_kernel import build as build_carrier
 from compose_image import compose
 from media import derive_layout, inspect
+from kernel_cc import banner_date, verify_banner
 
 
 class PreText(HTMLParser):
@@ -104,6 +105,7 @@ def main():
     kernel_linked = out / "kernel-linked.exe"
     kernel_map = out / "kernel.map"
     shutil.copy2(kernel_tree / "bin/KERNEL.SYS", kernel_linked)
+    verify_banner(kernel_linked.read_bytes(), os.environ['SOURCE_DATE_EPOCH'])
     shutil.copy2(kernel_tree / "build/KVA8616.map", kernel_map)
     normalize_kernel_map(kernel_map)
     kernel_source = ROOT / "components/fdkernel/pc88va/kernel/m13_unpack.asm"
@@ -135,7 +137,12 @@ def main():
         json.dumps(carrier, indent=2, sort_keys=True) + "\n", encoding="ascii"
     )
     fdkernel_build = {
-        "kernel_make_command": "wmake -ms -h -f makefile.m13.wc clean all",
+        "kernel_make_command": "wmake -ms -h -f makefile.m13.wc 'CC=python3 /work/source/tools/m18/kernel_cc.py' clean all",
+        "banner_date_policy": {
+            "source_date_epoch": int(os.environ['SOURCE_DATE_EPOCH']),
+            "date": banner_date(os.environ['SOURCE_DATE_EPOCH']),
+            "method": "compile-time KERNEL_BUILD_DATE definition; no linked-image patching",
+        },
         "kernel_makefile_sha256": sha256((kernel_tree / "makefile.m13.wc").read_bytes()),
         "linked_kernel": {"size_bytes": kernel_linked.stat().st_size,
                           "sha256": sha256(kernel_linked.read_bytes())},

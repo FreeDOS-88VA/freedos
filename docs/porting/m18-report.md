@@ -175,6 +175,24 @@ read-only checks; FORMAT failed and returned to a usable shell, with both disk
 hashes unchanged. These scoped results do not replace the remaining media-change,
 capacity, alternate-model and memory qualification gates.
 
+## Kernel date reproducibility correction (qualification pending)
+
+A later clean build exposed a wall-clock-dependent `__DATE__` in the linked
+kernel's display string. Comparing the retained linked image and the new image
+isolated the difference to that date; matching same-day builds had not proved
+cross-date reproducibility. Earlier image identities remain historical results,
+not final release qualification. The build now supplies the pinned component's
+existing `KERNEL_BUILD_DATE` interface from the committed epoch, with an explicit
+compiler wrapper preserving all other arguments. The linked-banner checker
+rejects missing, duplicate or drifted dates. This is declared non-semantic build
+metadata, not a linked-binary patch or a component source change. The changed
+kernel identity requires clean carrier/placement verification and fresh guest
+qualification before any acceptance claim.
+
+The new QA producer also explicitly selects NASM as the compiler-container
+entrypoint rather than passing its executable to the image's Bash entrypoint.
+A failed initial QA build was retained and is not a guest result.
+
 ## Allocator QA implementation
 
 An original 8086 allocation probe and a separate `make m18-allocator-qa` producer

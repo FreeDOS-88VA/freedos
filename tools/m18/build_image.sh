@@ -46,7 +46,7 @@ for item in lock['canonical']['open_watcom']['host_tools']:
     assert len(data)==item['size'] and hashlib.sha256(data).hexdigest()==item['sha256'], item['name']
 PY
 cd components/fdkernel/pc88va
-wmake -ms -h -f makefile.m13.wc clean all
+wmake -ms -h -f makefile.m13.wc 'CC=python3 /work/source/tools/m18/kernel_cc.py' clean all
 cd ../sys
 wmake -ms -h -f makefile.pc88va clean all
 cd /work/source/components/freecom
