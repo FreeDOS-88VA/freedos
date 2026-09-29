@@ -72,6 +72,14 @@ Its companion `PC88VA-M18-SOURCES.tar.xz` is 2,194,228 bytes, SHA-256
 `226486e29bb5c0565fd10d6a8a03b752a3433f79210faa3346359385ed06ad7b`.
 Neither is designated or archived.
 
+The subsequent report-only tip
+`19f73f4cba301143af2c1d66895b6c6dc749f1f9` also clean-built identical disk bytes
+locally, but CI run `36516412091` failed fetching optional command-not-found
+metadata from the Ubuntu snapshot (HTTP 502), before tests or compilation.
+The workflow now disables that irrelevant metadata and translations and bounds
+APT retries while retaining the exact NASM package/version check. Qualification
+of this CI correction is pending; the failure is not counted as a pass.
+
 The accepted native 2HD profile is 80 cylinders, two heads, eight
 1024-byte sectors per track, FAT12, and 192 root entries. The M18 host
 allocation policy retains a 32-cluster working-space estimate, not a measured
@@ -106,7 +114,15 @@ guest-generated COM/MZ files and valid before/after MEMMAP snapshots were read
 back independently. Both programs displayed their expected messages and returned
 to the shell for another successful memory check. VA2 boot was separately
 compared with the exact M17 control using M17's accepted emulator executable;
-both reached FreeCOM. The full VA2 application workflow remains pending. Guest
+both reached FreeCOM. The full starter workflow was then repeated on VA and VA2
+with the exact accepted executable, B: empty, and fresh candidate copies.
+Independent FAT inspection verified edited/backup source, guest COM/MZ output,
+redirected messages from both executed programs, valid MCB checks and matching
+before/after memory accounting. The fixed small JWASMR samples succeeded in the
+tested 640-KiB configuration; fresh 256/384/512-KiB runs rejected both assembly
+attempts without producing executables, returned to the shell, and preserved
+matching before/after MCB accounting. This establishes these bounded workload
+results, not arbitrary-source fit or all-tool minimum requirements. Guest
 records distinguish the locally rebuilt emulator executable from the earlier
 accepted executable; a shared source revision alone is not executable identity.
 
@@ -162,14 +178,14 @@ capacity, alternate-model and memory qualification gates.
 ## Remaining qualification and scope
 
 The following required guest gates remain **NOT RUN or incomplete**: JWASMR
-low-memory behavior and measured minimum; the complete fresh-boot starter
-workflow on the rebuilt corrected candidate; full shell/file regressions with A:
+peak/largest-block measurement and broader low-memory stress; full shell/file regressions with A:
 and physical B: media, including exchange during operations; complete FORMAT/SYS
 safeguard coverage beyond the targeted tests above; observed working-space
 peak; memory ownership and capacity accounting. Any test not yet executed is
 not a pass. No hardware test was attempted. Initial capacity scripts did not complete their
-full workloads; they do not establish per-tool minima. The narrower low-memory
-return-to-shell observation is not a repeated allocation/EXEC stress pass.
+full workloads and remain unqualified. Later matched-executable capacity runs
+completed the bounded workload described above; they do not establish all-tool
+minima or a near-limit allocation/EXEC stress pass.
 
 The disk payload is the FreeDOS kernel, NECPC88VA FreeCOM, COUNTRY.SYS, EDLIN,
 MORE, MEMMAP, real-mode JWASMR, CHKDSK, FORMAT and SYS, plus English/ASCII
