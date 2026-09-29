@@ -3,7 +3,7 @@ name: M03 port surface and integration ADR
 on:
   push:
     # Later milestones use their own gates and run historical regressions separately.
-    branches-ignore: ['topic/m14-floppy-write-media-change', 'topic/m15-dos-api-writable-session', 'topic/m16-floppy-formats-console-input']
+    branches-ignore: ['topic/m14-floppy-write-media-change', 'topic/m15-dos-api-writable-session', 'topic/m16-floppy-formats-console-input', 'topic/m18-memory-layout-basic-disk']
     paths:
       - ".github/workflows/m03-port-surface.yml"
       - ".gitignore"
@@ -40,6 +40,9 @@ on:
 
 jobs:
   census:
+    # M18 adds explicitly pinned tools; the frozen M03 three-component census
+    # is not its acceptance gate. M18 source-build verifies its complete lock.
+    if: github.head_ref != 'topic/m18-memory-layout-basic-disk'
     runs-on: ubuntu-22.04
     steps:
       - name: Check out repository and pinned submodules
