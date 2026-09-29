@@ -111,6 +111,16 @@ cases failed before the correction; the complete 57-test host suite passes after
 it. No kernel/component code was changed. Full source builds, exact-tip CI and
 guest maintenance qualification for this correction are still pending.
 
+A second integration defect was isolated to initial removable-media binding.
+The pinned VA `media_check_io()` deliberately rejects unbound/changed media
+rather than silently redirecting an existing absolute-sector operation. Tools
+must establish their binding before starting work. The maintenance volume opener
+and FORMAT now call DOS AH=32h once at operation entry, reject its error result,
+and never rebind or retry inside absolute-sector I/O. Host fixtures cover failed
+initial binding with no reads/writes and mid-operation invalidation with no
+rebind. This preserves the kernel's existing media-generation protection rather
+than relaxing it. Qualification of this source correction is pending.
+
 ## Remaining qualification and scope
 
 The following required guest gates remain **NOT RUN or incomplete**: JWASMR

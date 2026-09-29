@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 
   old24 = _dos_getvect(0x24);
   _dos_setvect(0x24, m18_critical);
-  if (!m18_read_sector(1, 0, verify) ||
+  if (!m18_bind_volume(1) || !m18_read_sector(1, 0, verify) ||
       !m18_validate_bpb(verify, sizeof(verify), &volume.layout)) {
     fputs("FORMAT: B: lacks a valid native 2HD BPB; no write was attempted.\n", stderr);
     _dos_setvect(0x24, old24);

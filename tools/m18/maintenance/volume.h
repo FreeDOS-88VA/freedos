@@ -27,6 +27,7 @@ extern unsigned __far __cdecl m18_abs_sector(unsigned writing, unsigned drive,
 extern void __interrupt __far m18_critical(void);
 
 void m18_reset_disk(void);
+int m18_bind_volume(unsigned drive);
 int m18_read_sector(unsigned drive, unsigned sector, void *buffer);
 int m18_write_sector(unsigned drive, unsigned sector, void *buffer);
 int m18_load_volume(unsigned drive, struct m18_volume *volume);

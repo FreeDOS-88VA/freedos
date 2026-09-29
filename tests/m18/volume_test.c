@@ -6,24 +6,34 @@
 #include "../../tools/m18/maintenance/volume.h"
 
 static unsigned char disk[2][M18_TOTAL_SECTORS][M18_SECTOR_BYTES];
-static unsigned writes;
+static unsigned writes, reads, binds;
+static unsigned bound[2];
+static int binding_failure;
 
 int intdos(union REGS *input, union REGS *output)
 {
-  (void)input;
-  (void)output;
+  memset(output, 0, sizeof(*output));
+  if (input->h.ah == 0x32) {
+    assert(input->h.dl == 1 || input->h.dl == 2);
+    ++binds;
+    output->h.al = binding_failure ? 0xff : 0;
+    bound[input->h.dl - 1] = !binding_failure;
+  } else {
+    assert(input->h.ah == 0x0d);
+  }
   return 0;
 }
 
 unsigned m18_abs_sector(unsigned writing, unsigned drive, unsigned sector,
                         void *buffer)
 {
-  if (drive > 1 || sector >= M18_TOTAL_SECTORS || !buffer)
+  if (drive > 1 || sector >= M18_TOTAL_SECTORS || !buffer || !bound[drive])
     return 1;
   if (writing) {
     memcpy(disk[drive][sector], buffer, M18_SECTOR_BYTES);
     ++writes;
   } else {
+    ++reads;
     memcpy(buffer, disk[drive][sector], M18_SECTOR_BYTES);
   }
   return 0;
@@ -62,6 +72,7 @@ static void make_volume(void)
   unsigned char root[M18_ROOT_BYTES];
   unsigned char *dir;
   memset(disk, 0, sizeof(disk));
+  memset(bound, 0, sizeof(bound));
   memset(boot, 0, sizeof(boot));
   boot[0] = 0xeb;
   boot[1] = 0xfe;
@@ -156,6 +167,23 @@ int main(void)
   assert(!m18_check_allocations(0, &volume, &report));
 
   assert(!m18_load_volume(2, &volume));
+
+  /* Failed initial binding must not read or write any sector. */
+  make_volume();
+  binding_failure = 1;
+  writes_before = reads;
+  assert(!m18_load_volume(1, &volume));
+  assert(reads == writes_before);
+  binding_failure = 0;
+  assert(m18_bind_volume(1));
+  assert(!m18_bind_volume(2));
+
+  /* A media change during an operation fails closed, without rebinding. */
+  writes_before = binds;
+  bound[1] = 0;
+  assert(!m18_read_sector(1, 0, volume.boot));
+  assert(!m18_write_sector(1, 0, volume.boot));
+  assert(binds == writes_before);
   puts("M18 native-volume synthetic read-only tests: PASS");
   return 0;
 }

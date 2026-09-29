@@ -14,6 +14,21 @@ void m18_reset_disk(void)
   intdos(&in, &out);
 }
 
+int m18_bind_volume(unsigned drive)
+{
+  union REGS in, out;
+  if (drive > 1)
+    return 0;
+  memset(&in, 0, sizeof(in));
+  in.h.ah = 0x32;
+  in.h.dl = (unsigned char)(drive + 1);
+  /* Establish a fresh DOS media binding before starting an operation.
+     Never rebind/retry inside a failed absolute-sector transfer: that could
+     replay a write against replacement media. No returned DPB is dereferenced. */
+  intdos(&in, &out);
+  return out.h.al == 0;
+}
+
 int m18_read_sector(unsigned drive, unsigned sector, void *buffer)
 {
   return m18_abs_sector(0, drive, sector, buffer) == 0;
@@ -30,7 +45,8 @@ int m18_load_volume(unsigned drive, struct m18_volume *volume)
   if (!volume || drive > 1)
     return 0;
   m18_reset_disk();
-  if (!m18_read_sector(drive, 0, volume->boot) ||
+  if (!m18_bind_volume(drive) ||
+      !m18_read_sector(drive, 0, volume->boot) ||
       !m18_validate_bpb(volume->boot, sizeof(volume->boot), &volume->layout))
     return 0;
 
