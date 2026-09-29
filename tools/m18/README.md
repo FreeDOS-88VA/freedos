@@ -37,6 +37,31 @@ checkout's local Git configuration; it never changes component source or pushes
 to a remote. Parent build inputs are exported from Git, not the mutable working
 tree.
 
+## Separate allocator QA media
+
+`make m18-allocator-qa` first performs the complete normal source build, then
+composes a separate `build/m18-allocator-qa/media.d88` from its fresh, hash-checked
+boot/shell/MEMMAP outputs and the original 8086 `tools/m18/qa/alloc.asm` probe.
+The normal distribution is unchanged; QA payloads never enter its AUTOEXEC path.
+Use a new `M18_QA_OUTPUT` for each candidate, and `M18_DIST` when the source
+identity changes. The producer rejects existing QA output roots, stale source
+pins, changed archives and payload drift. It builds the probe in the exact
+compiler container from the full build and checks stage-1 byte equivalence.
+No ROM, old D88 template or historical milestone helper is needed.
+
+Boot a disposable QA copy and run `MEMMAP > BEFORE.TXT`, `ALLOC > RESULT.TXT`,
+then `MEMMAP > AFTER.TXT` and `MEMMAP /CHECK`. ALLOC shrinks only itself while
+retaining its own 512-byte stack, restores the DOS allocation strategy, and
+performs 16 allocation/shrink/grow/free/coalescing rounds. It checks live-owner
+preservation, failure across an occupied neighbor, zero-sized allocations,
+invalid handles within its own payload (never corrupting a live MCB), exact
+largest-block allocation, boundary word access and stable recovered capacity.
+It returns zero only after all assertions, otherwise stage-specific failure and
+exit code 1. DOS process termination releases outstanding child-owned blocks.
+The reported baseline is actual AH=48h output in hexadecimal paragraphs.
+Host tests prove an initial resize failure cannot be reported as success; they
+do not substitute for running the complete probe under the real DOS kernel.
+
 ## Milestone-local layout
 
 - `build_image.py`, `build_image.sh`, and `finish_image.py` own the complete

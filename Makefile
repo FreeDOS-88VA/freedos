@@ -558,10 +558,13 @@ M18_PYTHON ?= python3
 M18_IMAGE ?= freedos-pc88va-m18:local
 M18_OUTPUT ?= build/m18
 M18_DIST ?= dist/m18
+M18_QA_OUTPUT ?= build/m18-allocator-qa
 M18_WHEEL_CACHE ?= $(CURDIR)/build/m18-wheel-cache
-.PHONY: m18-toolchain m18-disk m18-clean m18-host-tests
+.PHONY: m18-toolchain m18-disk m18-clean m18-host-tests m18-allocator-qa
 m18-toolchain:
 	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/toolchain.py --image "$(M18_IMAGE)"
+m18-allocator-qa: m18-disk
+	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/build_allocator_qa.py --build "$(M18_OUTPUT)" --dist "$(M18_DIST)" --output "$(M18_QA_OUTPUT)"
 m18-disk: m18-toolchain
 	@M18_WHEEL_CACHE="$(M18_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/build_image.py --output "$(M18_OUTPUT)" --dist "$(M18_DIST)" --image "$(M18_IMAGE)"
 m18-clean:

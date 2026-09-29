@@ -175,6 +175,20 @@ read-only checks; FORMAT failed and returned to a usable shell, with both disk
 hashes unchanged. These scoped results do not replace the remaining media-change,
 capacity, alternate-model and memory qualification gates.
 
+## Allocator QA implementation
+
+An original 8086 allocation probe and a separate `make m18-allocator-qa` producer
+now cover own-block shrinking, DOS 48h/49h/4Ah allocation/free/resize, occupied
+neighbor rejection, coalescing, owner preservation, zero-payload blocks, invalid
+handles within probe-owned payload, exact-largest allocation and recovered
+capacity across 16 rounds. The QA target first clean-builds the complete public
+normal disk, then verifies source/archive/payload bindings before composing a
+separate QA disk. It never reads an old D88 template. The probe is not included
+on the normal disk. Synthetic tests reject stale QA inputs and check that initial
+shrink failure produces a failure exit rather than a PASS marker. Guest results
+for this new probe are pending; implementation alone does not close allocation
+or memory-lifetime acceptance.
+
 ## Remaining qualification and scope
 
 The following required guest gates remain **NOT RUN or incomplete**: JWASMR
