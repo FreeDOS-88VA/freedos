@@ -57,6 +57,7 @@ class StarterPayloadTests(unittest.TestCase):
     def test_quickstart_documents_edlin_backup_and_both_formats(self):
         guide = (PAYLOAD / "QUICKSTR.TXT").read_text(encoding="ascii")
         self.assertIn("HELLO.BAK", guide)
+        self.assertIn("Enter lowercase e to save", guide)
         self.assertIn("JWASMR -0 -bin", guide)
         self.assertIn("JWASMR -0 -mz", guide)
         self.assertIn("B:", guide)

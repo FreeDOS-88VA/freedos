@@ -13,9 +13,10 @@ M18 QUICKSTART - edit, assemble, and run on A:
    EDLIN HELLO.ASM
 
    At the EDLIN prompt, enter 1 to replace the first line. Type the replacement
-   comment line and press Enter. Enter E to save the file and quit. EDLIN keeps
-   the previous contents as HELLO.BAK when it rewrites HELLO.ASM. Reopen the
-   edited file with TYPE HELLO.ASM to confirm the saved text.
+   comment line and press Enter. Enter lowercase e to save the file and quit;
+   this build checks the exit command in lowercase. EDLIN keeps the previous
+   contents as HELLO.BAK when it rewrites HELLO.ASM. Reopen the edited file
+   with TYPE HELLO.ASM to confirm the saved text.
 
 3. Build and run both 8086 examples:
 

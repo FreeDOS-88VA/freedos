@@ -1,17 +1,19 @@
 # M18 work report
 
-Status: **IN PROGRESS — source-build gates partly passed; guest qualification is
-blocked by a MEMMAP runtime failure and exact-tip CI has failed.** No M18 PASS
-or HANDOFF READY is claimed.
+Status: **IN PROGRESS — source-build gates pass at the current public tip;
+required guest and memory-qualification gates remain incomplete.** No M18 PASS,
+release designation, archive, or HANDOFF READY is claimed.
 
-Evidence labels: **HOST PASS: NOT ESTABLISHED** (the exact-tip native x64 CI
-run failed); **VAEG PASS: NOT ESTABLISHED** (scoped guest execution found a
-failure); **DEFERRED HARDWARE VALIDATION** (hardware is NOT RUN).
+Evidence labels: **HOST PASS** for the source-build checkpoint at
+`04854df8bccfc62abb61fd861f0381b539f9703e` only; this is not full M18
+acceptance. **VAEG PASS: NOT ESTABLISHED**; targeted guest workflows pass, but
+required qualification is incomplete. **DEFERRED HARDWARE VALIDATION**; hardware
+is NOT RUN.
 
-`START_SHA`: `d81bba18f0e4793d7165fb0acfdf7e229e160c83`. A `QUALIFIED_IMPLEMENTATION_SHA`
-has not been established. The publication tip and downstream base belong in a
-separate post-push handoff; this report cannot contain its own future commit
-identity.
+`START_SHA`: `d81bba18f0e4793d7165fb0acfdf7e229e160c83`.
+`QUALIFIED_IMPLEMENTATION_SHA` is not established. The publication tip and
+downstream base belong in a separate post-push handoff; this report cannot
+contain its own future commit identity.
 
 ## Baseline and provenance
 
@@ -32,65 +34,81 @@ the parent and no upstream branch was pushed.
 
 ## Host source-build evidence
 
-Before the guest finding, the M18-local `make m18-disk` recipe exported
-committed allowlisted inputs and exact component gitlinks, then completed two
-clean network-disabled Linux/amd64 builds. It checked linked placement,
-native 2HD geometry/BPB/FAT12 data, payload hashes, cluster chains, package
-records and exact image readback. Both builds matched. The pinned toolchain
-image is
+At public parent tip `04854df8bccfc62abb61fd861f0381b539f9703e`, the M18-local
+`make m18-disk` recipe exported committed allowlisted inputs and exact component
+gitlinks, then completed two clean network-disabled Linux/amd64 builds. The
+builds produced identical D88 bytes and release records. They checked linked
+placement, native 2HD geometry/BPB/FAT12 data, payload hashes, cluster chains,
+package records and exact image readback. Exact-tip native x64 CI run
+`36463965573` succeeded, including the M18-local host suite, public-source
+audit, and complete two-build comparison. The 56-test local suite also passed.
+The pinned toolchain image is
 `sha256:3c465999ab43719da8209eb19d273b4c8208f4544ba75b9063cf4b5b494d0c17`;
 the pinned Unicorn 2.1.4 host-test wheel SHA-256 is
 `9d6e6dea140560de4ebd8446661f7ef84a357d428c14a3ef09dacd306ec8c239`.
 
-The exact tested pre-fix candidate was built from parent tip
-`b8cccb9c42ce007a8d53695794f306ec02cbd159`. Its native 2HD D88 is 1,331,888
-bytes with SHA-256
-`ae198059b95d7d02943ea7f59480df392984f369d7d03a2fe99db815e222c32e`. This
-candidate is not designated or archived. Host readback confirmed the configured
-80-cylinder, two-head, eight-sector/track, 1024-byte-sector FAT12 profile and
-valid file/FAT records. The sample-workflow disk-space policy is an estimate;
-the actual EDLIN/JWASMR peak remains unmeasured.
+The exact built candidate at that tip is
+`dist/m18-memmap-bounded/PC88VA-M18-2HD.D88`, 1,331,888 bytes, SHA-256
+`ab3ea20baea41fc375248516356bd3f1e0d9efe9f3bb87e6c2c2f7e94410d6ce`;
+its source bundle SHA-256 is
+`2ce8d3f7148a41bcd841c95bde48752c2ced8a454d1856f3d1711530d61be690`. It is a
+candidate, not designated or archived. The current source delta contains a quickstart/test correction for EDLIN
+command case. It has not yet been built into a new candidate or covered by CI.
 
-The M18 host suite passed 53 tests locally and in the two clean build
-containers for the pre-fix source. Exact-tip native x64 CI run
-`36458214567` completed with **failure**: the runner did not have NASM although
-the M18 host placement/media tests require it. The workflow is being corrected
-to install the NASM version from the shared toolchain lock; no CI pass is
-claimed until a new exact-tip run succeeds.
+The accepted native 2HD profile is 80 cylinders, two heads, eight
+1024-byte sectors per track, FAT12, and 192 root entries. The M18 host
+allocation policy retains a 32-cluster working-space estimate, not a measured
+guest EDLIN/JWASMR workflow peak. Tool RAM minima and practical largest-block
+requirements remain unmeasured.
 
-## Guest finding and memory investigation
+## Guest and memory evidence
 
-A source-built, unmodified VAEG executable reached the DOS shell in a scoped
-run of the exact pre-fix candidate; a guest file copy/readback was independently
-checked. This is only a smoke test, not `VAEG PASS` or full guest qualification.
+The exact candidate passed the previously failing `MEMMAP /CHECK` guest test in
+the scoped no-backup-memory run; redirected MEMMAP output was read back by DOS
+`TYPE` and `DIR`, and the guest-written D88/FAT contents were independently
+inspected. This is targeted VAEG evidence, not full guest qualification.
 
-The same candidate's MEMMAP `/CHECK` operation caused DOS to report a corrupted
-MCB chain and halt. This is a blocking application defect, not evidence of a
-kernel ownership defect. A temporary diagnostic build isolated the failure to
-MEMMAP's runtime AH=4Ah resize path; the read-only parser path did not reproduce
-it. The proposed correction bounds MEMMAP's MZ maximum allocation at load time
-and removes runtime resizing. The changed source passed 56 local host tests and
-the public-source audit, but has not yet been clean-built in the isolated
-containers or guest-tested. The failure is not considered fixed.
-Private emulator configuration, numeric observations and raw captures remain
-in Git-excluded evidence.
+A subsequent targeted starter workflow copied the original COM/MZ examples to
+A:, edited and saved the COM source with EDLIN using lowercase `e`, observed the
+prior file as `HELLO.BAK`, and read the edited and backup files. JWASMR produced
+a COM and an MZ executable; both were run separately and displayed their
+expected sample messages before returning to the shell. Before/after MEMMAP
+snapshots were redirected and independently read from the guest-written disk;
+each reported a valid MCB chain. MORE `/?` help and page advancement were
+also exercised, with control returning to the shell. JWASMR help, a syntax
+error, and a missing-source error returned control; the syntax-error test
+started with previously generated executables, and the guest D88 readback
+confirmed BUILD.BAT removed them without creating a replacement COM. MEMMAP
+`/CHECK` still reported a valid chain. The VAEG tests used the source-built
+candidate and an empty B: drive. These results do not establish low-memory
+behavior or a measured RAM minimum.
+
+The uppercase EDLIN `E` command wrote the file but did not leave the editor.
+Inspection of the pinned public EDLIN source identifies a case-sensitive exit
+flag after case-insensitive command dispatch. No component source was changed;
+the starter quickstart and its host regression now explicitly use lowercase
+`e`. The correction requires the normal source rebuild and exact-tip CI before
+publication.
 
 The source review of `PreConfig2()` and `P_0()` found no demonstrated stale
-memory ownership defect. No kernel memory code was changed. A matched guest
+memory ownership defect. No kernel memory code was changed. A matched
 physical/resident/MCB ownership table, full DOS allocation/EXEC accounting,
-stable child-return evidence and measured per-tool RAM minima remain unrun. The
-memory-waste hypothesis is unresolved; M18 has not established that
-reservations are stale or that all remaining RAM is necessary.
+stable repeated-child memory evidence, low-memory tool behavior, and actual
+per-tool RAM minima remain unrun. The hypothesis that conventional memory is
+unusable due to stale reservations is unresolved; absent MCB entries are not
+being treated as free memory.
 
-EDLIN editing/save/reopen, MORE paging, JWASMR assembly and COM/MZ execution,
-syntax/missing-input recovery, alternate floppy regressions, the complete
-starter workflow, and CHKDSK/FORMAT/SYS destructive-operation safeguards on
-disposable media remain **NOT RUN**. The guest workflow's disk-space peak is
-also **NOT RUN**. No hardware test was attempted.
+## Remaining qualification and scope
 
-## Scope and next work
+The following required guest gates remain **NOT RUN or incomplete**: JWASMR
+low-memory behavior and measured minimum; the complete fresh-boot starter
+workflow on the rebuilt corrected candidate; shell/file regressions with A:
+and physical B: media; read-only CHKDSK; FORMAT and SYS safeguards and
+successful boot transfer on disposable native media; observed working-space
+peak; memory ownership and capacity accounting. Any test not yet executed is
+not a pass. No hardware test was attempted.
 
-The disk payload is FreeDOS kernel, NECPC88VA FreeCOM, COUNTRY.SYS, EDLIN,
+The disk payload is the FreeDOS kernel, NECPC88VA FreeCOM, COUNTRY.SYS, EDLIN,
 MORE, MEMMAP, real-mode JWASMR, CHKDSK, FORMAT and SYS, plus English/ASCII
 starter material and license notices. Maintenance tools are limited to native
 2HD FAT12 media: CHKDSK is read-only; FORMAT writes filesystem metadata only
@@ -99,14 +117,8 @@ M18 A: system files to a prepared 2HD B: target. No SASI/SCSI runtime, HDD boot,
 FAT16 guest access or hardware support is claimed. FreeDOS version reporting
 remains unchanged.
 
-- Commit and push the MEMMAP MZ-allocation correction and the CI dependency
-  correction. Run all host regressions and two complete clean builds from the
-  exact public inputs, then verify the new exact-tip native CI run.
-- Boot the changed candidate in the previously failing guest configuration and
-  repeat MEMMAP `/CHECK`, map redirection and independent readback. Continue the
-  required shell, utility, assembler, disk-space and disposable-media gates on
-  the exact resulting D88. Preserve the failing candidate and evidence.
-- Keep the report and handoff partial unless all required gates pass. Do not
-  designate/archive an M18 image or begin M19 until the active milestone is
-  buildable from its exact public revision and its required qualification is
-  complete. Hardware may remain `NOT RUN`.
+Before designation, rebuild the corrected committed source twice from clean
+public exports, verify equality and current exact-tip CI, then finish all
+applicable guest, memory, media and maintenance qualification on the exact
+candidate. Keep M18 partial and do not archive a distribution image or begin
+M19 until the required gates are complete. Hardware may remain `NOT RUN`.
