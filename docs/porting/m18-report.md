@@ -98,6 +98,19 @@ per-tool RAM minima remain unrun. The hypothesis that conventional memory is
 unusable due to stale reservations is unresolved; absent MCB entries are not
 being treated as free memory.
 
+## Maintenance adapter correction (qualification pending)
+
+Source review of the pinned kernel's `entry.asm:int2526` established that DOS
+returns result CF live and leaves the original caller FLAGS word on the stack.
+The M18 maintenance adapter incorrectly tested that original word, masking I/O
+errors. The adapter now discards it with POP and tests live CF. A production
+8086 adapter test independently models read/write returns with opposite original
+and result carry values, verifies error propagation (including zero-error-code
+fallback), far-call arguments, preserved registers and stack balance. All six
+cases failed before the correction; the complete 57-test host suite passes after
+it. No kernel/component code was changed. Full source builds, exact-tip CI and
+guest maintenance qualification for this correction are still pending.
+
 ## Remaining qualification and scope
 
 The following required guest gates remain **NOT RUN or incomplete**: JWASMR

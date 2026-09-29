@@ -8,8 +8,8 @@ global _m18_abs_sector, m18_critical_
 ;                         unsigned sector, void __far *buffer)
 ; The 16:16 far pointer is passed as offset then segment. DOS INT 25h/26h
 ; use the drive in AX, sector in DX, count in CX and DS:BX.
-; The returned FLAGS word is popped and checked, as required by the absolute
-; disk interface. Exactly one 1024-byte logical sector is transferred.
+; DOS leaves the original caller FLAGS on the stack, not the result flags.
+; Discard that word without changing live CF. Transfer one 1024-byte sector.
 _m18_abs_sector:
         push bp
         mov bp, sp
@@ -33,9 +33,8 @@ _m18_abs_sector:
 .write:
         int 26h
 .returned:
-        pop si                  ; DOS returns the result FLAGS word here.
-        test si, 1
-        jnz .failed
+        pop si                  ; Discard original FLAGS; POP preserves CF.
+        jc .failed
         xor ax, ax
         jmp short .done
 .failed:
