@@ -335,7 +335,13 @@ returned to a valid DOS MCB chain. The output data encoding was independently
 inspected. Pinned Watcom's linked map includes both its real-number conversion
 routine and DOS software 8087 emulator. A new build verifier fails if a later
 link omits the required emulator; the host negative tests do not substitute for
-the guest result. Further CPU/VA startup and library review remains required.
+the guest result. On the later unchanged-byte normal disk, both VA and VA2
+repeated the no-coprocessor REAL4 assembly and COM execution. Independent FAT
+readback verified the generated program's floating initializer, success report
+and subsequent valid DOS MCB chain. VA2 also showed the commands and check on
+screen; VA's final screen showed only prompts, so its visible-console claim is
+restricted to independent readback. Neither test proves hardware or every
+floating operation. Further CPU/VA startup and library review remains required.
 
 At smaller installed capacities, actual normal-disk sample-assembly requests
 failed without leaving executable outputs and with stable checked MCB reports;
