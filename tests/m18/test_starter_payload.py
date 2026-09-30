@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 """Fail-closed checks for the original 8.3 ASCII assembler workflow."""
 from pathlib import Path
+import json
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -9,7 +10,7 @@ PAYLOAD = ROOT / "config/m18/payload"
 
 class StarterPayloadTests(unittest.TestCase):
     def test_files_are_ascii_and_83(self):
-        expected = {"BUILD.BAT", "HELLO.ASM", "MZDEMO.ASM",
+        expected = {"BUILD.BAT", "HELLO.ASM", "HELLO.DOC", "MZDEMO.ASM",
                     "QUICKSTR.TXT", "README.TXT"}
         self.assertEqual({path.name for path in PAYLOAD.iterdir()}, expected)
         for name in expected:
@@ -37,6 +38,27 @@ class StarterPayloadTests(unittest.TestCase):
         self.assertIn("JWASMR -0 -mz -Fo=MZDEMO.EXE MZDEMO.ASM", batch)
         self.assertNotIn("WLINK", batch.upper())
         self.assertNotIn("TLINK", batch.upper())
+
+    def test_hello_source_and_doc_explain_the_installed_com_build(self):
+        command = "JWASMR -0 -bin -Fo=HELLO.COM HELLO.ASM"
+        com = (PAYLOAD / "HELLO.ASM").read_text(encoding="ascii")
+        doc = (PAYLOAD / "HELLO.DOC").read_text(encoding="ascii")
+        guide = (PAYLOAD / "QUICKSTR.TXT").read_text(encoding="ascii")
+        readme = (PAYLOAD / "README.TXT").read_text(encoding="ascii")
+        packages = json.loads((ROOT / "config/m18/packages.json").read_text(encoding="ascii"))
+        starter = next(item for item in packages["packages"] if item["id"] == "starter-material")
+        composer = (ROOT / "tools/m18/finish_image.py").read_text(encoding="ascii")
+        self.assertIn(command, com)
+        self.assertIn(command, doc)
+        self.assertIn("HELLO.COM", doc)
+        self.assertIn("AH=09h", doc)
+        self.assertIn("AH=4Ch", doc)
+        self.assertIn("640 KiB of installed RAM", doc)
+        self.assertIn("no linker step", doc)
+        self.assertIn("HELLO.DOC", guide)
+        self.assertIn("HELLO.DOC", readme)
+        self.assertIn("HELLO.DOC", starter["files"])
+        self.assertIn('("HELLO.DOC", "config/m18/payload/HELLO.DOC")', composer)
 
     def test_batch_deletes_old_products_before_build_and_checks_results(self):
         batch = (PAYLOAD / "BUILD.BAT").read_text(encoding="ascii").splitlines()

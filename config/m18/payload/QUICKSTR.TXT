@@ -1,4 +1,5 @@
 M18 QUICKSTART - edit, assemble, and run on A:
+For the individual COM source and build command, read HELLO.DOC.
 
 Use 640 KiB installed RAM for this full sample workflow on the tested VA/VA2
 models. At installed 512 KiB, EDLIN editing worked but JWASMR could not start

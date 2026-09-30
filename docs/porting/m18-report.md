@@ -5,6 +5,15 @@ native 2HD disk.** `HANDOFF READY` is separate and requires post-push checks of
 the publication tip and its own CI; this committed report cannot record its own
 future commit SHA.
 
+**HELLO documentation update in progress:** the PASS and designated archive
+below apply only to the earlier D88 SHA-256
+`991370d0c075f75153192e94365c3c798c3ca50639aaeb716054ab6c5da4dd12`.
+The changed `HELLO.ASM`, new `HELLO.DOC`, updated on-disk instructions and media
+recipe create a different candidate. Its full clean build, exact-byte guest
+qualification, exact-head CI, replacement archive and publication-tip CI are
+**NOT YET RUN/PASSED**. Do not substitute the old disk's VAEG results or claim
+this new candidate is designated. Hardware remains NOT RUN.
+
 Evidence labels: **HOST PASS** at qualified implementation
 `679fb32dee9709ca298d70b5168bd0dbbd32d601`, including 91 host tests,
 two independent clean source-build containers per run, two separate identical

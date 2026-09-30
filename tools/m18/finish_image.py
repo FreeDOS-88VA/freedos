@@ -218,6 +218,7 @@ def main():
         ("README.TXT", "config/m18/payload/README.TXT"),
         ("QUICKSTR.TXT", "config/m18/payload/QUICKSTR.TXT"),
         ("HELLO.ASM", "config/m18/payload/HELLO.ASM"),
+        ("HELLO.DOC", "config/m18/payload/HELLO.DOC"),
         ("MZDEMO.ASM", "config/m18/payload/MZDEMO.ASM"),
         ("BUILD.BAT", "config/m18/payload/BUILD.BAT"),
     ):

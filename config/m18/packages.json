@@ -95,12 +95,12 @@
     },
     {
       "id": "starter-material",
-      "version": "M18 original examples and quickstart 1",
-      "files": ["README.TXT", "QUICKSTR.TXT", "HELLO.ASM", "MZDEMO.ASM", "BUILD.BAT", "COPYING"],
+      "version": "M18 original examples and quickstart 2",
+      "files": ["README.TXT", "QUICKSTR.TXT", "HELLO.ASM", "HELLO.DOC", "MZDEMO.ASM", "BUILD.BAT", "COPYING"],
       "source": "config/m18/payload/ and public component license files",
       "license": "GPL-2.0-or-later; sample assembly text is project-authored",
       "cpu": "ASCII DOS text and 8086 assembly examples",
-      "va_adaptation": "Original English/ASCII instructions and linker-free COM/MZ examples",
+      "va_adaptation": "Original English/ASCII instructions, plain-text HELLO.DOC, and linker-free COM/MZ examples",
       "tests": ["8.3 names and source command inspection", "matched VA/VA2 guest edit/build/run workflow", "staged FAT workspace readback within committed reserve; no instantaneous disk peak claimed or required"]
     }
   ],

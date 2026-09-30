@@ -17,12 +17,14 @@ Files and examples
 ------------------
 EDLIN is a line editor. MORE pages text with Space, Enter, or Q. MEMMAP lists
 the validated DOS MCB chain; it does not report physical or reserved memory.
-JWASMR is a real-mode 8086-class assembler. HELLO.ASM, MZDEMO.ASM, and BUILD.BAT
+JWASMR is a real-mode 8086-class assembler. HELLO.ASM includes its COM build
+command; HELLO.DOC explains and builds it step by step. MZDEMO.ASM and BUILD.BAT
 show direct COM and MZ output without a linker.
 
 Create a writable work directory before editing or assembling. Keep the
 original release image unchanged; make a writable copy for ordinary file work.
-See QUICKSTR.TXT for the complete edit/assemble/run example.
+See HELLO.DOC for the individual COM build and QUICKSTR.TXT for the complete
+edit/assemble/run example.
 
 RAM limits of the tested small workflow
 ---------------------------------------
