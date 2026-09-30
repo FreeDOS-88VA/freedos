@@ -152,7 +152,9 @@ def main():
         "carrier": carrier,
         "stage2_loader": stage2,
         "pc88va_loadseg_paragraph": pc88va_loadseg,
-        "config_sys_sha256": sha256(config_source.read_bytes()),
+        # The disk carries the CRLF-normalized payload, not the LF source file.
+        "config_sys_sha256": sha256(read_text_payload("config/m18/CONFIG.SYS")),
+        "config_sys_source_sha256": sha256(config_source.read_bytes()),
         "memory_qualification": "host layout verification only; guest RAM/MCB snapshots pending",
     }
 
@@ -306,6 +308,11 @@ def main():
         json.dumps(capacity, indent=2, sort_keys=True) + "\n", encoding="ascii"
     )
 
+    parent_revision = os.environ.get("M18_PARENT_SHA", "")
+    toolchain_identity = os.environ.get("M18_TOOLCHAIN_IDENTITY", "")
+    if (not re.fullmatch(r"[0-9a-f]{40}", parent_revision) or
+            not re.fullmatch(r"sha256:[0-9a-f]{64}", toolchain_identity)):
+        raise ValueError("M18_PARENT_SHA and M18_TOOLCHAIN_IDENTITY must bind the build")
     source = source_lock()
     toolchain_lock_path = ROOT / "manifests/toolchains.lock.json"
     toolchain_lock_bytes = toolchain_lock_path.read_bytes()
@@ -313,9 +320,9 @@ def main():
     package_manifest = {
         "schema_version": 1,
         "milestone": "M18",
-        "parent_revision": os.environ.get("M18_PARENT_SHA", "UNBOUND"),
+        "parent_revision": parent_revision,
         "parent_start_sha": "d81bba18f0e4793d7165fb0acfdf7e229e160c83",
-        "toolchain_identity": os.environ.get("M18_TOOLCHAIN_IDENTITY", "UNBOUND"),
+        "toolchain_identity": toolchain_identity,
         "toolchain_lock_sha256": sha256(toolchain_lock_bytes),
         "open_watcom_host_tools": toolchain_lock["canonical"]["open_watcom"]["host_tools"],
         "cpu_contract": package_config["cpu_contract"],

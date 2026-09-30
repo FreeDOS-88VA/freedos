@@ -10,9 +10,9 @@ static struct m18_check_report report;
 static int usage(void)
 {
   puts("CHKDSK - read-only native PC-88VA 2HD FAT12 check");
-  puts("Usage: CHKDSK [A:|B:] [/CHECK]");
+  puts("Usage: CHKDSK [A:|B:]");
   puts("Only 80x2x8, 1024-byte-sector 2HD FAT12 media are checked.");
-  puts("No repair option is provided; other M16 floppy profiles are unsupported.");
+  puts("No repair option is provided; other floppy profiles are unsupported.");
   return 0;
 }
 
@@ -23,7 +23,8 @@ static int parse_drive(int argc, char **argv, unsigned *drive)
   for (i = 1; i < argc; ++i) {
     if (!strcmp(argv[i], "/?") || !strcmp(argv[i], "-?"))
       return usage();
-    if (!strcmp(argv[i], "/CHECK"))
+    /* Accepted for compatibility; every run is already a read-only check. */
+    if (!strcmp(argv[i], "/CHECK") || !strcmp(argv[i], "/check"))
       continue;
     if ((argv[i][0] == 'A' || argv[i][0] == 'a') &&
         argv[i][1] == ':' && argv[i][2] == 0) {

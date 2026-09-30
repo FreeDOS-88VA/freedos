@@ -1,12 +1,18 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
-/* Small ASCII pager using DOS file I/O and DOS AH=06 console input. */
+/* Small ASCII pager using DOS file I/O and DOS AH=06 console input.
+   AH=06 reads DOS standard input, so a redirected or piped standard input
+   is moved to a private handle and handle 0 is rebound to CON first. */
 #include <dos.h>
+#include <fcntl.h>
+#include <i86.h>
+#include <io.h>
 #include <stdio.h>
 #include <string.h>
 
 #define SCREEN_COLUMNS 80
 #define PAGE_LINES 24
-#define DOS_ZERO_FLAG 0x0040U
+#define DOS_DEVICE_BIT 0x0080U
+#define DOS_CONSOLE_INPUT_BIT 0x0001U
 
 static int usage(void)
 {
@@ -17,15 +23,62 @@ static int usage(void)
   return 0;
 }
 
+static int stdin_is_console(void)
+{
+  union REGPACK regs;
+  memset(&regs, 0, sizeof(regs));
+  regs.w.ax = 0x4400;
+  regs.w.bx = 0;
+  intr(0x21, &regs);
+  if (regs.w.flags & INTR_CF)
+    return 0;
+  return (regs.w.dx & (DOS_DEVICE_BIT | DOS_CONSOLE_INPUT_BIT)) ==
+         (DOS_DEVICE_BIT | DOS_CONSOLE_INPUT_BIT);
+}
+
+/* Keep piped/redirected data readable through a duplicate handle and make
+   DOS standard input the console, so paging keys never consume data. */
+static FILE *bind_console_input(int data_from_stdin)
+{
+  int console, data;
+  FILE *stream;
+  if (stdin_is_console())
+    return stdin;
+  console = open("CON", O_RDONLY | O_BINARY);
+  if (console < 0)
+    return NULL;
+  data = -1;
+  if (data_from_stdin) {
+    data = dup(0);
+    if (data < 0) {
+      close(console);
+      return NULL;
+    }
+  }
+  if (dup2(console, 0) != 0) {
+    close(console);
+    if (data >= 0)
+      close(data);
+    return NULL;
+  }
+  close(console);
+  if (!data_from_stdin)
+    return stdin;
+  stream = fdopen(data, "rb");
+  if (stream == NULL)
+    close(data);
+  return stream;
+}
+
 static int console_key(void)
 {
-  union REGS regs;
+  union REGPACK regs;
   for (;;) {
     memset(&regs, 0, sizeof(regs));
     regs.h.ah = 0x06;
     regs.h.dl = 0xff;
-    intdos(&regs, &regs);
-    if ((regs.x.cflag & DOS_ZERO_FLAG) == 0 && regs.h.al != 0)
+    intr(0x21, &regs);
+    if ((regs.w.flags & INTR_ZF) == 0 && regs.h.al != 0)
       return regs.h.al;
   }
 }
@@ -52,6 +105,10 @@ static int page_input(FILE *input)
     }
     if (putchar(ch) == EOF)
       return 3;
+    if (ch == '\r') {
+      column = 0;
+      continue;
+    }
     if (ch == '\n' || ++column == SCREEN_COLUMNS) {
       column = 0;
       if (++lines == PAGE_LINES) {
@@ -80,6 +137,7 @@ prompt:
 int main(int argc, char **argv)
 {
   FILE *input = stdin;
+  FILE *console_data;
   int result;
 
   if (argc > 2) {
@@ -99,6 +157,15 @@ int main(int argc, char **argv)
       return 2;
     }
   }
+  console_data = bind_console_input(input == stdin);
+  if (console_data == NULL) {
+    fputs("MORE: cannot bind console input.\n", stderr);
+    if (input != stdin)
+      fclose(input);
+    return 2;
+  }
+  if (input == stdin)
+    input = console_data;
   result = page_input(input);
   if (input != stdin && fclose(input) != 0 && result == 0) {
     fputs("MORE: close error.\n", stderr);

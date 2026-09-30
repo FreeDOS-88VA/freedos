@@ -87,8 +87,6 @@ static int m18_is_dot(const unsigned char *entry)
   if (entry[0] != '.')
     return 0;
   if (entry[1] == '.') {
-    if (entry[2] != ' ')
-      return 0;
     for (n = 2; n < 11; ++n)
       if (entry[n] != ' ')
         return 0;

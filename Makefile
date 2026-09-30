@@ -571,6 +571,6 @@ m18-disk: m18-toolchain
 m18-clean:
 	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/clean.py --path "$(M18_OUTPUT)"
 m18-accept:
-	@python3 -B tools/m18/verify_distribution.py --dist "$(M18_DIST)"
+	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/verify_distribution.py --dist "$(M18_DIST)"
 m18-host-tests:
 	@M18_WHEEL_CACHE="$(M18_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/run_host_tests.py

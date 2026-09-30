@@ -51,6 +51,27 @@ class PublicBuildPipelineTests(unittest.TestCase):
                 verify_isolation.verify(self.root)
             path.rmdir()
 
+    def test_suffixed_historical_milestone_directory_is_rejected(self):
+        path = self.root / "tools" / "m07r2"
+        path.mkdir(parents=True)
+        with self.assertRaises(verify_isolation.IsolationError):
+            verify_isolation.verify(self.root)
+
+    def test_suffixless_file_reference_to_old_milestone_is_rejected(self):
+        source = self.root / "tools/m18/toolchain/Dockerfile"
+        source.write_text(source.read_text(encoding="ascii") +
+                          "COPY tools/" + "m07r3/helper.sh /opt/\n", encoding="ascii")
+        with self.assertRaises(verify_isolation.IsolationError):
+            verify_isolation.verify(self.root)
+
+    def test_source_audit_rejects_non_83_package_filename(self):
+        path = self.root / "config/m18/packages.json"
+        packages = json.loads(path.read_text(encoding="ascii"))
+        packages["packages"][0]["files"].append("A.B.C")
+        path.write_text(json.dumps(packages), encoding="ascii")
+        with self.assertRaises(verify_source_audit.AuditError):
+            verify_source_audit.verify(self.root)
+
     def test_transitive_import_and_symlink_are_rejected(self):
         source = self.root / "tools/m18/transitive.py"
         source.write_text("from tools." + "m17 import old_builder\n", encoding="ascii")

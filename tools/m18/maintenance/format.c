@@ -10,8 +10,6 @@ static struct m18_volume volume;
 static struct m18_check_report report;
 static unsigned char sector[M18_SECTOR_BYTES];
 static unsigned char verify[M18_SECTOR_BYTES];
-static unsigned char fat[M18_FAT_BYTES];
-static unsigned char root[M18_ROOT_BYTES];
 
 static void put16(unsigned char *p, unsigned value)
 {
@@ -106,21 +104,25 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  memset(fat, 0, sizeof(fat));
-  fat[0] = 0xfe;
-  fat[1] = 0xff;
-  fat[2] = 0xff;
-  memset(root, 0, sizeof(root));
-  memcpy(root, "PC88VA-M18 ", 11);
-  root[11] = 0x08;
+  /* The validated layout selects every metadata sector; the volume buffers
+     hold the new FAT and root until they are reloaded for verification. */
+  memset(volume.fat, 0, sizeof(volume.fat));
+  volume.fat[0] = 0xfe;
+  volume.fat[1] = 0xff;
+  volume.fat[2] = 0xff;
+  memset(volume.root, 0, sizeof(volume.root));
+  memcpy(volume.root, "PC88VA-M18 ", 11);
+  volume.root[11] = 0x08;
   make_boot();
 
   m18_reset_disk();
-  for (i = 0; i < 4 && good; ++i)
-    good = write_verified(1, 1U + i,
-                          fat + (i % 2U) * M18_SECTOR_BYTES);
-  for (i = 0; i < 6 && good; ++i)
-    good = write_verified(1, 5U + i, root + i * M18_SECTOR_BYTES);
+  for (i = 0; i < volume.layout.fat_count * volume.layout.sectors_per_fat && good; ++i)
+    good = write_verified(1, volume.layout.fat_start + i,
+                          volume.fat + (i % volume.layout.sectors_per_fat) *
+                                       M18_SECTOR_BYTES);
+  for (i = 0; i < volume.layout.root_sectors && good; ++i)
+    good = write_verified(1, volume.layout.root_start + i,
+                          volume.root + i * M18_SECTOR_BYTES);
   if (good)
     good = write_verified(1, 0, sector);
   m18_reset_disk();

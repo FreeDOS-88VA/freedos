@@ -29,6 +29,8 @@ static unsigned char copy_buffer[COPY_BYTES];
 static unsigned char verify_buffer[COPY_BYTES];
 static unsigned char boot_verify[M18_SECTOR_BYTES];
 static unsigned dos_error;
+static unsigned loader_first;
+static unsigned loader_count;
 
 static unsigned word(const unsigned char *p)
 {
@@ -72,38 +74,32 @@ static unsigned free_root_slots(struct m18_volume *volume)
   return free_slots;
 }
 
-static int validate_source(void)
+/* Stage 1 reads LOADER.BIN from the fixed contiguous extent recorded when the
+   source disk was composed. The copied boot sector is valid on B: only if
+   LOADER.BIN occupies exactly the same contiguous clusters there. */
+static int loader_extent(struct m18_volume *volume, unsigned *first,
+                         unsigned *count)
 {
   unsigned char *loader;
-  unsigned first, current, count, expected, n;
+  unsigned current, n, expected;
   unsigned long size;
-  if (source_volume.boot[0] == 0xeb && source_volume.boot[1] == 0xfe &&
-      source_volume.boot[2] == 0x90)
+  loader = find_root(volume, "LOADER  BIN");
+  if (!loader || (loader[11] & 0x18))
     return 0;
-  loader = find_root(&source_volume, "LOADER  BIN");
-  if (!loader)
-    return 0;
-  first = current = word(loader + 26);
+  current = word(loader + 26);
   size = dword(loader + 28);
   if (!size || size > 65535UL)
     return 0;
   expected = (unsigned)((size + M18_SECTOR_BYTES - 1U) / M18_SECTOR_BYTES);
-  for (n = 0; n < SYSTEM_FILES; ++n) {
-    unsigned char *entry = find_root(&source_volume, files[n].dos_name);
-    if (!entry || (entry[11] & 0x18) || !dword(entry + 28))
-      return 0;
-    files[n].size = dword(entry + 28);
-  }
-  count = 0;
-  while (count < expected) {
+  *first = current;
+  *count = expected;
+  for (n = 1; n <= expected; ++n) {
     unsigned next;
     if (current < 2 || current >= M18_CLUSTER_LIMIT ||
-        !m18_fat12_get(source_volume.fat, sizeof(source_volume.fat),
-                       current, &next))
+        !m18_fat12_get(volume->fat, sizeof(volume->fat), current, &next))
       return 0;
-    ++count;
-    if (count == expected)
-      return next >= 0xff8 && next <= 0xfff;
+    if (n == expected)
+      return next >= 0xff8;
     if (next != current + 1U)
       return 0;
     current = next;
@@ -111,11 +107,49 @@ static int validate_source(void)
   return 0;
 }
 
+static int validate_source(void)
+{
+  unsigned n;
+  if (source_volume.boot[0] == 0xeb && source_volume.boot[1] == 0xfe &&
+      source_volume.boot[2] == 0x90)
+    return 0;
+  if (!loader_extent(&source_volume, &loader_first, &loader_count))
+    return 0;
+  for (n = 0; n < SYSTEM_FILES; ++n) {
+    unsigned char *entry = find_root(&source_volume, files[n].dos_name);
+    if (!entry || (entry[11] & 0x18) || !dword(entry + 28))
+      return 0;
+    files[n].size = dword(entry + 28);
+  }
+  return 1;
+}
+
+static int loader_extent_free(struct m18_volume *volume)
+{
+  unsigned n;
+  for (n = 0; n < loader_count; ++n) {
+    unsigned value;
+    if (loader_first + n >= M18_CLUSTER_LIMIT ||
+        !m18_fat12_get(volume->fat, sizeof(volume->fat), loader_first + n,
+                       &value) || value)
+      return 0;
+  }
+  return 1;
+}
+
+static int loader_extent_matches(struct m18_volume *volume)
+{
+  unsigned first, count;
+  return loader_extent(volume, &first, &count) &&
+         first == loader_first && count == loader_count;
+}
+
 static int confirm_install(void)
 {
   char line[32];
   puts("SYS copies the native boot files from A: to the prepared 2HD B: disk.");
   puts("It writes the boot sector last; existing B: user files are preserved.");
+  puts("The boot loader must land on the same free clusters as on A:.");
   fputs("Type SYS to continue (anything else cancels): ", stdout);
   fflush(stdout);
   if (!fgets(line, sizeof(line), stdin))
@@ -217,6 +251,7 @@ int main(int argc, char **argv)
     puts("Usage: SYS A: B:");
     puts("Requires a validated bootable M18 2HD source in A: and a formatted 2HD B:.");
     puts("B: is the only permitted target; the boot sector is written last.");
+  puts("B: must have LOADER.BIN's A: clusters free (a freshly formatted B: does).");
     return 0;
   }
   if (argc != 3 || (strcmp(argv[1], "A:") && strcmp(argv[1], "a:")) ||
@@ -252,6 +287,12 @@ int main(int argc, char **argv)
     required_bytes += ((files[n].size + M18_SECTOR_BYTES - 1U) /
                        M18_SECTOR_BYTES) * (unsigned long)M18_SECTOR_BYTES;
   }
+  if (!loader_extent_free(&target_volume)) {
+    fprintf(stderr, "SYS: B: clusters %u-%u must be free for the boot loader; B: was not changed.\n",
+            loader_first, loader_first + loader_count - 1U);
+    _dos_setvect(0x24, old24);
+    return 1;
+  }
   free_slots = free_root_slots(&target_volume);
   if (target_report.free_clusters < required_clusters ||
       free_slots < SYSTEM_FILES) {
@@ -266,19 +307,36 @@ int main(int argc, char **argv)
     return 1;
   }
 
+  dos_error = 0;
   for (n = 0; n < SYSTEM_FILES && good; ++n)
     good = copy_file(n);
-  if (good) {
-    m18_reset_disk();
-    good = m18_write_sector(1, 0, source_volume.boot) &&
-           m18_read_sector(1, 0, boot_verify) &&
-           memcmp(source_volume.boot, boot_verify, M18_SECTOR_BYTES) == 0;
+  if (!good) {
+    fprintf(stderr, "SYS: file transfer failed (DOS error %u); boot sector not written.\n",
+            dos_error);
+    _dos_setvect(0x24, old24);
+    return 1;
   }
+  /* Never install the boot sector unless DOS placed LOADER.BIN on the exact
+     contiguous extent that the copied stage 1 reads. */
+  m18_reset_disk();
+  if (!m18_load_volume(1, &target_volume) ||
+      !m18_check_allocations(1, &target_volume, &target_report) ||
+      !loader_extent_matches(&target_volume)) {
+    fprintf(stderr, "SYS: LOADER.BIN on B: is not at clusters %u-%u; boot sector not written.\n",
+            loader_first, loader_first + loader_count - 1U);
+    _dos_setvect(0x24, old24);
+    return 1;
+  }
+  m18_reset_disk();
+  good = m18_write_sector(1, 0, source_volume.boot) &&
+         m18_read_sector(1, 0, boot_verify) &&
+         memcmp(source_volume.boot, boot_verify, M18_SECTOR_BYTES) == 0;
   m18_reset_disk();
   if (good)
     good = m18_load_volume(1, &target_volume) &&
            m18_check_allocations(1, &target_volume, &target_report) &&
-           !memcmp(target_volume.boot, source_volume.boot, M18_SECTOR_BYTES);
+           !memcmp(target_volume.boot, source_volume.boot, M18_SECTOR_BYTES) &&
+           loader_extent_matches(&target_volume);
   for (n = 0; n < SYSTEM_FILES && good; ++n) {
     unsigned char *entry = find_root(&target_volume, files[n].dos_name);
     if (!entry || dword(entry + 28) != files[n].size)
@@ -289,8 +347,8 @@ int main(int argc, char **argv)
            SYSTEM_FILES, required_bytes);
     puts("Boot B: separately; the source A: disk was not modified.");
   } else {
-    fprintf(stderr, "SYS: transfer/readback failed (DOS error %u); B: may be incomplete.\n",
-            dos_error);
+    fputs("SYS: boot-sector write/readback or final check failed; B: may be incomplete.\n",
+          stderr);
   }
   _dos_setvect(0x24, old24);
   return good ? 0 : 1;

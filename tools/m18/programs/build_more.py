@@ -90,6 +90,7 @@ def build(output: Path) -> dict[str, object]:
     record["source_sha256"] = hashlib.sha256(SOURCE.read_bytes()).hexdigest()
     record["dos_services"] = ["DOS file I/O through Open Watcom C runtime",
                               "INT 21h/AH=06h nonblocking console input",
+                              "INT 21h/AX=4400h check; redirected stdin is duplicated and handle 0 rebound to CON",
                               "DOS stdout/stderr; no IBM BIOS calls"]
     record["license"] = "GPL-2.0-or-later"
     (output / "more-build.json").write_text(

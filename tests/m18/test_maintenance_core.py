@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class MaintenanceCoreTests(unittest.TestCase):
-    def compile_and_run(self, name, sources, include_dirs):
+    def compile_and_run(self, name, sources, include_dirs, stdin=None):
         compiler = shlex.split(os.environ.get("CC", "cc"))
         with tempfile.TemporaryDirectory(prefix="m18-{}-".format(name)) as temporary:
             executable = Path(temporary) / name
@@ -21,7 +21,8 @@ class MaintenanceCoreTests(unittest.TestCase):
             command.extend(["-o", str(executable)])
             subprocess.run(command, check=True)
             return subprocess.run(
-                [str(executable)], check=True, capture_output=True, text=True
+                [str(executable)], check=True, capture_output=True, text=True,
+                input=stdin,
             ).stdout
 
     def test_dos_absolute_disk_adapter_matches_large_model_far_abi(self):
@@ -51,6 +52,17 @@ class MaintenanceCoreTests(unittest.TestCase):
             [ROOT / "tests/m18/stubs", ROOT / "tools/m18/maintenance"],
         )
         self.assertIn("M18 native-volume synthetic read-only tests: PASS", output)
+
+    def test_sys_installs_boot_only_on_the_source_loader_extent(self):
+        # Two transfers reach the confirmation prompt; the refused cases do not.
+        output = self.compile_and_run(
+            "sys-test",
+            ["tools/m18/maintenance/fat12.c", "tools/m18/maintenance/volume.c",
+             "tests/m18/sys_test.c"],
+            [ROOT / "tests/m18/stubs", ROOT / "tools/m18/maintenance"],
+            stdin="SYS\nSYS\n",
+        )
+        self.assertIn("M18 SYS loader-extent transfer tests: PASS", output)
 
 
 if __name__ == "__main__":

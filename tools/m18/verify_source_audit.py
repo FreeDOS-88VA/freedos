@@ -9,6 +9,7 @@ import re
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[2]
 REQUIRED_COMPONENTS = {"fdkernel", "freecom", "country", "edlin", "jwasm"}
+DOS_83 = re.compile(r"[A-Z0-9!#$%&'()@^_`{}~-]{1,8}(?:\.[A-Z0-9!#$%&'()@^_`{}~-]{1,3})?")
 PRIVATE_NAMES = {".private-evidence", "pc88va-private-docs", "private", "roms"}
 
 
@@ -50,10 +51,8 @@ def verify(root: Path = DEFAULT_ROOT) -> None:
         if item.get("source_lock") and item["source_lock"] not in components:
             raise AuditError("M18 package refers to an unpinned component")
         for filename in item.get("files", []):
-            stem, dot, extension = filename.partition(".")
-            if (len(stem) > 8 or len(extension) > 3 or
-                    (not dot and extension) or filename != filename.upper()):
-                raise AuditError("M18 disk path is not uppercase DOS 8.3: " + filename)
+            if not isinstance(filename, str) or not DOS_83.fullmatch(filename):
+                raise AuditError("M18 disk path is not uppercase DOS 8.3: " + str(filename))
 
     payload = root / "config/m18/payload"
     for path in payload.iterdir():

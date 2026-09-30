@@ -451,11 +451,10 @@ def main() -> None:
     source_archives["parent"] = normalize_parent_export_pinned(image_id, inputs, epoch)
     wheel = get_wheel(host_config, inputs)
 
-    results = []
     for number in (1, 2):
         run_dir = output / ("run-{}".format(number))
-        results.append(copy_container_run(image_id, toolchain_identity, inputs, run_dir,
-                                          parent, number, epoch))
+        copy_container_run(image_id, toolchain_identity, inputs, run_dir,
+                           parent, number, epoch)
     first_d88 = (output / "run-1/media.d88").read_bytes()
     second_d88 = (output / "run-2/media.d88").read_bytes()
     if first_d88 != second_d88:

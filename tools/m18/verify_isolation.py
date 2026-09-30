@@ -7,15 +7,16 @@ from pathlib import Path
 import re
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[2]
-FORBIDDEN_DIRS = tuple(
-    "{}/m{:02d}".format(parent, milestone)
-    for milestone in range(0, 18)
-    for parent in ("tools", "config", "tests", "containers")
-)
-SCAN_SUFFIXES = {".py", ".sh", ".json", ".c", ".h", ".asm", ".inc", ".bat"}
+MILESTONE_PARENTS = ("tools", "config", "tests", "containers")
+# Historical milestone directories include suffixed revisions such as m07r2.
+HISTORICAL_NAME = re.compile(r"m(?:0[0-9]|1[0-7])[a-z0-9]*")
+# Files without a suffix (for example Dockerfile) are scanned as well.
+SCAN_SUFFIXES = {"", ".py", ".sh", ".json", ".c", ".h", ".asm", ".inc", ".bat",
+                 ".md", ".txt", ".doc", ".sys", ".mak", ".wc", ".yml", ".yaml"}
 RUNTIME_PATTERNS = (
-    re.compile(r"(?:from|import)\s+(?:tools\.)?m(?:0[0-9]|1[0-7])(?:\.|\s|$)"),
-    re.compile(r"(?:tools|config|tests|containers)/m(?:0[0-9]|1[0-7])(?:/|['\" ])"),
+    re.compile(r"(?:from|import)\s+(?:tools\.)?m(?:0[0-9]|1[0-7])[a-z0-9]*(?:\.|\s|$)"),
+    re.compile(r"(?:tools|config|tests|containers)/m(?:0[0-9]|1[0-7])[a-z0-9]*"
+               r"(?:[/'\"\s),;:]|$)", re.MULTILINE),
     re.compile(r"sys\.path[^\n]*m(?:0[0-9]|1[0-7])"),
 )
 
@@ -34,10 +35,14 @@ def verify(root: Path = DEFAULT_ROOT) -> None:
     missing = [name for name in required if not (root / name).exists()]
     if missing:
         raise IsolationError("M18 source export is missing: " + ", ".join(missing))
-    for name in FORBIDDEN_DIRS:
-        path = root / name
-        if path.exists():
-            raise IsolationError("M18 source export contains forbidden milestone input: " + name)
+    for parent in MILESTONE_PARENTS:
+        directory = root / parent
+        if not directory.is_dir():
+            continue
+        for path in directory.iterdir():
+            if HISTORICAL_NAME.fullmatch(path.name):
+                raise IsolationError("M18 source export contains forbidden milestone input: " +
+                                     parent + "/" + path.name)
     scanned = (root / "tools/m18", root / "tests/m18", root / "config/m18")
     for directory in scanned:
         for path in directory.rglob("*"):

@@ -2,6 +2,15 @@
 #include <string.h>
 #include "fat12.h"
 
+/* Compile-time proof that the fixed native profile constants agree. */
+typedef char m18_profile_constants_agree[
+    (M18_ROOT_BYTES == M18_ROOT_ENTRIES * 32U &&
+     M18_ROOT_BYTES % M18_SECTOR_BYTES == 0 &&
+     M18_FIRST_DATA_SECTOR == 1U + 2U * 2U + M18_ROOT_BYTES / M18_SECTOR_BYTES &&
+     M18_TOTAL_SECTORS - M18_FIRST_DATA_SECTOR == M18_DATA_CLUSTERS &&
+     (M18_DATA_CLUSTERS + 2U) * 3U / 2U <= M18_FAT_BYTES &&
+     M18_FAT_BYTES == 2U * M18_SECTOR_BYTES) ? 1 : -1];
+
 static unsigned m18_word(const unsigned char *p)
 {
   return (unsigned)p[0] | ((unsigned)p[1] << 8);
@@ -32,15 +41,10 @@ int m18_validate_bpb(const unsigned char *boot, unsigned bytes,
       boot[1022] != 0x55 || boot[1023] != 0xaa)
     return 0;
 
-  root_sectors = (M18_ROOT_ENTRIES * 32U + M18_SECTOR_BYTES - 1U) /
-                 M18_SECTOR_BYTES;
-  first_data = 1U + 2U * 2U + root_sectors;
-  if (first_data >= M18_TOTAL_SECTORS)
-    return 0;
-  clusters = M18_TOTAL_SECTORS - first_data;
-  if (clusters != M18_DATA_CLUSTERS ||
-      (clusters + 2U) * 3U / 2U > M18_FAT_BYTES)
-    return 0;
+  /* All geometry fields were matched to the one supported native profile. */
+  root_sectors = M18_ROOT_BYTES / M18_SECTOR_BYTES;
+  first_data = M18_FIRST_DATA_SECTOR;
+  clusters = M18_DATA_CLUSTERS;
 
   layout->bytes_per_sector = M18_SECTOR_BYTES;
   layout->sectors_per_cluster = 1;
@@ -80,7 +84,7 @@ enum m18_chain_error m18_validate_chain(
     unsigned first_cluster, unsigned expected_clusters,
     unsigned char *owned, unsigned owned_bytes, unsigned *actual_clusters)
 {
-  unsigned current, next, count = 0, limit, index;
+  unsigned current, next, count = 0, limit;
   unsigned required_bytes;
   unsigned char local[512];
 
@@ -104,9 +108,8 @@ enum m18_chain_error m18_validate_chain(
     unsigned char bit;
     if (current < 2U || current >= limit)
       return M18_CHAIN_OUT_OF_RANGE;
-    index = current;
-    byte_index = index >> 3;
-    bit = (unsigned char)(1U << (index & 7U));
+    byte_index = current >> 3;
+    bit = (unsigned char)(1U << (current & 7U));
     if (local[byte_index] & bit)
       return M18_CHAIN_CYCLE;
     if (owned[byte_index] & bit)
@@ -117,11 +120,11 @@ enum m18_chain_error m18_validate_chain(
     if (!m18_fat12_get(fat, fat_bytes, current, &next))
       return M18_CHAIN_TRUNCATED_FAT;
 
-    if (next >= 0xff8U && next <= 0xfffU) {
+    if (next >= 0xff8U) {
+      /* count can never exceed expected_clusters here: that case already
+         returned M18_CHAIN_EXTRA_LINK on the previous link. */
       if (expected_clusters && count < expected_clusters)
         return M18_CHAIN_EARLY_END;
-      if (expected_clusters && count > expected_clusters)
-        return M18_CHAIN_EXTRA_LINK;
       if (actual_clusters)
         *actual_clusters = count;
       return M18_CHAIN_OK;
@@ -136,8 +139,7 @@ enum m18_chain_error m18_validate_chain(
       return M18_CHAIN_BAD_CLUSTER_LINK;
     if (next < 2U || next >= limit)
       return M18_CHAIN_OUT_OF_RANGE;
-    if (count >= data_clusters)
-      return M18_CHAIN_CYCLE;
+    /* A revisit is reported by the local bitmap as M18_CHAIN_CYCLE. */
     current = next;
   }
 }

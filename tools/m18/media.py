@@ -19,7 +19,7 @@ DOS_NAME_RE = re.compile(r"^[A-Z0-9!#$%&'()@^_`{}~-]{1,8}(?:\.[A-Z0-9!#$%&'()@^_
 
 
 class ValidationError(RuntimeError):
-    """Raised for a bounded fail-closed M16 contract error."""
+    """Raised for a bounded fail-closed media contract error."""
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -77,7 +77,7 @@ def derive_layout(spec: dict) -> dict:
     }
     for key, value in declared.items():
         if derived[key] != value:
-            raise ValidationError(f"declared M16 layout does not recompute: {key}")
+            raise ValidationError(f"declared media layout does not recompute: {key}")
     expected_d88 = spec["d88"]["header_size"] + total_sectors * (
         spec["d88"]["sector_header_size"] + bps
     )
@@ -106,17 +106,6 @@ def decode_dos_name(value: bytes) -> str:
     if encode_dos_name(name) != value:
         raise ValidationError("DOS directory name is noncanonical")
     return name
-
-def lba_to_chs(lba: int, geometry: dict) -> tuple[int, int, int]:
-    total = geometry["total_sectors"]
-    if not isinstance(lba, int) or isinstance(lba, bool) or not 0 <= lba < total:
-        raise ValidationError("LBA is outside the M16 geometry")
-    heads = geometry["heads"]
-    spt = geometry["sectors_per_track"]
-    base = geometry["physical_sector_id_base"]
-    cylinder, remainder = divmod(lba, heads * spt)
-    head, sector = divmod(remainder, spt)
-    return cylinder, head, sector + base
 
 def fat_datetime(source_date_epoch: int) -> tuple[int, int, str]:
     if not isinstance(source_date_epoch, int) or isinstance(source_date_epoch, bool):
@@ -149,7 +138,7 @@ def build_boot_record(spec: dict) -> bytes:
     sector = bytearray(geometry["bytes_per_sector"])
     placeholder = bytes(policy["placeholder_code"])
     if placeholder != b"\xeb\xfe\x90":
-        raise ValidationError("M16 placeholder must remain the documented self-loop")
+        raise ValidationError("placeholder must remain the documented self-loop")
     sector[0:3] = placeholder
     oem = policy["oem_name"].encode("ascii")
     if len(oem) != 8:
@@ -177,7 +166,7 @@ def build_boot_record(spec: dict) -> bytes:
     sector[43:54] = label.ljust(11, b" ")
     filesystem_type = policy["filesystem_type"].encode("ascii")
     if filesystem_type != b"FAT12":
-        raise ValidationError("M16 filesystem type label changed")
+        raise ValidationError("filesystem type label changed")
     sector[54:62] = filesystem_type.ljust(8, b" ")
     offsets = policy.get("signature_offsets", [])
     if not isinstance(offsets, list) or len(offsets) != len(set(offsets)):
@@ -261,7 +250,7 @@ def parse_d88(d88_bytes: bytes, spec: dict, derived: dict) -> tuple[dict, bytes]
     expected_name = contract["disk_name"].encode("ascii").ljust(17, b"\x00")
     if d88_bytes[:17] != expected_name or d88_bytes[17:26] != bytes(9):
         raise ValidationError("D88 disk name or reserved header bytes differ")
-    if d88_bytes[26] != 0 or d88_bytes[27] != contract["disk_type"]:
+    if d88_bytes[26] != contract["write_protect"] or d88_bytes[27] != contract["disk_type"]:
         raise ValidationError("D88 write-protect or disk-type field differs")
     offsets = list(struct.unpack_from("<164I", d88_bytes, 32))
     populated = offsets[:contract["populated_tracks"]]
@@ -310,7 +299,7 @@ def parse_d88(d88_bytes: bytes, spec: dict, derived: dict) -> tuple[dict, bytes]
         if cursor != end:
             raise ValidationError("D88 track contains trailing or hidden sector data")
     if sector_records != derived["total_sectors"] or len(raw) != derived["total_bytes"]:
-        raise ValidationError("D88 sector set does not reconstruct the M16 geometry")
+        raise ValidationError("D88 sector set does not reconstruct the media geometry")
     return {
         "declared_size": declared,
         "disk_type": d88_bytes[27],
