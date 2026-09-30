@@ -29,6 +29,17 @@ def run(command: list[str], *, cwd: Path, env: dict[str, str]) -> None:
     subprocess.run(command, cwd=cwd, env=env, check=True)
 
 
+def verify_floating_runtime(map_text: str) -> None:
+    # Pinned JWasm uses strtod() for REAL4/REAL8. The 16-bit OW runtime must
+    # include its software 8087 emulator even when the user has no coprocessor.
+    required = (
+        "math87l.lib(strtod.c)", "emu87.lib(initemu.asm)",
+        "emu87.lib(emu8087.asm)", "emu87.lib(dosinit.asm)",
+    )
+    if any(map_text.count(token) != 1 for token in required) or 'noemu87.lib(' in map_text:
+        raise ValueError('JWASMR linked floating conversion lacks the pinned OW 1.9 DOS software 8087 runtime')
+
+
 def parse_mz(executable: Path, map_file: Path) -> dict[str, object]:
     data = executable.read_bytes()
     if len(data) < 28:
@@ -53,6 +64,7 @@ def parse_mz(executable: Path, map_file: Path) -> dict[str, object]:
     if psp_block_paragraphs > 0xFFFF or stack_bytes > (image_paragraphs + minalloc) * 16:
         raise ValueError("JWASMR MZ minimum allocation does not contain its stack")
     map_text = map_file.read_text(encoding="ascii", errors="strict")
+    verify_floating_runtime(map_text)
     stack_match = re.search(
         r"^Stack size:\s+([0-9A-Fa-f]+)\s+\(([0-9]+)\.\)$",
         map_text, re.MULTILINE,
@@ -84,6 +96,7 @@ def parse_mz(executable: Path, map_file: Path) -> dict[str, object]:
         "overlay_number": overlay,
         "linker_stack_bytes": stack_size,
         "cpu_target": "8086 (Open Watcom -0; JWasm OWDOS16 source recipe)",
+        "floating_conversion_runtime": "OW 1.9 strtod plus linked DOS software 8087 emulator; real guest no-coprocessor conversion separately qualified",
     }
 
 

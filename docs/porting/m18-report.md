@@ -302,6 +302,41 @@ both reads and the prompt. The VA final screenshot was blank, so its results are
 limited to independently read-back guest writes and checks, not a visual
 console claim.
 
+## Same-candidate maintenance and no-coprocessor check
+
+The `1705f56ae1f829441a3fc56ef560d8e89fd8bc81` checkpoint preserves the
+exact previously guest-tested normal D88 bytes, while publishing new
+M18-local QA media preparation and workspace helpers in its independently
+rebuilt source bundle. All local host tests and exact-head native M18 CI run
+`36648740861`, attempt 1, succeeded; complete M18 qualification remains open.
+
+Matched VA and VA2 separately booted the same normal A: disk with freshly
+source-generated, disposable nonbooting B: media. Both ran FORMAT B:,
+CHKDSK B: and SYS A: B:, with a valid subsequent memory chain. Independent
+FAT readback found precisely the selected five SYS system files on B:, with
+bytes equal to the current source disk. Each exact SYS-produced disk, before
+any host-side file injection, was then booted with FDD2 empty and wrote/read a
+new guest file. VA2 visibly returned to the prompt with its file contents and
+directory shown. VA ended at a visible prompt; its written file was independently
+read back, but the final display did not show the TYPE command. Neither run is
+a hardware result or a claim that SYS copied unselected applications.
+
+A separate VA2 guest used the matched normal disk with its optional numeric
+coprocessor explicitly disabled. JWASMR assembled an original 8086 COM source
+containing a real-number data initializer, produced and ran the result, and
+returned to a valid DOS MCB chain. The output data encoding was independently
+inspected. Pinned Watcom's linked map includes both its real-number conversion
+routine and DOS software 8087 emulator. A new build verifier fails if a later
+link omits the required emulator; the host negative tests do not substitute for
+the guest result. Further CPU/VA startup and library review remains required.
+
+At smaller installed capacities, actual normal-disk sample-assembly requests
+failed without leaving executable outputs and with stable checked MCB reports;
+one case retained a larger backup-memory selection. This qualifies clean
+failure on those tested cases, **not** a successful minimum for JWASMR or every
+other utility. A CHKDSK stdout redirection was empty in those runs and is not
+accepted as a successful disk check or evidence of CHKDSK's RAM minimum.
+
 ## Remaining qualification and scope
 
 The following required guest gates remain **NOT RUN or incomplete**: JWASMR

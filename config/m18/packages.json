@@ -81,8 +81,8 @@
       "source_lock": "jwasm",
       "license": "Sybase Open Watcom Public License 1.0",
       "cpu": "8086 real-mode DOS MZ; no protected-mode extender",
-      "va_adaptation": "Pinned JWasm DOS16 source recipe, Open Watcom 1.9 build with optional host/COFF/ELF/386 features disabled, plus reproducible M18 source/license notice",
-      "tests": ["clean build and MZ accounting", "matched VA/VA2 640-KiB guest COM/MZ and syntax/missing-file recovery", "bounded insufficient-memory results on earlier matching candidates; current per-tool minima pending"]
+      "va_adaptation": "Pinned JWasm DOS16 source recipe, Open Watcom 1.9 build with optional host/COFF/ELF/386 features disabled; require the actual linked DOS software 8087 emulator for REAL4/REAL8 conversion without a coprocessor; reproducible M18 source/license notice",
+      "tests": ["clean build and MZ accounting", "matched VA/VA2 640-KiB guest COM/MZ and syntax/missing-file recovery", "VA2 real REAL4 conversion and output execution with NDP8087 disabled", "current low-memory clean rejection tested; actual per-tool minima pending"]
     },
     {
       "id": "starter-material",
