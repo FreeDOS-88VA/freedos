@@ -87,6 +87,11 @@ a separate allocation. On the current build the lower PSP-block bounds are:
 | SYS | 68,464 bytes | bootable 2HD B: transfer and its actual re-boot at 384 KiB on VA, transfer/boot at high capacity; 512-KiB VA2 help only; 256 KiB insufficient |
 | JWASMR | 330,048 bytes | COM/MZ sample build at 640 KiB; at lower tested capacities it failed without executable output |
 
+The owner accepts that 256 KiB is too little for EDLIN editing; the qualified
+editor workload floor is 384 KiB on VA. The 256-KiB machine remains supported
+for the separately qualified DOS shell and small utilities. EDLIN's observed
+low-memory failure is not an open port-repair issue.
+
 All byte counts above are public-source-derived, **not** private guest-memory
 measurements or total installed RAM requirements. A Watcom `exMaxAlloc=FFFFh`
 can reserve substantially more than the listed minimum at EXEC. The source

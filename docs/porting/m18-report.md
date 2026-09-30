@@ -344,12 +344,21 @@ also completed **destructive** FORMAT B:, read-only CHKDSK B: and SYS A: B:;
 the B: system files match the A: source, and the actual SYS-produced disk
 subsequently booted at 384 KiB and wrote/read a new guest file. The first
 redirected CHKDSK A: output in that session was empty and is not counted as
-a check; B: inspections did produce validated content. A separate 384-KiB VA editor run also saved a modified source copy, preserved
-the byte-identical `.BAK`, reopened the saved file in EDLIN, independently read
-its contents and returned to an identical, valid normal MEMMAP snapshot. Its
-last redirected `/CHECK` file was empty because the run ended before that
-command completed; **that invocation is not a `/CHECK` PASS**. These results
-do not prove alternate-model low-memory destructive work. At 256 KiB, a directed EDLIN load reported no source lines and ended
+a check; B: inspections did produce validated content. A later isolated
+A:-target redirection again yielded an empty result file. This remains
+[public issue #12](https://github.com/nakatamaho/freedos-pc88va/issues/12),
+**not** a CHKDSK A: PASS. A screenshot is retained only in private evidence;
+no ROM-dependent capture is attached to the issue. Its cause is undetermined,
+and an unredirected A: check was NOT RUN.
+
+A separate 384-KiB VA editor run saved a modified source copy, preserved the
+byte-identical `.BAK`, reopened the file in EDLIN, independently read its
+contents and returned to an identical, valid normal MEMMAP snapshot. Its last
+redirected `/CHECK` file was empty because the run ended before that command
+completed; **that invocation is not a `/CHECK` PASS**. These results do not
+prove alternate-model low-memory destructive work.
+
+At 256 KiB, a directed EDLIN load reported no source lines and ended
 abnormally; CHKDSK, FORMAT and SYS rejected their operations for insufficient
 DOS memory, with a usable shell and matching checked MCB snapshots afterward.
 An independent **unredirected** EDLIN run on the later notice-updated normal
@@ -359,10 +368,12 @@ its redirected output was empty, so it is **not** a file-read PASS. The original
 source file remained byte-identical to the clean normal disk, a later shell
 write/readback marker was present, and a subsequent MCB check passed. This is
 a bounded explicit resource failure with shell recovery, **not** successful
-EDLIN editing at 256 KiB or a claim that its diagnostic is pleasant. The
-pinned upstream EDLIN path reports zero lines when it cannot open a file; do
-not repair that upstream behavior solely to conceal low-memory pressure. Actual
-per-tool workload ceilings and instantaneous execution peaks remain open.
+EDLIN editing at 256 KiB. The pinned upstream EDLIN path reports zero lines
+when it cannot open a file; do not repair that upstream behavior solely to
+conceal low-memory pressure. The owner accepts 256 KiB as too little for EDLIN:
+the supported editing floor is 384 KiB. This is **not** an EDLIN issue or an
+authorization to shrink another owner's memory. Other tools' useful-memory
+peaks remain unmeasured.
 
 An M18-local private readback inspector now reconciles the exact public
 carrier/D88 identity with selected post-shell MEMMAP snapshots at every native
@@ -407,13 +418,13 @@ release designation.
 ## Remaining qualification and scope
 
 The following required guest gates remain **NOT RUN or incomplete**: JWASMR
-in-program useful-memory/peak measurement and broader low-memory workload
-boundaries; exact notice-updated-disk protection and live media exchange;
-full safe-failure coverage for the smallest machine and documented editor
-minimum; observed instantaneous disk workspace peak; outstanding physical
-ownership facts that MCB traversal cannot supply. Any test not yet executed is
-not a pass. No hardware test was attempted. Initial capacity scripts did not complete their
-full workloads and remain unqualified. Later matched-executable capacity runs
+in-program useful-memory/peak measurement and remaining low-memory workload
+boundaries; observed instantaneous disk workspace peak; the separately tracked
+CHKDSK A: redirection issue; and physical ownership facts that MCB traversal
+cannot supply. Same-candidate protection and media exchange have separately
+passed on VA and VA2; neither closes these remaining gates. Any unrun test is
+not a pass. No hardware test was attempted. Initial capacity scripts did not
+complete their full workloads and remain unqualified. Later matched-executable capacity runs
 completed the bounded workload described above; allocator/COM/MZ near-limit
 EXEC stress did pass on their separate byte-identical QA media, but does not
 establish every required utility's in-program memory peak or minimum.
