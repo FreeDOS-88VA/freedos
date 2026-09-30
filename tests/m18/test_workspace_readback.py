@@ -37,6 +37,25 @@ class WorkspaceReadbackTests(unittest.TestCase):
         self.assertEqual([row['additional_allocated_clusters'] for row in result], [0, 4, 5, 7])
         self.assertEqual(result[-1]['workspace_files']['WORK/MZDEMO.EXE']['bytes'], 32)
 
+    def test_observer_file_is_optional_but_unexpected_work_files_fail(self):
+        observed = self.fixtures()
+        for report, files in observed[2:]:
+            files['WORK/PRE.TXT'] = b'private guest observer output'
+            report['files']['WORK/PRE.TXT'] = {'clusters': [8]}
+        self.assertEqual(len(check_stages(observed, 32, 128)), 4)
+        for stage in (2, 3):
+            changed = self.fixtures()
+            report, files = changed[stage]
+            files['WORK/EXTRA.TMP'] = b'unexpected intermediate product'
+            report['files']['WORK/EXTRA.TMP'] = {'clusters': [9]}
+            with self.assertRaisesRegex(ValueError, 'unexpected work file'):
+                check_stages(changed, 32, 128)
+        missing = self.fixtures()
+        del missing[3][1]['WORK/HELLO.BAK']
+        del missing[3][0]['files']['WORK/HELLO.BAK']
+        with self.assertRaisesRegex(ValueError, 'missing or unexpected work file'):
+            check_stages(missing, 32, 128)
+
     def test_cli_rejects_manifest_drift_and_public_evidence_output(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -58,7 +77,7 @@ class WorkspaceReadbackTests(unittest.TestCase):
 
     def test_missing_stage_or_corrupted_root_is_rejected(self):
         stages = self.fixtures()
-        with self.assertRaisesRegex(ValueError, 'lacks both generated'):
+        with self.assertRaisesRegex(ValueError, 'missing or unexpected work file'):
             missing = self.fixtures()
             del missing[3][1]['WORK/HELLO.COM']
             del missing[3][0]['files']['WORK/HELLO.COM']

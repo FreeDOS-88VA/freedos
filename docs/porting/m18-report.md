@@ -280,11 +280,17 @@ manifest, including the unchanged boot sector and root, editor backup, real
 COM/MZ outputs and the committed workspace reserve. The first attempted BUILD
 checkpoint exited before BUILD was injected; it remains an incomplete run.
 A new completed BUILD run visibly executed both examples and independently
-passed stage readback. Settled checkpoint measurements are not an independent
-instantaneous in-program high-water mark; the source-bounded output paths and
-conservative reserve still need final acceptance review. The inspector writes
-private evidence outside the public repository; neither the guest disks nor
-numeric observations are public build inputs.
+passed stage readback. On the later exact normal disk, independent copy, edit
+and build guest runs again reached their intended stages; the build visibly
+executed both examples and returned to a valid MCB report. The same-source
+readback checked the unchanged distribution files, editor backup, generated
+COM/MZ programs and reserve. The inspector now rejects unaccounted WORK files
+while allowing the explicitly optional observer output. Settled snapshots do
+not directly measure instantaneous in-program disk or RAM high-water marks;
+source-bounded intermediate file lifetimes and the conservative disk reserve
+still require final acceptance review. The inspector writes private evidence
+outside the public repository; neither guest disks nor numeric observations
+are public build inputs.
 
 The same exact normal bytes were booted separately on both models to run MORE
 paging and help, followed by valid MEMMAP checks and another shell command.

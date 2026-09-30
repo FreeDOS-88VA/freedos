@@ -42,6 +42,12 @@ def check_stages(stages, cluster_budget, minimum_free):
         if set(files) - set(original) != {name for name in files if name.startswith('WORK/')}:
             raise ValueError(step + ': unrelated guest file or release root mutation')
         workspace = {name for name in files if name.startswith('WORK/')}
+        if step in ('edit', 'build'):
+            expected = {'WORK/' + name for name in COPY_NAMES} | {'WORK/HELLO.BAK'}
+            if step == 'build':
+                expected |= {'WORK/HELLO.COM', 'WORK/MZDEMO.EXE'}
+            if not expected.issubset(workspace) or workspace - expected - {'WORK/PRE.TXT'}:
+                raise ValueError(step + ': missing or unexpected work file')
         if step != 'normal':
             if 'WORK' not in report['directories']:
                 raise ValueError(step + ': work directory missing')
