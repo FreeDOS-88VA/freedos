@@ -26,7 +26,16 @@ or prior milestone tool/config/test directory is a build input.
   archives. The resulting parent TAR hash is bound as the actual build input
   and corresponding-source archive, never the host's raw Git TAR hash. The
   host-side corresponding-source bundle is packed by the same pinned image's
-  Python/liblzma, not the host's variable Python/xz versions.
+  Python/liblzma, not the host's variable Python/xz versions. A BuildKit Docker
+  **local image config ID** can vary between hosts even when all locked build
+  inputs and resulting programs agree. Public `toolchain_identity` records the
+  SHA-256 of the exact committed `manifests/toolchains.lock.json` (base-image
+  digest, snapshot and verified Open Watcom binaries); the local image ID is
+  only a verified execution handle, never a portable source or package hash.
+  The build and QA verify the actual local container's compiler binaries and
+  fixed Python, liblzma/xz and NASM versions before use; the lock digest is
+  not treated as a Docker image ID. QA also rechecks the canonical parent's
+  file bytes against a fresh Git export.
   A repeat with the same inputs is allowed only if every public distribution
   file is identical. Use `M18_DIST=dist/m18-candidate-<id>` for a changed source
   identity.

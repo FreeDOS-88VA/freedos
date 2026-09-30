@@ -11,9 +11,12 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import tempfile
 
 import build_image
 from compose_image import compose
+from normalize_parent_archive import records as parent_archive_records
+from toolchain import verify_image
 
 ROOT = Path(__file__).resolve().parents[2]
 PROGRAMS = ('LOADER.BIN', 'KERNEL.SYS', 'COMMAND.COM', 'COUNTRY.SYS', 'MEMMAP.EXE')
@@ -51,15 +54,27 @@ def main():
     parser.add_argument('--build', type=Path, required=True)
     parser.add_argument('--dist', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--image', default='freedos-pc88va-m18:local')
     args = parser.parse_args()
     _, revisions, lock = build_image.verify_parent_and_components()
     manifest = json.loads((args.dist / 'build-manifest.json').read_text())
     expected = {item['name']: item['source_archive_sha256']
                 for item in lock['components']}
-    expected['parent'] = digest(subprocess.check_output(
-        ['git', 'archive', revisions['parent'], *build_image.PARENT_INPUTS], cwd=ROOT))
+    # Git TAR headers differ across hosts. Compare its committed file bytes and
+    # executable modes with the canonical TAR used by both clean builds.
+    with tempfile.TemporaryDirectory(prefix='m18-qa-parent-') as temporary:
+        raw = Path(temporary) / 'parent.tar'
+        raw.write_bytes(subprocess.check_output(
+            ['git', 'archive', revisions['parent'], *build_image.PARENT_INPUTS], cwd=ROOT))
+        if parent_archive_records(raw) != parent_archive_records(args.build / 'inputs/parent.tar'):
+            raise ValueError('QA canonical parent archive differs from committed public files')
+    expected['parent'] = digest((args.build / 'inputs/parent.tar').read_bytes())
     if manifest['source_archives_sha256'] != expected:
         raise ValueError('QA source archives do not match committed public inputs')
+    toolchain_lock = (ROOT / 'manifests/toolchains.lock.json').read_bytes()
+    if manifest.get('toolchain_identity') != 'sha256:' + digest(toolchain_lock):
+        raise ValueError('QA toolchain profile differs from the committed lock')
+    image_id = verify_image(args.image, json.loads(toolchain_lock)['canonical'])
     payloads = verified_payloads(args.build, manifest, revisions)
     output = build_image.verify_output_root(args.output, 'QA output')
     # Never overwrite a failed or guest-written candidate.
@@ -75,7 +90,7 @@ def main():
             '--entrypoint', 'nasm',
             '--user', '{}:{}'.format(os.getuid(), os.getgid()),
             '-v', str(source.parent) + ':/source:ro',
-            '-v', str(output) + ':/output', manifest['toolchain_image'],
+            '-v', str(output) + ':/output', image_id,
             '-f', 'bin', *definitions, '/source/' + filename, '-o', '/output/' + name,
         ], check=True)
         payloads[name] = (output / name).read_bytes()
@@ -98,7 +113,7 @@ def main():
     record = {'scope': 'QA ONLY; not the normal distribution',
               'parent_revision': revisions['parent'],
               'component_revisions': revisions,
-              'toolchain_image': manifest['toolchain_image'],
+              'toolchain_identity': manifest['toolchain_identity'],
               'assembler_source_sha256': digest(source.read_bytes()),
               'probe_sha256': digest(payloads['ALLOC.COM']),
               'programs': programs,

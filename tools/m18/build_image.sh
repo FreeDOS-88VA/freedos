@@ -8,7 +8,7 @@ export PATH=/opt/openwatcom-1.9/binl:$PATH
 export WATCOM=/opt/openwatcom-1.9 INCLUDE=/opt/openwatcom-1.9/h
 export LIB='/opt/openwatcom-1.9/lib286;/opt/openwatcom-1.9/lib286/dos'
 : "${M18_PARENT_SHA:?M18_PARENT_SHA must be supplied by the host source lock}"
-: "${M18_TOOLCHAIN_IMAGE_ID:?M18_TOOLCHAIN_IMAGE_ID must be supplied by the host toolchain check}"
+: "${M18_TOOLCHAIN_IDENTITY:?M18_TOOLCHAIN_IDENTITY must be supplied by the host toolchain check}"
 : "${M18_SOURCE_DATE_EPOCH:?M18_SOURCE_DATE_EPOCH must be supplied by the host manifest}"
 export LC_ALL=C LANG=C TZ=UTC SOURCE_DATE_EPOCH="$M18_SOURCE_DATE_EPOCH" PYTHONDONTWRITEBYTECODE=1
 umask 022

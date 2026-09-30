@@ -565,7 +565,7 @@ M18_WHEEL_CACHE ?= $(CURDIR)/build/m18-wheel-cache
 m18-toolchain:
 	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/toolchain.py --image "$(M18_IMAGE)"
 m18-allocator-qa: m18-disk
-	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/build_allocator_qa.py --build "$(M18_OUTPUT)" --dist "$(M18_DIST)" --output "$(M18_QA_OUTPUT)"
+	@PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/build_allocator_qa.py --build "$(M18_OUTPUT)" --dist "$(M18_DIST)" --output "$(M18_QA_OUTPUT)" --image "$(M18_IMAGE)"
 m18-disk: m18-toolchain
 	@M18_WHEEL_CACHE="$(M18_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/build_image.py --output "$(M18_OUTPUT)" --dist "$(M18_DIST)" --image "$(M18_IMAGE)"
 m18-clean:

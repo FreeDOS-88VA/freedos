@@ -25,7 +25,8 @@ def instances():
     payloads = {n: n.encode() for n in revisions}
     archives = {n: sha(payloads[n]) for n in revisions}
     source = {'archive_members': [n + '.tar' for n in revisions],
-              'parent_revision': parent, 'source_archives_sha256': archives,
+              'parent_revision': parent, 'toolchain_identity': 'sha256:' + sha(b'lock'),
+              'source_archives_sha256': archives,
               'components': {n: {'commit': revisions[n], 'source_archive_sha256': archives[n]}
                              for n in COMPONENTS}}
     stream = io.BytesIO()
@@ -41,7 +42,7 @@ def instances():
                     guest_boot='NOT RUN BY make m18-disk', parent_revision=parent,
                     parent_start_sha=start, component_revisions=revisions,
                     source_archives_sha256=archives, two_independent_clean_builds_equal=True,
-                    toolchain_image='sha256:' + 'd' * 64,
+                    toolchain_identity='sha256:' + sha(b'lock'),
                     distribution_d88={'sha256': 'e' * 64, 'size_bytes': 100})
     comparison = dict(schema_version=1, independent_clean_builds=2,
                       media_d88_byte_identical=True,
@@ -61,7 +62,7 @@ def instances():
                                     'configured_free_clusters_floor': 128,
                                     'guest_peak_measurement': 'NOT MEASURED'})
     packages = dict(schema_version=1, milestone='M18', parent_revision=parent,
-                    parent_start_sha=start, toolchain_image=manifest['toolchain_image'],
+                    parent_start_sha=start, toolchain_identity=manifest['toolchain_identity'],
                     toolchain_lock_sha256=sha(b'lock'), packages=[
                         {'id': name, 'files': ['TEST.TXT'] if name == 'starter-material' else [],
                          'built_files': {'TEST.TXT': {'sha256': sha(b'hello'),
@@ -98,7 +99,8 @@ class DistributionInstanceTests(unittest.TestCase):
                               (2, lambda a: a['filesystem']['file_records']['TEST.TXT']
                                .update(sha256='f' * 64)),
                               (1, lambda a: a.update(media_d88_sha256='f' * 64)),
-                              (3, lambda a: a.update(parent_revision='f' * 40))):
+                              (3, lambda a: a.update(parent_revision='f' * 40)),
+                              (3, lambda a: a.update(toolchain_identity='sha256:' + 'f' * 64))):
             values = copy.deepcopy(baseline)
             change(values[index])
             with self.subTest(index=index), self.assertRaises(VerificationError):

@@ -25,7 +25,7 @@ BUILD_FIELDS = {
     "guest_boot", "hardware", "host_test_wheel", "host_validation", "milestone",
     "package_manifest_sha256", "parent_revision", "parent_start_sha",
     "schema_version", "source_archives_sha256", "source_bundle",
-    "toolchain_image", "two_build_comparison_sha256", "two_independent_clean_builds_equal",
+    "toolchain_identity", "two_build_comparison_sha256", "two_independent_clean_builds_equal",
 }
 COMPONENTS = {"fdkernel", "freecom", "country", "edlin", "jwasm"}
 
@@ -87,7 +87,8 @@ def check_manifest(manifest: dict, comparison: dict, budget: dict,
         revisions[n] == locked[n]["commit"] and
         archives[n] == locked[n]["source_archive_sha256"] for n in COMPONENTS),
         "source lock/component provenance differs")
-    require(manifest["toolchain_image"] == packages["toolchain_image"] and
+    require(manifest["toolchain_identity"] == packages["toolchain_identity"] ==
+            "sha256:" + toolchain_lock_hash and
             packages["toolchain_lock_sha256"] == toolchain_lock_hash and
             packages["parent_revision"] == parent and
             packages["parent_start_sha"] == manifest["parent_start_sha"] and
@@ -149,6 +150,7 @@ def check_manifest(manifest: dict, comparison: dict, budget: dict,
         source = json.load(archive.extractfile(base + "SOURCE-MANIFEST.json"))
         require(set(source["archive_members"]) == {name + ".tar" for name in revisions}
                 and source["parent_revision"] == parent and
+                source["toolchain_identity"] == manifest["toolchain_identity"] and
                 source["source_archives_sha256"] == archives and
                 all(source["components"][n]["commit"] == revisions[n] and
                     source["components"][n]["source_archive_sha256"] == archives[n]

@@ -15,6 +15,7 @@ import sys
 import tarfile
 
 from normalize_parent_archive import records as parent_archive_records
+from toolchain import verify_image
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT = ROOT / "build/m18"
@@ -105,6 +106,9 @@ def image_identity(image: str) -> tuple[str, dict]:
     info = json.loads(run("docker", "image", "inspect", image))[0]
     if (info.get("Os"), info.get("Architecture")) != ("linux", "amd64"):
         raise ValueError("M18 requires the pinned Linux/amd64 toolchain image")
+    lock = json.loads((ROOT / "manifests/toolchains.lock.json").read_text())["canonical"]
+    if verify_image(image, lock) != info["Id"]:
+        raise ValueError("M18 locally inspected toolchain identity changed")
     return info["Id"], info
 
 
@@ -378,7 +382,7 @@ def build_source_bundle_pinned(image_id: str, inputs: Path, output: Path,
     return {"filename": output.name, "size_bytes": len(data), "sha256": sha256(data)}
 
 
-def copy_container_run(image_id: str, inputs: Path, run_dir: Path,
+def copy_container_run(image_id: str, toolchain_identity: str, inputs: Path, run_dir: Path,
                        parent: str, pass_number: int, source_date_epoch: int) -> dict:
     command = (
         "mkdir -p /work/entry && tar -xf /input/parent.tar -C /work/entry "
@@ -386,7 +390,7 @@ def copy_container_run(image_id: str, inputs: Path, run_dir: Path,
     )
     cid = run("docker", "create", "--platform", "linux/amd64", "--network", "none",
               "-e", "M18_PARENT_SHA=" + parent,
-              "-e", "M18_TOOLCHAIN_IMAGE_ID=" + image_id,
+              "-e", "M18_TOOLCHAIN_IDENTITY=" + toolchain_identity,
               "-e", "M18_SOURCE_DATE_EPOCH=" + str(source_date_epoch),
               "--entrypoint", "bash",
               image_id, "-ec", command)
@@ -423,6 +427,11 @@ def main() -> None:
     dist = verify_output_root(args.dist, "M18 distribution")
     parent, sources, lock = verify_parent_and_components()
     image_id, _ = image_identity(args.image)
+    # Docker's local config ID varies with BuildKit metadata across hosts.
+    # The committed lock pins the base, apt snapshot and compiler bytes; use
+    # its stable digest in public records, not an unreproducible local image ID.
+    toolchain_identity = "sha256:" + sha256(
+        (ROOT / "manifests/toolchains.lock.json").read_bytes())
     safe_recreate(output, ".m18-generated-root", BUILD_MARKER, "M18 build")
     staging_dist, distribution_exists = stage_distribution(dist)
     inputs = output / "inputs"
@@ -440,7 +449,7 @@ def main() -> None:
     results = []
     for number in (1, 2):
         run_dir = output / ("run-{}".format(number))
-        results.append(copy_container_run(image_id, inputs, run_dir,
+        results.append(copy_container_run(image_id, toolchain_identity, inputs, run_dir,
                                           parent, number, epoch))
     first_d88 = (output / "run-1/media.d88").read_bytes()
     second_d88 = (output / "run-2/media.d88").read_bytes()
@@ -480,7 +489,7 @@ def main() -> None:
             } for item in lock["components"]
         },
         "source_archives_sha256": source_archives,
-        "toolchain_image": image_id,
+        "toolchain_identity": toolchain_identity,
         "host_test_wheel": wheel,
         "source_date_epoch": epoch,
         "two_independent_clean_builds_equal": True,
@@ -504,7 +513,7 @@ def main() -> None:
         "parent_start_sha": lock["start_sha"],
         "component_revisions": sources,
         "source_archives_sha256": source_archives,
-        "toolchain_image": image_id,
+        "toolchain_identity": toolchain_identity,
         "host_test_wheel": wheel,
         "two_independent_clean_builds_equal": True,
         "two_build_comparison_sha256": sha256((staging_dist / "two-build-comparison.json").read_bytes()),

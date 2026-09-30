@@ -314,7 +314,7 @@ def main():
         "milestone": "M18",
         "parent_revision": os.environ.get("M18_PARENT_SHA", "UNBOUND"),
         "parent_start_sha": "d81bba18f0e4793d7165fb0acfdf7e229e160c83",
-        "toolchain_image": os.environ.get("M18_TOOLCHAIN_IMAGE_ID", "UNBOUND"),
+        "toolchain_identity": os.environ.get("M18_TOOLCHAIN_IDENTITY", "UNBOUND"),
         "toolchain_lock_sha256": sha256(toolchain_lock_bytes),
         "open_watcom_host_tools": toolchain_lock["canonical"]["open_watcom"]["host_tools"],
         "cpu_contract": package_config["cpu_contract"],

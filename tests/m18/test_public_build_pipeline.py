@@ -98,7 +98,7 @@ class PublicBuildPipelineTests(unittest.TestCase):
             "parent_start_sha": "2" * 40,
             "components": {},
             "source_archives_sha256": {},
-            "toolchain_image": "sha256:" + "3" * 64,
+            "toolchain_identity": "sha256:" + "3" * 64,
             "host_test_wheel": {},
             "source_date_epoch": 1740233872,
             "two_independent_clean_builds_equal": True,

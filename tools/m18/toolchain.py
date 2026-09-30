@@ -26,7 +26,14 @@ def verify_image(image: str, lock: dict) -> str:
     info = docker_json("docker", "image", "inspect", image)
     if (info.get("Os"), info.get("Architecture")) != ("linux", "amd64"):
         raise ValueError("M18 toolchain must be a Linux/amd64 image")
-    check = r'''import hashlib,json,pathlib,sys
+    check = r'''import hashlib,json,pathlib,subprocess,sys
+assert sys.version_info[:3] == (3,10,12), 'pinned source packer Python differs'
+assert subprocess.check_output(['/usr/bin/xz','--version']).splitlines()[0] == b'xz (XZ Utils) 5.2.5', 'pinned xz differs'
+assert subprocess.check_output(['nasm','-v']).strip() == b'NASM version 2.15.05', 'pinned assembler differs'
+for package,version in [('liblzma5','5.2.5-2ubuntu1.1'),
+                        ('python3.10-minimal','3.10.12-1~22.04.17')]:
+ actual=subprocess.check_output(['dpkg-query','-W','-f=${Version}',package]).decode()
+ assert actual == version, 'pinned runtime package differs: '+package
 for item in json.loads(sys.stdin.read()):
  p=pathlib.Path('/opt/openwatcom-1.9')/item['path']
  data=p.read_bytes()
