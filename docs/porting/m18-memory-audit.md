@@ -1,7 +1,9 @@
-# M18 memory ownership audit (in progress)
+# M18 scoped memory ownership audit
 
-This is a source review, not completed M18-MEMORY-MAP or allocator acceptance.
-The kernel remains pinned at `e87e8071c355a99a7f34a8758d4a3368b6523f3d`.
+This source/lifetime ledger and its separately held matched guest/allocator
+checks qualify the owner-scoped M18 memory gates, **not** a measured physical
+map or an unsupported kernel memory saving. The kernel remains pinned at
+`e87e8071c355a99a7f34a8758d4a3368b6523f3d`.
 No kernel allocation, reservation, buffer budget or release policy was changed
 in M18. The inherited [memory contract](m17-memory-layout.md) remains applicable.
 Private runtime addresses and observations are retained separately.
@@ -167,8 +169,10 @@ heap ends to DOS; zero is success and nonzero is error. Both run after stdout
 priming and before traversal, with an error exit instead of a validity claim if
 trimming fails. No MCB is edited and no numerical linked minimum is passed to
 AH=4Ah. A synthetic integration test enforces prime/trim/walk ordering and both
-failure paths; it is not a reimplementation of the Watcom heap manager. Actual
-guest validation of this change is pending.
+failure paths; it is not a reimplementation of the Watcom heap manager. Later
+exact-disk VA/VA2 guest checks independently parsed valid chains and matched
+post-warmup ownership across repeated children. They qualify this scoped
+observer correction, not an unmeasured in-program memory peak.
 
 The build record also distinguishes the compact linked-image requirement from
 `DosExeLoader`'s initial whole-file-page allocation. That existing FreeDOS
@@ -194,15 +198,26 @@ kernel reclaim has been demonstrated. Private numerical observations and full
 runtime records are held separately. The linked footprint, active DOS heap,
 MCB payload, and practical executable budget remain different quantities.
 
-## Still required
+## Qualified boundaries and explicit unknowns
 
-A complete audit needs matched initialization/idle/child/termination snapshots,
-byte-accounted permanent and temporary regions, all remaining gaps explained,
-real 48h/49h/4Ah boundary/fragmentation/owner tests, practical COM/MZ EXEC limits,
-repeated-child stability, supported-capacity and stale-selection regressions,
-and scoped per-tool native-capacity workloads and settled disk-workspace
-readback within the committed reserve. The owner removed in-program useful-
-memory and instantaneous disk-workspace-peak measurements as M18 gates; neither
-is inferred from the lower-bound table, the settled FAT snapshots or a single
-application workflow. Successful source review or MEMMAP output alone does not
-close the remaining gates.
+Source-bound allocator QA media covered real DOS 48h/49h/4Ah
+allocation/free/resize, fragmentation/coalescing, near-boundary COM/MZ EXEC,
+owner links, low-memory failure recovery and repeated children without
+reclaiming someone else's block. The exact normal disk was separately booted
+on VA and VA2: post-warmup and post-repeated-child MCB ownership agreed at
+installed 640 KiB; installed 512 KiB with a stale retained larger selection
+preserved checked ownership after EDLIN and bounded JWASMR EXEC rejection.
+Matched guest results and numbers stay in Git-excluded evidence; the public
+carrier descriptor, release barriers, linker map, runtime capacity check and
+end-exclusive source equations bind permanent versus temporary owners.
+
+There is **no demonstrated stale permanent reservation** or measured kernel
+saving, and no kernel memory code changed. A writable top is not proof that
+unknown firmware/VRAM intervals or lower-policy exclusions are allocatable.
+The owner accepted 256-KiB EDLIN editing as unavailable and limited further
+functional workload review to 512 KiB; the small edit/assemble/run workflow
+needs 640 KiB *installed*, not just retained. The owner removed in-program
+useful-memory usage and instantaneous disk-workspace peak measurements as M18
+gates; both remain **NOT MEASURED**. MZ EXEC-entry floors and settled FAT
+workspace snapshots are not relabeled as peaks. No complete physical map,
+arbitrary-source assembler capacity or real-hardware result is claimed.

@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "milestone": "M18",
+  "artifact": {
+    "file": "freedos-pc88va-m18-2hd-1280.d88.xz",
+    "compression": {
+      "format": "xz",
+      "tool": "XZ Utils 5.2.5 in the locked M18 Linux/amd64 build environment",
+      "arguments": ["-c", "-9e", "--threads=1", "--check=crc64"]
+    },
+    "compressed": {
+      "bytes": 302316,
+      "sha256": "5d7ebb3dd0a29ec817b58c35a2c1550fdb39b810983eaf5c5c33ea24848c5f60"
+    },
+    "uncompressed": {
+      "file": "PC88VA-M18-2HD.D88",
+      "bytes": 1331888,
+      "sha256": "991370d0c075f75153192e94365c3c798c3ca50639aaeb716054ab6c5da4dd12"
+    },
+    "profile": {
+      "media": "native PC-88VA 2HD FAT12",
+      "payload_capacity_bytes": 1310720,
+      "cylinders": 80,
+      "heads": 2,
+      "sectors_per_track": 8,
+      "bytes_per_sector": 1024,
+      "role": "single bootable normal distribution; QA media excluded"
+    }
+  },
+  "rebuild_source": {
+    "start": "d81bba18f0e4793d7165fb0acfdf7e229e160c83",
+    "parent": "679fb32dee9709ca298d70b5168bd0dbbd32d601",
+    "qualified_implementation": "679fb32dee9709ca298d70b5168bd0dbbd32d601",
+    "fdkernel": "e87e8071c355a99a7f34a8758d4a3368b6523f3d",
+    "freecom": "29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e",
+    "country": "23f189cca3420606eae8723884fa92ccd65eb307",
+    "edlin": "c036c43adbdaa5693bb4cd3f4f3c65090f1c9d57",
+    "jwasm": "96d1f3d4c1661c85788297d50ab032e452f48978"
+  },
+  "source_archives_sha256": {
+    "parent": "fc4b4ef23ef03b3c36d02cbc3ef94c5986595083a7037830bccad84fbfdeeabe",
+    "fdkernel": "887857e0c6706e47a9c8ea2055f74b3891138ed00564585a0053795e9e7dbc69",
+    "freecom": "e61d4e889a6b10f9e05903f9575bb1466dfc5b20cb232f5286219bc173bbb24a",
+    "country": "cf0b16ac57e661eeb7e19118cea2d2d200e4545507f15912e8a6462652c2cd9d",
+    "edlin": "42865928e8d2c14b3970557892c53d18bd86603c857bbc587d33050f535b14ae",
+    "jwasm": "739a6b45458ed43ca2160bc3f5d96172e37b11a0c88a33841453d9e51c174b32"
+  },
+  "corresponding_sources": {
+    "file": "PC88VA-M18-SOURCES.tar.xz",
+    "bytes": 2224012,
+    "sha256": "afcac120b9fcab6a080187d74d06daa97b00f053421d604ea474e3eeac8d341d",
+    "availability": "Rebuild from the public qualified parent commit and pinned component gitlinks; generated host-side companion, not a second disk or committed build product"
+  },
+  "toolchain": {
+    "lock_sha256": "39c5b3052d71463235a26e8704ab54c1fedb51ee75bb4efb55e6229391a95162",
+    "stable_profile_identity": "sha256:39c5b3052d71463235a26e8704ab54c1fedb51ee75bb4efb55e6229391a95162",
+    "base_linux_amd64_manifest_digest": "sha256:79676deb51ebb02885b0b9d33788e78a37cf1045ad79d1bb04c6a222c3556b3d",
+    "open_watcom_release": "official Open Watcom 1.9 final Linux i386 tools; exact executable hashes in the committed lock",
+    "host_test_wheel": {
+      "version": "2.1.4",
+      "sha256": "9d6e6dea140560de4ebd8446661f7ef84a357d428c14a3ef09dacd306ec8c239"
+    }
+  },
+  "qualification_ci": {
+    "run_id": 36674161070,
+    "attempt": 1,
+    "exact_head_sha": "679fb32dee9709ca298d70b5168bd0dbbd32d601",
+    "successful_job": "isolated-build",
+    "conclusion": "success"
+  },
+  "guest_emulator": {
+    "repository": "https://github.com/nakatamaho/vaeg.git",
+    "source_commit": "62a597f0ee81e2e036af740a3e79ad3da83e3fb7",
+    "tested_executable_sha256": "c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf",
+    "models": ["VA", "VA2"],
+    "note": "External guest-only dependency; ROMs and guest media are not public build inputs"
+  },
+  "reproducibility": {
+    "independent_clean_container_builds_per_run": 2,
+    "independent_local_full_builds": 2,
+    "d88_bytes_identical": true,
+    "all_eight_public_distribution_files_identical_across_local_builds": true,
+    "local_and_exact_head_native_ci_source_bundle_identical": true,
+    "compressed_archive_tested": true,
+    "independent_compressions_byte_identical": true,
+    "decompression_matches_designated_d88": true
+  },
+  "validation": {
+    "host": "HOST PASS",
+    "vaeg": "VAEG PASS",
+    "hardware": "NOT RUN",
+    "hardware_status": "DEFERRED HARDWARE VALIDATION",
+    "scope": [
+      "The exact designated D88 boots on VA and VA2 with the matched emulator executable; no hardware or physical keyboard result is claimed.",
+      "At 640 KiB installed on both models, English EDLIN edit/save/reopen, JWASMR small COM and relocated MZ assembly/execution, failure recovery, shell follow-up, and checked MCB ownership passed; no instantaneous RAM or disk peak was measured.",
+      "At 512 KiB installed with a retained larger selection, EDLIN save/reopen and the native 2HD B: FORMAT, CHKDSK and SYS workflow passed on VA and VA2. JWASMR sample assembly was rejected at DOS EXEC without output and without losing the checked shell; it is not a 512-KiB assembly PASS.",
+      "Both exact SYS-produced 2HD B: disks booted and wrote/read files; separate write-protected normal A:, live-swapped native B:, and nonbooting 2D B: QA checks were performed and kept out of this distribution.",
+      "CHKDSK A: redirected output can be empty (public issue #12) and is not counted as an A: filesystem-check PASS. Independently read-back B: checks remain scoped successes."
+    ],
+    "limits": [
+      "256 KiB EDLIN editing is not qualified; an earlier source-bound attempt reported out of memory and recovered the shell.",
+      "640 KiB installed, not merely a retained 640-KiB selection, is the qualified small edit/assemble/run sample setting; arbitrary source sizes are not guaranteed.",
+      "DOS MCB reports do not establish physical firmware or VRAM ownership; useful in-program RAM and instantaneous disk-workspace peaks remain unmeasured by owner decision.",
+      "SASI/SCSI, hard-disk boot, all-floppy-format maintenance, exhaustive 8086 linked-opcode proof, and actual hardware validation are outside this M18 result."
+    ]
+  },
+  "licenses": {
+    "parent": ["COPYING", "LICENSE.md"],
+    "fdkernel": "components/fdkernel/COPYING",
+    "freecom": "components/freecom/license and SUPPL notices",
+    "country": "components/country/LICENSE",
+    "edlin": "components/edlin/COPYING",
+    "jwasm": "components/jwasm/Html/License.html and the on-disk JWASM.LIC",
+    "official_open_watcom_1_9_source": "public open_watcom_1.9.0-src.tar.bz2, SHA-256 6d303327988ee2dda60cfabebf3f45a9758aee4da117d41cf3153fccb7e5e4bf"
+  }
+}

@@ -1,21 +1,28 @@
 # M18 work report
 
-Status: **IN PROGRESS — source-build gates pass at the current public tip;
-required guest and memory-qualification gates remain incomplete.** No M18 PASS,
-release designation, archive, or HANDOFF READY is claimed.
+Status: **M18 PASS for the qualified implementation and its single designated
+native 2HD disk.** `HANDOFF READY` is separate and requires post-push checks of
+the publication tip and its own CI; this committed report cannot record its own
+future commit SHA.
 
-Evidence labels: **HOST PASS** for the isolated source-build checkpoint at
-`b772f72fc6c2fb5ba548b567e10cc21374ef8307` (exact-head M18 CI
-`36552873414`); this is not full M18 acceptance. Its earlier behavioral
-checkpoint was `d55b17afbe8d63ffc69eaaea03b6fa97c5a6e21e`.
-**VAEG PASS: NOT ESTABLISHED**; targeted guest workflows pass, but
-required qualification is incomplete. **DEFERRED HARDWARE VALIDATION**; hardware
-is NOT RUN.
+Evidence labels: **HOST PASS** at qualified implementation
+`679fb32dee9709ca298d70b5168bd0dbbd32d601`, including 91 host tests,
+two independent clean source-build containers per run, two separate identical
+full local distributions (D88 **and** companion sources), the separate allocator
+QA producer, M18-local public acceptance verifier, and native x64 exact-head
+CI `36674161070` attempt 1 with the same D88/source-bundle SHA-256 values.
+**VAEG PASS** for the bounded VA/VA2 workflows on D88 SHA-256
+`991370d0c075f75153192e94365c3c798c3ca50639aaeb716054ab6c5da4dd12`
+with the matched emulator executable SHA-256
+`c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf`.
+**DEFERRED HARDWARE VALIDATION**; hardware is NOT RUN. Earlier checkpoints
+below remain historical, including failed or unrun gates; they are not
+retroactively promoted to PASS.
 
 `START_SHA`: `d81bba18f0e4793d7165fb0acfdf7e229e160c83`.
-`QUALIFIED_IMPLEMENTATION_SHA` is not established. The publication tip and
-downstream base belong in a separate post-push handoff; this report cannot
-contain its own future commit identity.
+`QUALIFIED_IMPLEMENTATION_SHA`: `679fb32dee9709ca298d70b5168bd0dbbd32d601`.
+`PUBLICATION_TIP_SHA` and `DOWNSTREAM_BASE_SHA` belong in the separate
+post-push handoff, not in a self-referential committed report.
 
 ## Baseline and provenance
 
@@ -135,16 +142,15 @@ flag after case-insensitive command dispatch. No component source was changed;
 the starter quickstart and its host regression now explicitly use lowercase
 `e`. The correction has completed the normal source rebuild and exact-tip CI.
 
-The source review of `PreConfig2()` and `P_0()` found no demonstrated stale
-memory ownership defect. No kernel memory code was changed. A matched
-physical/resident/MCB ownership table, full DOS allocation/EXEC accounting,
-stable repeated-child memory evidence, low-memory tool behavior, and actual
-per-tool RAM minima remain unrun. The hypothesis that conventional memory is
-unusable due to stale reservations is unresolved; absent MCB entries are not
-being treated as free memory. The source ownership ledger, release-barrier audit
-and runtime-observer caveat are in [m18-memory-audit.md](m18-memory-audit.md).
+At this **earlier checkpoint**, source review of `PreConfig2()` and `P_0()`
+found no demonstrated stale ownership defect; the then-unrun allocator,
+repeated-child and low-memory checks were subsequently performed within the
+owner-scoped gates below. No kernel memory code was changed, and absent MCB
+entries are not treated as free physical memory. The lifetime ledger,
+release-barrier audit, qualified boundaries and remaining unknowns are in
+[m18-memory-audit.md](m18-memory-audit.md).
 
-## Maintenance adapter correction (qualification pending)
+## Maintenance adapter correction (historical checkpoint; later qualified)
 
 Source review of the pinned kernel's `entry.asm:int2526` established that DOS
 returns result CF live and leaves the original caller FLAGS word on the stack.
@@ -239,7 +245,7 @@ The dedicated CI now composes the separate QA media after the complete normal
 two-build gate. Neither QA implementation nor the scoped allocator results close
 the remaining full memory-ownership and per-tool acceptance gates.
 
-## Runtime observer trimming (guest validation pending)
+## Runtime observer trimming (historical checkpoint; later qualified)
 
 The next MEMMAP implementation replaces the incomplete initial-MZ-only policy
 with the pinned Watcom runtime's documented `_nheapshrink`/`_fheapshrink` calls.
@@ -459,7 +465,7 @@ The compiler runtime is unmodified. Any change to on-disk notice text yields
 a new normal D88 and must be guest-tested by its **new** exact identity before
 release designation.
 
-## Remaining qualification and scope
+## Owner-scoped limits and historical open gates
 
 The owner removed two requirements: establishing programs' useful memory
 use during execution and an instantaneous disk-workspace peak. Both remain
@@ -468,20 +474,17 @@ readbacks are relabeled as peaks. Keep the committed disk reserve, exact-disk
 staged checks and live-ownership safety rules. Do not infer physical firmware
 or VRAM ownership from the DOS MCB chain.
 
-The owner-scoped 512-KiB native-capacity workload review is complete for the
-listed successful tools and safe JWASMR rejection, with 640 KiB installed
-required for the qualified assembler samples. The new on-disk notice documenting
-this limitation changes the normal D88 identity; prior boots do **not**
-automatically qualify the new image. Remaining work includes its clean source
-build, exact-disk guest regressions, source/CPU/startup/library and final
-acceptance review. The empty CHKDSK A:
-redirection is separately tracked in public issue #12; it is **not** a disk-
-check PASS or a reason to relabel the separately qualified B: checks. Same-
-candidate protection and media exchange passed on VA and VA2. Any unrun test
-is not a pass. No hardware test was attempted. Initial capacity scripts that
-did not finish remain unqualified; the owner no longer requests an exhaustive
-minimum for every utility. Allocator/COM/MZ near-limit EXEC stress passed
-on separate source-bound QA media, not on the normal disk.
+The owner-scoped 512-KiB workload review is complete for the listed tools and
+safe JWASMR rejection, with 640 KiB **installed** required for the qualified
+assembler samples. An earlier on-disk notice changed the normal D88 identity:
+boots of preceding candidates could not qualify it. The final exact-byte
+retests and clean build are recorded below. Empty redirected CHKDSK A: output
+remains [public issue #12](https://github.com/nakatamaho/freedos-pc88va/issues/12)
+and is **not** an A: check PASS or a reason to relabel independently read-back
+B: checks. Any unrun test is not a pass; no hardware test was attempted. Initial
+capacity scripts that did not finish remain unqualified; the owner does not
+require an exhaustive minimum for every utility. Allocator/COM/MZ near-limit
+EXEC stress used separate source-bound QA media, not the normal disk.
 
 The disk payload is the FreeDOS kernel, NECPC88VA FreeCOM, COUNTRY.SYS, EDLIN,
 MORE, MEMMAP, real-mode JWASMR, CHKDSK, FORMAT and SYS, plus English/ASCII
@@ -492,8 +495,90 @@ M18 A: system files to a prepared 2HD B: target. No SASI/SCSI runtime, HDD boot,
 FAT16 guest access or hardware support is claimed. FreeDOS version reporting
 remains unchanged.
 
-Before designation, rebuild the corrected committed source twice from clean
-public exports, verify equality and current exact-tip CI, then finish all
-applicable guest, memory, media and maintenance qualification on the exact
-candidate. Keep M18 partial and do not archive a distribution image or begin
-M19 until the required gates are complete. Hardware may remain `NOT RUN`.
+## Qualified single-image publication and bounded handoff
+
+The qualified `679fb32dee9709ca298d70b5168bd0dbbd32d601` source and exact
+five component gitlinks clean-built two independent complete local distributions
+from fresh committed exports. **All eight generated public distribution files**
+were byte-identical between those runs; each run independently built the complete
+DOS disk twice in isolated, network-disabled Linux/amd64 containers. Native
+exact-head CI `36674161070`, attempt 1, also passed the same 91-test host suite,
+public privacy audit, two-build source pipeline, separate allocator QA producer
+and shared `make m18-accept` instance/dependency verifier. Local and native CI
+both produced the same normal D88, 1,331,888 bytes, SHA-256
+`991370d0c075f75153192e94365c3c798c3ca50639aaeb716054ab6c5da4dd12`,
+and corresponding-source/license bundle, 2,224,012 bytes, SHA-256
+`afcac120b9fcab6a080187d74d06daa97b00f053421d604ea474e3eeac8d341d`.
+BuildKit-local Docker config IDs differed across hosts; public toolchain records
+instead use the exact committed toolchain-lock profile
+`sha256:39c5b3052d71463235a26e8704ab54c1fedb51ee75bb4efb55e6229391a95162`,
+while verifying local executable/compiler, Python, liblzma/xz and assembler
+identities before use. Only nonsemantic parent Git TAR headers were canonically
+rewritten in that pinned environment, with source bytes and executable modes
+verified unchanged. Component Git archives were not rewritten. Earlier
+cross-host bundle drift and the failed QA CI attempt `36672838956` remain
+recorded as **failures**, not passes.
+
+The **only** designated M18 image is
+[the native 2HD D88 xz archive](../../images/milestones/m18/README.md),
+302,316 bytes, SHA-256
+`5d7ebb3dd0a29ec817b58c35a2c1550fdb39b810983eaf5c5c33ea24848c5f60`.
+Independent pinned-container compressions were byte-identical; decompressing
+the archive reproduced the exact guest-qualified D88. Its
+[public manifest](../../images/milestones/m18/manifest.json) binds uncompressed
+and compressed hashes/sizes, exact source/gitlink/archive/toolchain identities,
+license references and validation limits. The companion sources are generated
+from the qualified public source commit, not committed as a second archive or
+installed on another floppy. The normal FAT12 profile is 80 cylinders, two
+heads, eight 1024-byte sectors per track: 19 distribution files, 648 allocated
+and 621 free data clusters (635,904 free data bytes). The committed sample
+workspace policy reserves 32 clusters and a 128-free-cluster floor; the
+independent exact-disk settled copy/edit/build readback stayed within the
+reserve. **Instantaneous** workspace peak and useful in-program memory remain
+**NOT MEASURED** by owner decision.
+
+The exact disk and matched executable booted on VA and VA2. With 640 KiB
+**installed**, both edited/saved/reopened an EDLIN source, preserved its
+backup, assembled and executed COM and relocated MZ starter programs, recovered
+from assembler errors, ran repeated children, and returned to valid matched
+post-warmup/post-repeat DOS MCB ownership; the no-coprocessor VA2 REAL4 sample
+also assembled, executed and passed independent byte/MCB readback. At 512 KiB
+installed **with a stale larger retained selection**, both edited/saved and
+reopened an EDLIN source and safely rejected JWASMR sample EXEC without an
+executable or lost shell. VA and VA2 each ran real native 2HD FORMAT B:,
+CHKDSK B: and SYS A: B: on public-source-generated B: disks; both actual
+SYS-produced disks then booted and wrote/read guest files. A separate
+write-protected normal A:, live-exchanged native B: media, and nonbooting
+360-KiB 2D-D88 B: controls passed independent media readback without adding
+another distribution disk.
+A fresh copy of the designated normal image also passed the automated VA2 F3,
+cursor and repeat-input regression; two earlier faulty/nonfresh input fixtures
+remain non-passes for the claims they did not establish. Protected-media and
+VA2 display claims are limited to the separately read-back files and actual
+visible output. CHKDSK A: redirected emptiness is **not** a filesystem-check
+success, and the SYS-only disks have no MEMMAP for a checked-MCB claim.
+
+Every shipped parent-built DOS C executable selects Watcom's 8086 `-0` DOS
+model; the native raw-media assembly declares `cpu 8086`. Source and linked
+startup review found DOS real-mode `_cstart_`, Watcom's linked software 8087
+support for JWASMR, and an IBM INT16h keyboard call only in EDLIN's disabled
+`SHIFT_JIS`-guarded path, not the English release. No exhaustive all-linked-
+branch opcode proof or hardware result is inferred. The kernel/source ownership
+review and matched DOS allocator/EXEC tests found no stale permanent kernel
+reservation to reclaim; the guarded boot-time temporary release, firmware
+exclusion policy and other live owners remain intact. An MCB chain is not a
+physical firmware/VRAM map. The confirmed repairs are limited to M18 adapter
+error FLAGS/media binding, deterministic banner metadata, and MEMMAP observer
+heap trimming; none invent a new DOS implementation or shrink an unrelated
+owner. Selected M18 source, package/CPU/VA attribution, Open Watcom runtime
+source URL/hash and individual licenses are documented in the accompanying
+source bundle, the image manifest and on-disk English notices.
+
+Use `make m18-disk` after the documented pinned toolchain setup, then
+`make m18-accept M18_DIST=dist/m18`; the exact qualified source checkout and
+extraction commands are in the archive README. The current M13–M32 route is
+unchanged. **M19 SASI-data work is not started**: its downstream handoff must
+preserve the M17 storage contracts and this qualified memory/single-disk
+baseline. Publication-tip CI, remote equality, ancestry and the bounded
+report/archive-only diff are verified in the separate post-push handoff.
+Hardware remains **NOT RUN / DEFERRED HARDWARE VALIDATION**.
