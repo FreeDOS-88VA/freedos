@@ -18,9 +18,15 @@ or prior milestone tool/config/test directory is a build input.
 - `make m18-disk` performs both complete source builds, compares D88 bytes and
   release records, validates payload hashes/FAT chains and root-directory
   capacity, and writes `dist/m18/` without overwriting an unrelated existing
-  distribution. The host-side corresponding-source bundle is packed by the
-  pinned Linux/amd64 image's Python/liblzma, not the host's variable Python/xz
-  versions; its input archives still come only from deterministic Git exports.
+  distribution. Only the **parent** Git export's nonsemantic TAR headers
+  (member order, uid/gid, timestamps, PAX commit header and padding) are
+  canonically rewritten by the pinned Linux/amd64 image before it is used for
+  either build. Its allowlisted file bytes, executable modes and source commit
+  are verified unchanged; component Git archives remain the unmodified locked
+  archives. The resulting parent TAR hash is bound as the actual build input
+  and corresponding-source archive, never the host's raw Git TAR hash. The
+  host-side corresponding-source bundle is packed by the same pinned image's
+  Python/liblzma, not the host's variable Python/xz versions.
   A repeat with the same inputs is allowed only if every public distribution
   file is identical. Use `M18_DIST=dist/m18-candidate-<id>` for a changed source
   identity.

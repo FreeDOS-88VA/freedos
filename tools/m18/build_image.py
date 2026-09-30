@@ -14,6 +14,8 @@ import subprocess
 import sys
 import tarfile
 
+from normalize_parent_archive import records as parent_archive_records
+
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT = ROOT / "build/m18"
 DEFAULT_DIST = ROOT / "dist/m18"
@@ -227,6 +229,43 @@ def create_exports(inputs: Path, parent: str, sources: dict[str, str], entries: 
     return hashes
 
 
+def normalize_parent_export_pinned(image_id: str, inputs: Path, epoch: int) -> str:
+    """Bind a canonical Git-export TAR as both build input and source record.
+
+    Only TAR metadata, never source contents or executable modes, is
+    normalized. The canonicalizer runs with the locked container's Python.
+    All five component archives remain untouched exact Git archives.
+    """
+    original = inputs / "parent.tar"
+    canonical = inputs.parent / "canonical-parent.tar"
+    command = (
+        "mkdir -p /work/entry /work/result && "
+        "tar -xf /input/parent.tar -C /work/entry "
+        "tools/m18/normalize_parent_archive.py && "
+        "python3 -B /work/entry/tools/m18/normalize_parent_archive.py "
+        "/input/parent.tar /work/result/parent.tar "
+        "--epoch \"$M18_SOURCE_DATE_EPOCH\""
+    )
+    cid = run("docker", "create", "--platform", "linux/amd64", "--network", "none",
+              "-e", "M18_SOURCE_DATE_EPOCH=" + str(epoch), "--entrypoint", "bash",
+              image_id, "-ec", command)
+    try:
+        subprocess.run(["docker", "cp", str(inputs) + "/.", cid + ":/input"], check=True)
+        log = inputs.parent / "parent-normalization.log"
+        with log.open("xb") as stream:
+            subprocess.run(["docker", "start", "-a", cid], stdout=stream,
+                           stderr=subprocess.STDOUT, check=True)
+        subprocess.run(["docker", "cp", cid + ":/work/result/parent.tar",
+                        str(canonical)], check=True)
+    finally:
+        subprocess.run(["docker", "rm", "-f", cid], check=True,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if parent_archive_records(original) != parent_archive_records(canonical):
+        raise ValueError("parent Git export canonicalization changed source bytes or modes")
+    canonical.replace(original)
+    return sha256(original.read_bytes())
+
+
 def tar_member(tar: tarfile.TarFile, name: str, data: bytes, epoch: int) -> None:
     info = tarfile.TarInfo(name)
     info.size = len(data)
@@ -394,6 +433,7 @@ def main() -> None:
     epoch = host_config.get("source_date_epoch")
     if type(epoch) is not int or epoch <= 0:
         raise ValueError("M18 SOURCE_DATE_EPOCH is missing or invalid")
+    source_archives["parent"] = normalize_parent_export_pinned(image_id, inputs, epoch)
     wheel = get_wheel(host_config, inputs)
 
     results = []
