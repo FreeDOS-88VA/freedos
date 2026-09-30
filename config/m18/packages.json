@@ -89,7 +89,7 @@
       "license": "Sybase Open Watcom Public License 1.0",
       "cpu": "8086 real-mode DOS MZ; no protected-mode extender",
       "va_adaptation": "Pinned JWasm DOS16 source recipe, Open Watcom 1.9 build with optional host/COFF/ELF/386 features disabled; require the actual linked DOS software 8087 emulator for REAL4/REAL8 conversion without a coprocessor; reproducible M18 source/license notice",
-      "tests": ["clean build and MZ accounting", "matched VA/VA2 640-KiB guest COM/MZ and syntax/missing-file recovery", "VA2 real REAL4 conversion and output execution with NDP8087 disabled", "current low-memory clean rejection tested; actual per-tool minima pending"]
+      "tests": ["clean build and MZ accounting", "matched VA/VA2 640-KiB guest COM/MZ and syntax/missing-file recovery", "matched VA/VA2 real REAL4 conversion and output execution with NDP8087 disabled", "current low-memory clean rejection tested; actual per-tool minima pending"]
     },
     {
       "id": "starter-material",
@@ -99,7 +99,7 @@
       "license": "GPL-2.0-or-later; sample assembly text is project-authored",
       "cpu": "ASCII DOS text and 8086 assembly examples",
       "va_adaptation": "Original English/ASCII instructions and linker-free COM/MZ examples",
-      "tests": ["8.3 names and source command inspection", "matched VA/VA2 guest edit/build/run workflow", "staged FAT workspace readback; instantaneous in-program peak pending"]
+      "tests": ["8.3 names and source command inspection", "matched VA/VA2 guest edit/build/run workflow", "staged FAT workspace readback within committed reserve; no instantaneous disk peak claimed or required"]
     }
   ],
   "optional_tools": {

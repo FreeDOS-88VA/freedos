@@ -84,9 +84,10 @@ of this CI correction is pending; the failure is not counted as a pass.
 
 The accepted native 2HD profile is 80 cylinders, two heads, eight
 1024-byte sectors per track, FAT12, and 192 root entries. The M18 host
-allocation policy retains a 32-cluster working-space estimate, not a measured
-guest EDLIN/JWASMR workflow peak. Tool RAM minima and practical largest-block
-requirements remain unmeasured.
+allocation policy retains a 32-cluster working-space reserve. Later exact-disk
+settled copy/edit/build readback qualified that reserve; it does not measure an
+instantaneous peak. Source-derived MZ EXEC lower bounds and native-capacity
+functional tests are separate; not every practical workload limit is qualified.
 
 ## Guest and memory evidence
 
@@ -286,9 +287,11 @@ executed both examples and returned to a valid MCB report. The same-source
 readback checked the unchanged distribution files, editor backup, generated
 COM/MZ programs and reserve. The inspector now rejects unaccounted WORK files
 while allowing the explicitly optional observer output. Settled snapshots do
-not directly measure instantaneous in-program disk or RAM high-water marks;
-source-bounded intermediate file lifetimes and the conservative disk reserve
-still require final acceptance review. The inspector writes private evidence
+not directly measure instantaneous in-program disk or RAM high-water marks.
+The owner removed both the in-program useful-memory and instantaneous disk-
+workspace-peak measurement requirements from M18 acceptance. Retain source-
+bounded intermediate file lifetimes, the conservative disk reserve, and staged
+guest readback without claiming an unmeasured peak. The inspector writes private evidence
 outside the public repository; neither guest disks nor numeric observations
 are public build inputs.
 
@@ -384,8 +387,9 @@ EDLIN editing at 256 KiB. The pinned upstream EDLIN path reports zero lines
 when it cannot open a file; do not repair that upstream behavior solely to
 conceal low-memory pressure. The owner accepts 256 KiB as too little for EDLIN:
 the supported editing floor is 384 KiB. This is **not** an EDLIN issue or an
-authorization to shrink another owner's memory. Other tools' useful-memory
-peaks remain unmeasured.
+authorization to shrink another owner's memory. Other native-capacity workload
+limits remain to be reviewed; runtime useful-memory peaks are not measured and
+are no longer a required M18 result.
 
 An M18-local private readback inspector now reconciles the exact public
 carrier/D88 identity with selected post-shell MEMMAP snapshots at every native
@@ -429,17 +433,22 @@ release designation.
 
 ## Remaining qualification and scope
 
-The following required guest gates remain **NOT RUN or incomplete**: JWASMR
-in-program useful-memory/peak measurement and remaining low-memory workload
-boundaries; observed instantaneous disk workspace peak; the separately tracked
-CHKDSK A: redirection issue; and physical ownership facts that MCB traversal
-cannot supply. Same-candidate protection and media exchange have separately
-passed on VA and VA2; neither closes these remaining gates. Any unrun test is
-not a pass. No hardware test was attempted. Initial capacity scripts did not
-complete their full workloads and remain unqualified. Later matched-executable capacity runs
-completed the bounded workload described above; allocator/COM/MZ near-limit
-EXEC stress did pass on their separate byte-identical QA media, but does not
-establish every required utility's in-program memory peak or minimum.
+The owner removed two requirements: establishing programs' useful memory
+use during execution and an instantaneous disk-workspace peak. Both remain
+**NOT MEASURED**, and neither the MZ EXEC lower bounds nor settled workspace
+readbacks are relabeled as peaks. Keep the committed disk reserve, exact-disk
+staged checks and live-ownership safety rules. Do not infer physical firmware
+or VRAM ownership from the DOS MCB chain.
+
+Remaining qualification includes the scoped native-capacity workload limits,
+source/CPU/startup/library and final acceptance review. The empty CHKDSK A:
+redirection is separately tracked in public issue #12; it is **not** a disk-
+check PASS or a reason to relabel the separately qualified B: checks. Same-
+candidate protection and media exchange passed on VA and VA2. Any unrun test
+is not a pass. No hardware test was attempted. Initial capacity scripts that
+did not finish remain unqualified; later bounded runs do not establish every
+utility's practical minimum. Allocator/COM/MZ near-limit EXEC stress passed
+on separate source-bound QA media, not on the normal disk.
 
 The disk payload is the FreeDOS kernel, NECPC88VA FreeCOM, COUNTRY.SYS, EDLIN,
 MORE, MEMMAP, real-mode JWASMR, CHKDSK, FORMAT and SYS, plus English/ASCII

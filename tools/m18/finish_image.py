@@ -296,7 +296,7 @@ def main():
             "configured_free_bytes_floor": workspace["minimum_free_bytes_after_build"],
             "sample_workflow_cluster_budget": workspace["sample_workflow"]["workspace_cluster_budget"],
             "sample_workflow_includes_edlin_backup": True,
-            "guest_peak_measurement": "PENDING; this host capacity reserve is not a guest measurement",
+            "guest_peak_measurement": "NOT MEASURED; owner removed instantaneous disk-workspace peak from M18 acceptance; this host reserve is not a guest measurement",
             "free_after_workflow_budget": free_clusters - workspace["sample_workflow"]["workspace_cluster_budget"],
         },
         "d88_and_fat_readback": "PASS; all payload bytes, FAT copies, geometry, and deterministic cluster chains were independently checked on host",

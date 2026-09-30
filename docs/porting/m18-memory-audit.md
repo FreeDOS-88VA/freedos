@@ -97,7 +97,10 @@ measurements or total installed RAM requirements. A Watcom `exMaxAlloc=FFFFh`
 can reserve substantially more than the listed minimum at EXEC. The source
 bounds exclude input, environment, filesystem and runtime heap growth; a
 successful boot, help banner, or file load alone does not measure an in-program
-peak. Keep the actual success/failure evidence bound to the exact normal D88,
+peak. The owner removed the requirement to establish in-program useful-memory
+usage or its runtime peak for M18; **no peak measurement is claimed**. Continue
+to qualify functional native-capacity success/failure and stable DOS ownership.
+Keep the actual success/failure evidence bound to the exact normal D88,
 emulator and RAM setting. The standalone inspector's synthetic negative tests
 cover truncated and drifted MZ headers, rounded last pages and bad entry/stack
 boundaries. Do not subtract this table from physical capacity to claim a
@@ -190,5 +193,9 @@ A complete audit needs matched initialization/idle/child/termination snapshots,
 byte-accounted permanent and temporary regions, all remaining gaps explained,
 real 48h/49h/4Ah boundary/fragmentation/owner tests, practical COM/MZ EXEC limits,
 repeated-child stability, supported-capacity and stale-selection regressions,
-and measured per-tool/workspace requirements. Successful source review, MEMMAP
-output or a single application workflow does not close these gates.
+and scoped per-tool native-capacity workloads and settled disk-workspace
+readback within the committed reserve. The owner removed in-program useful-
+memory and instantaneous disk-workspace-peak measurements as M18 gates; neither
+is inferred from the lower-bound table, the settled FAT snapshots or a single
+application workflow. Successful source review or MEMMAP output alone does not
+close the remaining gates.
