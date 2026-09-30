@@ -42,11 +42,14 @@ SASI/SCSI and hard-disk boot are not part of M18.
 
 ### Owner-provided release illustration
 
-![M18 owner-provided photo, with runtime diagnostics and metadata removed](https://github.com/nakatamaho/freedos-pc88va/releases/download/m18/freedos-pc88va-m18-public-photo.jpg)
+![M18 owner-provided photo, with EXIF/GPS removed and diagnostics unmasked](https://github.com/nakatamaho/freedos-pc88va/releases/download/m18/freedos-pc88va-m18-public-photo.jpg)
 
-The photo is included by the owner's request, with private startup observations
-and image metadata removed. It is an illustration, **not hardware acceptance
-or proof of the exact release disk**. The original photo is not committed.
+Published with the owner's authorization: EXIF/GPS metadata is removed,
+while displayed diagnostics remain unmasked. The same
+[metadata-free photograph](images/milestones/m18/freedos-pc88va-m18-public-photo.jpg)
+is versioned in the M18 branch and attached to the release. It is an
+illustration, **not hardware acceptance or proof of the exact release disk**,
+and never a build input. The original metadata-bearing photo is not committed.
 
 ## Rebuild M18 from public source
 

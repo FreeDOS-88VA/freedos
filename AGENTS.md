@@ -282,6 +282,16 @@ DGROUP: removing unrelated arrays can expose an existing wrong-segment write
 against live allocation metadata. Preserve release-barrier error returns and
 keep their diagnostics resident.
 
+Owner-authorized photographs of real-hardware screens may be published without
+masking displayed diagnostics. Remove EXIF/GPS metadata. Such photographs do
+not establish HARDWARE PASS. ROM contents, proprietary disk contents, and raw
+trace dumps remain excluded.
+
+As an owner-authorized exception to the image-commit prohibition, M18 may store
+its metadata-free release photograph at
+`images/milestones/m18/freedos-pc88va-m18-public-photo.jpg`. It is a presentation
+asset, never a public build input or hardware-qualification evidence.
+
 The M17 kernel configuration passes are enabled. The loader reads only the
 PC88VA_LOADSEG selector; it does not replace DOS CONFIG.SYS processing. Preserve
 FDCONFIG.SYS precedence in the common kernel, and qualify settings through actual

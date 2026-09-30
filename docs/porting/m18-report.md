@@ -7,6 +7,16 @@ release with the known JWASMR hardware issue deferred as **M19's first task**.
 tip and its own CI; this committed report cannot record its own future SHA.
 See the [release notes](../releases/m18.md).
 
+The owner-authorized release photograph is now committed as a presentation
+asset and attached to the release, with displayed diagnostics **unmasked** and
+EXIF/GPS plus ancillary image metadata removed. Its explicit policy exception
+is recorded in `AGENTS.md`. File:
+`images/milestones/m18/freedos-pc88va-m18-public-photo.jpg`, 3,870,267 bytes,
+SHA-256 `8f7819e658af57fc051d1e8bb4dc68c73cdce06a65ff3f399965bd45c6779d95`.
+It is not a build input, hardware acceptance or proof of exact disk identity.
+This presentation-only update changes neither the immutable `m18` release tag,
+D88 bytes, component pins nor the existing emulator-only validation boundary.
+
 **Known issue: JWASMR hangs on physical hardware before Usage appears**,
 including a no-argument invocation, as reported by the owner. No independently
 reproduced root cause or RAM-failure diagnosis is established. M18 ships the
