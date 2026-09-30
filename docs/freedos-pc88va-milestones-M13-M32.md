@@ -10,7 +10,7 @@ Revision: 2026-09-27, compact M18 replacement. M18 covers conventional-memory cl
 | M16 | VAEG 2D support, floppy formats, physical B: and native console input | Mandatory production VAEG 2D 320/360 implementation and synthetic FDC/media tests, followed by guest qualification with the exact new build; 2D 320/360 KiB, 2DD 640/720 KiB and documented 2HC reads/writes on A: and physical FDD2/B:; media change and cross-drive copy; VA cursor keys/display coherence; VA and VA2 guest-timed key repeat and native function keys | Actual M15 baseline; VAEG 2D path before dependent guest tests; per-model evidence and matched emulator/guest revisions | 4/5 - High |
 | M17 | Common storage contracts and media formats | Built-in FDD/SASI and external SCSI ownership; source audit of VA DEVICE=/INIT/block-unit registration; concrete capacity/sector/partition/BPB/drive contracts; reproducible FAT12/FAT16 fixtures and independent validation; M18 memory/device-residency input plus M19/M21 storage handoffs | Actual new M16 baseline; independent host work may proceed while a runtime prerequisite is unresolved | 3/5 - Medium |
 | M18 | Conventional-memory cleanup and one bootable 2HD VA basic disk | Account for native RAM/resident/MCB ownership, repair proven stale reservations or avoidable fragmentation, and validate allocation/EXEC; MEMMAP plus selected basic shell/editor/floppy tools and real-mode JWASMR; all mandatory tools on one 2HD disk with measured working space; guest edit/assemble/COM-and-MZ-run on A: with B: empty; isolated public-input-only make m18-disk and one exact tested D88/sources/licenses/manifests | Actual M16/M17 baseline, accepted native memory/toolchain contracts and public QA/media builder; no Japanese or complete upstream distribution requirement | 4/5 - High |
-| M19 | SASI HDD as a data drive | Built-in VA storage integration, discovery and volume registration, common-kernel FAT16 reads/writes, errors/protection and persistence while booting from accepted FDD media | M18 plus M17 storage contracts; required M15 acceptance | 4/5 - High |
+| M19 | JWASMR hardware-startup issue first; then SASI HDD as a data drive | Investigate/fix and check the M18 known JWASMR physical startup hang before storage implementation; built-in VA storage integration, discovery and volume registration, common-kernel FAT16 reads/writes, errors/protection and persistence while booting from accepted FDD media | M18 plus M17 storage contracts; required M15 acceptance | 4/5 - High |
 | M20 | Native SASI boot | Firmware-to-loader-to-kernel-to-FreeCOM boot with no bootable FDD required; correct boot-volume identity, resident I/O handoff, normal session and recovery | M19 | 5/5 - Very high |
 | M21 | External SCSI .SYS and read-only HDD access | Normal DEVICE= loading from an accessible FDD/SASI volume; actual INIT, resident memory and DOS unit/BPB registration; controller/discovery/partition reads and FAT16 files through the common kernel; write rejection, unchanged media, bounded failures and no-device behavior | M17 driver/media contracts and M15 foundation; M20 for SASI-boot qualification; follows M20 in the default sequence | 4/5 - High |
 | M22 | SCSI HDD writes through the same .SYS | Controlled file/directory/FAT updates, close/flush and reopen/fresh-boot persistence; protection, non-target preservation, truthful partial results and bounded failure recovery | M21 | 4/5 - High |
@@ -58,6 +58,17 @@ Use the common kernel's FAT12/FAT16 implementation. FAT12 remains the floppy
 baseline; FAT16 is the initial HDD objective, subject to the concrete M17 media
 profiles and measured limits. M17 host-valid media are not evidence of guest
 FAT16 support. FAT32 is outside this plan.
+
+## M18 release boundary and M19 entry priority
+
+The owner releases M18 with **emulator validation only**, preserving its
+qualified HOST/VAEG results without claiming HARDWARE PASS. JWASMR's reported
+physical hang before Usage is a known issue, with no established root cause or
+verified repair. It is **M19's first task, before SASI-data implementation**;
+see the [entry task](tasks/M19-first-task-jwasmr-hardware-startup.md) and
+[M18 release notes](releases/m18.md). M19 implementation has not started.
+This priority does not change M17 storage contracts or the subsequent milestone
+numbering and architecture.
 
 ## Adopted SCSI architecture
 

@@ -27,8 +27,13 @@ build steps; `HELLO.ASM` includes its own assembly command.
 The public build neither obtains nor invokes an emulator or ROM. Installed
 512 KiB (including a stale larger retained setting) is qualified for editing
 and native 2HD B: maintenance, **not** for the sample JWASMR assembly. Physical
-hardware is NOT RUN. See the [M18 report](../../../docs/porting/m18-report.md)
-for the exact scope and CHKDSK A: redirection caveat.
+hardware is **not qualified**: M18 is released with **emulator validation
+only**. The complete hardware gate is NOT RUN, and an owner-reported JWASMR
+hang before Usage remains a known issue and **M19's first task**. No HARDWARE
+PASS or physical repair is claimed. See the
+[release notes](../../../docs/releases/m18.md) and
+[M18 report](../../../docs/porting/m18-report.md) for the exact scope and
+CHKDSK A: redirection caveat.
 
 ## Rebuild from public source, not an old disk
 

@@ -98,6 +98,7 @@
       "CHKDSK A: redirected output can be empty (public issue #12) and is not counted as an A: filesystem-check PASS. Independently read-back B: checks remain scoped successes."
     ],
     "limits": [
+      "M18 is released with emulator validation only. The complete hardware qualification gate is NOT RUN; an owner-reported JWASMR hang before Usage is a known issue and M19's first task before SASI-data work. No physical repair or HARDWARE PASS is claimed.",
       "256 KiB EDLIN editing is not qualified; an earlier source-bound attempt reported out of memory and recovered the shell.",
       "640 KiB installed, not merely a retained 640-KiB selection, is the qualified small edit/assemble/run sample setting; arbitrary source sizes are not guaranteed.",
       "DOS MCB reports do not establish physical firmware or VRAM ownership; useful in-program RAM and instantaneous disk-workspace peaks remain unmeasured by owner decision.",

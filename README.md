@@ -1,75 +1,94 @@
 # FreeDOS PC-88VA Integration
 
-This is an experimental FreeDOS integration project for NEC PC-88VA. M15 is
-owner-accepted with the deferred work listed in its
-[acceptance report](docs/porting/m15-report.md). M16 is the active milestone.
+Experimental FreeDOS integration for NEC PC-88VA/VA2.
 
-For the active M16 source build and toolchain setup, see
-[M16 build instructions](tools/m16/README.md):
+## M18 release — emulator-validated only
+
+**M18 is released with emulator validation only (エミュレータ検証のみ).**
+The evidence is **HOST PASS** for the reproducible public-source build and
+**VAEG PASS** for the bounded VA/VA2 workflows. Hardware compatibility is
+**not qualified**: **DEFERRED HARDWARE VALIDATION**, not `HARDWARE PASS`.
+
+- [M18 release and downloads](https://github.com/nakatamaho/freedos-pc88va/releases/tag/m18)
+- [Release notes](docs/releases/m18.md)
+- [Exact image, source/toolchain identities and licenses](images/milestones/m18/README.md)
+- [Validation scope and historical results](docs/porting/m18-report.md)
+
+The release provides one bootable native 2HD FAT12 D88, with FreeCOM,
+English/ASCII EDLIN, MORE, MEMMAP, real-mode JWASMR, profile-bounded FORMAT,
+CHKDSK and SYS, and small COM/MZ source examples. `HELLO.DOC` on the disk
+explains `HELLO.ASM` and its assembly command. The corresponding-source and
+license bundle is a host-side companion, **not another floppy**. No ROM or
+private firmware is distributed or required to build the disk.
+
+Use a writable copy in the supported emulator. The small complete
+edit/assemble/run workflow requires **640 KiB installed RAM**, not merely a
+retained BIOS selection; arbitrary source sizes are not guaranteed.
+512-KiB sample JWASMR assembly and 256-KiB EDLIN editing are not passes.
+SASI/SCSI and hard-disk boot are not part of M18.
+
+### Known issues and M19's first task
+
+- **JWASMR can hang on physical hardware before Usage appears**, including
+  an invocation without arguments. Its cause is not established; this is not
+  a RAM-failure diagnosis. Fixing and checking this startup issue is
+  **M19's first task**, before its planned SASI-data work. See the
+  [M19 entry task](docs/tasks/M19-first-task-jwasmr-hardware-startup.md).
+  M19 implementation has not started. VAEG success does not qualify this path
+  on a real machine.
+- Redirected `CHKDSK A:` output can be empty
+  ([issue #12](https://github.com/nakatamaho/freedos-pc88va/issues/12)); it is
+  not counted as a successful A: filesystem check.
+
+### Owner-provided release illustration
+
+![M18 owner-provided photo, with runtime diagnostics and metadata removed](https://github.com/nakatamaho/freedos-pc88va/releases/download/m18/freedos-pc88va-m18-public-photo.jpg)
+
+The photo is included by the owner's request, with private startup observations
+and image metadata removed. It is an illustration, **not hardware acceptance
+or proof of the exact release disk**. The original photo is not committed.
+
+## Rebuild M18 from public source
 
 ```sh
-python3 tools/m16/toolchain.py
-python3 tools/m16/build_image.py --output build/m16-image
+git clone --branch m18 --recurse-submodules https://github.com/nakatamaho/freedos-pc88va.git
+cd freedos-pc88va
+make m18-toolchain
+make m18-disk
+make m18-accept
 ```
 
-This builds the complete M16 candidate twice from source archives and compares
-the results. It does not use an old candidate D88 or saved DOS binaries.
-Initialize the pinned submodules first as shown below.
+Set up Docker/Linux amd64, the identity-pinned official Open Watcom 1.9
+archive and host test dependencies as described in the
+[M18 build/setup guide](tools/m18/DISTRIBUTION-README.md) and
+[M18-local tooling instructions](tools/m18/README.md). The complete disk is
+built twice in clean allowlisted source exports; no previous D88 or saved DOS
+executable is an input. Normal outputs are:
 
-Kernel-only is not a complete distribution. The three foundational components
-are:
+- `dist/m18/freedos-PC88VA-M18-2HD.D88`
+- `dist/m18/freedos-PC88VA-M18-SOURCES.tar.xz`
 
-- `components/fdkernel`: the `nakatamaho/fdkernel` fork with PC-88VA adapters.
-- `components/freecom`: the `nakatamaho/freecom_dbcs2` command processor fork.
-- `components/country`: the read-only upstream NLS/DBCS data component,
-  `FDOS/country:master`.
+The D88 must match SHA-256
+`ace43378a504b1af5bad3d6e89184c1e193d6abf85c995b7a94b581a7d743e5c`.
+The release's attached source bundle is bound to qualified implementation
+`99a8f59a0ec7388cc16968a8814aa23bb0ba8c92`; rebuilding the documentation-only
+release tag gives the same D88 but a different source bundle's parent identity.
+See the release notes for the exact qualified-bundle checksum and rebuild pin.
 
-The parent gitlinks and `manifests/m16-components.lock.json` pin the exact M16
-component commits and their M15 control lineage. The M01 manifests retain their
-historical baseline identities. The kernel and FreeCOM forks are experimental;
-branch names do not imply PC-88VA boot success.
+Component source remains in its pinned public repositories; project-authored
+platform adapters and build recipes are versioned here. Kernel and FreeCOM
+use the `nakatamaho` forks, not direct upstream branch changes. All five pinned
+components and their source/license identities are recorded in
+`manifests/m18-components.lock.json`.
 
-Clone the repository with its components:
+## Historical milestones and project scope
 
-```sh
-git clone --branch topic/m16-floppy-formats-console-input --recurse-submodules https://github.com/nakatamaho/freedos-pc88va.git
-```
+M13-M17 results remain historical, separately bounded qualification; M18 does
+not rewrite their acceptance state. See the
+[M13-M32 roadmap](docs/freedos-pc88va-milestones-M13-M32.md).
 
-For an existing clone, initialize the components with:
-
-```sh
-git submodule update --init --recursive
-```
-
-The host scaffold check is:
-
-```sh
-make verify-scaffold
-```
-
-M01 uses a pinned Linux/amd64 container and does not modify the component
-sources. Its host checks are:
-
-```sh
-make m01-preflight
-make m01-image
-make m01-build
-make m01-compare
-make m01-verify
-```
-
-M01 proves only that the exact pinned upstream baselines build reproducibly in
-the canonical host environment. It does not prove PC-88VA compatibility or a
-successful boot.
-
-VAEG and private documentation are sibling checkouts and are not included in
-this repository. A possible workspace layout is:
-
-```text
-work/
-├── freedos-pc88va/          public writable integration repository
-├── vaeg/                    separate emulator checkout
-└── pc88va-private-docs/     non-public local material
-```
-
-Project status must not be read as evidence of a successful PC-88VA boot.
+The host scaffold check is `make verify-scaffold`. M01's container build proves
+only reproducibility of its pinned upstream baselines, not PC-88VA bootability.
+VAEG, licensed ROMs and private verification material are separate inputs for
+optional emulator testing, never public-build inputs. Unrun tests are not
+passes, and the release photograph does not change the validation boundary.

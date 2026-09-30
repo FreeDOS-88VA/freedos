@@ -1,8 +1,28 @@
 # M18 work report
 
-Status: **M18 PASS for the refreshed, single designated native 2HD disk.**
-`HANDOFF READY` is separate and requires post-push checks of the publication
+Status: **M18 RELEASED — EMULATOR VALIDATION ONLY (エミュレータ検証のみ)**
+for the single designated native 2HD disk. The owner accepts this bounded
+release with the known JWASMR hardware issue deferred as **M19's first task**.
+`HANDOFF READY` remains separate and requires post-push checks of the publication
 tip and its own CI; this committed report cannot record its own future SHA.
+See the [release notes](../releases/m18.md).
+
+**Known issue: JWASMR hangs on physical hardware before Usage appears**,
+including a no-argument invocation, as reported by the owner. No independently
+reproduced root cause or RAM-failure diagnosis is established. M18 ships the
+unchanged executable; there is no repaired or hardware-qualified replacement.
+Review of the exact shipped executable and pinned official Open Watcom source
+found a pre-main software-FPU initializer that first calls a raw x87 detector
+containing WAIT/FWAIT, before installing software-emulation vectors or honoring
+NO87. A linked clock initializer assumes an IBM BIOS data-area counter. These
+are source-bound review leads, not proof of the physical stop location. Prior
+emulator checks did not model the physical CPU's POLL/TEST input.
+The [M19 entry task](../tasks/M19-first-task-jwasmr-hardware-startup.md) requires
+investigation before SASI-data work, clean builds, affected exact-image
+qualification and a reported-configuration hardware retest before claiming a
+physical repair. M19 implementation has not started. Disk bytes, component
+pins and historical HOST/VAEG evidence remain unchanged. Hardware is not
+qualified, and the release illustration is not acceptance evidence.
 
 The host-side outputs now use the requested names
 `dist/m18/freedos-PC88VA-M18-2HD.D88` and
@@ -25,8 +45,10 @@ CI `36690434903` attempt 1 with identical D88/source-bundle SHA-256 values.
 SHA-256 `ace43378a504b1af5bad3d6e89184c1e193d6abf85c995b7a94b581a7d743e5c`
 with matched executable SHA-256
 `c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf`.
-**DEFERRED HARDWARE VALIDATION**; hardware is NOT RUN. Failed or unrun earlier
-checks remain historical and are not retroactively promoted to PASS.
+**DEFERRED HARDWARE VALIDATION**; the complete hardware qualification gate is
+NOT RUN and the owner-reported JWASMR startup failure remains a known issue.
+No HARDWARE PASS is claimed. Failed or unrun earlier checks remain historical
+and are not retroactively promoted to PASS.
 
 `START_SHA`: `d81bba18f0e4793d7165fb0acfdf7e229e160c83`.
 `QUALIFIED_IMPLEMENTATION_SHA`: `99a8f59a0ec7388cc16968a8814aa23bb0ba8c92`.
@@ -648,7 +670,9 @@ source bundle, the image manifest and on-disk English notices.
 Use `make m18-disk` after the documented pinned toolchain setup, then
 `make m18-accept M18_DIST=dist/m18`; the exact qualified source checkout and
 extraction commands are in the archive README. The current M13–M32 route is
-unchanged. **M19 SASI-data work is not started**: its downstream handoff must
+unchanged. **M19 implementation is not started**; the owner-directed first
+task is the known JWASMR hardware-startup issue, before SASI-data work. Its
+downstream handoff must
 preserve the M17 storage contracts and this qualified memory/single-disk
 baseline. Publication-tip CI, remote equality, ancestry and the bounded
 report/archive-only diff are verified in the separate post-push handoff.
