@@ -9,13 +9,13 @@
       "arguments": ["-c", "-9e", "--threads=1", "--check=crc64"]
     },
     "compressed": {
-      "bytes": 302316,
-      "sha256": "5d7ebb3dd0a29ec817b58c35a2c1550fdb39b810983eaf5c5c33ea24848c5f60"
+      "bytes": 303000,
+      "sha256": "e399db6aa1775e3b61f76f1b6e9bb7abcb80de35271f1b0d34ff75dc7d18d5dc"
     },
     "uncompressed": {
       "file": "PC88VA-M18-2HD.D88",
       "bytes": 1331888,
-      "sha256": "991370d0c075f75153192e94365c3c798c3ca50639aaeb716054ab6c5da4dd12"
+      "sha256": "ace43378a504b1af5bad3d6e89184c1e193d6abf85c995b7a94b581a7d743e5c"
     },
     "profile": {
       "media": "native PC-88VA 2HD FAT12",
@@ -29,8 +29,8 @@
   },
   "rebuild_source": {
     "start": "d81bba18f0e4793d7165fb0acfdf7e229e160c83",
-    "parent": "679fb32dee9709ca298d70b5168bd0dbbd32d601",
-    "qualified_implementation": "679fb32dee9709ca298d70b5168bd0dbbd32d601",
+    "parent": "203983964a5892f8c79c365151f0703b573ba931",
+    "qualified_implementation": "203983964a5892f8c79c365151f0703b573ba931",
     "fdkernel": "e87e8071c355a99a7f34a8758d4a3368b6523f3d",
     "freecom": "29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e",
     "country": "23f189cca3420606eae8723884fa92ccd65eb307",
@@ -38,7 +38,7 @@
     "jwasm": "96d1f3d4c1661c85788297d50ab032e452f48978"
   },
   "source_archives_sha256": {
-    "parent": "fc4b4ef23ef03b3c36d02cbc3ef94c5986595083a7037830bccad84fbfdeeabe",
+    "parent": "6f8d3f74f6cb3bb85e2a4e8f48af8a33e3fb62b5b7be83f5d291705ea60485d8",
     "fdkernel": "887857e0c6706e47a9c8ea2055f74b3891138ed00564585a0053795e9e7dbc69",
     "freecom": "e61d4e889a6b10f9e05903f9575bb1466dfc5b20cb232f5286219bc173bbb24a",
     "country": "cf0b16ac57e661eeb7e19118cea2d2d200e4545507f15912e8a6462652c2cd9d",
@@ -47,8 +47,8 @@
   },
   "corresponding_sources": {
     "file": "PC88VA-M18-SOURCES.tar.xz",
-    "bytes": 2224012,
-    "sha256": "afcac120b9fcab6a080187d74d06daa97b00f053421d604ea474e3eeac8d341d",
+    "bytes": 2225220,
+    "sha256": "52fb140dfaec0a161e47492a2635df7217371230eac9cce4354df793a7ec4156",
     "availability": "Rebuild from the public qualified parent commit and pinned component gitlinks; generated host-side companion, not a second disk or committed build product"
   },
   "toolchain": {
@@ -62,9 +62,9 @@
     }
   },
   "qualification_ci": {
-    "run_id": 36674161070,
+    "run_id": 36681167366,
     "attempt": 1,
-    "exact_head_sha": "679fb32dee9709ca298d70b5168bd0dbbd32d601",
+    "exact_head_sha": "203983964a5892f8c79c365151f0703b573ba931",
     "successful_job": "isolated-build",
     "conclusion": "success"
   },
@@ -91,10 +91,10 @@
     "hardware": "NOT RUN",
     "hardware_status": "DEFERRED HARDWARE VALIDATION",
     "scope": [
-      "The exact designated D88 boots on VA and VA2 with the matched emulator executable; no hardware or physical keyboard result is claimed.",
-      "At 640 KiB installed on both models, English EDLIN edit/save/reopen, JWASMR small COM and relocated MZ assembly/execution, failure recovery, shell follow-up, and checked MCB ownership passed; no instantaneous RAM or disk peak was measured.",
+      "The exact refreshed designated D88 boots on VA and VA2 with the matched emulator executable; HELLO.DOC and the build instructions in HELLO.ASM were read back byte-for-byte from both guest disks and the examples were assembled and run; no hardware or physical keyboard result is claimed.",
+      "At 640 KiB installed on both models, English EDLIN edit/save/reopen, JWASMR small COM and relocated MZ assembly/execution, failure recovery, shell follow-up, and checked MCB ownership passed; the complete guest workflow stayed within the committed 32-cluster workspace reserve and 128-free-cluster floor at the settled checkpoint; no instantaneous RAM or disk peak was measured.",
       "At 512 KiB installed with a retained larger selection, EDLIN save/reopen and the native 2HD B: FORMAT, CHKDSK and SYS workflow passed on VA and VA2. JWASMR sample assembly was rejected at DOS EXEC without output and without losing the checked shell; it is not a 512-KiB assembly PASS.",
-      "Both exact SYS-produced 2HD B: disks booted and wrote/read files; separate write-protected normal A:, live-swapped native B:, and nonbooting 2D B: QA checks were performed and kept out of this distribution.",
+      "Both exact refreshed SYS-produced 2HD B: disks booted and wrote/read files; separate header-protected A:, live-swapped native B:, and nonbooting 2D B: QA checks used this exact new normal disk and were kept out of this distribution. No SYS-only disk MCB check is claimed.",
       "CHKDSK A: redirected output can be empty (public issue #12) and is not counted as an A: filesystem-check PASS. Independently read-back B: checks remain scoped successes."
     ],
     "limits": [

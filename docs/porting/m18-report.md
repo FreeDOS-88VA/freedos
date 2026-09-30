@@ -1,37 +1,87 @@
 # M18 work report
 
-Status: **M18 PASS for the qualified implementation and its single designated
-native 2HD disk.** `HANDOFF READY` is separate and requires post-push checks of
-the publication tip and its own CI; this committed report cannot record its own
-future commit SHA.
-
-**HELLO documentation update in progress:** the PASS and designated archive
-below apply only to the earlier D88 SHA-256
-`991370d0c075f75153192e94365c3c798c3ca50639aaeb716054ab6c5da4dd12`.
-The changed `HELLO.ASM`, new `HELLO.DOC`, updated on-disk instructions and media
-recipe create a different candidate. Its full clean build, exact-byte guest
-qualification, exact-head CI, replacement archive and publication-tip CI are
-**NOT YET RUN/PASSED**. Do not substitute the old disk's VAEG results or claim
-this new candidate is designated. Hardware remains NOT RUN.
+Status: **M18 PASS for the refreshed, single designated native 2HD disk.**
+`HANDOFF READY` is separate and requires post-push checks of the publication
+tip and its own CI; this committed report cannot record its own future SHA.
 
 Evidence labels: **HOST PASS** at qualified implementation
-`679fb32dee9709ca298d70b5168bd0dbbd32d601`, including 91 host tests,
-two independent clean source-build containers per run, two separate identical
-full local distributions (D88 **and** companion sources), the separate allocator
-QA producer, M18-local public acceptance verifier, and native x64 exact-head
-CI `36674161070` attempt 1 with the same D88/source-bundle SHA-256 values.
-**VAEG PASS** for the bounded VA/VA2 workflows on D88 SHA-256
-`991370d0c075f75153192e94365c3c798c3ca50639aaeb716054ab6c5da4dd12`
-with the matched emulator executable SHA-256
+`203983964a5892f8c79c365151f0703b573ba931`: 92 host tests, two clean
+source-build containers per run, two independent identical complete local
+distributions (all eight generated files), separate allocator QA media, the
+M18-local instance/dependency verifier, and successful native x64 exact-head
+CI `36681167366` attempt 1 with identical D88/source-bundle SHA-256 values.
+**VAEG PASS** for the bounded VA/VA2 workflows on the *refreshed* normal D88
+SHA-256 `ace43378a504b1af5bad3d6e89184c1e193d6abf85c995b7a94b581a7d743e5c`
+with matched executable SHA-256
 `c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf`.
-**DEFERRED HARDWARE VALIDATION**; hardware is NOT RUN. Earlier checkpoints
-below remain historical, including failed or unrun gates; they are not
-retroactively promoted to PASS.
+**DEFERRED HARDWARE VALIDATION**; hardware is NOT RUN. Failed or unrun earlier
+checks remain historical and are not retroactively promoted to PASS.
 
 `START_SHA`: `d81bba18f0e4793d7165fb0acfdf7e229e160c83`.
-`QUALIFIED_IMPLEMENTATION_SHA`: `679fb32dee9709ca298d70b5168bd0dbbd32d601`.
+`QUALIFIED_IMPLEMENTATION_SHA`: `203983964a5892f8c79c365151f0703b573ba931`.
 `PUBLICATION_TIP_SHA` and `DOWNSTREAM_BASE_SHA` belong in the separate
 post-push handoff, not in a self-referential committed report.
+
+## Refreshed HELLO instructions and current designated image
+
+The owner requested build instructions **inside** `HELLO.ASM` and a separate
+plain-ASCII `HELLO.DOC` with an explanation and actual build steps. Both
+files are on the disk; `README.TXT` and `QUICKSTR.TXT` point to the guide.
+The supported command is `JWASMR -0 -bin -Fo=HELLO.COM HELLO.ASM`, followed by
+`HELLO.COM` **only after successful assembly**; it needs no linker. The
+existing fail-closed `BUILD.BAT` also builds/runs the MZ example. This edit
+changed only on-disk source/instructions/package/media composition, not any
+DOS binary, loader, CONFIG.SYS or component gitlink. Independent FAT inspection
+found the only changed existing files to be `HELLO.ASM`, `README.TXT` and
+`QUICKSTR.TXT`, plus newly added `HELLO.DOC`; every executable is byte-identical
+to the earlier distribution. The first M18 distribution at source 679 and its
+D88 SHA-256 `991370d0...dd12` remain historical evidence, **not** guest
+qualification for the different current D88 bytes.
+
+The **only current designated** archive is
+[the M18 native 2HD D88 xz archive](../../images/milestones/m18/README.md),
+303,000 bytes, SHA-256
+`e399db6aa1775e3b61f76f1b6e9bb7abcb80de35271f1b0d34ff75dc7d18d5dc`.
+Its extracted 1,331,888-byte D88 has the exact guest-qualified SHA-256
+`ace43378a504b1af5bad3d6e89184c1e193d6abf85c995b7a94b581a7d743e5c`.
+Two independent XZ Utils 5.2.5 locked-container compressions were identical;
+extraction was compared byte-for-byte with the new D88. Its host-side
+corresponding-source/license companion is **not** a second floppy or committed
+build product: 2,225,220 bytes, SHA-256
+`52fb140dfaec0a161e47492a2635df7217371230eac9cce4354df793a7ec4156`,
+recreated from the public qualified source and pinned dependencies. The FAT12
+native 2HD image has 20 distribution files, 650 allocated and 619 free
+1,024-byte data clusters. The complete guest edit/assemble/repeat workflow
+(including its DOC/source readback and output files) stayed within the
+committed 32-cluster reserve and 128-free-cluster floor at its settled
+checkpoint. Individual in-process peaks are **NOT MEASURED**.
+
+Both VA and VA2 at **640 KiB installed** read back the original `HELLO.DOC`
+and pre-edit `HELLO.ASM` byte-for-byte, saved an EDLIN edit with an intact
+backup, assembled and executed COM and relocated MZ examples, rejected invalid
+and missing assembler inputs without stale executables, and checked matched
+post-warmup/post-repeat DOS MCB ownership. At **512 KiB installed** with a
+stale retained 640-KiB selection, both edited/saved/reopened a source and
+safely rejected COM and MZ JWASMR DOS EXEC without outputs; source-generated
+native B: FORMAT, read-only CHKDSK and SYS passed on both, and both exact
+SYS-produced B: disks separately booted and wrote/read guest files. SYS-only
+media lack MEMMAP, so no SYS-disk MCB PASS is claimed. With this same new
+normal D88, both models also passed header-protected A: byte preservation,
+live B: exchange and separate **nonbooting 2D-D88** B: copy/write/readback;
+these fixtures are not designated distributions. A fresh normal-disk VA2
+input regression and VA2 no-numeric-coprocessor REAL4 assembly/execution
+also passed. No physical keyboard or all-linked-opcode proof is inferred.
+CHKDSK A: redirection remains issue #12, **not** an A: check PASS. EDLIN
+editing at 256 KiB and sample assembly at 512 KiB remain non-passes; 640 KiB
+is an installed-RAM setting for the tested *small* example, not a promise for
+arbitrarily large source files. Useful in-program RAM and instantaneous disk
+workspace peak remain **NOT MEASURED** by owner decision. Ownership remains
+bounded by the DOS MCB chain; no firmware/VRAM interval was reclassified free.
+
+The sections below preserve earlier source/guest checkpoints, including the
+first qualified disk. Their numeric file counts, image/archive identities and
+qualifications bind to their stated **historical** source/D88, not this
+refreshed distribution.
 
 ## Baseline and provenance
 
@@ -504,7 +554,7 @@ M18 A: system files to a prepared 2HD B: target. No SASI/SCSI runtime, HDD boot,
 FAT16 guest access or hardware support is claimed. FreeDOS version reporting
 remains unchanged.
 
-## Qualified single-image publication and bounded handoff
+## First qualified single-image publication (historical; superseded)
 
 The qualified `679fb32dee9709ca298d70b5168bd0dbbd32d601` source and exact
 five component gitlinks clean-built two independent complete local distributions
@@ -528,14 +578,15 @@ verified unchanged. Component Git archives were not rewritten. Earlier
 cross-host bundle drift and the failed QA CI attempt `36672838956` remain
 recorded as **failures**, not passes.
 
-The **only** designated M18 image is
-[the native 2HD D88 xz archive](../../images/milestones/m18/README.md),
+At the first M18 publication, the **then-only** designated image was stored
+at `images/milestones/m18/freedos-pc88va-m18-2hd-1280.d88.xz`
+([historical manifest](https://github.com/nakatamaho/freedos-pc88va/blob/d5ba0ebbd9fb8e50ac2c822f699379b48747c1e8/images/milestones/m18/manifest.json)),
 302,316 bytes, SHA-256
 `5d7ebb3dd0a29ec817b58c35a2c1550fdb39b810983eaf5c5c33ea24848c5f60`.
 Independent pinned-container compressions were byte-identical; decompressing
-the archive reproduced the exact guest-qualified D88. Its
-[public manifest](../../images/milestones/m18/manifest.json) binds uncompressed
-and compressed hashes/sizes, exact source/gitlink/archive/toolchain identities,
+that earlier archive reproduced its own exact guest-qualified D88. Its
+historical public manifest binds uncompressed and compressed hashes/sizes,
+exact source/gitlink/archive/toolchain identities,
 license references and validation limits. The companion sources are generated
 from the qualified public source commit, not committed as a second archive or
 installed on another floppy. The normal FAT12 profile is 80 cylinders, two

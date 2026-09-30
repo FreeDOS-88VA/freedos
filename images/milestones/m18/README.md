@@ -2,10 +2,10 @@
 
 `freedos-pc88va-m18-2hd-1280.d88.xz` is the **only designated M18 disk**.
 It contains one bootable PC-88VA 80-cylinder, two-head, eight-sector/track,
-1024-byte/sector FAT12 2HD disk. The compressed archive is 302,316 bytes,
-SHA-256 `5d7ebb3dd0a29ec817b58c35a2c1550fdb39b810983eaf5c5c33ea24848c5f60`.
+1024-byte/sector FAT12 2HD disk. The compressed archive is 303,000 bytes,
+SHA-256 `e399db6aa1775e3b61f76f1b6e9bb7abcb80de35271f1b0d34ff75dc7d18d5dc`.
 The decompressed D88 is 1,331,888 bytes, SHA-256
-`991370d0c075f75153192e94365c3c798c3ca50639aaeb716054ab6c5da4dd12`.
+`ace43378a504b1af5bad3d6e89184c1e193d6abf85c995b7a94b581a7d743e5c`.
 See [manifest.json](manifest.json) for complete source/component/toolchain identities,
 license references, separate source-bundle digest and qualified test scope.
 
@@ -22,6 +22,8 @@ qualifying executable SHA-256 and source revision are in the manifest; its
 licensed ROMs are supplied separately by the operator. For normal boot select
 that emulator's VA or VA2 model, 640 KiB **installed** for the included small
 EDLIN/JWASMR edit/assemble/run samples, this disk as FDD1 and an empty FDD2.
+Read `HELLO.DOC` on the disk for the individual COM program explanation and
+build steps; `HELLO.ASM` includes its own assembly command.
 The public build neither obtains nor invokes an emulator or ROM. Installed
 512 KiB (including a stale larger retained setting) is qualified for editing
 and native 2HD B: maintenance, **not** for the sample JWASMR assembly. Physical
@@ -33,7 +35,7 @@ for the exact scope and CHKDSK A: redirection caveat.
 From a fresh checkout of `https://github.com/nakatamaho/freedos-pc88va.git`:
 
 ```sh
-git checkout 679fb32dee9709ca298d70b5168bd0dbbd32d601
+git checkout 203983964a5892f8c79c365151f0703b573ba931
 git submodule update --init --recursive
 make m18-toolchain
 make m18-disk M18_DIST=dist/m18
@@ -48,8 +50,8 @@ committed M18 inputs and component gitlinks, builds the **complete** disk twice
 in separate clean network-disabled containers, and checks placement and media
 readback. It does not read a candidate D88 or saved DOS programs. The built
 D88 must have the uncompressed digest above; the public-source/license
-companion `dist/m18/PC88VA-M18-SOURCES.tar.xz` must be 2,224,012 bytes, SHA-256
-`afcac120b9fcab6a080187d74d06daa97b00f053421d604ea474e3eeac8d341d`.
+companion `dist/m18/PC88VA-M18-SOURCES.tar.xz` must be 2,225,220 bytes, SHA-256
+`52fb140dfaec0a161e47492a2635df7217371230eac9cce4354df793a7ec4156`.
 The source bundle is a host-side **generated** companion and is not a second
 floppy or a committed artifact. Its archives include the exact corresponding
 project and component source and their license files. Unmodified official
