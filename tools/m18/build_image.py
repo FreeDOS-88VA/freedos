@@ -342,7 +342,8 @@ def build_source_bundle_pinned(image_id: str, inputs: Path, output: Path,
     record.write_text(json.dumps(source_record, sort_keys=True) + "\n", encoding="ascii")
     script = (
         "mkdir -p /work/entry /work/result && "
-        "tar -xf /input/parent.tar -C /work/entry tools/m18/build_image.py && "
+        "tar -xf /input/parent.tar -C /work/entry "
+        "tools/m18/build_image.py tools/m18/normalize_parent_archive.py && "
         "python3 -B -c 'import json,sys; from pathlib import Path; "
         "sys.path.insert(0,\"/work/entry/tools/m18\"); "
         "from build_image import build_source_bundle; "
