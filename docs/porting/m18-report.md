@@ -4,6 +4,14 @@ Status: **M18 PASS for the refreshed, single designated native 2HD disk.**
 `HANDOFF READY` is separate and requires post-push checks of the publication
 tip and its own CI; this committed report cannot record its own future SHA.
 
+**Host filename update in progress:** the requested public output names are
+`dist/m18/freedos-PC88VA-M18-2HD.D88` and
+`dist/m18/freedos-PC88VA-M18-SOURCES.tar.xz`. The producer, acceptance verifier
+and host instructions are being updated together. The prior qualified disk
+and its guest evidence below remain bound to their exact bytes. Qualification
+of the changed host recipe and its source companion is pending a clean full
+build and exact-head CI; no new guest or hardware result is claimed by a rename.
+
 Evidence labels: **HOST PASS** at qualified implementation
 `203983964a5892f8c79c365151f0703b573ba931`: 92 host tests, two clean
 source-build containers per run, two independent identical complete local

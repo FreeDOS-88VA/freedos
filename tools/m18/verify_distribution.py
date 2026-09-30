@@ -171,11 +171,11 @@ def verify(root: Path, distribution: Path) -> None:
         records[filename] = json.loads(bound_file(distribution, filename, manifest[key]))
     d88 = manifest["distribution_d88"]
     fields(d88, {"filename", "sha256", "size_bytes"}, "D88 record")
-    require(d88["filename"] == "PC88VA-M18-2HD.D88", "normal disk filename differs")
+    require(d88["filename"] == "freedos-PC88VA-M18-2HD.D88", "normal disk filename differs")
     image = bound_file(distribution, d88["filename"], d88["sha256"], d88["size_bytes"])
     bundle_record = manifest["source_bundle"]
     fields(bundle_record, {"filename", "sha256", "size_bytes"}, "source bundle record")
-    require(bundle_record["filename"] == "PC88VA-M18-SOURCES.tar.xz",
+    require(bundle_record["filename"] == "freedos-PC88VA-M18-SOURCES.tar.xz",
             "source bundle filename differs")
     bundle = bound_file(distribution, bundle_record["filename"],
                         bundle_record["sha256"], bundle_record["size_bytes"])

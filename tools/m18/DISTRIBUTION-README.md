@@ -6,7 +6,7 @@ hardware qualification. `build-manifest.json` identifies the exact parent and
 component commits, public source-archive hashes, pinned Linux/amd64 toolchain,
 source bundle, image bytes, and validation scope. The complete corresponding
 project/component sources, build recipes, and licenses are supplied separately
-in `PC88VA-M18-SOURCES.tar.xz`; the unmodified compiler runtime has its own
+in `freedos-PC88VA-M18-SOURCES.tar.xz`; the unmodified compiler runtime has its own
 public upstream source reference below. `package-manifest.json` provides
 versions, build settings, source identities, output hashes, and declared DOS
 CPU scope.
@@ -17,14 +17,15 @@ CPU scope.
    public parent repository and initialize its pinned submodules with
    `git submodule update --init --recursive`.
 2. Verify every source archive and child gitlink against
-   `PC88VA-M18-SOURCES.tar.xz`'s `SOURCE-MANIFEST.json` and the committed
+   `freedos-PC88VA-M18-SOURCES.tar.xz`'s `SOURCE-MANIFEST.json` and the committed
    `manifests/m18-components.lock.json`.
 3. Install Docker and Python 3, then run `make m18-toolchain` to acquire the
    identity-pinned official Open Watcom 1.9 archive and prepare the isolated
    Linux/amd64 build image.
 4. Run `make m18-disk`. It builds twice in network-disabled containers from
    deterministic Git exports, verifies independent D88 bytes and native FAT12
-   readback, and places identical output under `dist/m18/`.
+   readback, and places `freedos-PC88VA-M18-2HD.D88` and
+   `freedos-PC88VA-M18-SOURCES.tar.xz` under `dist/m18/`.
 5. Run `make m18-accept M18_DIST=dist/m18` to independently close the actual
    JSON instances, source and toolchain references, source bundle archive
    members, distribution files and FATs. This is a host-only gate; VAEG and
@@ -90,6 +91,7 @@ unrun gates; host build success is not guest qualification.
 
 ## Rebuild and validation data
 
+- `freedos-PC88VA-M18-2HD.D88`: one native bootable 2HD distribution disk.
 - `build-manifest.json`: source, toolchain, archive, image identity, and scope.
 - `two-build-comparison.json`: exact result of the two independent D88 builds.
 - `capacity-budget.json`: BPB/FAT/root/data-region accounting, per-file hashes
@@ -99,7 +101,7 @@ unrun gates; host build success is not guest qualification.
 - `package-manifest.json`: package versions, licenses, 8086/VA scope, exact
   source identities, build recipes/options, DOS MZ allocation accounting, and
   disk payload hashes.
-- `PC88VA-M18-SOURCES.tar.xz`: source archives with its own member hashes and
+- `freedos-PC88VA-M18-SOURCES.tar.xz`: source archives with its own member hashes and
   fixed metadata. Verify its compressed SHA-256 against `build-manifest.json`
   before extraction.
 

@@ -124,13 +124,26 @@ class PublicBuildPipelineTests(unittest.TestCase):
             "source_date_epoch": 1740233872,
             "two_independent_clean_builds_equal": True,
         }
-        output = self.root / "source.tar.xz"
+        output = self.root / "freedos-PC88VA-M18-SOURCES.tar.xz"
         first = build_image.build_source_bundle(inputs, output, record, 1740233872)
         first_bytes = output.read_bytes()
         second = build_image.build_source_bundle(inputs, output, record, 1740233872)
         self.assertEqual(first, second)
         self.assertEqual(first_bytes, output.read_bytes())
         self.assertEqual(first["sha256"], hashlib.sha256(first_bytes).hexdigest())
+        self.assertEqual(first["filename"], "freedos-PC88VA-M18-SOURCES.tar.xz")
+
+    def test_public_output_names_match_the_pinned_packer_and_instructions(self):
+        producer = inspect.getsource(build_image)
+        packer = inspect.getsource(build_image.build_source_bundle_pinned)
+        instructions = (ROOT / 'tools/m18/DISTRIBUTION-README.md').read_text()
+        for name in ('freedos-PC88VA-M18-2HD.D88',
+                     'freedos-PC88VA-M18-SOURCES.tar.xz'):
+            self.assertIn(name, producer)
+            self.assertIn(name, instructions)
+        self.assertIn('/work/result/freedos-PC88VA-M18-SOURCES.tar.xz', packer)
+        self.assertNotIn('/work/result/PC88VA-M18-SOURCES.tar.xz', packer)
+        self.assertNotIn('staging_dist / "PC88VA-M18-', producer)
 
 
 if __name__ == "__main__":

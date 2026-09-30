@@ -9,10 +9,11 @@ import sys
 import tarfile
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools/m18'))
 from verify_distribution import (BUILD_FIELDS, COMPONENTS, VerificationError,
-                                 bound_file, check_manifest, fields)
+                                 bound_file, check_manifest, fields, verify)
 
 
 def sha(data):
@@ -105,6 +106,49 @@ class DistributionInstanceTests(unittest.TestCase):
             change(values[index])
             with self.subTest(index=index), self.assertRaises(VerificationError):
                 self.verify(values)
+
+    def test_public_filename_contract_accepts_prefix_and_rejects_old_names(self):
+        manifest, comparison, budget, packages, files, bundle, lock, lock_hash = instances()
+        image = b'synthetic D88'
+        manifest['distribution_d88'] = {
+            'filename': 'freedos-PC88VA-M18-2HD.D88',
+            'sha256': sha(image), 'size_bytes': len(image)}
+        manifest['source_bundle'] = {
+            'filename': 'freedos-PC88VA-M18-SOURCES.tar.xz',
+            'sha256': sha(bundle), 'size_bytes': len(bundle)}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            dist = root / 'dist/m18'
+            dist.mkdir(parents=True)
+            (root / 'config/m18').mkdir(parents=True)
+            (root / 'manifests').mkdir()
+            (root / 'config/m18/media.json').write_text(json.dumps({'geometry': {}}))
+            (root / 'manifests/m18-components.lock.json').write_text(json.dumps(lock))
+            (root / 'manifests/toolchains.lock.json').write_bytes(b'lock')
+            for key, filename, record in (
+                    ('two_build_comparison_sha256', 'two-build-comparison.json', comparison),
+                    ('capacity_budget_sha256', 'capacity-budget.json', budget),
+                    ('package_manifest_sha256', 'package-manifest.json', packages)):
+                data = json.dumps(record).encode()
+                (dist / filename).write_bytes(data)
+                manifest[key] = sha(data)
+            (dist / manifest['distribution_d88']['filename']).write_bytes(image)
+            (dist / manifest['source_bundle']['filename']).write_bytes(bundle)
+            with patch('verify_distribution.inspect', return_value=(
+                    {'fat_copies_equal': True}, files)), patch(
+                    'verify_distribution.check_manifest') as check:
+                (dist / 'build-manifest.json').write_text(json.dumps(manifest))
+                verify(root, dist)
+                check.assert_called_once()
+                for key, name in (
+                        ('distribution_d88', 'PC88VA-M18-2HD.D88'),
+                        ('source_bundle', 'PC88VA-M18-SOURCES.tar.xz')):
+                    old = copy.deepcopy(manifest)
+                    old[key]['filename'] = name
+                    (dist / 'build-manifest.json').write_text(json.dumps(old))
+                    with self.subTest(key=key), self.assertRaisesRegex(
+                            VerificationError, 'filename differs'):
+                        verify(root, dist)
 
     def test_source_bundle_missing_archive_member(self):
         values = list(instances())

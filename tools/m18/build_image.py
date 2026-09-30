@@ -357,7 +357,7 @@ def build_source_bundle_pinned(image_id: str, inputs: Path, output: Path,
         "sys.path.insert(0,\"/work/entry/tools/m18\"); "
         "from build_image import build_source_bundle; "
         "build_source_bundle(Path(\"/input\"), "
-        "Path(\"/work/result/PC88VA-M18-SOURCES.tar.xz\"), "
+        "Path(\"/work/result/freedos-PC88VA-M18-SOURCES.tar.xz\"), "
         "json.loads(Path(\"/work/source-record.json\").read_text()), "
         "int(sys.argv[1]))' \"$M18_SOURCE_DATE_EPOCH\""
     )
@@ -500,13 +500,13 @@ def main() -> None:
         "two_independent_clean_builds_equal": True,
     }
     bundle_record = build_source_bundle_pinned(image_id, inputs,
-        output / "PC88VA-M18-SOURCES.tar.xz", source_record, epoch)
-    target_d88 = staging_dist / "PC88VA-M18-2HD.D88"
+        output / "freedos-PC88VA-M18-SOURCES.tar.xz", source_record, epoch)
+    target_d88 = staging_dist / "freedos-PC88VA-M18-2HD.D88"
     target_d88.write_bytes(first_d88)
     shutil.copy2(output / "run-1/capacity-budget.json", staging_dist / "capacity-budget.json")
     shutil.copy2(output / "run-1/package-manifest.json", staging_dist / "package-manifest.json")
     shutil.copy2(output / "two-build-comparison.json", staging_dist / "two-build-comparison.json")
-    shutil.copy2(output / "PC88VA-M18-SOURCES.tar.xz", staging_dist / "PC88VA-M18-SOURCES.tar.xz")
+    shutil.copy2(output / "freedos-PC88VA-M18-SOURCES.tar.xz", staging_dist / "freedos-PC88VA-M18-SOURCES.tar.xz")
     readme = ROOT / "tools/m18/DISTRIBUTION-README.md"
     if not readme.is_file():
         raise FileNotFoundError("M18 distribution instructions are missing")
