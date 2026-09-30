@@ -245,7 +245,14 @@ disk. It contains the complete allowlisted M18 parent build inputs and the
 full source archives of fdkernel, FreeCOM, COUNTRY.SYS, FreeDOS EDLIN, and JWasm.
 Each source archive preserves its upstream license and notices. The root COPYING
 is GPL version 2; JWasm's Sybase Open Watcom Public License 1.0 is included in
-its source archive and as JWASM.LIC on the disk.
+its source archive and as JWASM.LIC on the disk. The unmodified Open Watcom
+1.9 DOS compiler runtime has independently pinned publicly obtainable source:
+https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.9/open_watcom_1.9.0-src.tar.bz2
+SHA-256: 6d303327988ee2dda60cfabebf3f45a9758aee4da117d41cf3153fccb7e5e4bf
+It is a toolchain source release, not one of the five component archives in
+this bundle. Its Sybase Open Watcom Public License 1.0 text matches JWASM.LIC
+when normalized for line endings; the official *binary* compiler is pinned
+separately by the project's toolchain lock.
 
 For a reproducible image, use the exact parent commit and component gitlinks in
 SOURCE-MANIFEST.json, initialize the pinned Linux/amd64 Open Watcom 1.9 image

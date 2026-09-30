@@ -96,6 +96,36 @@ minimum RAM claims for other applications. Host child tests deliberately omit
 the relocation and require a failing exit. Only real DOS guest execution can
 qualify the parent's complete allocation/EXEC assertions.
 
+## DOS executable entry lower bounds (not runtime peaks)
+
+The build's `package-manifest.json` includes
+`dos_executable_entry_lower_bounds` for every required external DOS utility,
+read independently from the **composed** normal disk by
+`tools/m18/qa/tool_ram_budget.py`. This accounts for the pinned FreeDOS
+`DosExeLoader()`'s entire final 512-byte MZ page, plus the PSP and MZ minimum
+extra paragraphs, with the MCB header reported separately. The literal linked
+image length alone can **understate** this entry allocation. A Watcom
+`maxalloc=FFFFh` may reserve a larger block up to the available DOS arena, and
+runtime heap/stack/input/output demands, a child environment and concurrent
+kernel/shell owners can impose further requirements. These per-file public
+source-bound floors **do not measure useful runtime peaks or installed-RAM
+minima**. Guest success/failure must be checked separately on the exact disk.
+
+## Separate mixed-floppy data regression (not the normal disk)
+
+`python3 -B tools/m18/qa/mixed_floppy_360.py --output /absolute/private-test-root/b-360.d88`
+creates one **nonbooting, disposable** 40-cylinder/2-head/9-sector, 512-byte
+sector, 360-KiB **2D-D88** FAT12 B: test disk. Raw 360-KiB `.img` is not
+recognized by the matched emulator and must not be substituted. The M18-local recipe and
+negative host tests are in `config/m18/mixed-floppy-360.json` and
+`tests/m18/test_mixed_floppy_360.py`; neither imports an older milestone's
+runtime inputs. Use a disposable copy of the *same tested normal* 2HD disk as
+A:, then write and read a file on B: with ordinary DOS COPY/TYPE; stop VAEG
+before `--inspect` readback or examining the final D88/FAT chains. This does
+not add a second distribution disk or imply that the **2HD-only** M18 FORMAT,
+CHKDSK and SYS programs support a 360-KiB profile. Do not feed this QA image
+to normal `make m18-disk` or change another milestone's accepted fixture.
+
 ## Optional private interval readback
 
 `tools/m18/qa/interval_readback.py` is a separately invoked M18-local inspector;

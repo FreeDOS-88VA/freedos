@@ -232,8 +232,8 @@ The fixture now owns explicit trailing stack space. A new host regression models
 that pre-entry write and rejects the old fixture. The expected COM boundary is
 31 tail paragraphs, including environment, split MCB, PSP, image and stack;
 the MZ boundary remains 83 under the pinned FreeDOS page-rounding policy.
-Bounded progress output was added to the QA parent. Fresh real guest validation
-of the corrected probe is pending; no common-kernel change was made.
+Bounded progress output was added to the QA parent. Later real-DOS validation of the corrected probe passed as recorded in the
+source-bound guest checks below; no common-kernel change was made.
 The dedicated CI now composes the separate QA media after the complete normal
 two-build gate. Neither QA implementation nor the scoped allocator results close
 the remaining full memory-ownership and per-tool acceptance gates.
@@ -248,8 +248,9 @@ MCB traversal. No kernel reservation, foreign owner or guessed linked minimum
 is resized. A synthetic integration test checks ordering and both failure
 returns. Build records now separate linked requirements, FreeDOS whole-page
 initial allocation and actual runtime ownership; they no longer claim the
-linked minimum is the complete process footprint. Local host tests total 67;
-clean builds and exact new-disk guest comparison must still qualify this change.
+linked minimum is the complete process footprint. That implementation checkpoint ran 67 host tests; later clean builds, exact
+candidate guest comparisons and an expanded host suite supersede this pending
+gate as recorded below.
 
 ## Later source-bound guest checks (M18 remains in progress)
 
@@ -338,13 +339,29 @@ other utility. An earlier CHKDSK stdout redirection was empty and is not
 accepted as a successful disk check. Separate same-image low-memory tests did
 read a newly generated 2HD B: with CHKDSK and load/quit the original HELLO.ASM
 in EDLIN at 384 KiB on VA and installed 512 KiB on VA2 with a stale larger
-retained setting. FORMAT/SYS **help only**, MORE help, and settled MCB-chain
-identity passed in those runs. They do not prove FORMAT/SYS destructive work at
-these capacities, or successful EDLIN save there. At 256 KiB, a directed EDLIN
-load reported no source lines and ended abnormally; CHKDSK, FORMAT and SYS
-rejected the operation for insufficient DOS memory, with a usable shell and
-matching checked MCB snapshots afterward. The EDLIN case is not a pass or a
-cleanly diagnosed editor memory minimum; its failed script is preserved. Actual
+retained setting. For the later exact notice-updated candidate, VA at 384 KiB
+also completed **destructive** FORMAT B:, read-only CHKDSK B: and SYS A: B:;
+the B: system files match the A: source, and the actual SYS-produced disk
+subsequently booted at 384 KiB and wrote/read a new guest file. The first
+redirected CHKDSK A: output in that session was empty and is not counted as
+a check; B: inspections did produce validated content. A separate 384-KiB VA editor run also saved a modified source copy, preserved
+the byte-identical `.BAK`, reopened the saved file in EDLIN, independently read
+its contents and returned to an identical, valid normal MEMMAP snapshot. Its
+last redirected `/CHECK` file was empty because the run ended before that
+command completed; **that invocation is not a `/CHECK` PASS**. These results
+do not prove alternate-model low-memory destructive work. At 256 KiB, a directed EDLIN load reported no source lines and ended
+abnormally; CHKDSK, FORMAT and SYS rejected their operations for insufficient
+DOS memory, with a usable shell and matching checked MCB snapshots afterward.
+An independent **unredirected** EDLIN run on the later notice-updated normal
+candidate visibly printed Watcom's `Out of memory` and `ABNORMAL TERMINATION`.
+The subsequent typed TYPE command was partly consumed during termination and
+its redirected output was empty, so it is **not** a file-read PASS. The original
+source file remained byte-identical to the clean normal disk, a later shell
+write/readback marker was present, and a subsequent MCB check passed. This is
+a bounded explicit resource failure with shell recovery, **not** successful
+EDLIN editing at 256 KiB or a claim that its diagnostic is pleasant. The
+pinned upstream EDLIN path reports zero lines when it cannot open a file; do
+not repair that upstream behavior solely to conceal low-memory pressure. Actual
 per-tool workload ceilings and instantaneous execution peaks remain open.
 
 An M18-local private readback inspector now reconciles the exact public
@@ -364,6 +381,20 @@ recorded in a file; the first fixture accidentally omitted the ECHO separator
 and left its target file empty, and is explicitly not counted for repeat.
 Automated frontend input is not a physical keyboard or hardware result.
 
+On the notice-updated normal disk, VA and VA2 separately edited and saved
+the bundled sample, read it back, assembled and executed real COM and relocated MZ
+programs, recovered from syntax and missing-input errors without stale
+executables, and returned to a valid MCB chain. The initial pre/post snapshots
+were not byte-identical; **post-warmup and post-repeated-child snapshots**
+matched, and repeated COM/MZ output files were independently inspected. A
+separate M18-local QA fixture preserves the accepted public 360-KiB FAT12 data
+geometry on a nonbooting 2D-D88 B: disk, with the normal 2HD A: unchanged.
+VA and VA2 read/wrote files to this mixed B: and the independent 2D-D88/raw
+FAT readback agreed with guest A: readback and stable MCB snapshots. The
+initial 360-KiB **raw .img** attempt failed because the matched emulator did
+not recognize that container; it is preserved as a non-pass, not counted as
+an adapter failure or silently renamed into the working 2D-D88 fixture.
+M18 CHKDSK/FORMAT/SYS remain deliberately 2HD-only.
 The official Open Watcom 1.9 source release was separately obtained and
 hash-checked for the linked DOS software-8087 and floating-conversion modules
 and its license. The host package manifest and on-disk/host instructions identify
@@ -376,14 +407,16 @@ release designation.
 ## Remaining qualification and scope
 
 The following required guest gates remain **NOT RUN or incomplete**: JWASMR
-peak/largest-block measurement and broader low-memory stress; full shell/file regressions with A:
-and physical B: media, including exchange during operations; complete FORMAT/SYS
-safeguard coverage beyond the targeted tests above; observed working-space
-peak; memory ownership and capacity accounting. Any test not yet executed is
+in-program useful-memory/peak measurement and broader low-memory workload
+boundaries; exact notice-updated-disk protection and live media exchange;
+full safe-failure coverage for the smallest machine and documented editor
+minimum; observed instantaneous disk workspace peak; outstanding physical
+ownership facts that MCB traversal cannot supply. Any test not yet executed is
 not a pass. No hardware test was attempted. Initial capacity scripts did not complete their
 full workloads and remain unqualified. Later matched-executable capacity runs
-completed the bounded workload described above; they do not establish all-tool
-minima or a near-limit allocation/EXEC stress pass.
+completed the bounded workload described above; allocator/COM/MZ near-limit
+EXEC stress did pass on their separate byte-identical QA media, but does not
+establish every required utility's in-program memory peak or minimum.
 
 The disk payload is the FreeDOS kernel, NECPC88VA FreeCOM, COUNTRY.SYS, EDLIN,
 MORE, MEMMAP, real-mode JWASMR, CHKDSK, FORMAT and SYS, plus English/ASCII

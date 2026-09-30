@@ -67,6 +67,37 @@ hard-coded free-memory promise. Runtime PSPs and environments are independently
 checked against each observed MCB chain, and the largest raw MCB remains
 separate from a practical EXEC capacity.
 
+### Application demand is not just a linked length
+
+The M18 distribution's package manifest records each DOS MZ utility's actual
+source file SHA-256 and the **entry lower bound** derived from its header and
+the pinned FreeDOS `DosExeLoader()` source. That loader allocates
+`16 + (exPages * 32 - exHeaderSize) + exMinAlloc` paragraphs for the child's
+PSP block at minimum; `exPages` rounds the *entire last MZ file page*. Its
+header consumes one additional MCB paragraph and its cloned environment needs
+a separate allocation. On the current build the lower PSP-block bounds are:
+
+| Source-built tool | Required PSP block at EXEC entry | Observed native capacity scope, not a full peak |
+| --- | ---: | --- |
+| MORE | 20,896 bytes | `MORE /?` at 256 KiB; full paging at the high-capacity matched model |
+| MEMMAP | 22,528 bytes | checked MCB traversal at 256, 384, 512 and 640 KiB; its own Watcom heaps are trimmed before the report |
+| EDLIN | 35,696 bytes | edit/save/reopen at 384 KiB on VA and 640 KiB on both models, file load/quit at 512 KiB; **256-KiB load failed with explicit Watcom OOM/abnormal exit** |
+| CHKDSK | 38,112 bytes | read-only 2HD B: check at 384/512 and 640 KiB; at 256 KiB the program reported insufficient DOS memory |
+| FORMAT | 45,072 bytes | destructive 2HD B: operation at 384 KiB on VA and 640 KiB on both models; 512-KiB VA2 help only; 256 KiB insufficient |
+| SYS | 68,464 bytes | bootable 2HD B: transfer and its actual re-boot at 384 KiB on VA, transfer/boot at high capacity; 512-KiB VA2 help only; 256 KiB insufficient |
+| JWASMR | 330,048 bytes | COM/MZ sample build at 640 KiB; at lower tested capacities it failed without executable output |
+
+All byte counts above are public-source-derived, **not** private guest-memory
+measurements or total installed RAM requirements. A Watcom `exMaxAlloc=FFFFh`
+can reserve substantially more than the listed minimum at EXEC. The source
+bounds exclude input, environment, filesystem and runtime heap growth; a
+successful boot, help banner, or file load alone does not measure an in-program
+peak. Keep the actual success/failure evidence bound to the exact normal D88,
+emulator and RAM setting. The standalone inspector's synthetic negative tests
+cover truncated and drifted MZ headers, rounded last pages and bad entry/stack
+boundaries. Do not subtract this table from physical capacity to claim a
+maximum executable size.
+
 The known source contract does not authorize reclaiming the low policy exclusion
 or merging across FreeCOM/system allocations. Hardware holes, unavailable memory
 and any unconfirmed region remain outside MEMMAP's physical-memory claim.

@@ -235,6 +235,8 @@ def main():
     layout = derive_layout(spec)
     allocations = json.loads((out / "media.json").read_text(encoding="ascii"))["allocations"]
     package_config = json.loads((ROOT / "config/m18/packages.json").read_text(encoding="ascii"))
+    from qa.tool_ram_budget import all_tool_floors
+    dos_exec_floors = all_tool_floors(files)
     workspace = json.loads((ROOT / "config/m18/workspace-budget.json").read_text(encoding="ascii"))
     free_clusters = len(filesystem["free_clusters"])
     minimum_free = workspace["minimum_free_clusters_after_build"]
@@ -316,6 +318,7 @@ def main():
         "toolchain_lock_sha256": sha256(toolchain_lock_bytes),
         "open_watcom_host_tools": toolchain_lock["canonical"]["open_watcom"]["host_tools"],
         "cpu_contract": package_config["cpu_contract"],
+        "dos_executable_entry_lower_bounds": dos_exec_floors,
         "compiler_runtime_source": package_config["compiler_runtime_source"],
         "native_boot_profile": {
             "id": "2hd-1280",
