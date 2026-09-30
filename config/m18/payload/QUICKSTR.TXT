@@ -1,5 +1,11 @@
 M18 QUICKSTART - edit, assemble, and run on A:
 
+Use 640 KiB installed RAM for this full sample workflow on the tested VA/VA2
+models. At installed 512 KiB, EDLIN editing worked but JWASMR could not start
+the sample COM/MZ build; DOS reported insufficient memory. Retained BIOS RAM
+selections do not supply missing installed RAM. This quickstart does not prove
+that arbitrarily large programs or source files will fit.
+
 1. Make room and copy the original examples into a work directory:
 
    MD WORK
@@ -46,7 +52,9 @@ Other useful commands:
    MEMMAP                 List the checked DOS MCB chain.
    MEMMAP > MEMORY.TXT    Redirect the map through DOS standard output.
    MORE README.TXT        Page through text (Space, Enter, or Q).
-   CHKDSK A:              Check this disk without repairing it.
+   CHKDSK B:              Check a prepared native 2HD B: disk, read-only.
 
+Redirected CHKDSK A: output to an A: file may be empty (open issue); do not
+count an empty file as a completed check.
 Use FORMAT and SYS only on a disposable native 2HD target in B:. FORMAT does
 not low-level format tracks. Do not use A: or the release master as a target.

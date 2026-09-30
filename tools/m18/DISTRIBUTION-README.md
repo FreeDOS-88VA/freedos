@@ -60,8 +60,18 @@ separate hash/URL lock in the toolchain setup. No upstream Watcom runtime code
 was modified by M18. Do not conflate the two independently verified binary
 and upstream source identities.
 
+At installed 512 KiB, both tested VA/VA2 models completed editor save/reopen,
+MORE paging, memory-chain checks and native 2HD maintenance on a separate B:.
+JWASMR's sample COM/MZ builds failed at DOS EXEC allocation with no output and
+stable shell/MCB state. The bundled full assembler sample workflow was verified
+at 640 KiB installed; a retained 640-KiB selection is not writable 640-KiB
+RAM. This is a tested small-workload floor, not a promise for arbitrary input
+size or a measurement of live heap peaks.
+
 The maintenance programs accept only the documented native 2HD FAT12 profile.
-CHKDSK is read-only. FORMAT initializes filesystem metadata only on a B:
+CHKDSK is read-only. A redirected `CHKDSK A:` check may leave an empty A: output
+file (public issue #12); it is not counted as a successful check. Guest checks
+on a separately prepared 2HD B: are independently verified. FORMAT initializes filesystem metadata only on a B:
 volume with a readable, valid native 2HD BPB from prior preparation; it does not
 low-level format tracks. SYS requires a valid M18 A: source and a prepared 2HD B: target. FORMAT and SYS
 are destructive and should be tried only on disposable media, never on a
@@ -79,8 +89,9 @@ unrun gates; host build success is not guest qualification.
 - `build-manifest.json`: source, toolchain, archive, image identity, and scope.
 - `two-build-comparison.json`: exact result of the two independent D88 builds.
 - `capacity-budget.json`: BPB/FAT/root/data-region accounting, per-file hashes
-  and clusters, and the configured sample-workflow reserve. Guest peak usage
-  remains unmeasured until explicitly recorded.
+  and clusters, and the configured sample-workflow reserve. Settled guest
+  stages were read back; the owner removed instantaneous peak measurement from
+  M18 acceptance, and no such peak is claimed.
 - `package-manifest.json`: package versions, licenses, 8086/VA scope, exact
   source identities, build recipes/options, DOS MZ allocation accounting, and
   disk payload hashes.

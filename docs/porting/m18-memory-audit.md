@@ -79,18 +79,25 @@ a separate allocation. On the current build the lower PSP-block bounds are:
 
 | Source-built tool | Required PSP block at EXEC entry | Observed native capacity scope, not a full peak |
 | --- | ---: | --- |
-| MORE | 20,896 bytes | `MORE /?` at 256 KiB; full paging at the high-capacity matched model |
+| MORE | 20,896 bytes | `MORE /?` at 256 KiB; 512-KiB VA/VA2 paging and subsequent checked shell command; earlier high-capacity paging |
 | MEMMAP | 22,528 bytes | checked MCB traversal at 256, 384, 512 and 640 KiB; its own Watcom heaps are trimmed before the report |
-| EDLIN | 35,696 bytes | edit/save/reopen at 384 KiB on VA and 640 KiB on both models, file load/quit at 512 KiB; **256-KiB load failed with explicit Watcom OOM/abnormal exit** |
-| CHKDSK | 38,112 bytes | read-only 2HD B: check at 384/512 and 640 KiB; at 256 KiB the program reported insufficient DOS memory |
-| FORMAT | 45,072 bytes | destructive 2HD B: operation at 384 KiB on VA and 640 KiB on both models; 512-KiB VA2 help only; 256 KiB insufficient |
-| SYS | 68,464 bytes | bootable 2HD B: transfer and its actual re-boot at 384 KiB on VA, transfer/boot at high capacity; 512-KiB VA2 help only; 256 KiB insufficient |
-| JWASMR | 330,048 bytes | COM/MZ sample build at 640 KiB; at lower tested capacities it failed without executable output |
+| EDLIN | 35,696 bytes | edit/save/reopen at installed 512 KiB with a stale larger retained setting on both VA and VA2; earlier VA 384-KiB and VA/VA2 640-KiB edit runs; **256-KiB load failed with explicit Watcom OOM/abnormal exit** |
+| CHKDSK | 38,112 bytes | read-only 2HD B: check on both VA/VA2 at installed 512 KiB; earlier other-capacity B: checks; A: stdout redirection is issue #12 and NOT PASS |
+| FORMAT | 45,072 bytes | destructive 2HD B: operation at installed 512 KiB on both VA/VA2; earlier VA 384-KiB and high-capacity results; 256 KiB insufficient |
+| SYS | 68,464 bytes | 2HD B: transfer and exact SYS-produced boot/write/readback at installed 512 KiB on VA/VA2; earlier VA 384-KiB and high-capacity results; 256 KiB insufficient |
+| JWASMR | 330,048 bytes | sample COM/MZ builds pass at 640 KiB; at installed 512 KiB in both models DOS rejected the EXEC allocation without executable output and preserved the checked shell/MCB chain; 512-KiB assembly is NOT PASS |
 
 The owner accepts that 256 KiB is too little for EDLIN editing; the qualified
 editor workload floor is 384 KiB on VA. The 256-KiB machine remains supported
 for the separately qualified DOS shell and small utilities. EDLIN's observed
-low-memory failure is not an open port-repair issue.
+low-memory failure is not an open port-repair issue. The owner narrowed further
+capacity review to installed 512 KiB rather than an exhaustive per-tool minimum
+matrix. Existing evidence at other capacities remains scoped history; the
+512-KiB JWASMR allocation failure is not silently promoted to a successful
+minimum. The owner accepted 640 KiB **installed** as the qualified minimum
+among the tested native capacities for the bundled small assembler samples;
+this does not guarantee that larger sources fit. Keep functional 512-KiB
+boot/editor/native maintenance and assembler safe-failure results separate.
 
 All byte counts above are public-source-derived, **not** private guest-memory
 measurements or total installed RAM requirements. A Watcom `exMaxAlloc=FFFFh`

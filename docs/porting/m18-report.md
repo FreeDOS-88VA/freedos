@@ -387,9 +387,37 @@ EDLIN editing at 256 KiB. The pinned upstream EDLIN path reports zero lines
 when it cannot open a file; do not repair that upstream behavior solely to
 conceal low-memory pressure. The owner accepts 256 KiB as too little for EDLIN:
 the supported editing floor is 384 KiB. This is **not** an EDLIN issue or an
-authorization to shrink another owner's memory. Other native-capacity workload
-limits remain to be reviewed; runtime useful-memory peaks are not measured and
-are no longer a required M18 result.
+authorization to shrink another owner's memory. Runtime useful-memory peaks
+are not measured and are no longer a required M18 result.
+
+The owner narrowed the outstanding functional capacity review to **installed
+512 KiB**, not an exhaustive new per-tool RAM-minimum matrix. On the unchanged
+normal disk with a stale larger retained selection, both VA and VA2 edited,
+saved and reopened an EDLIN source copy with an intact backup; MORE help and
+paging returned to a subsequent checked MEMMAP command. Independent FAT
+readback confirmed unchanged distributed files and matching before/after MCB
+reports. The first input fixture accidentally issued MORE twice and was
+aborted; it is not counted. The corrected runs' late shell marker did not
+complete, so that marker is also not a pass. These are scoped 512-KiB results,
+not evidence that other models or settings passed unrun operations.
+
+On separate source-generated native 2HD B: disks at installed 512 KiB in both
+models, real FORMAT B:, CHKDSK B: and SYS A: B: completed. Independent D88
+readback found only the selected, source-identical SYS files and source boot
+sector on each B:, with valid source-A MCB checks. Both exact SYS-produced
+disks then booted and wrote/read guest files. The SYS-only disk does **not**
+contain MEMMAP: an attempted command printed a missing-command error and its
+redirected check file was empty; no MCB check on that disk is claimed. On the
+normal disk at installed 512 KiB, VA2 visibly reported a DOS EXEC allocation
+failure for JWASMR COM/MZ. Independent VA and VA2 FAT readback found failure
+markers, no new executables and valid checked shell/MCB chains; VA's final
+screen alone did not show the commands. Previously qualified 640-KiB assembly is
+a separate success, not a 512-KiB success. The owner accepted that the small
+JWASMR assembly workflow cannot run at installed 512 KiB: the documented
+sample setting is **640 KiB installed**, not a stale retained selection.
+512-KiB boot, editor and native maintenance remain supported within their
+observed scope. Neither speculative kernel reclamation nor a second tools disk
+is warranted. This is not a guarantee for larger assembly sources.
 
 An M18-local private readback inspector now reconciles the exact public
 carrier/D88 identity with selected post-shell MEMMAP snapshots at every native
@@ -440,14 +468,19 @@ readbacks are relabeled as peaks. Keep the committed disk reserve, exact-disk
 staged checks and live-ownership safety rules. Do not infer physical firmware
 or VRAM ownership from the DOS MCB chain.
 
-Remaining qualification includes the scoped native-capacity workload limits,
-source/CPU/startup/library and final acceptance review. The empty CHKDSK A:
+The owner-scoped 512-KiB native-capacity workload review is complete for the
+listed successful tools and safe JWASMR rejection, with 640 KiB installed
+required for the qualified assembler samples. The new on-disk notice documenting
+this limitation changes the normal D88 identity; prior boots do **not**
+automatically qualify the new image. Remaining work includes its clean source
+build, exact-disk guest regressions, source/CPU/startup/library and final
+acceptance review. The empty CHKDSK A:
 redirection is separately tracked in public issue #12; it is **not** a disk-
 check PASS or a reason to relabel the separately qualified B: checks. Same-
 candidate protection and media exchange passed on VA and VA2. Any unrun test
 is not a pass. No hardware test was attempted. Initial capacity scripts that
-did not finish remain unqualified; later bounded runs do not establish every
-utility's practical minimum. Allocator/COM/MZ near-limit EXEC stress passed
+did not finish remain unqualified; the owner no longer requests an exhaustive
+minimum for every utility. Allocator/COM/MZ near-limit EXEC stress passed
 on separate source-bound QA media, not on the normal disk.
 
 The disk payload is the FreeDOS kernel, NECPC88VA FreeCOM, COUNTRY.SYS, EDLIN,

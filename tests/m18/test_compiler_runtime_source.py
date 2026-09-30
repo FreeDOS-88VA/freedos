@@ -14,6 +14,22 @@ class CompilerRuntimeSourceTests(unittest.TestCase):
     OFFICIAL_SHA256 = '6d303327988ee2dda60cfabebf3f45a9758aee4da117d41cf3153fccb7e5e4bf'
     LICENSE_SHA256 = '4173a410eac727611c8cc156c6ecc5c12be621bf05d84514245e4c950b8cb042'
 
+    def test_on_disk_sample_ram_notice_matches_public_manifest(self):
+        package = json.loads((ROOT / 'config/m18/packages.json').read_text())
+        assembler, = (entry for entry in package['packages'] if entry['id'] == 'jwasm')
+        self.assertEqual(assembler['sample_workflow_qualified_installed_kib'], 640)
+        self.assertIn('DOS EXEC allocation failed', assembler['installed_512_kib_result'])
+        self.assertIn('no executable output', assembler['installed_512_kib_result'])
+        for name in ('README.TXT', 'QUICKSTR.TXT'):
+            with self.subTest(name=name):
+                data = (ROOT / 'config/m18/payload' / name).read_bytes()
+                self.assertTrue(data.isascii())
+                self.assertIn(b'512 KiB', data)
+                self.assertIn(b'640 KiB', data)
+                self.assertIn(b'installed', data)
+                self.assertIn(b'CHKDSK A:', data)
+                self.assertIn(b'empty', data)
+
     def test_pinned_upstream_source_and_license_notice_are_consistent(self):
         package = json.loads((ROOT / 'config/m18/packages.json').read_text())
         source = package['compiler_runtime_source']

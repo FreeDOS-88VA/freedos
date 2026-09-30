@@ -29,7 +29,7 @@
       "license": "GPL-2.0-or-later",
       "cpu": "8086 real mode",
       "va_adaptation": "Pinned NECPC88VA FreeCOM configuration, English build, fixed reproducible timestamp",
-      "tests": ["clean source build", "matched VA/VA2 shell, file/edit/assembly/batch commands; input and physical-media matrix pending"]
+      "tests": ["clean source build", "matched VA/VA2 shell, file/edit/assembly/batch commands and input regression", "source-generated B: media exchange and SYS boot checked separately"]
     },
     {
       "id": "country",
@@ -48,8 +48,8 @@
       "source_lock": "edlin",
       "license": "GPL-2.0-or-later",
       "cpu": "8086 DOS MZ",
-      "va_adaptation": "Pinned FreeDOS EDLIN source, English ASCII messages, Open Watcom large-model build",
-      "tests": ["clean build", "matched VA/VA2 guest ASCII load/edit/save and backup readback; broader editor limits pending"]
+      "va_adaptation": "Pinned FreeDOS EDLIN source, English ASCII messages, Open Watcom large-model build; the upstream IBM INT16h keyboard path is guarded by disabled SHIFT_JIS",
+      "tests": ["clean build", "matched VA/VA2 512-KiB guest edit/save/reopen and byte-identical backup readback; 256-KiB editing is outside the owner's supported scope"]
     },
     {
       "id": "more",
@@ -69,7 +69,7 @@
       "license": "GPL-2.0-or-later",
       "cpu": "8086 DOS MZ",
       "va_adaptation": "Project-owned native 1024-byte-sector FAT12 maintenance for the explicitly declared 2HD profile; CHKDSK is read-only; FORMAT initializes filesystem metadata only on a readable B: volume with a valid native 2HD BPB from prior preparation; SYS transfers selected native system files and boot sector to disposable B: media",
-      "tests": ["synthetic FAT/volume tests", "earlier matched disposable B: FORMAT/CHKDSK/SYS and SYS-produced boot, tied to the earlier candidate rather than current kernel bytes; current-candidate destructive maintenance rerun pending"]
+      "tests": ["synthetic FAT/volume tests", "matched VA/VA2 actual FORMAT/CHKDSK/SYS on source-generated B: at installed 512 KiB, source-identical SYS files and exact SYS-output boot/readback", "A: redirected CHKDSK output remains open issue #12 and NOT PASS"]
     },
     {
       "id": "memmap",
@@ -89,7 +89,9 @@
       "license": "Sybase Open Watcom Public License 1.0",
       "cpu": "8086 real-mode DOS MZ; no protected-mode extender",
       "va_adaptation": "Pinned JWasm DOS16 source recipe, Open Watcom 1.9 build with optional host/COFF/ELF/386 features disabled; require the actual linked DOS software 8087 emulator for REAL4/REAL8 conversion without a coprocessor; reproducible M18 source/license notice",
-      "tests": ["clean build and MZ accounting", "matched VA/VA2 640-KiB guest COM/MZ and syntax/missing-file recovery", "matched VA/VA2 real REAL4 conversion and output execution with NDP8087 disabled", "current low-memory clean rejection tested; actual per-tool minima pending"]
+      "sample_workflow_qualified_installed_kib": 640,
+      "installed_512_kib_result": "DOS EXEC allocation failed on VA and VA2 for both sample formats; no executable output, preserved shell and MCB chain",
+      "tests": ["clean build and MZ accounting", "matched VA/VA2 640-KiB guest COM/MZ and syntax/missing-file recovery", "matched VA/VA2 real REAL4 conversion and output execution with NDP8087 disabled", "installed-512-KiB clean DOS allocation rejection; do not claim 512-KiB sample assembly or an arbitrary source-size guarantee"]
     },
     {
       "id": "starter-material",

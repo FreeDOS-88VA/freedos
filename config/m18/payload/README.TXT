@@ -10,8 +10,8 @@ Boot
 Insert this disk in drive A: and boot through the PC-88VA native floppy path.
 Compatibility with any emulator or machine must be established by the matching
 qualification record; it is not implied by this disk. Leave B: empty for normal
-startup. At the DOS prompt, use DIR, TYPE, COPY, REN, DEL, MD, RD, CD, ECHO, SET, PATH, batch files,
-and shell redirection. Use HELP for shell help.
+startup. At the DOS prompt, use DIR, TYPE, COPY, REN, DEL, MD, RD, CD,
+ECHO, SET, PATH, batch files, and shell redirection. Use HELP for shell help.
 
 Files and examples
 ------------------
@@ -24,6 +24,16 @@ Create a writable work directory before editing or assembling. Keep the
 original release image unchanged; make a writable copy for ordinary file work.
 See QUICKSTR.TXT for the complete edit/assemble/run example.
 
+RAM limits of the tested small workflow
+---------------------------------------
+At installed 512 KiB, the shell, EDLIN editing, MORE, MEMMAP and native 2HD
+maintenance worked on the tested VA/VA2 models. JWASMR could not start a COM
+or MZ sample build: DOS reported insufficient memory. Use at least 640 KiB
+installed for the bundled edit/assemble/run example; this is a tested sample
+setting, not a guarantee for larger source files. A saved 640 KiB selection
+cannot replace missing physical RAM. Do not count an old executable as output
+from a failed build.
+
 Floppy maintenance
 ------------------
 CHKDSK checks the documented native 2HD FAT12 filesystem without repairing it.
@@ -34,7 +44,9 @@ transfers the boot system to a prepared native 2HD target and writes its boot
 record. Both FORMAT and SYS are intended for disposable target media in B:;
 never use the release master as a target. Read each command's confirmation and
 help before proceeding. Only the native 2HD FAT12 profile is supported by these
-maintenance commands.
+maintenance commands. CHKDSK B: on a prepared 2HD disk was checked. Redirected
+CHKDSK A: output to a file on A: may be empty (open issue); do not treat an
+empty file as a completed check.
 
 License and corresponding source
 --------------------------------
