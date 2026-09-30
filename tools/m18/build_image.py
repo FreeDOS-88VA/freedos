@@ -290,6 +290,54 @@ firmware, disk captures, guest traces, or emulator results.
     return {"filename": output.name, "size_bytes": len(data), "sha256": sha256(data)}
 
 
+def build_source_bundle_pinned(image_id: str, inputs: Path, output: Path,
+                               source_record: dict, epoch: int) -> dict:
+    """Pack sources with the same pinned Python/liblzma as the DOS build.
+
+    The host's Python and xz versions vary even when source archives and the
+    normal D88 agree. Never let that change the designated companion archive.
+    Copy only deterministic public exports into an isolated no-network
+    container; do not mount a checkout or use cached DOS executables.
+    """
+    record = output.parent / "source-record.json"
+    record.write_text(json.dumps(source_record, sort_keys=True) + "\n", encoding="ascii")
+    script = (
+        "mkdir -p /work/entry /work/result && "
+        "tar -xf /input/parent.tar -C /work/entry tools/m18/build_image.py && "
+        "python3 -B -c 'import json,sys; from pathlib import Path; "
+        "sys.path.insert(0,\"/work/entry/tools/m18\"); "
+        "from build_image import build_source_bundle; "
+        "build_source_bundle(Path(\"/input\"), "
+        "Path(\"/work/result/PC88VA-M18-SOURCES.tar.xz\"), "
+        "json.loads(Path(\"/work/source-record.json\").read_text()), "
+        "int(sys.argv[1]))' \"$M18_SOURCE_DATE_EPOCH\""
+    )
+    cid = run("docker", "create", "--platform", "linux/amd64", "--network", "none",
+              "-e", "M18_SOURCE_DATE_EPOCH=" + str(epoch), "--entrypoint", "bash",
+              image_id, "-ec", script)
+    try:
+        subprocess.run(["docker", "cp", str(inputs) + "/.", cid + ":/input"], check=True)
+        subprocess.run(["docker", "cp", str(record), cid + ":/work/source-record.json"],
+                       check=True)
+        log = output.parent / "source-bundle-build.log"
+        with log.open("xb") as stream:
+            subprocess.run(["docker", "start", "-a", cid], stdout=stream,
+                           stderr=subprocess.STDOUT, check=True)
+        subprocess.run(["docker", "cp", cid + ":/work/result/" + output.name,
+                        str(output)], check=True)
+    finally:
+        subprocess.run(["docker", "rm", "-f", cid], check=True,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    data = output.read_bytes()
+    with tarfile.open(output, "r:xz") as tar:
+        if set(tar.getnames()) != {"pc88va-freedos-m18-source/README.txt",
+                                   "pc88va-freedos-m18-source/SOURCE-MANIFEST.json"} | {
+                                       "pc88va-freedos-m18-source/" + name + ".tar"
+                                       for name in ("parent",) + COMPONENTS}:
+            raise ValueError("pinned source bundle member set differs")
+    return {"filename": output.name, "size_bytes": len(data), "sha256": sha256(data)}
+
+
 def copy_container_run(image_id: str, inputs: Path, run_dir: Path,
                        parent: str, pass_number: int, source_date_epoch: int) -> dict:
     command = (
@@ -396,7 +444,7 @@ def main() -> None:
         "source_date_epoch": epoch,
         "two_independent_clean_builds_equal": True,
     }
-    bundle_record = build_source_bundle(inputs,
+    bundle_record = build_source_bundle_pinned(image_id, inputs,
         output / "PC88VA-M18-SOURCES.tar.xz", source_record, epoch)
     target_d88 = staging_dist / "PC88VA-M18-2HD.D88"
     target_d88.write_bytes(first_d88)

@@ -18,9 +18,12 @@ or prior milestone tool/config/test directory is a build input.
 - `make m18-disk` performs both complete source builds, compares D88 bytes and
   release records, validates payload hashes/FAT chains and root-directory
   capacity, and writes `dist/m18/` without overwriting an unrelated existing
-  distribution. A repeat with the same inputs is allowed only if every public
-  distribution file is identical. Use `M18_DIST=dist/m18-candidate-<id>` for a
-  changed source identity.
+  distribution. The host-side corresponding-source bundle is packed by the
+  pinned Linux/amd64 image's Python/liblzma, not the host's variable Python/xz
+  versions; its input archives still come only from deterministic Git exports.
+  A repeat with the same inputs is allowed only if every public distribution
+  file is identical. Use `M18_DIST=dist/m18-candidate-<id>` for a changed source
+  identity.
 - `make m18-clean` removes only the marker-validated Git-excluded `build/m18/`
   intermediate root. It preserves `dist/m18/`, the identity-pinned toolchain,
   and the host wheel cache.
