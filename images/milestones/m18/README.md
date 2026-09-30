@@ -13,8 +13,8 @@ license references, separate source-bundle digest and qualified test scope.
 
 ```sh
 xz -t images/milestones/m18/freedos-pc88va-m18-2hd-1280.d88.xz
-xz -dc images/milestones/m18/freedos-pc88va-m18-2hd-1280.d88.xz > /tmp/PC88VA-M18-2HD.D88
-sha256sum images/milestones/m18/freedos-pc88va-m18-2hd-1280.d88.xz /tmp/PC88VA-M18-2HD.D88
+xz -dc images/milestones/m18/freedos-pc88va-m18-2hd-1280.d88.xz > /tmp/freedos-PC88VA-M18-2HD.D88
+sha256sum images/milestones/m18/freedos-pc88va-m18-2hd-1280.d88.xz /tmp/freedos-PC88VA-M18-2HD.D88
 ```
 
 Use a **writable copy** when testing in a supported VA/VA2 emulator. The
@@ -35,12 +35,12 @@ for the exact scope and CHKDSK A: redirection caveat.
 From a fresh checkout of `https://github.com/nakatamaho/freedos-pc88va.git`:
 
 ```sh
-git checkout 203983964a5892f8c79c365151f0703b573ba931
+git checkout 99a8f59a0ec7388cc16968a8814aa23bb0ba8c92
 git submodule update --init --recursive
 make m18-toolchain
 make m18-disk M18_DIST=dist/m18
 make m18-accept M18_DIST=dist/m18
-sha256sum dist/m18/PC88VA-M18-2HD.D88 dist/m18/PC88VA-M18-SOURCES.tar.xz
+sha256sum dist/m18/freedos-PC88VA-M18-2HD.D88 dist/m18/freedos-PC88VA-M18-SOURCES.tar.xz
 ```
 
 Follow [the source/toolchain setup guide](../../../tools/m18/DISTRIBUTION-README.md)
@@ -50,8 +50,11 @@ committed M18 inputs and component gitlinks, builds the **complete** disk twice
 in separate clean network-disabled containers, and checks placement and media
 readback. It does not read a candidate D88 or saved DOS programs. The built
 D88 must have the uncompressed digest above; the public-source/license
-companion `dist/m18/PC88VA-M18-SOURCES.tar.xz` must be 2,225,220 bytes, SHA-256
-`52fb140dfaec0a161e47492a2635df7217371230eac9cce4354df793a7ec4156`.
+companion `dist/m18/freedos-PC88VA-M18-SOURCES.tar.xz` must be 2,225,716 bytes, SHA-256
+`6283512d3002c67a7b118fecdbb373cb7789d62e03bcf62abb9fbcddbd3470d4`.
+The `freedos-` prefix changes host filenames, not disk contents: a clean
+build compared byte-for-byte with the HELLO.DOC guest-qualified D88. Its
+existing guest scope is retained; this rename is not a new VAEG/hardware run.
 The source bundle is a host-side **generated** companion and is not a second
 floppy or a committed artifact. Its archives include the exact corresponding
 project and component source and their license files. Unmodified official
@@ -65,8 +68,8 @@ reproduce its exact compressed bytes without depending on a host `xz` version:
 ```sh
 cid=$(docker create --platform linux/amd64 --network none \
   --entrypoint /usr/bin/xz freedos-pc88va-m18:local \
-  -c -9e --threads=1 --check=crc64 /work/PC88VA-M18-2HD.D88)
-docker cp dist/m18/PC88VA-M18-2HD.D88 "$cid:/work/PC88VA-M18-2HD.D88"
+  -c -9e --threads=1 --check=crc64 /work/freedos-PC88VA-M18-2HD.D88)
+docker cp dist/m18/freedos-PC88VA-M18-2HD.D88 "$cid:/work/freedos-PC88VA-M18-2HD.D88"
 docker start -a "$cid" > /tmp/recompressed-m18.d88.xz
 docker rm "$cid"
 cmp /tmp/recompressed-m18.d88.xz \

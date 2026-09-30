@@ -4,20 +4,23 @@ Status: **M18 PASS for the refreshed, single designated native 2HD disk.**
 `HANDOFF READY` is separate and requires post-push checks of the publication
 tip and its own CI; this committed report cannot record its own future SHA.
 
-**Host filename update in progress:** the requested public output names are
+The host-side outputs now use the requested names
 `dist/m18/freedos-PC88VA-M18-2HD.D88` and
-`dist/m18/freedos-PC88VA-M18-SOURCES.tar.xz`. The producer, acceptance verifier
-and host instructions are being updated together. The prior qualified disk
-and its guest evidence below remain bound to their exact bytes. Qualification
-of the changed host recipe and its source companion is pending a clean full
-build and exact-head CI; no new guest or hardware result is claimed by a rename.
+`dist/m18/freedos-PC88VA-M18-SOURCES.tar.xz`. Producer, manifests, acceptance
+verifier and instructions use the same names; the old names are rejected by
+the new verifier. The rebuilt D88 and designated compressed archive are
+**byte-identical** to the HELLO.DOC-qualified disk. No new guest or hardware
+run is claimed by this host-only filename change. The guest evidence remains
+bound to that exact disk built and tested at
+`203983964a5892f8c79c365151f0703b573ba931`; the source companion changes to
+include the maintained filename recipe and its provenance.
 
 Evidence labels: **HOST PASS** at qualified implementation
-`203983964a5892f8c79c365151f0703b573ba931`: 92 host tests, two clean
+`99a8f59a0ec7388cc16968a8814aa23bb0ba8c92`: 94 host tests, two clean
 source-build containers per run, two independent identical complete local
 distributions (all eight generated files), separate allocator QA media, the
 M18-local instance/dependency verifier, and successful native x64 exact-head
-CI `36681167366` attempt 1 with identical D88/source-bundle SHA-256 values.
+CI `36690434903` attempt 1 with identical D88/source-bundle SHA-256 values.
 **VAEG PASS** for the bounded VA/VA2 workflows on the *refreshed* normal D88
 SHA-256 `ace43378a504b1af5bad3d6e89184c1e193d6abf85c995b7a94b581a7d743e5c`
 with matched executable SHA-256
@@ -26,7 +29,7 @@ with matched executable SHA-256
 checks remain historical and are not retroactively promoted to PASS.
 
 `START_SHA`: `d81bba18f0e4793d7165fb0acfdf7e229e160c83`.
-`QUALIFIED_IMPLEMENTATION_SHA`: `203983964a5892f8c79c365151f0703b573ba931`.
+`QUALIFIED_IMPLEMENTATION_SHA`: `99a8f59a0ec7388cc16968a8814aa23bb0ba8c92`.
 `PUBLICATION_TIP_SHA` and `DOWNSTREAM_BASE_SHA` belong in the separate
 post-push handoff, not in a self-referential committed report.
 
@@ -55,8 +58,8 @@ Its extracted 1,331,888-byte D88 has the exact guest-qualified SHA-256
 Two independent XZ Utils 5.2.5 locked-container compressions were identical;
 extraction was compared byte-for-byte with the new D88. Its host-side
 corresponding-source/license companion is **not** a second floppy or committed
-build product: 2,225,220 bytes, SHA-256
-`52fb140dfaec0a161e47492a2635df7217371230eac9cce4354df793a7ec4156`,
+build product: `freedos-PC88VA-M18-SOURCES.tar.xz`, 2,225,716 bytes, SHA-256
+`6283512d3002c67a7b118fecdbb373cb7789d62e03bcf62abb9fbcddbd3470d4`,
 recreated from the public qualified source and pinned dependencies. The FAT12
 native 2HD image has 20 distribution files, 650 allocated and 619 free
 1,024-byte data clusters. The complete guest edit/assemble/repeat workflow

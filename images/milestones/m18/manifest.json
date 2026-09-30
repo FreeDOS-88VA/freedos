@@ -13,7 +13,7 @@
       "sha256": "e399db6aa1775e3b61f76f1b6e9bb7abcb80de35271f1b0d34ff75dc7d18d5dc"
     },
     "uncompressed": {
-      "file": "PC88VA-M18-2HD.D88",
+      "file": "freedos-PC88VA-M18-2HD.D88",
       "bytes": 1331888,
       "sha256": "ace43378a504b1af5bad3d6e89184c1e193d6abf85c995b7a94b581a7d743e5c"
     },
@@ -29,8 +29,8 @@
   },
   "rebuild_source": {
     "start": "d81bba18f0e4793d7165fb0acfdf7e229e160c83",
-    "parent": "203983964a5892f8c79c365151f0703b573ba931",
-    "qualified_implementation": "203983964a5892f8c79c365151f0703b573ba931",
+    "parent": "99a8f59a0ec7388cc16968a8814aa23bb0ba8c92",
+    "qualified_implementation": "99a8f59a0ec7388cc16968a8814aa23bb0ba8c92",
     "fdkernel": "e87e8071c355a99a7f34a8758d4a3368b6523f3d",
     "freecom": "29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e",
     "country": "23f189cca3420606eae8723884fa92ccd65eb307",
@@ -38,7 +38,7 @@
     "jwasm": "96d1f3d4c1661c85788297d50ab032e452f48978"
   },
   "source_archives_sha256": {
-    "parent": "6f8d3f74f6cb3bb85e2a4e8f48af8a33e3fb62b5b7be83f5d291705ea60485d8",
+    "parent": "0332d025b72a1dd0f282c50ea0b3aa976bdc9165a4c9f020e08a1083b1ef0388",
     "fdkernel": "887857e0c6706e47a9c8ea2055f74b3891138ed00564585a0053795e9e7dbc69",
     "freecom": "e61d4e889a6b10f9e05903f9575bb1466dfc5b20cb232f5286219bc173bbb24a",
     "country": "cf0b16ac57e661eeb7e19118cea2d2d200e4545507f15912e8a6462652c2cd9d",
@@ -46,9 +46,9 @@
     "jwasm": "739a6b45458ed43ca2160bc3f5d96172e37b11a0c88a33841453d9e51c174b32"
   },
   "corresponding_sources": {
-    "file": "PC88VA-M18-SOURCES.tar.xz",
-    "bytes": 2225220,
-    "sha256": "52fb140dfaec0a161e47492a2635df7217371230eac9cce4354df793a7ec4156",
+    "file": "freedos-PC88VA-M18-SOURCES.tar.xz",
+    "bytes": 2225716,
+    "sha256": "6283512d3002c67a7b118fecdbb373cb7789d62e03bcf62abb9fbcddbd3470d4",
     "availability": "Rebuild from the public qualified parent commit and pinned component gitlinks; generated host-side companion, not a second disk or committed build product"
   },
   "toolchain": {
@@ -62,9 +62,9 @@
     }
   },
   "qualification_ci": {
-    "run_id": 36681167366,
+    "run_id": 36690434903,
     "attempt": 1,
-    "exact_head_sha": "203983964a5892f8c79c365151f0703b573ba931",
+    "exact_head_sha": "99a8f59a0ec7388cc16968a8814aa23bb0ba8c92",
     "successful_job": "isolated-build",
     "conclusion": "success"
   },
@@ -73,7 +73,7 @@
     "source_commit": "62a597f0ee81e2e036af740a3e79ad3da83e3fb7",
     "tested_executable_sha256": "c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf",
     "models": ["VA", "VA2"],
-    "note": "External guest-only dependency; ROMs and guest media are not public build inputs"
+    "note": "External guest-only dependency; ROMs and guest media are not public build inputs. The host filename rename rebuilt exactly the D88 bytes guest-qualified at source 203983964a5892f8c79c365151f0703b573ba931; it adds no guest or hardware result."
   },
   "reproducibility": {
     "independent_clean_container_builds_per_run": 2,
