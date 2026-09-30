@@ -281,3 +281,7 @@ that is unreachable under the VA platform policy. Audit this when shrinking
 DGROUP: removing unrelated arrays can expose an existing wrong-segment write
 against live allocation metadata. Preserve release-barrier error returns and
 keep their diagnostics resident.
+
+Owner-authorized photographs of real-hardware screens may be published without masking displayed diagnostics. Remove EXIF/GPS metadata. 
+Such photographs do not establish HARDWARE PASS. ROM contents, proprietary disk contents, and raw trace dumps remain excluded.
+ 
