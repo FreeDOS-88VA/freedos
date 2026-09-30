@@ -66,6 +66,8 @@ jobs:
         run: make m18-toolchain
       - name: Build the complete disk twice and compose separate allocator QA media
         run: make m18-allocator-qa
+      - name: Close the public distribution's instance and source references
+        run: make m18-accept
       - name: Confirm public source checkouts remain clean
         run: |
           git diff --check

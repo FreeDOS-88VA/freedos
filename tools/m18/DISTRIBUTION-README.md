@@ -25,6 +25,10 @@ CPU scope.
 4. Run `make m18-disk`. It builds twice in network-disabled containers from
    deterministic Git exports, verifies independent D88 bytes and native FAT12
    readback, and places identical output under `dist/m18/`.
+5. Run `make m18-accept M18_DIST=dist/m18` to independently close the actual
+   JSON instances, source and toolchain references, source bundle archive
+   members, distribution files and FATs. This is a host-only gate; VAEG and
+   hardware results require separately bound evidence.
 
 `make m18-clean` removes only the marker-validated ignored intermediate build
 root. The designated distribution is preserved. A different source revision

@@ -28,6 +28,13 @@ or prior milestone tool/config/test directory is a build input.
   the Git-excluded cache and runs the M18-local suite on Linux/x86_64. On other
   host architectures, `make m18-disk` runs all tests inside its pinned
   Linux/amd64 build container.
+- After `make m18-disk`, run `make m18-accept M18_DIST=dist/m18` (or the
+  selected output path). CI calls the same M18-local instance verifier. It
+  independently checks JSON instance fields, source lock/archives, source
+  bundle members, distribution file bytes, both FATs, the capacity record and
+  two-build references. The pre-build M18 public-source/privacy audit and
+  negative instance tests also run in native CI; neither command reads private
+  media or establishes an emulator/hardware result.
 
 The topic branch must be committed and clean before `make m18-disk`. The build
 checks the exact baseline ancestry, component gitlinks, source-archive hashes,
