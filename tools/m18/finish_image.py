@@ -316,6 +316,7 @@ def main():
         "toolchain_lock_sha256": sha256(toolchain_lock_bytes),
         "open_watcom_host_tools": toolchain_lock["canonical"]["open_watcom"]["host_tools"],
         "cpu_contract": package_config["cpu_contract"],
+        "compiler_runtime_source": package_config["compiler_runtime_source"],
         "native_boot_profile": {
             "id": "2hd-1280",
             "geometry": spec["geometry"],

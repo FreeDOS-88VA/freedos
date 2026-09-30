@@ -96,6 +96,22 @@ minimum RAM claims for other applications. Host child tests deliberately omit
 the relocation and require a failing exit. Only real DOS guest execution can
 qualify the parent's complete allocation/EXEC assertions.
 
+## Optional private interval readback
+
+`tools/m18/qa/interval_readback.py` is a separately invoked M18-local inspector;
+it never runs during normal media construction. Pass `--manifest` the public
+`build-manifest.json`, `--normal` its exact normal D88, `--carrier` the
+same build's `carrier.json`, `--snapshot` an actual guest `MEMMAP > FILE.TXT`
+readback, `--installed-kib` the **installed** 256/384/512/640-KiB capacity,
+and `--output` a new path **outside** this checkout. It independently checks
+source disk/carrier identity, linked resident/first-MCB adjacency, every MCB
+header/end/owner PSP, memory-top bounds, paragraph totals, observer footprint,
+and the temporary carrier/INIT/scratch/ring placement and lifetimes. It does
+not infer hardware/BIOS ownership from DOS MCBs or measure an in-program peak.
+Do not publish its guest snapshot or generated numeric interval report; the
+synthetic host tests cover corrupt headers, ownership, missing rows, totals,
+RAM-top drift and placement errors without private inputs.
+
 ## JWASMR without a numeric coprocessor
 
 The pinned JWasm source converts REAL4/REAL8 decimal initializers through Watcom `strtod()`. A DOS16 `-0` compiler flag alone is not proof that a floating-point coprocessor is unnecessary. The clean JWASMR link therefore verifies that both the pinned Watcom conversion object and its DOS **software 8087 emulator** are present; `noemu87.lib` is rejected. A matched VA2 guest with the optional coprocessor explicitly disabled assembled and executed a small 8086 COM file containing a real-number initializer, and its output bytes and subsequent MCB state were inspected privately. The assembler can emit later CPU/FPU instructions at a user's explicit request; this is not a promise that such *generated* programs run on an 8086/V30 without a coprocessor. The shipped samples use only their original 8086 DOS contract.

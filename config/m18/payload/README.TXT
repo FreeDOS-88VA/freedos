@@ -40,6 +40,13 @@ License and corresponding source
 --------------------------------
 COPYING contains the GNU GPL version 2 terms used by the FreeDOS and M18 GPL
 programs. JWASM.LIC contains the Sybase Open Watcom Public License 1.0. The
-complete corresponding source, build recipes, patches, component notices, and
-license files accompany the public M18 disk as a separate host-side source
-bundle. See its README and package manifest for exact source revisions.
+project and component corresponding source, build recipes, patches, notices,
+and license files accompany this disk in a separate host-side source bundle.
+The unmodified Open Watcom 1.9 DOS compiler runtime, linked into programs,
+shares JWASM.LIC terms. Its official upstream source archive is publicly
+available from open-watcom/open-watcom-1.9 GitHub release ow1.9 under the
+name open_watcom_1.9.0-src.tar.bz2, SHA-256
+6d303327988ee2dda60cfabebf3f45a9758aee4da117d41cf3153fccb7e5e4bf.
+The official compiler binary is separately identity-locked by this project's
+host toolchain recipe. See the host README and package manifest for URLs and
+exact component revisions.

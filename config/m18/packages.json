@@ -3,6 +3,13 @@
   "milestone": "M18",
   "disk_profile": "PC-88VA native 2HD: 80 cylinders, 2 heads, 8 sectors/track, 1024 bytes/sector, 1280 logical sectors, FAT12",
   "cpu_contract": "Native boot path uses the documented VA/V30 profile; required DOS applications and examples target 8086 real mode and require no FPU, XMS, EMS, or protected mode.",
+  "compiler_runtime_source": {
+    "archive_url": "https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.9/open_watcom_1.9.0-src.tar.bz2",
+    "archive_sha256": "6d303327988ee2dda60cfabebf3f45a9758aee4da117d41cf3153fccb7e5e4bf",
+    "license": "Sybase Open Watcom Public License 1.0",
+    "source_location": "public upstream; not copied into the M18 project/component source bundle",
+    "binary_lock": "manifests/toolchains.lock.json canonical.open_watcom; independently hash-verified official final 1.9 Linux archive"
+  },
   "packages": [
     {
       "id": "fdkernel",

@@ -5,9 +5,11 @@ not the QA build tree and does not itself imply guest, emulator, VAEG, or
 hardware qualification. `build-manifest.json` identifies the exact parent and
 component commits, public source-archive hashes, pinned Linux/amd64 toolchain,
 source bundle, image bytes, and validation scope. The complete corresponding
-sources, build recipes, and licenses are supplied separately in
-`PC88VA-M18-SOURCES.tar.xz`; `package-manifest.json` provides versions, build
-settings, source identities, output hashes, and declared DOS CPU scope.
+project/component sources, build recipes, and licenses are supplied separately
+in `PC88VA-M18-SOURCES.tar.xz`; the unmodified compiler runtime has its own
+public upstream source reference below. `package-manifest.json` provides
+versions, build settings, source identities, output hashes, and declared DOS
+CPU scope.
 
 ## Rebuild from public sources
 
@@ -45,7 +47,18 @@ require a protected-mode extender, XMS, EMS, or an FPU, and do not change
 FreeDOS version reporting. JWASMR is a real-mode DOS16 build of JWasm 2.20;
 `JWASM.LIC` contains its Sybase Open Watcom Public License 1.0. `COPYING`
 contains the GNU GPL version 2 terms for GPL-covered files. The source bundle
-contains the full component license and notice files.
+contains the full project/component license and notice files. The unmodified
+Open Watcom 1.9 DOS compiler runtime statically linked into the executables is
+also covered by Sybase Open Watcom Public License 1.0 (`JWASM.LIC`). Its public
+upstream source is the [official Open Watcom 1.9 source release](https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.9/open_watcom_1.9.0-src.tar.bz2),
+filename `open_watcom_1.9.0-src.tar.bz2`, SHA-256
+`6d303327988ee2dda60cfabebf3f45a9758aee4da117d41cf3153fccb7e5e4bf`.
+The archive was independently downloaded and inspected for the compiler-runtime
+conversion and software-8087 modules and `license.txt`. It is not inside the
+M18 component-source archive: the official compiler **binaries** have their
+separate hash/URL lock in the toolchain setup. No upstream Watcom runtime code
+was modified by M18. Do not conflate the two independently verified binary
+and upstream source identities.
 
 The maintenance programs accept only the documented native 2HD FAT12 profile.
 CHKDSK is read-only. FORMAT initializes filesystem metadata only on a B:

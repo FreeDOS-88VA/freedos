@@ -25,6 +25,48 @@ accounted 16-byte MCB headers; byte lengths must not be rounded twice.
 | Child PSP/environment/runtime allocations | Running DOS child and its libraries | EXEC, allocation/resize calls and process exit; repeated post-warmup checks required |
 | Free MCB payload | DOS-allocatable paragraphs | Current chain and common allocator; largest raw free MCB is not necessarily the largest executable |
 
+### End-exclusive source interval equations
+
+Let `L` be the effective `PC88VA_LOADSEG`, `T` the measured RAM top in bytes,
+`R` the exact linked resident-text paragraph, `H = ceil(HMAFree/16)`,
+`F = R + H` the first MCB paragraph, `B` the post-`KernelAlloc` low free-MCB
+paragraph, `I` the actual linked INIT byte extent and `Q` the `lpTop`
+paragraph at temporary-arena initialization. Quantities with unknown dynamic
+ownership must be taken from the **same** linked map, descriptor and boot
+instance; these equations do not turn measured writable RAM into free RAM.
+
+| Source interval `[start, end)` in bytes | Length | Owner and lifetime |
+| --- | --- | --- |
+| `[0, L*16)` | `L*16` | Firmware/platform exclusion **policy**, not a measured free interval; permanent while DOS runs |
+| `[L*16, R*16)` | `(R-L)*16` | Expanded resident image and its near work; becomes permanent at kernel startup |
+| `[R*16, F*16)` | `H*16` | Resident assembly/text; permanent, exact linked extent only |
+| `[F*16, B*16)` | `(B-F)*16` | First system MCB and final FAR kernel buffers/tables/stacks including owned metadata; permanent |
+| `[(B+1)*16, (Q-1)*16)` | `(Q-B-2)*16` | Pre-shell free DOS MCB payload before releasing high INIT; allocation ownership may then change |
+| `[(Q-1)*16, T)` | `T-(Q-1)*16` | Terminal high INIT/early-buffer reservation, owned until guarded `P_0` handoff; freed/coalesced only after its live references are gone |
+| `[T-0x3000-align16(I), T-0x3000)` | `align16(I)` | Linked INIT image inside high temporary ownership; discarded at release |
+| `[T-0x3000, T-0x2000)` | `0x1000` | INIT stack inside the high reservation; discarded after the permanent-stack switch |
+| `[T-0x19000, T-0x19000+carrier_bytes)` | `carrier_bytes` | Temporary compressed file/carrier input during expansion; **may overlap the high reservation at different times**, never counted as a separate permanent DOS allocation |
+| `[T-0x9000, T-0x8000)` | `0x1000` | Temporary decompressor scratch, from the actual linked carrier placement |
+| `[T-0x8000, T-0x7000)` | `0x1000` | Temporary decompressor history ring; **adjacent to** scratch, not contained in it |
+| `[T-0x1010, T-0x10)` | `0x1000` | Temporary bridge stack; not live together with the final shell stack |
+| `[T, 0x100000)` | `0x100000-T` within the conventional 1-MiB address bound | Not present as writable conventional RAM for this capacity; no DOS MCB entitlement |
+
+The early public loader profile independently bounds stage-2 code in its
+`stage2` region and the loader stack in `loader_stack`. Those may overlap the
+*later* expanded resident image only after the loader stops using them: interval
+arithmetic without a lifetime is not an overlap safety proof. The profile's
+firmware regions, native bank mapping, VRAM and ROM are not discoverable from
+MEMMAP and are **not** included in its DOS-arena totals. The temporary INIT
+image/stack, carrier, ring and scratch rows intentionally overlap their
+*enclosing* high reservation in different phases, but the actual scratch and
+ring are separate adjacent 4-KiB intervals. The linked INIT start must be
+checked beyond the ring's end. Do not sum an enclosing reservation with its
+subintervals as distinct concurrent occupied bytes. Actual kernel-work/FAT buffer allocation uses the
+exact map, BIOS-measured `T` and configured buffer/file counts; it is not a
+hard-coded free-memory promise. Runtime PSPs and environments are independently
+checked against each observed MCB chain, and the largest raw MCB remains
+separate from a practical EXEC capacity.
+
 The known source contract does not authorize reclaiming the low policy exclusion
 or merging across FreeCOM/system allocations. Hardware holes, unavailable memory
 and any unconfirmed region remain outside MEMMAP's physical-memory claim.

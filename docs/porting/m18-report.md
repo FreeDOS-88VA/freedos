@@ -334,8 +334,44 @@ At smaller installed capacities, actual normal-disk sample-assembly requests
 failed without leaving executable outputs and with stable checked MCB reports;
 one case retained a larger backup-memory selection. This qualifies clean
 failure on those tested cases, **not** a successful minimum for JWASMR or every
-other utility. A CHKDSK stdout redirection was empty in those runs and is not
-accepted as a successful disk check or evidence of CHKDSK's RAM minimum.
+other utility. An earlier CHKDSK stdout redirection was empty and is not
+accepted as a successful disk check. Separate same-image low-memory tests did
+read a newly generated 2HD B: with CHKDSK and load/quit the original HELLO.ASM
+in EDLIN at 384 KiB on VA and installed 512 KiB on VA2 with a stale larger
+retained setting. FORMAT/SYS **help only**, MORE help, and settled MCB-chain
+identity passed in those runs. They do not prove FORMAT/SYS destructive work at
+these capacities, or successful EDLIN save there. At 256 KiB, a directed EDLIN
+load reported no source lines and ended abnormally; CHKDSK, FORMAT and SYS
+rejected the operation for insufficient DOS memory, with a usable shell and
+matching checked MCB snapshots afterward. The EDLIN case is not a pass or a
+cleanly diagnosed editor memory minimum; its failed script is preserved. Actual
+per-tool workload ceilings and instantaneous execution peaks remain open.
+
+An M18-local private readback inspector now reconciles the exact public
+carrier/D88 identity with selected post-shell MEMMAP snapshots at every native
+capacity, including a stale retained selection. Its checks account for the
+resident/first-MCB boundary, kernel-work block, all PSP owners, end-exclusive
+MCB links, headers, totals and measured installed RAM top. Symbolic
+source-owned interval equations and distinct temporary lifetimes are in
+`m18-memory-audit.md`. Neither MCB traversal nor linked-placement arithmetic
+asserts unknown firmware/VRAM occupancy or an in-program maximum.
+
+The matched VA and VA2 frontend input paths recalled the preceding FreeCOM
+command with F3 and edited a typed filename using the cursor-left key; the
+expected independent guest files and checked MCB chain were read back. A VA2
+held-key run produced repeat characters through the guest's own input path,
+recorded in a file; the first fixture accidentally omitted the ECHO separator
+and left its target file empty, and is explicitly not counted for repeat.
+Automated frontend input is not a physical keyboard or hardware result.
+
+The official Open Watcom 1.9 source release was separately obtained and
+hash-checked for the linked DOS software-8087 and floating-conversion modules
+and its license. The host package manifest and on-disk/host instructions identify
+that **public upstream source archive** separately from the pinned official
+compiler binary and from the project/component corresponding-source bundle.
+The compiler runtime is unmodified. Any change to on-disk notice text yields
+a new normal D88 and must be guest-tested by its **new** exact identity before
+release designation.
 
 ## Remaining qualification and scope
 
