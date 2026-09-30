@@ -88,6 +88,24 @@ rounding policy is preserved, not changed to match MS-DOS or an estimate.
 This is an observer-footprint correction, not evidence of a permanent kernel
 leak or proof that a reported maximum block equals practical child capacity.
 
+## Later matched private controls
+
+The exact `b772f72` public-input candidate was booted in matched VA and VA2.
+Independent DOS-written before/after MCB snapshots keep all address, owner,
+size, type, summary and bound fields equal across the editor/assembler and
+COM/MZ workflow. Descriptive bytes in MEMMAP's own MCB name vary, so raw
+before/after text is **not** falsely described as byte-identical. The
+post-warmup snapshots around further repeated COM/MZ execution are byte-identical.
+A separate bounded QA application tested DOS allocation, fragmentation,
+coalescing and near-limit EXEC at supported low/high configurations, with
+stale larger retained memory selection tested separately from installed RAM.
+The allocator checks both guard contents and owner links without modifying an
+MCB. Source-backed conventional-memory release is unchanged: the adapter's
+boot-time temporary reservation is released at its guarded handoff; no further
+kernel reclaim has been demonstrated. Private numerical observations and full
+runtime records are held separately. The linked footprint, active DOS heap,
+MCB payload, and practical executable budget remain different quantities.
+
 ## Still required
 
 A complete audit needs matched initialization/idle/child/termination snapshots,

@@ -4,9 +4,11 @@ Status: **IN PROGRESS — source-build gates pass at the current public tip;
 required guest and memory-qualification gates remain incomplete.** No M18 PASS,
 release designation, archive, or HANDOFF READY is claimed.
 
-Evidence labels: **HOST PASS** for the source-build checkpoint at
-`d55b17afbe8d63ffc69eaaea03b6fa97c5a6e21e` only; this is not full M18
-acceptance. **VAEG PASS: NOT ESTABLISHED**; targeted guest workflows pass, but
+Evidence labels: **HOST PASS** for the isolated source-build checkpoint at
+`b772f72fc6c2fb5ba548b567e10cc21374ef8307` (exact-head M18 CI
+`36552873414`); this is not full M18 acceptance. Its earlier behavioral
+checkpoint was `d55b17afbe8d63ffc69eaaea03b6fa97c5a6e21e`.
+**VAEG PASS: NOT ESTABLISHED**; targeted guest workflows pass, but
 required qualification is incomplete. **DEFERRED HARDWARE VALIDATION**; hardware
 is NOT RUN.
 
@@ -248,6 +250,57 @@ returns. Build records now separate linked requirements, FreeDOS whole-page
 initial allocation and actual runtime ownership; they no longer claim the
 linked minimum is the complete process footprint. Local host tests total 67;
 clean builds and exact new-disk guest comparison must still qualify this change.
+
+## Later source-bound guest checks (M18 remains in progress)
+
+At behavioral checkpoint `b772f72fc6c2fb5ba548b567e10cc21374ef8307`,
+the full double clean build and exact-head native M18 CI run `36552873414`
+passed. The ordinary disk has been freshly booted on matched VA and VA2.
+Each guest edited and saved a source copy, assembled and executed both sample
+formats, handled assembler syntax and missing-input failures without accepting
+stale outputs, and ran repeated COM/MZ children. The post-warmup MEMMAP files
+are byte-identical. The earlier before/after text differs only in the shell's
+unreliable descriptive name bytes; all non-name MCB fields and totals match.
+A printed name is not evidence of a changed allocation. Neither result proves
+that the observer can see physical regions outside the DOS arena.
+
+On separate VA/VA2 and stale-selection QA disks from the same build, the
+allocator and bounded COM/MZ EXEC probes passed, with valid identical
+before/after MEMMAP reports. A matched 256/640-KiB control compares the old
+observer and the new Watcom API trim: independent filesystem readback and
+MCB arithmetic reconcile the freed tail exactly to the observer's own
+runtime allocations and headers; unchanged other owners are not reclaimed.
+Numeric observations and guest images are retained only in Git-excluded
+private evidence.
+
+A separately invoked `tools/m18/qa/workspace_readback.py` now validates
+completed guest copy/edit/build snapshots against the precise public D88 and
+manifest, including the unchanged boot sector and root, editor backup, real
+COM/MZ outputs and the committed workspace reserve. The first attempted BUILD
+checkpoint exited before BUILD was injected; it remains an incomplete run.
+A new completed BUILD run visibly executed both examples and independently
+passed stage readback. Settled checkpoint measurements are not an independent
+instantaneous in-program high-water mark; the source-bounded output paths and
+conservative reserve still need final acceptance review. The inspector writes
+private evidence outside the public repository; neither the guest disks nor
+numeric observations are public build inputs.
+
+The same exact normal bytes were booted separately on both models to run MORE
+paging and help, followed by valid MEMMAP checks and another shell command.
+Readback confirmed the distributed files were unchanged. For a protected A:
+copy, failed writes did not change the D88 bytes or create a guest file. The
+initial protection run lacked an answer to the DOS critical-error prompt and
+is not a recovery PASS; subsequent runs explicitly chose Fail. The VA2 screen
+showed recovery and an interactive shell. A separate shorter VA control then
+showed recovery at a usable prompt; independent readback confirms the entire
+protected image stayed unchanged in both cases. A milestone-local
+public-input-only, nonbooting 2HD B: fixture producer now exists without an old
+candidate disk. Both models used two independently prepared disposable B:
+paths: after a live media swap, each disk retained only its own distinct guest
+file; CHKDSK B: and the subsequent DOS MCB check passed. The VA2 screen showed
+both reads and the prompt. The VA final screenshot was blank, so its results are
+limited to independently read-back guest writes and checks, not a visual
+console claim.
 
 ## Remaining qualification and scope
 

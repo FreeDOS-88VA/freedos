@@ -96,6 +96,14 @@ minimum RAM claims for other applications. Host child tests deliberately omit
 the relocation and require a failing exit. Only real DOS guest execution can
 qualify the parent's complete allocation/EXEC assertions.
 
+## Separate guest-workspace readback
+
+`python3 -B tools/m18/qa/workspace_readback.py --normal dist/m18/PC88VA-M18-2HD.D88 --manifest dist/m18/build-manifest.json --copy COPY.d88 --edit EDIT.d88 --build BUILD.d88 --output /absolute/private-evidence/workspace.json` is an explicitly invoked QA inspector, **not** an input to `make m18-disk`. Use separate disposable copies of the exact release candidate, stop after each successive source-copy, EDLIN save and BUILD.BAT command, and keep the unmodified normal disk as the baseline. The inspector binds it to the build manifest, checks D88/FAT readback and an unchanged boot sector and release root, checks editor backup/source copies and both executable outputs (including a real MZ relocation), and fails if any settled checkpoint exceeds the committed cluster reserve. Keep the JSON output and guest media in Git-excluded private evidence; do not put private disk contents, hashes or observations in the public source tree. A snapshot taken during a write may have inconsistent FAT state: only settled completed guest runs qualify. Settled checkpoints alone do **not** measure instantaneous in-process peak. For the shipped successful sample, EDLIN renames the original to a backup before writing the new source, and JWASMR opens the one selected `-bin`/`-mz` output for writing without a listing or error file; no separate temporary payload is configured. The policy budget retains additional headroom for errors, filesystem metadata and future changes. Rerun guest checks if those source paths or build options change.
+
+## Separate disposable B: preparation
+
+`python3 -B tools/m18/qa/blank_data_media.py --output /absolute/private-test-root/b-target.d88` creates a **nonbooting**, empty, public-profile native 2HD FAT12 B: target with a distinct QA label, using only `config/m18/media.json` and the M18-maintained FAT/D88 builder. It verifies its own sector geometry, two FAT copies and empty directory through independent readback, rejects existing files and refuses output inside the public source tree. Run it separately for each B: disk, preserving both before/after bytes and the exact normal A: disk used for testing. It neither reads nor replaces the distribution and is never required by `make m18-disk`.
+
 ## Milestone-local layout
 
 - `build_image.py`, `build_image.sh`, and `finish_image.py` own the complete

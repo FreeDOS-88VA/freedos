@@ -12,7 +12,7 @@
       "license": "GPL-2.0-or-later",
       "cpu": "Native PC-88VA V30 boot adapter; common FreeDOS kernel application interface",
       "va_adaptation": "Pinned fdkernel PC-88VA loader/kernel integration and M18 native 2HD profile",
-      "tests": ["clean kernel/carrier build", "linked-placement verifier", "native guest boot pending"]
+      "tests": ["clean kernel/carrier build", "linked-placement verifier", "matched VA/VA2 guest boot on current normal candidate; full memory/media acceptance pending"]
     },
     {
       "id": "freecom",
@@ -22,7 +22,7 @@
       "license": "GPL-2.0-or-later",
       "cpu": "8086 real mode",
       "va_adaptation": "Pinned NECPC88VA FreeCOM configuration, English build, fixed reproducible timestamp",
-      "tests": ["clean source build", "normal prompt and command qualification pending"]
+      "tests": ["clean source build", "matched VA/VA2 shell, file/edit/assembly/batch commands; input and physical-media matrix pending"]
     },
     {
       "id": "country",
@@ -42,7 +42,7 @@
       "license": "GPL-2.0-or-later",
       "cpu": "8086 DOS MZ",
       "va_adaptation": "Pinned FreeDOS EDLIN source, English ASCII messages, Open Watcom large-model build",
-      "tests": ["clean build", "guest ASCII load/edit/save/reopen pending"]
+      "tests": ["clean build", "matched VA/VA2 guest ASCII load/edit/save and backup readback; broader editor limits pending"]
     },
     {
       "id": "more",
@@ -52,7 +52,7 @@
       "license": "GPL-2.0-or-later",
       "cpu": "8086 DOS MZ",
       "va_adaptation": "Original small pager uses DOS file I/O, DOS stdout, and DOS console input; no IBM BIOS access",
-      "tests": ["clean build", "guest paging and redirected-output qualification pending"]
+      "tests": ["clean build", "matched VA/VA2 guest paging/help and subsequent valid shell memory check; broader input regression pending"]
     },
     {
       "id": "maintenance",
@@ -62,7 +62,7 @@
       "license": "GPL-2.0-or-later",
       "cpu": "8086 DOS MZ",
       "va_adaptation": "Project-owned native 1024-byte-sector FAT12 maintenance for the explicitly declared 2HD profile; CHKDSK is read-only; FORMAT initializes filesystem metadata only on a readable B: volume with a valid native 2HD BPB from prior preparation; SYS transfers selected native system files and boot sector to disposable B: media",
-      "tests": ["synthetic FAT/volume tests pending", "disposable native guest media and boot test pending"]
+      "tests": ["synthetic FAT/volume tests", "earlier matched disposable B: FORMAT/CHKDSK/SYS and SYS-produced boot, tied to the earlier candidate rather than current kernel bytes; current-candidate destructive maintenance rerun pending"]
     },
     {
       "id": "memmap",
@@ -71,8 +71,8 @@
       "source": "tools/m18/memmap/",
       "license": "GPL-2.0-or-later",
       "cpu": "8086 DOS MZ",
-      "va_adaptation": "FreeDOS-version/layout-checked AH=52h MCB-chain reader; MZ maximum allocation equals minimum so DOS grants the bounded process block at EXEC without a runtime resize; no direct BIOS calls",
-      "tests": ["native synthetic MCB and bounded MZ allocation tests", "DOS chain/output and independent guest comparison pending"]
+      "va_adaptation": "FreeDOS-version/layout-checked AH=52h MCB-chain reader; MZ maximum allocation equals minimum at EXEC, while the OW 1.9 runtime may grow its own heaps; after priming stdout, the documented near/far heap-shrink APIs release only unused own heap tails before observation; no direct BIOS calls",
+      "tests": ["synthetic bounded MCB and runtime trim/failure tests", "matched VA/VA2 checked guest MCB reports and independent observer-only footprint comparison; physical/outside-arena view unavailable"]
     },
     {
       "id": "jwasm",
@@ -82,7 +82,7 @@
       "license": "Sybase Open Watcom Public License 1.0",
       "cpu": "8086 real-mode DOS MZ; no protected-mode extender",
       "va_adaptation": "Pinned JWasm DOS16 source recipe, Open Watcom 1.9 build with optional host/COFF/ELF/386 features disabled, plus reproducible M18 source/license notice",
-      "tests": ["clean build and MZ accounting", "guest help/COM/MZ/error/low-memory qualification pending"]
+      "tests": ["clean build and MZ accounting", "matched VA/VA2 640-KiB guest COM/MZ and syntax/missing-file recovery", "bounded insufficient-memory results on earlier matching candidates; current per-tool minima pending"]
     },
     {
       "id": "starter-material",
@@ -92,7 +92,7 @@
       "license": "GPL-2.0-or-later; sample assembly text is project-authored",
       "cpu": "ASCII DOS text and 8086 assembly examples",
       "va_adaptation": "Original English/ASCII instructions and linker-free COM/MZ examples",
-      "tests": ["8.3 names and source command inspection", "guest edit/build/run workflow pending"]
+      "tests": ["8.3 names and source command inspection", "matched VA/VA2 guest edit/build/run workflow", "staged FAT workspace readback; instantaneous in-program peak pending"]
     }
   ],
   "optional_tools": {
