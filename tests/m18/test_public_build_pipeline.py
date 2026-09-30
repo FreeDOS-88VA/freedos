@@ -1,4 +1,6 @@
+import ast
 import hashlib
+import inspect
 import json
 from pathlib import Path
 import shutil
@@ -87,6 +89,25 @@ class PublicBuildPipelineTests(unittest.TestCase):
         from tools.m18.clean import clean
         with self.assertRaises(ValueError):
             clean(unmarked)
+
+    def test_pinned_source_packer_exports_all_transitive_local_imports(self):
+        directory = ROOT / 'tools/m18'
+        modules = {path.stem for path in directory.glob('*.py')}
+        queue, seen = ['build_image'], set()
+        while queue:
+            name = queue.pop()
+            if name in seen:
+                continue
+            seen.add(name)
+            tree = ast.parse((directory / (name + '.py')).read_text())
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ImportFrom) and node.module in modules:
+                    queue.append(node.module)
+                if isinstance(node, ast.Import):
+                    queue.extend(alias.name for alias in node.names if alias.name in modules)
+        exporter = inspect.getsource(build_image.build_source_bundle_pinned)
+        for name in seen:
+            self.assertIn('tools/m18/' + name + '.py', exporter)
 
     def test_fixed_source_bundle_is_deterministic_and_closed(self):
         inputs = self.root / "source-inputs"
