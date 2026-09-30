@@ -21,6 +21,12 @@ class ParentArchiveTests(unittest.TestCase):
         if extra:
             files.update(extra)
         with tarfile.open(path, 'w:', format=tarfile.PAX_FORMAT) as archive:
+            for directory in ('config/', 'tools/', 'tests/', 'manifests/',
+                              'config/m18/', 'tools/m18/', 'tests/m18/'):
+                member = tarfile.TarInfo(directory)
+                member.type = tarfile.DIRTYPE
+                member.mode = 0o755
+                archive.addfile(member)
             for name, data in files.items():
                 member = tarfile.TarInfo(name)
                 member.size = len(data)

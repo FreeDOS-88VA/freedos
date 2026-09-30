@@ -17,12 +17,14 @@ import tarfile
 PREFIXES = ("tools/m18/", "tests/m18/", "config/m18/")
 SINGLES = {"COPYING", "LICENSE.md", "manifests/m18-components.lock.json",
            "manifests/toolchains.lock.json"}
+ROOT_DIRS = {"config", "tools", "tests", "manifests"}
 
 
 def allowed(name: str) -> bool:
     path = PurePosixPath(name)
     return (not path.is_absolute() and ".." not in path.parts and
-            (name in SINGLES or name.rstrip("/") in {x.rstrip("/") for x in PREFIXES} or
+            (name in SINGLES or name in ROOT_DIRS or
+             name.rstrip("/") in {x.rstrip("/") for x in PREFIXES} or
              any(name.startswith(prefix) for prefix in PREFIXES)))
 
 
