@@ -70,6 +70,10 @@ see the [entry task](tasks/M19-first-task-jwasmr-hardware-startup.md) and
 This priority does not change M17 storage contracts or the subsequent milestone
 numbering and architecture.
 
+M19 also records a known M18 limitation: FORMAT cannot prepare blank media
+because track formatting through a PC-88VA BIOS adapter is not implemented;
+see the [FORMAT blank-media task](tasks/M19-format-blank-media-track-format.md).
+
 ## Adopted SCSI architecture
 
 The deployment decision is settled: SCSI is an optional external DOS block-device
