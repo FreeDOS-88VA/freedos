@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "milestone": "M19",
+  "profile": "2hd-1280",
+  "cluster_bytes": 1024,
+  "minimum_free_clusters_after_build": 128,
+  "minimum_free_bytes_after_build": 131072,
+  "sample_workflow": {
+    "sequence": [
+      "create WORK directory on A:",
+      "copy HELLO.ASM, MZDEMO.ASM, and BUILD.BAT to WORK",
+      "edit HELLO.ASM with EDLIN and save it, retaining EDLIN's HELLO.BAK backup",
+      "assemble HELLO.COM and MZDEMO.EXE",
+      "retain both generated programs and return to the shell"
+    ],
+    "workspace_cluster_budget": 32,
+    "measurement_status": "build-time reserve and exact-disk settled guest copy/edit/build readback; instantaneous peak not measured or required by owner-scoped M19 acceptance",
+    "includes_editor_backup": true,
+    "includes_temporary_files": true,
+    "includes_generated_com_and_mz": true
+  },
+  "policy": "The build fails if fewer than 128 data clusters remain after all release files are allocated. This leaves 32 clusters for the staged sample workflow and extra reserve. Read back settled guest copy/edit/build checkpoints and retain source-lifetime review; neither the build nor the readback claims a measured instantaneous disk-workspace peak."
+}

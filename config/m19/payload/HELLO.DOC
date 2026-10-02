@@ -1,0 +1,41 @@
+HELLO.DOC - build and understand the HELLO.ASM 8086 DOS COM example
+
+HELLO.DOC is a plain ASCII text file; read it with TYPE HELLO.DOC or MORE.
+Work on a writable copy of the M19 native 2HD boot disk, not the release master.
+Use 640 KiB of installed RAM for the tested small assembly workflow. A retained
+640-KiB BIOS selection does not supply missing physical RAM. At 512 KiB
+installed, the sample JWASMR build could not start on the tested VA/VA2 models.
+
+From the A: prompt, make a working directory and copy the original source:
+
+    MD WORK
+    CD WORK
+    COPY A:\HELLO.ASM HELLO.ASM
+
+In that directory, build and run the COM program:
+
+    JWASMR -0 -bin -Fo=HELLO.COM HELLO.ASM
+    HELLO.COM
+
+The -0 option selects 8086 instructions. -bin produces a raw binary file;
+-Fo=HELLO.COM names the output. There is no linker step. Check JWASMR's exit
+message before running HELLO.COM; do not run an executable left by an older
+build if the assembly fails. To remove an old output first, use:
+
+    IF EXIST HELLO.COM DEL HELLO.COM
+    JWASMR -0 -bin -Fo=HELLO.COM HELLO.ASM
+
+Run HELLO.COM only after JWASMR reports success. An existing output file alone
+is not proof of a successful assembly; BUILD.BAT also checks ERRORLEVEL.
+
+HELLO.ASM selects the tiny memory model and ORG 100h, so DOS can load the
+binary as a COM program after its 256-byte program prefix. DOS INT 21h with
+AH=09h prints the dollar-terminated message and AH=4Ch returns to the shell.
+The example does not call an IBM-PC video, keyboard or disk BIOS, and it does
+not need a numeric coprocessor. It is a small sample, not a guarantee that
+larger source files fit the same RAM setting.
+
+For the combined COM and MZ demonstration, copy MZDEMO.ASM and BUILD.BAT into
+WORK too, then run BUILD. BUILD.BAT deletes both old outputs, assembles both
+examples with JWASMR, runs the new programs, and checks DOS memory with
+MEMMAP /CHECK. QUICKSTR.TXT explains optional EDLIN editing and its backup.

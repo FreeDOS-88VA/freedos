@@ -1,0 +1,9 @@
+REM Loader placement is read before the kernel configuration passes.
+REM 1000h keeps 256 KiB support; 1340h needs more than 256 KiB of RAM.
+PC88VA_LOADSEG=1000
+REM Four 1024-byte cache buffers; headers are additional.
+BUFFERS=4
+FILES=16
+LASTDRIVE=E
+SET PATH=A:\
+DOS=LOW

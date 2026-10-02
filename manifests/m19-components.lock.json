@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "milestone": "M19",
+  "status": "locked public M19 source pins",
+  "start_sha": "0c66cd8242cb2a751fa473a5704c606269ab28d0",
+  "components": [
+    {
+      "name": "fdkernel",
+      "path": "components/fdkernel",
+      "repository": "https://github.com/nakatamaho/fdkernel.git",
+      "branch": "topic/m19-77-cylinder-loader",
+      "upstream_repository": "https://github.com/lpproj/fdkernel.git",
+      "commit": "560e971a07787c287b278e4ef655089812e66474",
+      "parents": [
+        "e87e8071c355a99a7f34a8758d4a3368b6523f3d"
+      ],
+      "source_archive_sha256": "043f9904eaecbd956c67316c968d60d75b0ec432399c0461e13575cbf2e3bade",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "name": "freecom",
+      "path": "components/freecom",
+      "repository": "https://github.com/nakatamaho/freecom_dbcs2.git",
+      "branch": "topic/m19-pc88va-compact",
+      "upstream_repository": "https://github.com/lpproj/freecom_dbcs2.git",
+      "commit": "62dfacb4a88ca0a2b5a2b9b9c2c8ad5f8c917699",
+      "parents": [
+        "450d49b7a7756721b30afcfa8cb7cd75bde16de8"
+      ],
+      "source_archive_sha256": "035c2f5406429af2e0c4ec7fb1f4087e111cbe13bed2f45253ec72e003b05699",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "name": "country",
+      "path": "components/country",
+      "repository": "https://github.com/FDOS/country.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/country.git",
+      "commit": "23f189cca3420606eae8723884fa92ccd65eb307",
+      "parents": [
+        "6aaf7e92ede373b4339c77ecaa57fe919b953ec9"
+      ],
+      "source_archive_sha256": "cf0b16ac57e661eeb7e19118cea2d2d200e4545507f15912e8a6462652c2cd9d",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "name": "edlin",
+      "path": "components/edlin",
+      "repository": "https://github.com/FDOS/edlin.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/edlin.git",
+      "commit": "c036c43adbdaa5693bb4cd3f4f3c65090f1c9d57",
+      "parents": [
+        "fec125a752ed82a19c7340da07e6db68aff3214a"
+      ],
+      "source_archive_sha256": "42865928e8d2c14b3970557892c53d18bd86603c857bbc587d33050f535b14ae",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "name": "jwasm",
+      "path": "components/jwasm",
+      "repository": "https://github.com/nakatamaho/JWasm.git",
+      "branch": "topic/m19-source-notice",
+      "upstream_repository": "https://github.com/Baron-von-Riedesel/JWasm.git",
+      "upstream_base_commit": "ac54827ff40b77ecd6e77ed0866a43fc60cd5fe1",
+      "commit": "c9b3a947f74d7355b1b3d8bd5728241c95ff4b19",
+      "parents": [
+        "96d1f3d4c1661c85788297d50ab032e452f48978"
+      ],
+      "source_archive_sha256": "5511d3666107009b58d94912ebdc6a0c4e8013aad4850fb15b087872071013bf",
+      "license": "Sybase Open Watcom Public License 1.0"
+    }
+  ],
+  "toolchain": {
+    "identity_lock": "manifests/toolchains.lock.json",
+    "open_watcom": "Open Watcom 1.9 Linux i386 host tools in the pinned Linux/amd64 container",
+    "cpu_target": "8086 real mode for required DOS applications; native VA boot remains V30-specific"
+  }
+}

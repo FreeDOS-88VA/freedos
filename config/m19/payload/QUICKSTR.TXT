@@ -1,0 +1,62 @@
+M19 QUICKSTART - edit, assemble, and run on A:
+For the individual COM source and build command, read HELLO.DOC.
+
+Use 640 KiB installed RAM for this full sample workflow on the tested VA/VA2
+models. At installed 512 KiB, EDLIN editing worked but JWASMR could not start
+the sample COM/MZ build; DOS reported insufficient memory. Retained BIOS RAM
+selections do not supply missing installed RAM. This quickstart does not prove
+that arbitrarily large programs or source files will fit.
+
+1. Make room and copy the original examples into a work directory:
+
+   MD WORK
+   CD WORK
+   COPY A:\HELLO.ASM HELLO.ASM
+   COPY A:\MZDEMO.ASM MZDEMO.ASM
+   COPY A:\BUILD.BAT BUILD.BAT
+
+2. Edit a copy of the COM example with EDLIN:
+
+   EDLIN HELLO.ASM
+
+   At the EDLIN prompt, enter 1 to replace the first line. Type the replacement
+   comment line and press Enter. Enter lowercase e to save the file and quit;
+   this build checks the exit command in lowercase. EDLIN keeps the previous
+   contents as HELLO.BAK when it rewrites HELLO.ASM. Reopen the edited file
+   with TYPE HELLO.ASM to confirm the saved text.
+
+3. Build and run both 8086 examples:
+
+   BUILD
+
+   BUILD.BAT deletes old outputs before assembly, stops on an assembler error,
+   runs the fresh COM and MZ executables, and finishes with MEMMAP /CHECK.
+   JWASMR -bin writes a raw binary for the .model tiny COM source. JWASMR -mz
+   writes a DOS MZ executable for the .model small source. Neither needs a
+   separate linker. Both examples use DOS INT 21h for output and termination.
+
+4. You can also run the individual commands:
+
+   JWASMR -0 -bin -Fo=HELLO.COM HELLO.ASM
+   HELLO.COM
+   JWASMR -0 -mz -Fo=MZDEMO.EXE MZDEMO.ASM
+   MZDEMO.EXE
+   MEMMAP /CHECK
+
+If assembly reports an error, BUILD.BAT does not run an old executable: it
+removes previous outputs first. Fix the source and run BUILD again. These
+small samples are not a promise that arbitrary large source files fit memory.
+
+Other useful commands:
+
+   MEMMAP /?             Show memory-map help.
+   MEMMAP                 List the checked DOS MCB chain.
+   MEMMAP > MEMORY.TXT    Redirect the map through DOS standard output.
+   MORE README.TXT        Page through text (Space, Enter, or Q).
+   CHKDSK B:              Check a native 2HD B: disk (80 or 77 cylinders).
+   FORMAT B:              Format a blank 2HD disk in B: (80 cylinders).
+   FORMAT B: /T:77        Format the NEC-compatible 77-cylinder form.
+   SYS A: B:              Make the formatted B: disk bootable.
+
+Use FORMAT and SYS only on target media in B:. Do not use A: or the release
+master as a target.

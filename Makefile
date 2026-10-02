@@ -168,6 +168,11 @@ help:
 		'  m18-disk          Build and compare two isolated M18 native 2HD disks' \
 		'  m18-accept        Verify the M18 distribution instance and source bindings' \
 		'  m18-clean         Remove only marked M18 intermediate build output' \
+		'  m19-toolchain     Prepare or verify the pinned M19 Linux/amd64 environment' \
+		'  m19-host-tests    Run the M19-local host test suite' \
+		'  m19-disk          Build and compare two isolated M19 native 2HD disks' \
+		'  m19-accept        Verify the M19 distribution instance and source bindings' \
+		'  m19-clean         Remove only marked M19 intermediate build output' \
 		'  help              Show this help' \
 		'  submodules        Initialize/update locked submodules' \
 		'  component-status  Show submodule status' \
@@ -574,3 +579,23 @@ m18-accept:
 	@python3 -B tools/m18/verify_distribution.py --dist "$(M18_DIST)"
 m18-host-tests:
 	@M18_WHEEL_CACHE="$(M18_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M18_PYTHON) -B tools/m18/run_host_tests.py
+
+M19_PYTHON ?= python3
+M19_IMAGE ?= freedos-pc88va-m19:local
+M19_OUTPUT ?= build/m19
+M19_DIST ?= dist/m19
+M19_QA_OUTPUT ?= build/m19-allocator-qa
+M19_WHEEL_CACHE ?= $(CURDIR)/build/m19-wheel-cache
+.PHONY: m19-toolchain m19-disk m19-clean m19-host-tests m19-allocator-qa m19-accept
+m19-toolchain:
+	@PYTHONDONTWRITEBYTECODE=1 $(M19_PYTHON) -B tools/m19/toolchain.py --image "$(M19_IMAGE)"
+m19-allocator-qa: m19-disk
+	@PYTHONDONTWRITEBYTECODE=1 $(M19_PYTHON) -B tools/m19/build_allocator_qa.py --build "$(M19_OUTPUT)" --dist "$(M19_DIST)" --output "$(M19_QA_OUTPUT)" --image "$(M19_IMAGE)"
+m19-disk: m19-toolchain
+	@M19_WHEEL_CACHE="$(M19_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M19_PYTHON) -B tools/m19/build_image.py --output "$(M19_OUTPUT)" --dist "$(M19_DIST)" --image "$(M19_IMAGE)"
+m19-clean:
+	@PYTHONDONTWRITEBYTECODE=1 $(M19_PYTHON) -B tools/m19/clean.py --path "$(M19_OUTPUT)"
+m19-accept:
+	@PYTHONDONTWRITEBYTECODE=1 $(M19_PYTHON) -B tools/m19/verify_distribution.py --dist "$(M19_DIST)"
+m19-host-tests:
+	@M19_WHEEL_CACHE="$(M19_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M19_PYTHON) -B tools/m19/run_host_tests.py
