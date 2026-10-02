@@ -1,6 +1,10 @@
 # M19 entry task: JWASMR hardware startup
 
-Status: **QUEUED; M19 IMPLEMENTATION NOT STARTED**.
+Status: **DONE IN M19 — HARDWARE PASS** (owner report, 2026-10-02): on the M19
+public checkpoint disk, JWASMR with no arguments shows Usage on the physical
+machine, and HELLO.ASM assembles. Cause addressed: the Open Watcom 1.9
+pre-main x87 probe began with FWAIT; M19 links a no-WAIT probe instead. See
+`docs/porting/m19-report.md`.
 
 The owner accepts M18 for release as **emulator-validated only**, with its
 unchanged designated disk and exact bounded HOST/VAEG evidence. JWASMR's
