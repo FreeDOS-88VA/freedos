@@ -10,11 +10,11 @@
       "repository": "https://github.com/nakatamaho/fdkernel.git",
       "branch": "topic/m19-77-cylinder-loader",
       "upstream_repository": "https://github.com/lpproj/fdkernel.git",
-      "commit": "560e971a07787c287b278e4ef655089812e66474",
+      "commit": "fe2699fc537b225e18fa1b5c47bbc59389e6d3eb",
       "parents": [
         "e87e8071c355a99a7f34a8758d4a3368b6523f3d"
       ],
-      "source_archive_sha256": "043f9904eaecbd956c67316c968d60d75b0ec432399c0461e13575cbf2e3bade",
+      "source_archive_sha256": "49a8b1d0722ed50ba70b9cd3a0b22e0d77b042bdf5a2332b0f9327734f4ec002",
       "license": "GPL-2.0-or-later"
     },
     {
