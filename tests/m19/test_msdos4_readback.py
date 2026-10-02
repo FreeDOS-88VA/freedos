@@ -15,7 +15,7 @@ class ReadbackTests(unittest.TestCase):
         base = {'HELLO.ASM': b'; synthetic source\r\n'}
         guest = dict(base)
         guest.update({'HZ.ASM': base['HELLO.ASM'], 'TYPE.TXT': base['HELLO.ASM'],
-                      'VER.TXT': b'MS-DOS Version 6.22\r\n',
+                      'VER.TXT': b'MS-DOS Version 6.22\r\n', 'CLS.TXT': b'\x1b[2J\x1b[H',
                       'PRE.TXT': b'MCB chain: VALID\r\n', 'POST.TXT': b'MCB chain: VALID\r\n',
                       'LAST.TXT': b'MCB chain: VALID\r\n',
                       'COPY.TXT': b'1 File(s) copied\r\n', 'ERR.TXT': b'File not found\r\n',
@@ -51,7 +51,7 @@ class ReadbackTests(unittest.TestCase):
         base, guest = self.fixture()
         for name, value in [('VER.TXT', b'4.00'), ('POST.TXT', b'invalid chain'),
                             ('RUNCOM.TXT', b'not run'), ('PIPE.TXT', b'wrong'),
-                            ('HELLO.COM', b''), ('MZDEMO.EXE', b'MZ'), ('BAD.TXT', b'')]:
+                            ('CLS.TXT', b''), ('HELLO.COM', b''), ('MZDEMO.EXE', b'MZ'), ('BAD.TXT', b'')]:
             with self.subTest(name=name), self.assertRaises(ValueError):
                 qa.check(base, dict(guest, **{name: value}))
 

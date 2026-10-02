@@ -53,7 +53,10 @@ the original binary; `--profile freedos` keeps IBM console CLS for PC testing.
 - `/DFREEDOS`: use FreeDOS's native DOS version/OEM identity; do not globally
   spoof VERSION=4.00. Skip unsupported OS/2 extended attributes in COPY/TYPE;
   ordinary I/O and timestamp error handling remain intact.
-- `/DPC88VA`: CLS writes form feed via DOS, avoiding IBM INT 10h.
+- `/DPC88VA`: CLS uses the native text BIOS for standard CON, avoiding IBM
+  INT 10h and the DOS adapter's control-byte filter. Redirected CLS writes the
+  ANSI clear/home bytes through DOS file I/O instead. A missing BIOS vector
+  is rejected without calling it.
 - Standard MS-DOS 4 parsing, transient reload, batch and environment behavior
   are not replaced. Set PATH in AUTOEXEC.BAT rather than expecting CONFIG's
   environment to be retained by the original shell initialization.

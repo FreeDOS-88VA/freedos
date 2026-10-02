@@ -15,7 +15,8 @@ A normal PC FreeDOS control reproduced COPY failure: COMMAND requires OS/2
 extended-attribute calls which FreeDOS does not provide. The optional shell
 profile (separate Microsoft-source fork) omits those operations, accepts the
 native FreeDOS version without a global VERSION override, and uses the VA DOS
-CON clear/home operation rather than IBM INT 10h for CLS. No FreeDOS kernel
+console's native text-BIOS clear/home operation rather than IBM INT 10h for
+CLS (DOS form feed alone was tested and did not clear the display). No FreeDOS kernel
 behavior is changed. The adapted shell copied and read back a small text file
 on the PC control. This is not a VA result.
 

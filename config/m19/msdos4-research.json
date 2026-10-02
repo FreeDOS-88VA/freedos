@@ -6,8 +6,8 @@
     "upstream": "https://github.com/microsoft/MS-DOS.git",
     "upstream_base": "2d04cacc5322951f187bb17e017c12920ac8ebe2",
     "branch": "experiment/m19-freedos-command",
-    "commit": "55505699e59aa3a8bd5144bc06b5b5e07e32bb31",
-    "source_archive_sha256": "f40b38bdb1be5559ab36ed3b1862c6681963c59bfd0f5ea078be403fb34190be",
+    "commit": "825dc8753bf035835415ebf182c1b6ea786bfa64",
+    "source_archive_sha256": "45bda71517efde86e396b011194c3e24df2eb3d9175ba17f1fcba52c26722cf8",
     "license": "MIT"
   },
   "emu2": {

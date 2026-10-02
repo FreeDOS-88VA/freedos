@@ -22,7 +22,7 @@ def check(base, guest):
     for name, data in base.items():
         if guest.get(name) != data:
             raise ValueError('original payload changed: ' + name)
-    required = ['VER.TXT', 'PRE.TXT', 'POST.TXT', 'COPY.TXT', 'TYPE.TXT',
+    required = ['CLS.TXT', 'VER.TXT', 'PRE.TXT', 'POST.TXT', 'COPY.TXT', 'TYPE.TXT',
                 'ENV.TXT', 'FOR.TXT', 'EXIST.TXT', 'PIPE.TXT', 'CHILD.TXT',
                 'ERR.TXT', 'RUNCOM.TXT', 'RUNMZ.TXT', 'ASMCOM.TXT', 'ASMMZ.TXT',
                 'CALL.TXT', 'BATCH.TXT', 'LAST.TXT', 'DONE.TXT', 'HZ.ASM', 'HELLO.COM', 'MZDEMO.EXE']
@@ -41,6 +41,8 @@ def check(base, guest):
             raise ValueError('unexpected output: ' + name)
     if b'1 File(s) copied' not in guest['COPY.TXT'] or not guest['ERR.TXT'].strip():
         raise ValueError('COPY success/error evidence missing')
+    if guest['CLS.TXT'] != b'\x1b[2J\x1b[H':
+        raise ValueError('CLS did not preserve redirected output')
     if b'6.22' not in guest['VER.TXT']:
         raise ValueError('native FreeDOS version not retained')
     for name in ('PRE.TXT', 'POST.TXT'):
