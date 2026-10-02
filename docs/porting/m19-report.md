@@ -17,14 +17,27 @@ FreeCOM: `e9307705ba4cdcd5f51eac0559ebdc90ea5c2a00` (configuration only).
 Two complete allowlist-only container builds produced identical D88 bytes;
 all 101 host tests and the linked-placement and public-instance verifiers
 passed. Source/privacy audit passed inside the clean exports (not the working
-checkout, which contains excluded evidence). Native CI is NOT RUN yet for the
-experiment. VAEG shell startup and an ordinary MEMMAP command worked, but the
+checkout, which contains excluded evidence). The pushed revision
+`f06017d8e39584443e23fc3287deadad150a7ce8` was rebuilt twice from clean
+exports and produced the exact same D88 as the tested implementation.
+Native M19 CI run `37014730287`, attempt 1 (`isolated-build`), and scaffold
+run `37014730254`, attempt 1 (`verify`), both succeeded on that exact head.
+The scaffold's initially stale lock selector was corrected; historical
+milestone workflows are not experiment gates. **HOST PASS** applies only to
+these build/source checks, never to swapping or the auxiliary guest workflows.
+VAEG shell startup and an ordinary MEMMAP command worked, but the
 first interactive `CALL /S MEMMAP` stopped with memory-chain corruption.
 No successful swap, shell reload, memory saving, COM/MZ swap execution or
 JWASMR benefit is established. Alternate models/capacities, stale retained
 settings and hardware were NOT RUN for this experiment. Exact emulator,
 configuration, input, failing media and observations are retained privately.
-The previous distribution is preserved unchanged.
+The previous distribution is preserved unchanged. Stop the trial at this
+blocker: SYS transfer and allocator QA media were not adapted to carry the
+new wrapper and must not be used with this experimental CONFIG.SYS. Their
+guest boot/functionality is NOT RUN and is not established by host CI.
+The normal branch remains the usable checkpoint; this experiment is not a
+milestone release or HANDOFF READY. A later report-only publication does not
+qualify its own CI merely by citing the above implementation runs.
 
 ### Public-source blockers (existing upstream code, not repaired)
 
