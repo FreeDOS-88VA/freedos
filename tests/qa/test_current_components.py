@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+import subprocess
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,10 +19,10 @@ class CurrentComponentTests(unittest.TestCase):
     def setUpClass(cls):
         _, cls.lock = current_components._load_json(ROOT / current_components.M17_LOCK)
 
-    def test_selector_names_and_hash_binds_the_typed_provenance_lock(self):
+    def test_selector_names_and_hash_binds_the_current_lock(self):
         lock_path, milestone = current_components._select_current_lock(ROOT)
-        self.assertEqual(lock_path, current_components.M17_LOCK)
-        self.assertEqual(milestone, 'M17')
+        self.assertEqual(lock_path, current_components.M19_LOCK)
+        self.assertEqual(milestone, 'M19')
         selector = current_components._load_canonical_json(ROOT / current_components.CURRENT_SOURCE)
         self.assertEqual(selector['source']['sha256'],
                          hashlib.sha256((ROOT / lock_path).read_bytes()).hexdigest())
@@ -119,11 +120,33 @@ class CurrentComponentTests(unittest.TestCase):
         historical = {item['path']: item['commit']
                       for item in historical_lock['components']}
         resolved = current_components.resolve_current_components(ROOT, historical)
-        self.assertEqual(resolved, {
-            'components/country': '23f189cca3420606eae8723884fa92ccd65eb307',
-            'components/fdkernel': 'e87e8071c355a99a7f34a8758d4a3368b6523f3d',
-            'components/freecom': '29bbbc7748e5c1b9a70fbc56c7faa33f6cd84c2e',
-        })
+        m19 = json.loads((ROOT / current_components.M19_LOCK).read_text())
+        expected = {item['path']: item['commit'] for item in m19['components']
+                    if item['path'] in current_components.EXPECTED_PATHS}
+        self.assertEqual(resolved, expected)
+        for path, commit in resolved.items():
+            gitlink = subprocess.run(('git', 'rev-parse', 'HEAD:' + path), cwd=ROOT,
+                                     check=True, capture_output=True, text=True).stdout.strip()
+            self.assertEqual(gitlink, commit)
+
+    def test_m19_lock_rejects_a_component_that_does_not_descend_from_m17(self):
+        import shutil
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name in ('manifests', 'components'):
+                (root / name).mkdir()
+            for name in ('components.lock.json', 'm17-components.lock.json'):
+                shutil.copyfile(ROOT / 'manifests' / name, root / 'manifests' / name)
+            lock = json.loads((ROOT / current_components.M19_LOCK).read_text())
+            for item in lock['components']:
+                if item['name'] == 'country':
+                    item['commit'] = 'f' * 40
+            (root / current_components.M19_LOCK).write_text(json.dumps(lock))
+            for name in ('country', 'fdkernel', 'freecom'):
+                (root / 'components' / name).symlink_to(ROOT / 'components' / name)
+            with self.assertRaises(current_components.CurrentComponentError):
+                current_components._resolve_m19(root)
 
 
 if __name__ == '__main__':
