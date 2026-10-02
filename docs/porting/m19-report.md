@@ -1,5 +1,23 @@
 # M19 work report
 
+## KSSF experiment (not the normal distribution)
+
+The `experiment/m19-kswap` branch starts at
+`5fe502d673eafc3f57f3a7e690a3d9704ed9f1c0` (fetched predecessor tip;
+M19 build and scaffold CI succeeded on that exact head). Its bounded final
+publication change is report-only. Component checkouts matched clean gitlinks.
+The experiment enables existing FreeCOM kernel-swap support and builds the
+upstream KSSF wrapper against the same generated context. No swap algorithm or
+common DOS behavior is changed. The complete normal M19 build recipe is used,
+with a separate output directory; no old disk or saved binary is an input.
+
+Experiment status: build, host tests, VAEG and hardware **NOT RUN** yet.
+The historical results below apply only to the previous candidate, not KSSF.
+No new milestone PASS or handoff is claimed. See `tools/m19/README.md` for
+rebuilding and the explicit swap commands/limitations.
+
+## Previous non-swapping checkpoint
+
 Status: **VAEG PASS for the published M19 work checkpoint; HARDWARE PASS for
 JWASMR startup, the HELLO.ASM build and HELLO.COM run on a VA2 with 640 KiB
 (owner report, 2026-10-02); other

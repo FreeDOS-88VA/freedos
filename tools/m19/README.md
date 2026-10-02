@@ -1,5 +1,24 @@
 # M19 build, DOS payloads, and media tooling
 
+## Experimental KSSF branch
+
+This branch is a separate KSSF trial, not a replacement for the qualified
+non-swapping checkpoint. Use the toolchain setup below, then
+`make m19-disk M19_DIST=dist/m19-kswap-candidate` and
+`make m19-accept M19_DIST=dist/m19-kswap-candidate` from a clean committed tree.
+The complete build assembles the pinned FreeCOM `tools/kssf.asm` against its
+fresh generated `context.inc`. CONFIG.SYS starts KSSF with the absolute path
+`A:\COMMAND.COM`; XMS and UMBs are not required. All previous guest/hardware
+results must be requalified on this different shell configuration.
+
+At the interactive prompt, compare `MEMMAP` with `CALL /S MEMMAP`, then try
+`CALL /S JWASMR -bin -FoHELLO.COM HELLO.ASM` and `HELLO`. Test MZ execution,
+repeat shell reloads, environment/PATH retention and file write/readback too.
+Do not use a pipeline, redirection or a batch file for the swap test: the
+upstream `docs/k-swap.txt` describes restrictions on these, secondary shells
+and history preservation. This is unload/relaunch of the shell, not general
+virtual memory. There is no automatic swap on ordinary commands.
+
 M19 owns its complete parent-side build orchestration, helper modules,
 producers, inspectors, settings, tests and fixtures under `tools/m19/`,
 `config/m19/` and `tests/m19/`. `make m19-disk` exports the exact committed

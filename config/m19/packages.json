@@ -32,12 +32,13 @@
       "id": "freecom",
       "version": "FreeCOM 0.87",
       "files": [
-        "COMMAND.COM"
+        "COMMAND.COM",
+        "KSSF.COM"
       ],
       "source_lock": "freecom",
       "license": "GPL-2.0-or-later",
       "cpu": "8086 real mode",
-      "va_adaptation": "Pinned NECPC88VA FreeCOM configuration, English build, fixed reproducible timestamp",
+      "va_adaptation": "Experimental KSSF shell swapping; existing FreeCOM feature enabled for NECPC88VA, English build, fixed reproducible timestamp; guest qualification pending",
       "tests": [
         "clean source build",
         "matched VA/VA2 shell, file/edit/assembly/batch commands and input regression",

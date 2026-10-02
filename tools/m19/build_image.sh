@@ -65,6 +65,8 @@ bash build.sh pc88va no-xms-swap wc english
 # every heap byte stays resident; ptchsize estimates its minimum at about
 # 1.8 KiB. Use FreeCOM's own tool to set 3 KiB.
 utils/ptchsize.exe command.com +3KB
+# Existing upstream wrapper, assembled against this build's generated context.
+(cd tools && nasm -f bin kssf.asm -o kssf.com)
 cd /work/source
 python3 -B tools/m19/finish_image.py /work/result
 python3 -B tools/m19/verify_m13_linked_placement.py \

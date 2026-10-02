@@ -7,3 +7,5 @@ FILES=16
 LASTDRIVE=E
 SET PATH=A:\
 DOS=LOW
+REM Experimental KSSF wrapper; explicit CALL /S is required for swap-out.
+SHELL=A:\KSSF.COM A:\COMMAND.COM /E:512 /P

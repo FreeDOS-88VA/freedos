@@ -21,13 +21,13 @@
       "name": "freecom",
       "path": "components/freecom",
       "repository": "https://github.com/nakatamaho/freecom_dbcs2.git",
-      "branch": "topic/m19-pc88va-compact",
+      "branch": "experiment/m19-kswap",
       "upstream_repository": "https://github.com/lpproj/freecom_dbcs2.git",
-      "commit": "62dfacb4a88ca0a2b5a2b9b9c2c8ad5f8c917699",
+      "commit": "e9307705ba4cdcd5f51eac0559ebdc90ea5c2a00",
       "parents": [
-        "450d49b7a7756721b30afcfa8cb7cd75bde16de8"
+        "62dfacb4a88ca0a2b5a2b9b9c2c8ad5f8c917699"
       ],
-      "source_archive_sha256": "035c2f5406429af2e0c4ec7fb1f4087e111cbe13bed2f45253ec72e003b05699",
+      "source_archive_sha256": "0806b5fab7078e07de2a31bee09c1fd9d0a14a2602e9efd27534385badef596b",
       "license": "GPL-2.0-or-later"
     },
     {
