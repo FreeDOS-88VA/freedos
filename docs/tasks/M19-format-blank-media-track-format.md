@@ -1,6 +1,6 @@
 # M19 task: FORMAT cannot prepare blank media
 
-Status: **QUEUED; M19 IMPLEMENTATION NOT STARTED**. This records a known M18
+Status: **IMPLEMENTED IN M19 (VAEG-validated; hardware NOT RUN)** — see `docs/porting/m19-report.md`. This records a known M18
 limitation. It does not change the released M18 disk, its tooling or its
 emulator-only validation scope.
 
