@@ -57,6 +57,11 @@ the original binary; `--profile freedos` keeps IBM console CLS for PC testing.
 - Standard MS-DOS 4 parsing, transient reload, batch and environment behavior
   are not replaced. Set PATH in AUTOEXEC.BAT rather than expecting CONFIG's
   environment to be retained by the original shell initialization.
+- `%NAME%` environment expansion is implemented in the original batch reader,
+  not the interactive prompt. CALL does not propagate an outer redirection to
+  every command of the called batch. These historical parsing rules are kept;
+  `MS4QA.BAT` puts each redirection on the command being measured. Use
+  `COMMAND /C ...`, not interactive `%COMSPEC% /C ...`.
 - Default builds without the definitions retain the original code paths.
   This does not make any MS-DOS binary a general FreeDOS compatibility target.
 
@@ -70,5 +75,12 @@ Read guest-written files back after stopping the emulator; screenshots alone
 are not content validation. Record the exact disk/emulator identities and
 installed versus retained RAM separately in excluded evidence. Do not infer
 VA, VA2, smaller-memory or stale-setting coverage from another configuration.
+
+Inject `config/m19/msdos4-guest-input.txt` with the owner's emulator adapter.
+After stopping the guest, run `python3 -B tools/m19/qa/msdos4_readback.py
+--baseline build/m19-msdos4-qa-NEW/MSDOS4-QA.D88 --guest PRIVATE-COPY.d88
+--output PRIVATE-RESULT.json`. Output must be outside tracked source paths.
+The synthetic negative tests reject missing outputs, payload drift, a spoofed
+DOS version, failed MCB checks and absent COM/MZ execution evidence.
 
 See `docs/porting/m19-report.md` for actual executed versus unrun coverage.

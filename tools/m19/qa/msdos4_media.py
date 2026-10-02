@@ -64,6 +64,8 @@ def main():
         payloads['AUTOEXEC.BAT'] = (
             b'@ECHO OFF\r\nSET PATH=A:\\\r\nPROMPT $P$G\r\n'
             b'ECHO MS-DOS 4 COMMAND on FreeDOS - experimental QA only\r\n')
+        for name in ('MS4QA.BAT', 'SUBQA.BAT'):
+            payloads[name] = (ROOT / 'config/m19/payload' / name).read_text().replace('\n', '\r\n').encode('ascii')
         payloads['MSDOS.LIC'] = (shell / 'msdos/LICENSE').read_bytes()
         payloads['SHELLQA.TXT'] = (
             b'QA only, not the normal FreeCOM distribution. MS-DOS kernel not used.\r\n'
