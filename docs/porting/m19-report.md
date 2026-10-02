@@ -20,11 +20,47 @@ CLS (DOS form feed alone was tested and did not clear the display). No FreeDOS k
 behavior is changed. The adapted shell copied and read back a small text file
 on the PC control. This is not a VA result.
 
+Status: **HOST PASS; VAEG PASS for the bounded shell workflow below;
+DEFERRED HARDWARE VALIDATION (hardware NOT RUN).** This is not a normal M19
+release or milestone HANDOFF READY.
+
+- START_SHA: `5fe502d673eafc3f57f3a7e690a3d9704ed9f1c0`.
+- QUALIFIED_IMPLEMENTATION_SHA: `4b3bf7e80576b5fb66611452608e17fe0a952df5`.
+- Microsoft-source fork: `825dc8753bf035835415ebf182c1b6ea786bfa64`;
+  FreeDOS kernel and normal FreeCOM pins are unchanged.
+- Two independent complete normal-plus-shell builds produced identical QA D88
+  bytes: SHA-256 `fa8a3b3f0cd0f8837f0761274d174f0e7fd810995d941e188870368f9972fc4e`,
+  1,331,888 bytes. All 107 host tests, linked-placement, isolation/privacy and
+  public-instance checks passed. Failed intermediate builds/candidates were
+  retained, not used as inputs. The original (no profile definitions) shell
+  still builds byte-identically to the upstream Microsoft base.
+- Native CI `M19 MS-DOS 4 shell source QA`, run `37025826401`, attempt 1,
+  job `source-qa`, and scaffold run `37025826418`, attempt 1, job `verify`,
+  succeeded on the exact qualified head. CI calls the same complete QA build
+  and normal public-instance verifier as local testing, plus the original
+  profile binary comparison. A later report-only publication must check its
+  own CI separately; this report cannot contain its own publication SHA.
+- VAEG: VA and VA2 with 640 KiB installed (no persisted backup input), plus
+  VA2 with 512 KiB installed and a retained 640-KiB selection. On each exact
+  candidate: startup, native-version VER, visible CLS and redirected CLS,
+  COPY/TYPE/REN/DEL and missing-source rejection, FOR/IF, pipe to MORE, batch
+  environment expansion, nested batch CALL, child COMMAND /C, JWASMR COM and
+  relocatable MZ assembly/execution, and valid/stable post-batch MCB checks.
+  Settled disk readback verified file bytes and all original media payloads;
+  CLS screen captures were inspected separately. Exact emulator, disks,
+  configuration, retained settings, input and results remain private.
+- Normal MS-DOS 4 semantics are preserved: environment expansion is in the
+  batch reader, not the interactive prompt; CALL does not retain a wrapper's
+  redirection for every called command. The first test harness assumed newer
+  shell behavior and was corrected, rather than changing the DOS parser.
+- NOT RUN for this shell: hardware, VA at 512 KiB, a matching retained 512-KiB
+  setting, other capacities, full editor/pager/maintenance regression, SYS
+  transfer and arbitrary applications. The unchanged kernel's known F5/F8
+  timeout issue remains; the scripts send early Enter, as in baseline tests.
+
 Source pins and public acquisition/build instructions:
 `config/m19/msdos4-research.json`, `tools/m19/qa/MSDOS4.md`.
-Complete two-build QA media, host regressions, VAEG and hardware are pending;
-no PASS or HANDOFF READY is claimed for this experiment. Prior kswap research
-is parked separately, not an input to this build.
+Prior kswap research is parked separately, not an input to this build.
 
 ## Normal FreeCOM checkpoint (unchanged)
 
