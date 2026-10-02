@@ -1,5 +1,32 @@
 # M19 work report
 
+## Separate MS-DOS 4 COMMAND experiment
+
+Branch `experiment/m19-msdos4` starts from
+`5fe502d673eafc3f57f3a7e690a3d9704ed9f1c0`, the clean, pushed normal
+checkpoint. The owner scoped this task to running source-built MS-DOS 4
+COMMAND.COM under VAEG on the unchanged FreeDOS kernel. The normal FreeCOM
+image is preserved; the historical PASS statements below do not qualify the
+new shell.
+
+The original MASM 5.10 / LINK 3.65 build was reconstructed entirely from the
+public Microsoft source/tool tree, generating all message classes afresh.
+A normal PC FreeDOS control reproduced COPY failure: COMMAND requires OS/2
+extended-attribute calls which FreeDOS does not provide. The optional shell
+profile (separate Microsoft-source fork) omits those operations, accepts the
+native FreeDOS version without a global VERSION override, and uses the VA DOS
+CON clear/home operation rather than IBM INT 10h for CLS. No FreeDOS kernel
+behavior is changed. The adapted shell copied and read back a small text file
+on the PC control. This is not a VA result.
+
+Source pins and public acquisition/build instructions:
+`config/m19/msdos4-research.json`, `tools/m19/qa/MSDOS4.md`.
+Complete two-build QA media, host regressions, VAEG and hardware are pending;
+no PASS or HANDOFF READY is claimed for this experiment. Prior kswap research
+is parked separately, not an input to this build.
+
+## Normal FreeCOM checkpoint (unchanged)
+
 Status: **VAEG PASS for the published M19 work checkpoint; HARDWARE PASS for
 JWASMR startup, the HELLO.ASM build and HELLO.COM run on a VA2 with 640 KiB
 (owner report, 2026-10-02); other

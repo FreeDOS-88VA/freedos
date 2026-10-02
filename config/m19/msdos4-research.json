@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "scope": "Separate MS-DOS 4 COMMAND compatibility QA, not the normal distribution",
+  "msdos": {
+    "repository": "https://github.com/nakatamaho/MS-DOS.git",
+    "upstream": "https://github.com/microsoft/MS-DOS.git",
+    "upstream_base": "2d04cacc5322951f187bb17e017c12920ac8ebe2",
+    "branch": "experiment/m19-freedos-command",
+    "commit": "55505699e59aa3a8bd5144bc06b5b5e07e32bb31",
+    "source_archive_sha256": "f40b38bdb1be5559ab36ed3b1862c6681963c59bfd0f5ea078be403fb34190be",
+    "license": "MIT"
+  },
+  "emu2": {
+    "repository": "https://github.com/dmsc/emu2.git",
+    "commit": "9d8698d06e67359bc8b230c2d19d5b1503e60819",
+    "source_archive_sha256": "f014df25b076c3671f14104640de1e230b317592b6b1c217323f586cc3e750ac",
+    "license": "GPL-2.0"
+  },
+  "profile": "pc88va",
+  "tools": "Original BUILDIDX, BUILDMSG, MASM 5.10, LINK 3.65 and EXE2BIN from the pinned Microsoft repository; tool hashes recorded at build time"
+}
