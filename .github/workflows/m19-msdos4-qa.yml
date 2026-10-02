@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+name: M19 MS-DOS 4 shell source QA
+on:
+  push:
+    branches: ['experiment/m19-msdos4']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Install standard host tools
+        run: sudo apt-get update && sudo apt-get install -y nasm build-essential
+      - name: Source audit and pinned component acquisition
+        run: |
+          python3 -B tools/m19/verify_source_audit.py
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          lock=json.loads(Path('config/m19/msdos4-research.json').read_text())
+          root=Path(os.environ['RUNNER_TEMP'])
+          for name in ('msdos', 'emu2'):
+              target=root/name
+              subprocess.run(['git','clone',lock[name]['repository'],str(target)],check=True)
+              subprocess.run(['git','-C',str(target),'cat-file','-e',lock[name]['commit']+'^{commit}'],check=True)
+          PY
+      - name: Prepare normal pinned toolchain
+        run: make m19-toolchain
+      - name: Two complete normal and experimental shell builds
+        run: |
+          python3 -B tools/m19/qa/msdos4_media.py \
+            --msdos-repo "$RUNNER_TEMP/msdos" --emu2-repo "$RUNNER_TEMP/emu2" \
+            --output build/m19-msdos4-ci
+      - name: Original profile remains byte-identical to upstream
+        run: |
+          python3 -B tools/m19/qa/build_msdos4.py --msdos-repo "$RUNNER_TEMP/msdos" \
+            --emu2-repo "$RUNNER_TEMP/emu2" --output build/msdos4-upstream
+          revision=$(python3 -c 'import json; print(json.load(open("config/m19/msdos4-research.json"))["msdos"]["commit"])')
+          python3 -B tools/m19/qa/build_msdos4.py --msdos-repo "$RUNNER_TEMP/msdos" \
+            --emu2-repo "$RUNNER_TEMP/emu2" --msdos-revision "$revision" \
+            --profile original --output build/msdos4-original-control
+          cmp build/msdos4-upstream/COMMAND.COM build/msdos4-original-control/COMMAND.COM
+      - name: Close normal instance and keep source clean
+        run: |
+          python3 -B tools/m19/verify_distribution.py --dist build/m19-msdos4-ci/normal-dist
+          test -z "$(git status --porcelain --untracked-files=all)"
