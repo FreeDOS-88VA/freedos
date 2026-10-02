@@ -1,8 +1,8 @@
 # M19 entry task: JWASMR hardware startup
 
 Status: **DONE IN M19 — HARDWARE PASS** (owner report, 2026-10-02): on the M19
-public checkpoint disk, JWASMR with no arguments shows Usage on the physical
-machine, and HELLO.ASM assembles. Cause addressed: the Open Watcom 1.9
+public checkpoint disk, on a VA2 with 640 KiB, JWASMR with no arguments shows
+Usage, HELLO.ASM assembles and HELLO.COM prints its message. Cause addressed: the Open Watcom 1.9
 pre-main x87 probe began with FWAIT; M19 links a no-WAIT probe instead. See
 `docs/porting/m19-report.md`.
 

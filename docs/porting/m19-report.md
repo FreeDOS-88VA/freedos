@@ -1,7 +1,8 @@
 # M19 work report
 
 Status: **VAEG PASS for the published M19 work checkpoint; HARDWARE PASS for
-JWASMR startup and the HELLO.ASM build (owner report, 2026-10-02); other
+JWASMR startup, the HELLO.ASM build and HELLO.COM run on a VA2 with 640 KiB
+(owner report, 2026-10-02); other
 hardware items NOT RUN.**
 The parent branch `topic/m19-memory-format-tools` and the component topic
 branches listed below are pushed to the `nakatamaho` forks. A fresh clone of
@@ -20,7 +21,7 @@ physical-hardware stop. SASI data-drive work is not part of this report.
 | Item | Change | Evidence |
 | --- | --- | --- |
 | Milestone-local tooling | `tools/m19`, `tests/m19`, `config/m19`, `manifests/m19-components.lock.json`, `m19-*` Make targets, copied from M18 plus the reviewed M18 audit fixes | Isolation check forbids M00-M18 runtime inputs; host suite passes |
-| JWASMR stop before Usage on hardware | OW 1.9 `clibl.lib(init8087)` begins its x87 probe with `FWAIT; FNINIT`. On an 8086-class CPU without a coprocessor FWAIT waits on the TEST input. A project `x87id.asm` replaces that module and decides presence with no-WAIT `FNINIT`/`FNSTCW`; the build rejects a link that still contains `init8087` | Host tests; VAEG VA/VA2 assemble and run HELLO/MZDEMO. VAEG does not model the TEST input, so emulation could not show the fix. **HARDWARE PASS** (owner, M19 public checkpoint disk): JWASMR with no arguments shows Usage, and HELLO.ASM assembles |
+| JWASMR stop before Usage on hardware | OW 1.9 `clibl.lib(init8087)` begins its x87 probe with `FWAIT; FNINIT`. On an 8086-class CPU without a coprocessor FWAIT waits on the TEST input. A project `x87id.asm` replaces that module and decides presence with no-WAIT `FNINIT`/`FNSTCW`; the build rejects a link that still contains `init8087` | Host tests; VAEG VA/VA2 assemble and run HELLO/MZDEMO. VAEG does not model the TEST input, so emulation could not show the fix. **HARDWARE PASS** (owner, VA2 with 640 KiB, M19 public checkpoint disk): JWASMR with no arguments shows Usage, HELLO.ASM assembles and HELLO.COM prints its message |
 | FORMAT | Formats every track through INT 80h AH=03h (disk mode 23h), verifies every sector, marks unreadable data clusters bad, writes a fresh volume with a date/time serial; `/T:80` (default), `/T:77`, `/Q` metadata-only | Host fixtures; VAEG VA/VA2 formatted blank D88 media at 80 and 77 cylinders |
 | CHKDSK/SYS | Accept 80- and 77-cylinder native 2HD and DOS 2.x short BPBs; SYS keeps the target BPB geometry and label; SYS verifies LOADER.BIN lands on the source extent before writing the boot sector | Host fixtures; VAEG VA/VA2 SYS to both geometries, then booted the outputs and wrote/read a file |
 | 77-cylinder boot | fdkernel stage 2 accepts a BPB of fewer whole cylinders of the profile geometry and loads files from a volume shorter than the disk | fdkernel pc88va suite (331 + new tests); VAEG VA/VA2 boot of SYS-output 77-cylinder disks |
@@ -73,13 +74,14 @@ physical-hardware stop. SASI data-drive work is not part of this report.
   large programs; most of the remaining resident use is the FreeCOM code and
   the kernel. Investigations of an MIT-licensed MS-DOS 4.0 COMMAND.COM on the
   FreeDOS kernel and of the kernel resident breakdown are planned.
-- Hardware: the JWASMR startup fix and the HELLO.ASM build passed on hardware
-  (owner report). Blank-disk FORMAT, SYS and 77-cylinder boot are **NOT RUN**
+- Hardware: the JWASMR startup fix, the HELLO.ASM build and running HELLO.COM
+  passed on a VA2 with 640 KiB (owner report). Blank-disk FORMAT, SYS and 77-cylinder boot are **NOT RUN**
   on hardware.
 
 ## Not run
 
-HARDWARE PASS covers only the JWASMR startup and HELLO.ASM build; blank
+HARDWARE PASS covers only JWASMR startup, the HELLO.ASM build and the HELLO.COM
+run on a VA2 with 640 KiB; VA hardware, other capacities, blank
 FORMAT, SYS, 77-cylinder boot and the remaining workflow are NOT RUN on
 hardware. The historical M01-M09
 workflows still fail on this branch as they already do on `main`; they are not
