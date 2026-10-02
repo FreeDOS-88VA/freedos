@@ -11,7 +11,47 @@ upstream KSSF wrapper against the same generated context. No swap algorithm or
 common DOS behavior is changed. The complete normal M19 build recipe is used,
 with a separate output directory; no old disk or saved binary is an input.
 
-Experiment status: build, host tests, VAEG and hardware **NOT RUN** yet.
+Experiment status: **BLOCKED; do not use as a replacement disk**.
+Implementation tested: `860c536b34234e1111337ee200d30a7f89f7d6ff`;
+FreeCOM: `e9307705ba4cdcd5f51eac0559ebdc90ea5c2a00` (configuration only).
+Two complete allowlist-only container builds produced identical D88 bytes;
+all 101 host tests and the linked-placement and public-instance verifiers
+passed. Source/privacy audit passed inside the clean exports (not the working
+checkout, which contains excluded evidence). Native CI is NOT RUN yet for the
+experiment. VAEG shell startup and an ordinary MEMMAP command worked, but the
+first interactive `CALL /S MEMMAP` stopped with memory-chain corruption.
+No successful swap, shell reload, memory saving, COM/MZ swap execution or
+JWASMR benefit is established. Alternate models/capacities, stale retained
+settings and hardware were NOT RUN for this experiment. Exact emulator,
+configuration, input, failing media and observations are retained privately.
+The previous distribution is preserved unchanged.
+
+### Public-source blockers (existing upstream code, not repaired)
+
+- `shell/init.c` calls `kswapRegister()` before applying `/E:` or the automatic
+  environment resize. `shell/kswap.c` allocates the saved environment using
+  the old size. `kswapMkStruc()` later copies the **current** environment size
+  into that old allocation. The size assertion is disabled in a release build;
+  there is no runtime resize or bounds-error return. An enlarged environment
+  can therefore overwrite the following MCB. This source-level defect is
+  consistent with the failed swap; it is not a new VA RAM-detection issue.
+- `kswapRegister()` passes `(word)ctxt` as the registration segment.
+  `suppl/portable.h` defines `_seg` as a FAR pointer for Watcom, unlike Turbo C's
+  segment-pointer extension. Narrowing that pointer takes the offset, not the
+  segment. A separate pinned OW 1.9 `wcc -0 -ms -os -s` diagnostic with
+  `void far *p = MK_FP(0x1234, 0)` emitted `xor ax,ax; ret` for `(unsigned)p`,
+  versus `mov ax,1234h; ret` for `FP_SEG(p)`. These are synthetic compiler-test
+  constants, not guest-derived addresses. Thus registration has another
+  independent portability blocker even if the environment overwrite is avoided.
+- `kswapLoadStruc()` reads `dyn_ctxt`, but the selected tree has no writer of
+  that field after its zero initializer. Context restoration also needs an
+  upstream review; it was not qualified by this experiment.
+
+The relevant `shell/kswap.c`, `suppl/portable.h` and `tools/kssf.asm` are
+unchanged from upstream master `e24bd7eab62502b1dad4099539f418ac5bc5f278`;
+the registration/resize ordering also predates the VA port. Per project policy,
+do not repair those upstream defects as VA adapter work. Enabling the feature
+alone is insufficient; a separately reviewed upstream solution is needed.
 The historical results below apply only to the previous candidate, not KSSF.
 No new milestone PASS or handoff is claimed. See `tools/m19/README.md` for
 rebuilding and the explicit swap commands/limitations.

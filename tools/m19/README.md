@@ -2,8 +2,10 @@
 
 ## Experimental KSSF branch
 
-This branch is a separate KSSF trial, not a replacement for the qualified
-non-swapping checkpoint. Use the toolchain setup below, then
+**BLOCKED: the first swap failed; do not use this disk for real work.**
+See `docs/porting/m19-report.md` for the upstream source blockers and unrun
+coverage. This branch preserves a separate KSSF trial, not a replacement for
+the qualified non-swapping checkpoint. To reproduce, use the toolchain setup below, then
 `make m19-disk M19_DIST=dist/m19-kswap-candidate` and
 `make m19-accept M19_DIST=dist/m19-kswap-candidate` from a clean committed tree.
 The complete build assembles the pinned FreeCOM `tools/kssf.asm` against its
