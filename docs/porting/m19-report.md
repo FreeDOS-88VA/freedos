@@ -1,9 +1,11 @@
 # M19 work report
 
-Status: **IN PROGRESS — emulator (VAEG) validation of the M19 candidate; not
-published.** Commits are local to `topic/m19-memory-format-tools` and the
-component topic branches listed below; nothing has been pushed. No hardware
-result exists for M19: **HARDWARE: NOT RUN**.
+Status: **VAEG PASS for the published M19 work checkpoint; HARDWARE: NOT RUN.**
+The parent branch `topic/m19-memory-format-tools` and the component topic
+branches listed below are pushed to the `nakatamaho` forks. A fresh clone of
+the pushed parent revision rebuilt the complete disk twice with identical D88
+bytes, and its M19 and scaffold CI workflows passed. The designated milestone
+archive under `images/milestones/m19/` has not been created yet.
 
 M19 starts from parent `main` `0c66cd8242cb2a751fa473a5704c606269ab28d0`
 (released M18 plus queued M19 notes). The owner redefined the M19 scope for
@@ -28,7 +30,7 @@ physical-hardware stop. SASI data-drive work is not part of this report.
 (owner decision): its expanded image overlaps the 256 KiB staging plan at
 27000h and needs more than 256 KiB of RAM. The default stays 1000h.
 
-## Component pins (local, unpushed)
+## Component pins (pushed)
 
 | Component | Branch | Commit |
 | --- | --- | --- |
@@ -43,8 +45,12 @@ physical-hardware stop. SASI data-drive work is not part of this report.
 - fdkernel `pc88va/tests`: all pass, including new 77-cylinder volume and file
   tests.
 - `make m19-disk`: two isolated clean builds produce identical D88 bytes for each
-  candidate built during the work.
-- VAEG (private ROMs, `--no-bkupmem` unless noted), VA and VA2: boot, MEMMAP,
+  candidate built during the work, including a fresh clone of the pushed
+  parent revision (`make m19-allocator-qa` and `make m19-accept` pass there).
+- GitHub Actions: "M19 isolated native 2HD source build" and "Scaffold
+  validation" pass on the pushed branch.
+- VAEG (private ROMs, `--no-bkupmem` unless noted), VA and VA2, on the D88
+  rebuilt from the pushed revision: boot, MEMMAP,
   CHKDSK A:/B:, blank FORMAT (80 and 77), SYS, boot of SYS outputs with file
   write/readback, JWASMR COM and MZ builds and runs, MORE with pipe and `<`,
   MEMMAP /CHECK.
@@ -70,5 +76,7 @@ physical-hardware stop. SASI data-drive work is not part of this report.
 
 ## Not run
 
-HARDWARE PASS: not claimed. CI for M19: not run (no workflow yet, nothing
-pushed). Acceptance, publication and handoff gates: not run.
+HARDWARE PASS: not claimed; hardware is NOT RUN. The historical M01-M09
+workflows still fail on this branch as they already do on `main`; they are not
+M19 gates. The milestone image archive, acceptance metadata and handoff are not
+done.
