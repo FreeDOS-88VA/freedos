@@ -75,9 +75,55 @@ fixture now requests these assembler loans explicitly, records restored
 numeric exit status rather than redirected compiler stdout, and checks
 alias/environment/recent history after the large child returns. Installed RAM
 and retained settings are not altered to hide the failed ordinary execution.
-The updated complete four-case workflow and exact-head source gates are pending;
-no acceptance is inferred from the short reproducer. Hardware is **NOT RUN**.
-No disk handover or HANDOFF READY.
+The complete updated workflow is now independently qualified at
+`a30e9173179b7adeff6e3ddd37d74730f1e39006`:
+
+- **HOST PASS**: 118 parent tests and nine component host tests; two complete
+  clean builds and a separate fresh-public two-build agree; public instance,
+  source/privacy audit, milestone isolation and linked placement pass. Exact
+  M19 source CI `37119860461` and scaffold CI `37119860465`, attempt 1, succeeded
+  on that implementation SHA. Kernel and loader bytes equal the earlier
+  kernel-repair/preview checkpoint; no saved DOS executables are build inputs.
+- **VAEG PASS**, bounded to unattended startup and the specified workflow:
+
+  | Model | Installed RAM | Imported retained selection | Shell environment |
+  | --- | --- | --- | --- |
+  | VA2 | 640 KiB | no backup input | `/E:512` |
+  | VA | 640 KiB | no backup input | `/E:512` |
+  | VA2 | 512 KiB | 640 KiB, preserved before/after | `/E:512` |
+  | VA2 | 640 KiB | no backup input | `/E:8192` |
+
+  Each fresh run completes twenty stable probe swaps, gains the borrowed
+  arena with no live COMMAND-named blocks, preserves arguments and selected
+  environment/alias/history state, returns swapped MZ status 7, assembles both
+  source programs through explicit JWasm loans (status 0), executes their
+  resulting COM/MZ normally, preserves post-loan state/recent history and
+  settles valid MCB accounting. Original payloads remain unchanged. Startup
+  and final screens were reviewed independently; completed-input/settled
+  readback results and exact private runtime identities are retained locally.
+- **DEFERRED HARDWARE VALIDATION**: real hardware **NOT RUN**.
+
+Reproduce with `tools/m19/qa/KSWAP.md`. The source-generated QA disks are
+`KSWAP-E512.D88`, SHA-256
+`6de01f5bf00b137a57c80a3248a5ce8ea95171b5453eb5052240cf3227ac38df`, and
+`KSWAP-E8192.D88`, SHA-256
+`b06997ea7654c697de43880a6317e42bb6ddbddeee666a588772bed23e7d0953`.
+These are experimental test images, not a new designated milestone release.
+
+VA OOM fallback `/E:32752`, secondary shells, swapped batch/pipes/redirection,
+UMB, live environment relocation, failed-reload cleanup, Borland runtime,
+abnormal child termination on VAEG, KSSF F8/F5 paths, 256/384-KiB profiles,
+actual media-swap safety and unidentified legacy media remain **NOT RUN** or
+unqualified. Host decoder tests cover termination reasons, not those runtime
+paths. The failed ordinary 512-KiB assembler execution is not retroactively
+called a pass; use the explicitly qualified loan path.
+
+Historical workflow failures remain separate from M19 gates. In particular,
+root-policy run `37115623415` fails its historical M04 predecessor-diff scope,
+not this M19 license/source audit; no historical acceptance is rewritten.
+The normal FreeCOM pin on `fix/m19-shell-startup`, released Preview tag/assets
+and stable M18 distribution remain unchanged. This is a bounded experimental
+work checkpoint, not normal-release replacement or milestone HANDOFF READY.
 See `tools/m19/qa/KSWAP.md`. Previous PC results do not qualify VA.
 
 ## FreeCOM kswap resumed: bounded independent PC qualification
