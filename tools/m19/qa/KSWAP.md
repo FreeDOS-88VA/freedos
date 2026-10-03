@@ -50,6 +50,15 @@ the gate also rejects unresolved `String #` diagnostics, MCB-corruption claims,
 lost context and missing prompts even if all output files exist. Initial VA
 checks exposed an exit-7/status decoding error that earlier PC file checks
 missed. Host negatives now cover this false-success path as well.
+
+JWasm explicitly runs through `CALL /S`: ordinary execution exhausted its
+available DOS arena in the 512-KiB control. Do not change the installed/retained
+settings to evade this workload constraint. Assembler stdout stays on the
+console; after each loan, ordinary ECHO writes its restored numeric exit status
+to `ASMCOM.TXT`/`ASMMZ.TXT` (both must be 0). Check alias/environment and recent
+history again after the assembler loans. This does not qualify arbitrary
+swapped redirection or pipes.
+
 The probe/accounting algorithm is maintained locally from the independent
 component verifier at `f5512b5a1756768830b541a274ac48973c46de12`; its PC
 acceptance state is not inherited as VA evidence.

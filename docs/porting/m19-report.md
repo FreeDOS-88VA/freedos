@@ -59,9 +59,25 @@ CI `37116808065` and full build/test/cross-build CI `37116808110`, attempt 1,
 succeeded before the updated VA pin/rebuild. Fresh public source archive
 identity also agrees. Both failed VA candidates and their evidence are retained.
 
-Pending: matched VA rebuild and the same VA2/640 KiB retest, then alternate
-VA/stale-retained controls. Hardware and
-those alternate configurations are **NOT RUN**. No disk handover or HANDOFF READY.
+At `90d50e163f3f9c7397f084d75262aa363cffde4b`, 117 parent tests, two complete
+clean local builds, a fresh public two-build, distribution/source/isolation and
+linked placement verification passed; exact-head M19 CI `37117632849`, attempt
+1, succeeded. VA2/640 `/E:512`, VA/640 `/E:512`, and VA2/640 `/E:8192` completed
+the initial full workflow without the former status or ISA diagnostics. The
+installed-512/retained-640 control started and completed its swap/state probes,
+but ordinary JWasm exhausted its available DOS arena, so the full workflow
+correctly failed guest source assembly. Its failing artifacts are retained;
+this is not a full 512-KiB workflow PASS or a RAM-detection failure.
+
+A targeted same-model/capacity/retained-setting run demonstrated source COM/MZ
+assembly through `CALL /S JWASMR`, followed by normal execution. The public
+fixture now requests these assembler loans explicitly, records restored
+numeric exit status rather than redirected compiler stdout, and checks
+alias/environment/recent history after the large child returns. Installed RAM
+and retained settings are not altered to hide the failed ordinary execution.
+The updated complete four-case workflow and exact-head source gates are pending;
+no acceptance is inferred from the short reproducer. Hardware is **NOT RUN**.
+No disk handover or HANDOFF READY.
 See `tools/m19/qa/KSWAP.md`. Previous PC results do not qualify VA.
 
 ## FreeCOM kswap resumed: bounded independent PC qualification

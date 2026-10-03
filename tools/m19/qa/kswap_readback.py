@@ -53,11 +53,14 @@ def check(base, guest):
     for name, expected in [('ARGS.OUT', b'ARGUMENTS'), ('ENV.TXT', b'HELLO'),
                            ('ENV2.TXT', b'HELLO'), ('ALIAS.TXT', b'ALIASOK'),
                            ('ALIAS2.TXT', b'ALIASOK'), ('RC.TXT', b'7'),
+                           ('ASMCOM.TXT', b'0'), ('ASMMZ.TXT', b'0'),
+                           ('ALIAS3.TXT', b'ALIASOK'), ('ENV3.TXT', b'HELLO'),
                            ('DONE.TXT', b'FINISHED')]:
         if guest.get(name, b'').strip() != expected:
             raise ValueError('lost state or incomplete execution: ' + name)
-    if b'set KEEP=HELLO' not in guest.get('HIST.TXT', b''):
-        raise ValueError('lost history')
+    if (b'set KEEP=HELLO' not in guest.get('HIST.TXT', b'') or
+            b'JWASMR -0 -mz' not in guest.get('HIST2.TXT', b'')):
+        raise ValueError('lost history before or after assembler loan')
     if guest.get('MZ.OK') != b'MZ relocation OK\r\n':
         raise ValueError('swapped MZ did not execute')
     for name in ('PRE.TXT', 'POST.TXT', 'LAST.TXT'):
@@ -66,8 +69,7 @@ def check(base, guest):
             raise ValueError('MCB validation absent or failed: ' + name)
     if guest['POST.TXT'] != guest['LAST.TXT']:
         raise ValueError('MCB accounting did not settle')
-    for name, expected in [('ASMCOM.TXT', b'0 errors'), ('ASMMZ.TXT', b'0 errors'),
-                           ('RUNCOM.TXT', b'Hello from PC-88VA FreeDOS!'),
+    for name, expected in [('RUNCOM.TXT', b'Hello from PC-88VA FreeDOS!'),
                            ('RUNMZ.TXT', b'MZ relocation and DOS return succeeded.')]:
         if expected not in guest.get(name, b''):
             raise ValueError('source assembly or normal EXEC missing: ' + name)
