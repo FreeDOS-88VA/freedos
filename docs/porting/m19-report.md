@@ -1,23 +1,60 @@
 # M19 work report
 
-## F8 `/Y` compatibility follow-up (in progress)
+## F8 `/Y` compatibility follow-up (bounded qualification)
 
-START_SHA: `6b6e8520be69b1516d0a82f189a1b0681eb82996`.
+- START_SHA: `6b6e8520be69b1516d0a82f189a1b0681eb82996`.
+- QUALIFIED_IMPLEMENTATION_SHA: `99cbd700a97c54f06ac0ca762e1cf41a4cdf93b5`.
+- Microsoft fork: `e46d23b474f9406160a03c08dd4d931435f8781c`, branch
+  `fix/m19-freedos-y-option`; archive identity is in the research source lock.
+
 The owner confirmed F8 startup but requested removal of its invalid-switch
-message. Microsoft fork `e46d23b474f9406160a03c08dd4d931435f8781c`
-(`fix/m19-freedos-y-option`) recognizes `/Y` only in the FreeDOS profile, as an
-explicit no-op hint. CONFIG stepping stays in the kernel; AUTOEXEC still runs
-normally. This is not an implementation of batch single-stepping. Unknown
-and malformed switches retain their diagnostics. Kernel and FreeCOM pins are
-unchanged. Independent FreeCOM kswap work remains paused for this request.
+message. The FreeDOS profile now recognizes `/Y` as an explicit no-op hint.
+CONFIG confirmations remain in the kernel; AUTOEXEC still executes normally.
+This is not batch single-stepping. Unknown/malformed switches still diagnose
+errors. Kernel and FreeCOM pins, kernel/loader bytes, and the complete normal
+FreeCOM D88 are unchanged. Independent kswap work is separate and remains paused.
 
-The original-profile binary remains byte-identical to its upstream control.
-A fresh PC FreeDOS 2043/QEMU control accepted `/Y` and repeated/lowercase `/Y`,
-preserved `/C ECHO /Y`, and diagnosed `/Z`, `/YY`, and `/Y:1` before returning
-to the parent. Full VA-media rebuild, dedicated CI and new VAEG qualification
-are pending; hardware is NOT RUN. The previous qualified disk remains intact.
+**HOST PASS:** two complete normal-plus-shell builds agree; a clean public,
+allowlisted checkout repeated both builds with other milestones absent and
+produced the same QA disk. All 111 parent tests passed, including the component
+media-policy gates. New negative readback tests reject a `/Y` diagnostic,
+missing option outputs, suppressed unknown-switch errors and altered `/C`
+command text. Source/privacy audit, isolation and the public normal instance
+passed. Historical settled readback still validates without claiming the new
+option coverage. The original-profile COMMAND remains byte-identical to the
+upstream control (SHA-256
+`19ebe2e5a8e18ca5d447a3d1fc42c42e4942ff5f3ef50e39ab01374bb01d8ea9`).
 
-Latest status: the kernel media-uncertainty repair has **HOST PASS** and the
+Native source-QA run `37108753023`, attempt 1, and scaffold run `37108753036`,
+at the exact qualified implementation, succeeded. The publication tip's own
+CI and public rebuild are checked after push, separately from this report.
+Historical workflow failures are not an all-workflows-green claim.
+
+A fresh PC FreeDOS 2043/QEMU control accepted `/Y` and lowercase/repeated `/Y`,
+preserved `/C ECHO /Y`, and diagnosed `/Z`, `/YY` and `/Y:1` before returning to
+the parent. The first assembly attempt exceeded an 8086 short-branch range;
+the committed conditional trampoline fixed it before the successful builds.
+Incomplete DOS-host/control-harness attempts are retained, not counted as PASS.
+
+**VAEG PASS, bounded to this new disk:** F8 on VA2/640 KiB, VA2/512 KiB with a
+persisted 640-KiB selection, and VA/640 KiB; plus unattended startup on VA2/640
+KiB. Except for the explicit stale case, no backup input was supplied. Every
+run completed settled file/batch/pipe/child-shell checks, COM/MZ assembly and
+execution, held-open idle I/O, and MCB validation. `YOPTIONS.BAT` verified the
+positive and negative option cases above. Separate F8 screenshots for both
+VA2 capacities show CONFIG confirmations and the shell prompt without
+`Invalid switch`; a separate no-input capture confirms unattended startup.
+Installed capacity and retained selection remain separately recorded.
+
+New experimental `MSDOS4-QA.D88`: 1,331,888 bytes, SHA-256
+`e8ef926311d4edaec58461c962ca774a3455e2479b131a9d457aca6422633785`.
+Rebuild with `tools/m19/qa/MSDOS4.md` and the pinned public inputs. Earlier
+candidates remain retained; the normal distribution is not replaced. Hardware
+is NOT RUN / **DEFERRED HARDWARE VALIDATION**. Other startup/RAM combinations,
+SYS transfer and general application compatibility are not inferred from these
+runs. There is no milestone HANDOFF READY claim.
+
+Earlier kernel checkpoint: the media-uncertainty repair has **HOST PASS** and the
 bounded **VAEG PASS** recorded under "Unattended-startup repair qualification"
 below. The earlier shell-only checkpoints retain their original scope and
 kernel identity. The normal distribution is not replaced; hardware retesting
