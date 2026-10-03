@@ -38,14 +38,18 @@ Require a completed input sequence, final shell prompt and settled disk I/O.
 ```
 python3 -B tools/m19/qa/kswap_readback.py \
   --baseline build/NEW/KSWAP-E512.D88 --guest PRIVATE-COPY.d88 \
-  --output PRIVATE-RESULT.json
+  --screen-text PRIVATE-SCREEN.txt --output PRIVATE-RESULT.json
 ```
 
 The inspector requires an ordinary child with live COMMAND owners, a larger
 swapped allocation with none, twenty identical consecutive swapped results,
 preserved environment/alias/history/tail, relocated swapped MZ exit status 7,
 fresh guest COM/MZ assembly/execution, stable MCB accounting and original
-payload preservation. Host negatives reject absent outputs and false success.
+payload preservation. Supply the separately inspected final console text;
+the gate also rejects unresolved `String #` diagnostics, MCB-corruption claims,
+lost context and missing prompts even if all output files exist. Initial VA
+checks exposed an exit-7/status decoding error that earlier PC file checks
+missed. Host negatives now cover this false-success path as well.
 The probe/accounting algorithm is maintained locally from the independent
 component verifier at `f5512b5a1756768830b541a274ac48973c46de12`; its PC
 acceptance state is not inherited as VA evidence.

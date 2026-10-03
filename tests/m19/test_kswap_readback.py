@@ -71,6 +71,14 @@ class KswapReadbackTests(unittest.TestCase):
             with self.subTest(corrupt=name), self.assertRaises(ValueError):
                 qa.check(base, dict(guest, **{name: value}))
 
+    def test_nonzero_exit_does_not_allow_a_false_error_then_prompt(self):
+        qa.check_screen(b'COMPLETED\nA:\\>\n')
+        for text in (b'String #38\nA:\\>\n', b'PANIC\nA:\\>\n',
+                     b'MCB chain corrupt, or MS-DOS incompatible system.\nA:\\>\n',
+                     b'context is missing\nA:\\>\n', b'not returned'):
+            with self.subTest(screen=text), self.assertRaises(ValueError):
+                qa.check_screen(text)
+
     def test_probe_rejects_trailing_data_and_bad_topology(self):
         for data in (b'', b'PSP allocation paragraphs: 0000\n',
                      self.fixture()[1]['FIRST.OUT'] + b'PASS'):

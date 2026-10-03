@@ -28,6 +28,15 @@ def probe(data):
     return tuple(int(value, 16) for value in match.groups())
 
 
+def check_screen(text):
+    for message in (b'PANIC', b'context is missing', b'String #', b'MCB chain corrupt'):
+        if message in text:
+            raise ValueError('guest error diagnostic despite completed files')
+    lines = text.rstrip().splitlines()
+    if not lines or lines[-1].strip() != b'A:\\>':
+        raise ValueError('guest did not return to the root prompt')
+
+
 def check(base, guest):
     for name, data in base.items():
         if guest.get(name) != data:
@@ -78,6 +87,8 @@ def main():
     parser.add_argument('--baseline', type=Path, required=True)
     parser.add_argument('--guest', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--screen-text', type=Path, required=True,
+                        help='separately inspected final console text; not a build input')
     args = parser.parse_args()
     output = args.output.resolve()
     if output.is_relative_to(ROOT) and subprocess.run(
@@ -87,7 +98,11 @@ def main():
     original, modified = args.baseline.read_bytes(), args.guest.read_bytes()
     _, base = inspect(original, spec)
     _, guest = inspect(modified, spec)
+    screen = args.screen_text.read_bytes()
+    check_screen(screen)
     record = check(base, guest)
+    record.update(screen_text_sha256=hashlib.sha256(screen).hexdigest(),
+                  screen_diagnostics_checked=True)
     record.update(baseline_sha256=hashlib.sha256(original).hexdigest(),
                   guest_sha256=hashlib.sha256(modified).hexdigest())
     with args.output.open('x') as stream:

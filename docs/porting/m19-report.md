@@ -7,8 +7,9 @@ START_SHA: `ba868e2e33447fe5fcb3a2bed0711464f7968d82`, fetched from
 were verified before starting. This new parent branch is
 `experiment/m19-kswap-va`; it does not change the published shell-preview tag
 or the normal release branch. The pinned FreeCOM VA experiment is
-`fbf735f63ceb3e263adad5c210904321c1c605c7`, a config-only child of the qualified
-common repair `f5512b5a1756768830b541a274ac48973c46de12`. Component source
+`afc4d56a913597e9b85eb697fe03e6905ab68e49`, merging the independently
+requalified child-status correction into config-only VA experiment
+`fbf735f63ceb3e263adad5c210904321c1c605c7`. Component source
 remains in its public fork and was pushed before the parent gitlink update.
 
 The complete M19-local build now produces the matched KSSF/COMMAND pair and
@@ -19,10 +20,28 @@ state preservation, twenty stable swaps, relocated MZ exit 7, normal guest
 COM/MZ assembly/execution and settled MCB/file checks. The producer/verifier
 and usage instructions are public source inputs, not private helpers.
 
-Pending: full clean public build/rebuild, exact-head dedicated native CI,
-VA2/640 KiB first runtime, then VA and stale-retained 512-KiB controls if the
-first case succeeds. VAEG and hardware for this pair are **NOT RUN** at this
-implementation checkpoint. Fail closed; no disk handover or HANDOFF READY.
+The first complete clean two-build and fresh public two-build agreed; 116
+parent host tests, isolation/source audit, linked placement and native source
+CI `37113751126`, attempt 1, passed on implementation
+`8cdbdf5ed2f29fcc140c4d54891998a19d6ed3d0`. VA2/640 KiB started and completed
+all settled file/state/MCB checks, but its final screen exposed a remaining
+status-decoding defect: a successful child exit 7 was passed as EXEC error 7,
+producing an erroneous diagnostic. The same fallback was present in retained
+PC screens; earlier file/return-code gates did not reject it. This first VA
+candidate is therefore **not qualified**, and alternate RAM/model runs were
+not substituted for a source fix. Its disk and evidence remain retained.
+
+Common repair `52dd9a9af1048ceecd147e100c740c9d3f9b2c70` separates DOS EXEC
+API errors from full AH=4Dh child status, preserving termination reasons and
+using the ordinary decoder after context/resource setup. Independent PC
+requalification passed two complete clean builds, all three runtime cases and
+strengthened screen/decoder tests. Exact-head PC regression CI `37114741339`
+and full build/test CI `37114741324`, both attempt 1, succeeded before VA
+integration. The screen gate now rejects
+`String #`/corruption diagnostics even when all files and return codes exist.
+Pending: matched VA clean rebuild, VA2/640 KiB retest, then alternate
+VA/stale-retained controls. Hardware and those
+alternate configurations are **NOT RUN**. No disk handover or HANDOFF READY.
 See `tools/m19/qa/KSWAP.md`. Previous PC results do not qualify VA.
 
 ## FreeCOM kswap resumed: bounded independent PC qualification
