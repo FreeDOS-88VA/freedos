@@ -38,9 +38,12 @@ The two QA compositions must have identical bytes and independent readback.
 
 The resulting `MSDOS4-QA.D88` has `SHELL=A:\COMMAND.COM A:\ /P`, a small
 AUTOEXEC.BAT setting PATH/PROMPT, the Microsoft license, and the newly rebuilt
-M19 programs. It does not change the normal disk in `dist/m19`. The kernel,
-loader and placement contract are unchanged and are reverified by the complete
-build. Do not use SYS to transfer this shell as a qualified configuration.
+M19 programs. It does not change the normal disk in `dist/m19`. Shell composition
+preserves the freshly built normal kernel and loader; the complete build
+reverifies their placement contract. This repair branch also carries a separate
+kernel media-uncertainty repair, shared by both builds. Earlier F8 qualification
+does not qualify that changed kernel. Do not use SYS to transfer this shell as a
+qualified configuration.
 
 For an isolated shell build, use `build_msdos4.py --msdos-repo ... --emu2-repo
 ... --output ...`. By default it builds the unmodified Microsoft base. Pass

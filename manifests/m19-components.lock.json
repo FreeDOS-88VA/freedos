@@ -8,13 +8,13 @@
       "name": "fdkernel",
       "path": "components/fdkernel",
       "repository": "https://github.com/nakatamaho/fdkernel.git",
-      "branch": "topic/m19-77-cylinder-loader",
+      "branch": "fix/m19-media-uncertainty",
       "upstream_repository": "https://github.com/lpproj/fdkernel.git",
-      "commit": "fe2699fc537b225e18fa1b5c47bbc59389e6d3eb",
+      "commit": "2dba27f199b5748553143cec0568da8596210088",
       "parents": [
-        "e87e8071c355a99a7f34a8758d4a3368b6523f3d"
+        "fe2699fc537b225e18fa1b5c47bbc59389e6d3eb"
       ],
-      "source_archive_sha256": "49a8b1d0722ed50ba70b9cd3a0b22e0d77b042bdf5a2332b0f9327734f4ec002",
+      "source_archive_sha256": "0b84309e25cc8147b3998382b6abd59a9c1bc9e754a96e4f6eccb5b04a3aae0e",
       "license": "GPL-2.0-or-later"
     },
     {

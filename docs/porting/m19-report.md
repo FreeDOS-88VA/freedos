@@ -280,6 +280,38 @@ physical-hardware stop. SASI data-drive work is not part of this report.
   passed on a VA2 with 640 KiB (owner report). Blank-disk FORMAT, SYS and 77-cylinder boot are **NOT RUN**
   on hardware.
 
+## Unattended-startup repair in progress
+
+START_SHA: `c2fdaee8fb5904a40214db99d020eba6dc60b84b`.
+The preceding shell-only F8 qualification and its disk remain unchanged.
+This follow-up changes the experimental branch's kernel pin; it does not
+replace the previously offered or designated normal distribution.
+
+Source review identified a VA adapter mismatch: an uncertain firmware media
+result was returned as a confirmed change. The filesystem consequently marks
+open handles stale. Kernel commit
+`2dba27f199b5748553143cec0568da8596210088` on the public fork branch
+`fix/m19-media-uncertainty` now requests immediate read-only revalidation.
+A matching nonzero DOS volume serial and complete BPB preserve the binding;
+changed identity/layout, failed probes and unidentified media retain the
+conservative handling. Explicit change/reformat is not suppressed. Non-VA
+FreeDOS behavior is unchanged. This is DOS identity, not physical identity:
+clones with identical serial/BPB cannot be distinguished by those fields.
+Legacy media without identity can still invalidate an open handle on uncertainty.
+See the pinned component's `pc88va/M19-MEDIA.md` for scope and limits.
+
+The new regression fails against the preceding kernel and passes against the
+repair. Its two host tests cover the assembled FAR adapter ABI, actual driver
+policy, geometry/identity drift, read errors, absent identity, explicit change,
+and the non-VA control. The existing nine media-lifetime host tests also pass.
+The parent M19 suite now invokes both component tests. These synthetic results
+are not firmware, hardware or complete-build qualification.
+
+Pending: exact-source two-build comparison through final media; placement and
+carrier verification; native CI; unattended/F5/F8 startup and normal-shell
+controls; COM/MZ execution and settled file readback. Changed-candidate VAEG and
+hardware are **NOT RUN**. No replacement disk or HANDOFF READY claim is made.
+
 ## Not run
 
 HARDWARE PASS covers only JWASMR startup, the HELLO.ASM build and the HELLO.COM
