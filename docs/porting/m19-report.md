@@ -1,11 +1,18 @@
 # M19 work report
 
+Latest status: the kernel media-uncertainty repair has **HOST PASS** and the
+bounded **VAEG PASS** recorded under "Unattended-startup repair qualification"
+below. The earlier shell-only checkpoints retain their original scope and
+kernel identity. The normal distribution is not replaced; hardware retesting
+is **NOT RUN**, and this is not milestone HANDOFF READY.
+
 ## FreeCOM kswap follow-up (independent repair; paused)
 
 The follow-up starts at the fetched, exact MS-DOS-shell publication tip
-`6d4e2dda024d21d3a8380adfa8900201be3bfdcc`. Both the normal FreeCOM build
-and the qualified MS-DOS shell candidate remain unchanged. No component pin,
-kernel behavior or FreeCOM swapping implementation has been modified.
+`6d4e2dda024d21d3a8380adfa8900201be3bfdcc`. At that starting checkpoint,
+the normal FreeCOM build and qualified MS-DOS shell candidate were unchanged.
+The independent kswap work did not alter parent component pins; the later
+kernel startup repair is recorded separately below.
 
 Public-release controls were run on PC FreeDOS kernel 2043 from the public
 FreeDOS 1.4 floppy distribution, under QEMU with no extended-memory manager.
@@ -45,8 +52,8 @@ ownership/lifetime still need separate review.
 
 The owner authorized a separately scoped common-FreeCOM repair, not a VA
 adapter change. The independent fork branch is `fix/kswap-state`, at published
-`4223a28b78d1b0f5393f5d06ccd12acdebb6ddf0`. Normal component gitlinks are
-unchanged. Paired PC builds restored swapping, dynamic context and child return
+`4223a28b78d1b0f5393f5d06ccd12acdebb6ddf0`. No FreeCOM gitlink update from
+that branch is integrated. Paired PC builds restored swapping, dynamic context and child return
 codes. The two positive environment-size cases each completed twenty repeated
 COM swaps, retained state and executed the relocatable MZ. Qualification is
 still **BLOCKED**: the severe-memory-pressure case reaches ordinary execution
@@ -61,9 +68,9 @@ payload inputs to a new VA distribution. No new HOST PASS, VAEG PASS or
 milestone HANDOFF READY is claimed. Diagnostic artifacts are retained in
 Git-excluded research storage; generated files are not committed.
 
-## Separate MS-DOS 4 COMMAND experiment
+## Separate MS-DOS 4 COMMAND experiment (earlier shell-only checkpoints)
 
-**Startup failure follow-up: BLOCKED for general-use handover.** The owner
+**Historical startup failure follow-up: BLOCKED for general-use handover.** The owner
 reported startup failure with the offered QA disk on VA2 hardware and VAEG.
 The emulator report includes CONFIG.SYS confirmation prompts, unlike the
 previous early-Enter qualification. A fresh run of the same candidate on VA2
@@ -76,9 +83,10 @@ on hardware when bypassing configuration with F5; application execution and
 file readback on that hardware path have not been reported. Do not
 infer RAM exhaustion, a universal emulator PASS, or hardware success from the
 prior runs. The F8 repair now has the bounded qualification below, but a
-general-use replacement has not been offered. The unattended-startup issue
-and a hardware retest remain open. Historical results retain their original
-scope; they do not establish unrun startup paths.
+general-use replacement had not been offered at that checkpoint. Unattended
+startup was still open there; the subsequent kernel repair below adds bounded
+coverage. A hardware retest remains NOT RUN. Historical results retain their
+original scope; they do not establish unrun startup paths.
 
 Source review identified an additional shell-compatibility gap: FreeDOS
 ignores the MS-DOS INT 2Fh/122Eh message-table registration interface, while
@@ -270,8 +278,9 @@ physical-hardware stop. SASI data-drive work is not part of this report.
   "Press F8 to trace or F5 to skip" wait ends by timeout, or a key arrives only
   after a long wait, CONFIG.SYS processing repeats `BUFFERS=` with "line
   overflow" errors indefinitely. It reproduces with the released M18 disk in
-  VAEG `--nowait`. A key pressed before the prompt avoids it. Root cause not yet
-  identified (suspect the PC88VA `GetBiosKey` INT 21h polling during INIT).
+  VAEG `--nowait`. A key pressed before the prompt avoids it. At that original
+  checkpoint the cause was unidentified; the later media-uncertainty repair
+  below supersedes the tentative keyboard-polling hypothesis.
 - Conventional memory remains well below the NEC DOS of the same era for
   large programs; most of the remaining resident use is the FreeCOM code and
   the kernel. Investigations of an MIT-licensed MS-DOS 4.0 COMMAND.COM on the
@@ -280,42 +289,88 @@ physical-hardware stop. SASI data-drive work is not part of this report.
   passed on a VA2 with 640 KiB (owner report). Blank-disk FORMAT, SYS and 77-cylinder boot are **NOT RUN**
   on hardware.
 
-## Unattended-startup repair in progress
+## Unattended-startup repair qualification
 
-START_SHA: `c2fdaee8fb5904a40214db99d020eba6dc60b84b`.
-The preceding shell-only F8 qualification and its disk remain unchanged.
-This follow-up changes the experimental branch's kernel pin; it does not
-replace the previously offered or designated normal distribution.
+- START_SHA: `c2fdaee8fb5904a40214db99d020eba6dc60b84b`.
+- QUALIFIED_IMPLEMENTATION_SHA: `086f3da3a80b311db8b2fb00ad5e52d3af531c8f`.
+- Kernel: `2dba27f199b5748553143cec0568da8596210088`, public fork branch
+  `fix/m19-media-uncertainty`; exact archive identity is in the component lock.
+- Microsoft shell remains `04a52f29cc4f8cd3289cbc8b645f42d7cbe4ad5c`;
+  the FreeCOM gitlink and its non-swapping configuration remain unchanged.
 
-Source review identified a VA adapter mismatch: an uncertain firmware media
-result was returned as a confirmed change. The filesystem consequently marks
-open handles stale. Kernel commit
-`2dba27f199b5748553143cec0568da8596210088` on the public fork branch
-`fix/m19-media-uncertainty` now requests immediate read-only revalidation.
-A matching nonzero DOS volume serial and complete BPB preserve the binding;
-changed identity/layout, failed probes and unidentified media retain the
-conservative handling. Explicit change/reformat is not suppressed. Non-VA
-FreeDOS behavior is unchanged. This is DOS identity, not physical identity:
-clones with identical serial/BPB cannot be distinguished by those fields.
-Legacy media without identity can still invalidate an open handle on uncertainty.
-See the pinned component's `pc88va/M19-MEDIA.md` for scope and limits.
+This follow-up changes the experimental branch's kernel pin. It does not
+replace the previously offered or designated normal distribution. Source
+review identified a VA adapter mismatch: uncertain firmware media status was
+returned as confirmed change, causing the filesystem to mark open handles
+stale. The adapter now requests immediate read-only revalidation. A matching
+nonzero DOS volume serial and complete BPB preserve the binding; changed
+identity/layout, failed probes and unidentified media retain conservative
+handling. Explicit change/reformat is not suppressed. Non-VA FreeDOS behavior
+and the existing common CONFIG reader's handling of read errors are unchanged.
 
-The new regression fails against the preceding kernel and passes against the
-repair. Its two host tests cover the assembled FAR adapter ABI, actual driver
-policy, geometry/identity drift, read errors, absent identity, explicit change,
-and the non-VA control. The existing nine media-lifetime host tests also pass.
-The parent M19 suite now invokes both component tests. These synthetic results
-are not firmware, hardware or complete-build qualification. The new QA media
-also carries an original `IDLEIO.ASM` fixture, built inside the guest with
-JWASMR: it keeps a reader and writer open across five DOS clock second changes.
-Readback requires its success marker and exact before/after write contents.
-The new unattended-input script delays all keys until after its startup wait.
-The existing common CONFIG reader's handling of read errors is not changed.
+**HOST PASS:** two complete clean normal-plus-shell builds agree. A clean,
+publicly fetched allowlisted checkout, with other milestone directories absent,
+repeated both complete builds and produced the identical QA disk. All 110 parent
+host tests passed; their gate also invokes two new component driver/assembled-
+FAR-ABI tests and nine existing media-lifetime tests. The regression rejects the preceding
+kernel. Missing/corrupt idle-probe outputs are rejected. Historical F8 settled
+readback also passes without claiming the newly added idle-I/O coverage.
+Linked placement,
+carrier unpacking/relocations, descriptor/version/dynamic-top fields, source
+isolation, privacy audit and the public distribution instance passed.
 
-Pending: exact-source two-build comparison through final media; placement and
-carrier verification; native CI; unattended/F5/F8 startup and normal-shell
-controls; COM/MZ execution and settled file readback. Changed-candidate VAEG and
-hardware are **NOT RUN**. No replacement disk or HANDOFF READY claim is made.
+Native CI run `37103982570`, attempt 1, tested the exact qualified implementation;
+its `source-qa` job succeeded, including two builds and the unchanged original
+Microsoft-profile control. Scaffold run `37103982579`, attempt 1, also succeeded.
+Historical M01-M09 workflows remain failing; this is not an all-workflows-green
+claim. The publication tip and its own CI are checked separately after push;
+this report cannot contain its own commit identity.
+
+**VAEG PASS, bounded to the corrected QA disk and these cases:**
+
+| Model | Installed RAM | Retained selection input | Startup path |
+| --- | --- | --- | --- |
+| VA2 | 640 KiB | No backup input | Unattended, F8, F5 (separate runs) |
+| VA | 640 KiB | No backup input | Unattended |
+| VA2 | 512 KiB | Persisted 640 KiB | Unattended |
+
+Every listed QA run completed file/batch/pipe/child-shell operations, the invalid
+`/Y` child, COM/MZ assembly and execution, settled readback and MCB checks. Each
+also assembled `IDLEIO.COM` from the committed `IDLEIO.ASM` using the freshly
+built JWASMR, kept a reader and writer open across five DOS clock second
+changes, verified the reader and completed the writer. Readback required its
+success marker and exact before/after file contents. Separate no-input captures
+confirmed shell startup before the first workflow key in all three RAM/model
+cases. The retained selection/checksum was checked before and after the stale
+case. A separate F8 capture showed CONFIG confirmations, the expected invalid
+switch diagnostic, and the prompt; `/Y` is still not implemented.
+
+A separate freshly built normal-FreeCOM control passed on VA2/640 KiB:
+kernel startup without an early key, acknowledgement of FreeCOM's normal
+date/time prompts, COM/MZ assembly/execution, file write/readback and MCB
+validity. It is not a claim that those normal date/time prompts disappear.
+
+Incomplete attempts remain retained and are not counted: an operator-stopped
+long-wait run; shortened post-probe waits with missing command outputs; and a
+normal-shell script that failed to acknowledge date/time prompts. Corrected
+harness runs above required full settled readback. An initial public-rebuild
+invocation correctly rejected an untracked log in the source root; moving its
+output to ignored build storage and repeating the complete build passed.
+
+Corrected experimental QA disk: `MSDOS4-QA.D88`, 1,331,888 bytes, SHA-256
+`21eacf00217faf54d7489014fb96f1aa95d6d968d530f3a41bae34b0c375a127`.
+Rebuild it using `tools/m19/qa/MSDOS4.md` at the qualified revision and pinned
+public dependencies. It is a disposable-copy test candidate, not a designated
+milestone distribution or qualified SYS-transfer shell.
+
+Limits: DOS volume identity is not physical-medium identity; clones with the
+same serial/BPB are indistinguishable by these fields. Legacy media without
+identity can still invalidate an open handle on uncertainty. See the pinned
+component's `pc88va/M19-MEDIA.md`. Actual media-swap safety retesting, other
+startup/RAM combinations and hardware are **NOT RUN** for this candidate.
+Hardware remains **DEFERRED HARDWARE VALIDATION**; the owner's earlier F5
+startup observation is not a hardware result for this disk. No general DOS
+compatibility, complete M19 acceptance or HANDOFF READY claim is made.
 
 ## Not run
 
