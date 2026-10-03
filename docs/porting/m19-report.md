@@ -75,15 +75,16 @@ confirmed use of F8 on both platforms and separately reported shell startup
 on hardware when bypassing configuration with F5; application execution and
 file readback on that hardware path have not been reported. Do not
 infer RAM exhaustion, a universal emulator PASS, or hardware success from the
-prior runs. No corrected replacement has been qualified or offered. The
-bounded historical results below remain evidence for their specific inputs,
-not acceptance of these newly reported startup paths.
+prior runs. The F8 repair now has the bounded qualification below, but a
+general-use replacement has not been offered. The unattended-startup issue
+and a hardware retest remain open. Historical results retain their original
+scope; they do not establish unrun startup paths.
 
 Source review identified an additional shell-compatibility gap: FreeDOS
 ignores the MS-DOS INT 2Fh/122Eh message-table registration interface, while
 COMMAND uses it for resident parser diagnostics. The kernel adds `/Y` for
-single-step startup, but this shell does not implement that switch. A local
-component draft on `fix/m19-freedos-message-tables`,
+single-step startup, but this shell does not implement that switch. The
+component implementation on `fix/m19-freedos-message-tables`,
 `9de925dd732860655a43e5ad81b9d1c186450c0f`, keeps message pointers inside each
 FreeDOS-profile shell instead of depending on kernel registration. It does
 not implement `/Y` or alter kernel behavior. Standalone source builds for
@@ -95,10 +96,48 @@ COPY switch and child `/MSG` diagnostics also returned to the prompt.
 The child repair and its documentation are now published at
 `04a52f29cc4f8cd3289cbc8b645f42d7cbe4ad5c`; the experimental source lock
 selects that commit. The normal kernel/FreeCOM gitlinks are unchanged.
-These are limited local checks, not qualification: the complete corrected
-VA media build, two-build comparison, VA startup/error-path regression,
-unattended-startup repair and hardware retest remain outstanding. Parent
-normal component gitlinks and the previously offered disk are unchanged.
+
+### F8 repair qualification (general-use handover still blocked)
+
+- Branch: `fix/m19-shell-startup`.
+- Follow-up START_SHA: `6d4e2dda024d21d3a8380adfa8900201be3bfdcc`.
+- QUALIFIED_IMPLEMENTATION_SHA: `044a39e1b235ffdaf1d63dd37a4b71d7f06f79e7`.
+- **HOST PASS:** two complete normal-plus-shell clean builds agreed. A public
+  sparse checkout of that exact revision, with historical milestone runtime
+  directories absent and public component dependencies, repeated both full
+  builds and reproduced the same disk. SHA-256:
+  `c96fe6d5df30d925615cda0b8bfab417e7131b01ee5c53f9d12af2e7c201d93b`,
+  1,331,888 bytes. All 108 host tests, linked-placement checks, isolation,
+  source/privacy audit and public-instance validation passed. An initial host
+  test invocation lacked Unicorn; the pinned dependency was installed in an
+  isolated environment and the complete suite rerun successfully.
+- Native source QA run `37099015309`, attempt 1, job `source-qa`, and scaffold
+  run `37099015315` succeeded on the implementation SHA. Source QA includes
+  the complete two-build recipe and original-profile/upstream byte comparison.
+  The unrelated historical M03 run `37099015272` failed its obsolete component
+  baseline check; this is not a claim that every repository workflow is green.
+- **VAEG PASS, bounded:** F8 with CONFIG confirmation, shell startup, file and
+  batch operations, child shells including the invalid `/Y` diagnostic path,
+  JWASMR COM/MZ build and execution, settled disk readback, and before/after
+  MCB validation. Controls covered VA and VA2 with the 640-KiB/no-backup-input
+  configuration, plus VA2 with 512 KiB installed and a retained 640-KiB
+  selection. The retained selection/checksum was checked before and after.
+  VA2 early-Enter startup and the same workflow also passed. F8 startup was
+  separately inspected on screen: `Invalid switch` is printed once and the
+  shell prompt is reached. This does not add AUTOEXEC single-stepping.
+- Early-screen-capture runs did not finish automated input and are retained
+  as incomplete, not PASS. Qualification used separate startup captures and
+  input-complete, settled-readback runs; the VAEG checkout was not changed.
+- **DEFERRED HARDWARE VALIDATION:** corrected candidate hardware is **NOT RUN**.
+  The owner's F5 startup observation applies to the earlier disk only.
+  Unattended startup is not repaired or qualified. SYS transfer, general-use
+  handover and milestone HANDOFF READY are not claimed. The normal component
+  gitlinks and the earlier offered disk remain unchanged.
+
+### Historical early-Enter qualification
+
+The following describes the preceding publication, not a hardware pass or
+universal startup acceptance.
 
 Branch `experiment/m19-msdos4` starts from
 `5fe502d673eafc3f57f3a7e690a3d9704ed9f1c0`, the clean, pushed normal
