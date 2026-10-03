@@ -52,7 +52,9 @@ the original binary; `--profile freedos` keeps IBM console CLS for PC testing.
 
 - `/DFREEDOS`: use FreeDOS's native DOS version/OEM identity; do not globally
   spoof VERSION=4.00. Skip unsupported OS/2 extended attributes in COPY/TYPE;
-  ordinary I/O and timestamp error handling remain intact.
+  ordinary I/O and timestamp error handling remain intact. Message tables are
+  shell-local because FreeDOS ignores MS-DOS INT 2Fh/122Eh registration.
+  `/Y` still prints `Invalid switch`; AUTOEXEC single-stepping is not implemented.
 - `/DPC88VA`: CLS uses the native text BIOS for standard CON, avoiding IBM
   INT 10h and the DOS adapter's control-byte filter. Redirected CLS writes the
   ANSI clear/home bytes through DOS file I/O instead. A missing BIOS vector
@@ -79,7 +81,13 @@ are not content validation. Record the exact disk/emulator identities and
 installed versus retained RAM separately in excluded evidence. Do not infer
 VA, VA2, smaller-memory or stale-setting coverage from another configuration.
 
-Inject `config/m19/msdos4-guest-input.txt` with the owner's emulator adapter.
+Inject `config/m19/msdos4-guest-input.txt` with the owner's emulator adapter
+for the early-Enter control. Separately inject
+`config/m19/msdos4-f8-guest-input.txt` for F8 plus six CONFIG confirmations.
+Capture the F8 startup screen before CLS; reaching the prompt must not be
+inferred solely from file contents. Both paths run an invalid-switch child
+and require its completion marker. Neither path qualifies unattended startup
+or F5 bypass, which changes the configuration being processed.
 After stopping the guest, run `python3 -B tools/m19/qa/msdos4_readback.py
 --baseline build/m19-msdos4-qa-NEW/MSDOS4-QA.D88 --guest PRIVATE-COPY.d88
 --output PRIVATE-RESULT.json`. Output must be outside tracked source paths.

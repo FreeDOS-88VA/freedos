@@ -2,7 +2,7 @@
 name: M19 MS-DOS 4 shell source QA
 on:
   push:
-    branches: ['experiment/m19-msdos4']
+    branches: ['experiment/m19-msdos4', 'fix/m19-shell-startup']
   workflow_dispatch:
 permissions:
   contents: read

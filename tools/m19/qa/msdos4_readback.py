@@ -23,7 +23,7 @@ def check(base, guest):
         if guest.get(name) != data:
             raise ValueError('original payload changed: ' + name)
     required = ['CLS.TXT', 'VER.TXT', 'PRE.TXT', 'POST.TXT', 'COPY.TXT', 'TYPE.TXT',
-                'ENV.TXT', 'FOR.TXT', 'EXIST.TXT', 'PIPE.TXT', 'CHILD.TXT',
+                'ENV.TXT', 'FOR.TXT', 'EXIST.TXT', 'PIPE.TXT', 'CHILD.TXT', 'SWITCH.TXT',
                 'ERR.TXT', 'RUNCOM.TXT', 'RUNMZ.TXT', 'ASMCOM.TXT', 'ASMMZ.TXT',
                 'CALL.TXT', 'BATCH.TXT', 'LAST.TXT', 'DONE.TXT', 'HZ.ASM', 'HELLO.COM', 'MZDEMO.EXE']
     if any(name not in guest for name in required):
@@ -39,6 +39,9 @@ def check(base, guest):
         actual = [s.strip() for s in guest[name].decode('ascii').splitlines() if s.strip()]
         if actual != lines:
             raise ValueError('unexpected output: ' + name)
+    switch_lines = [s.strip() for s in guest['SWITCH.TXT'].decode('ascii').splitlines() if s.strip()]
+    if switch_lines not in (['SWITCHOK'], ['Invalid switch', 'SWITCHOK']):
+        raise ValueError('invalid-switch child did not complete')
     if b'1 File(s) copied' not in guest['COPY.TXT'] or not guest['ERR.TXT'].strip():
         raise ValueError('COPY success/error evidence missing')
     if guest['CLS.TXT'] != b'\x1b[2J\x1b[H':

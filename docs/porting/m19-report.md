@@ -1,6 +1,104 @@
 # M19 work report
 
+## FreeCOM kswap follow-up (independent repair; paused)
+
+The follow-up starts at the fetched, exact MS-DOS-shell publication tip
+`6d4e2dda024d21d3a8380adfa8900201be3bfdcc`. Both the normal FreeCOM build
+and the qualified MS-DOS shell candidate remain unchanged. No component pin,
+kernel behavior or FreeCOM swapping implementation has been modified.
+
+Public-release controls were run on PC FreeDOS kernel 2043 from the public
+FreeDOS 1.4 floppy distribution, under QEMU with no extended-memory manager.
+The shell line was `SHELL=A:\KSSF.COM A:\COMMAND.COM /E:512 /P`.
+A DOS probe inspected the MCB chain from within an external command; it was
+invoked normally, then with interactive `CALL /S` (not a batch or pipeline).
+
+- FreeCOM 0.82 pl3 `binary.zip`: basic swap and shell reload occurred on two
+  invocations, no live COMMAND-owned MCB remained while the swapped child ran,
+  and an environment variable survived. The shell reported that its dynamic
+  context was missing and recreated. This is not full state preservation or
+  a VA qualification. The binary identifies the Turbo C++ runtime; the paired
+  source defaults to Turbo C++ 1.01. An exact compiler archive and a fresh
+  source rebuild of this historical release have NOT been qualified.
+- FreeCOM 0.85a `bc/lang/bc-English.zip`: the Borland build booted and ran the
+  ordinary probe, then halted with MCB corruption on its first swap request.
+- FreeCOM 0.86 `English.zip`, `kswap/`: the Watcom build reproduced the same
+  failure outside VA. Thus the issue is not solely a VA adapter defect or the
+  current project's pin/configuration, and changing only the compiler is not
+  sufficient.
+
+The public archive root is
+`https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/command/`.
+The selected release archive SHA-256 values are:
+
+- `0.82pl3/binary.zip`: `970486a640eaa989814cd0c27bde88fd76ecf884330e9069c1fdd266f91d077c`
+- `0.82pl3/com082pl3.zip`: `44de286e14c52dab5ae46c97c8026746589f603487fa99ce333557de1f919845`
+- `0.85a/bc/lang/bc-English.zip`: `c4b7c78c4a497bd2a90d74ef4131f0f13c4a0e526f3e31b8c35818ba7fc81c54`
+- `0.86/English.zip`: `42093a00286f66bf922eebd8204a3b74b429f4c6973cd960ae1ab52ce80b4bd5`
+
+Source history identifies `1e600323d36c952572ce8141274e0a069adb0395`
+(2004-06-29, `/LOW` change) as the change moving `kswapRegister()` ahead of
+initial environment resizing. The old release performs that registration
+later. This is a source-history finding, not a claim that this is the only
+kswap defect. The Watcom segment-pointer registration and dynamic-context
+ownership/lifetime still need separate review.
+
+The owner authorized a separately scoped common-FreeCOM repair, not a VA
+adapter change. The independent fork branch is `fix/kswap-state`, at published
+`4223a28b78d1b0f5393f5d06ccd12acdebb6ddf0`. Normal component gitlinks are
+unchanged. Paired PC builds restored swapping, dynamic context and child return
+codes. The two positive environment-size cases each completed twenty repeated
+COM swaps, retained state and executed the relocatable MZ. Qualification is
+still **BLOCKED**: the severe-memory-pressure case reaches ordinary execution
+but its required warning is missing. A working-tree correction uses FreeCOM's
+resident DOS writer instead of CRT FILE operations and is not yet requalified.
+The dedicated CI run `37081855346` failed that diagnostic gate. The separate
+legacy build run `37081855340` also failed at its DOS NASM invocation; its five
+cross-build jobs succeeded, which does not override either failure. This work
+is paused for the owner's MS-DOS-shell startup failure report. New VA candidate
+builds, VAEG kswap qualification and hardware are NOT RUN. Public binary controls are research inputs only, never
+payload inputs to a new VA distribution. No new HOST PASS, VAEG PASS or
+milestone HANDOFF READY is claimed. Diagnostic artifacts are retained in
+Git-excluded research storage; generated files are not committed.
+
 ## Separate MS-DOS 4 COMMAND experiment
+
+**Startup failure follow-up: BLOCKED for general-use handover.** The owner
+reported startup failure with the offered QA disk on VA2 hardware and VAEG.
+The emulator report includes CONFIG.SYS confirmation prompts, unlike the
+previous early-Enter qualification. A fresh run of the same candidate on VA2
+with F8 confirmation also failed to reach the shell; unattended startup
+reproduced the previously recorded configuration-loop issue. Exact private
+observations and failing media are retained separately. The precise owner
+runtime identity and retained settings remain to be bound. The owner has
+confirmed use of F8 on both platforms and separately reported shell startup
+on hardware when bypassing configuration with F5; application execution and
+file readback on that hardware path have not been reported. Do not
+infer RAM exhaustion, a universal emulator PASS, or hardware success from the
+prior runs. No corrected replacement has been qualified or offered. The
+bounded historical results below remain evidence for their specific inputs,
+not acceptance of these newly reported startup paths.
+
+Source review identified an additional shell-compatibility gap: FreeDOS
+ignores the MS-DOS INT 2Fh/122Eh message-table registration interface, while
+COMMAND uses it for resident parser diagnostics. The kernel adds `/Y` for
+single-step startup, but this shell does not implement that switch. A local
+component draft on `fix/m19-freedos-message-tables`,
+`9de925dd732860655a43e5ad81b9d1c186450c0f`, keeps message pointers inside each
+FreeDOS-profile shell instead of depending on kernel registration. It does
+not implement `/Y` or alter kernel behavior. Standalone source builds for
+original, FreeDOS and VA profiles completed; the original profile remains
+byte-identical to the original-source control. An ordinary PC FreeDOS 2043
+control reached its prompt with `/Y`, printed invalid-switch diagnostics,
+ran a child with an invalid switch and returned to its parent. Interactive
+COPY switch and child `/MSG` diagnostics also returned to the prompt.
+The child repair and its documentation are now published at
+`04a52f29cc4f8cd3289cbc8b645f42d7cbe4ad5c`; the experimental source lock
+selects that commit. The normal kernel/FreeCOM gitlinks are unchanged.
+These are limited local checks, not qualification: the complete corrected
+VA media build, two-build comparison, VA startup/error-path regression,
+unattended-startup repair and hardware retest remain outstanding. Parent
+normal component gitlinks and the previously offered disk are unchanged.
 
 Branch `experiment/m19-msdos4` starts from
 `5fe502d673eafc3f57f3a7e690a3d9704ed9f1c0`, the clean, pushed normal
@@ -92,7 +190,7 @@ physical-hardware stop. SASI data-drive work is not part of this report.
 | INT 21h AH=38h case-map call | The upstream case-map service in HMA_TEXT NEAR-calls `DosUpChar`. In the VA medium-model build that C body is FAR and HMA_TEXT runs from a relocated copy, so a program calling the case-map pointer returned by AH=38h jumped to a meaningless offset and hung (VA port defect; FreeCOM never calls it). fdkernel now calls it FAR under PC88VA, and a static test rejects any NEAR call into C that is active in the VA build | fdkernel suite; VAEG VA2: a probe calling the case-map pointer hangs on the earlier checkpoint and returns on the fixed build |
 | Redirected maintenance output | Tools bound media with INT 21h AH=32h, which forces a rebuild; the VA media-lifetime code then marks open files of that drive stale, so `CHKDSK A: > X.TXT` was empty (M18 issue #12). Binding now uses AH=36h | VAEG VA/VA2: `CHKDSK A: > X.TXT` and `SYS A: B: > S.TXT` contain their output |
 | MORE | Keys come from DOS AH=06h, or from a raw CON handle when stdin is redirected/piped; ZF read via `intr()`; CR does not count as a column | VAEG VA/VA2: `TYPE README.TXT \| MORE` and `MORE < QUICKSTR.TXT` page and quit |
-| Conventional memory | FreeCOM PC88VA configuration drops kernel swap, LOADHIGH, LOADFIX, MEMORY, FDDEBUG (long filenames and LFNFOR kept at the owner's request); FreeCOM heap patched to 3 KiB with its own `ptchsize`; `BUFFERS=4`; `PC88VA_LOADSEG` stays 1000h (owner decision A) | VAEG VA/VA2 640 KiB: FreeCOM 63,040 B (M18 70,096), system block 9,520 B (M18 13,696), idle largest block about 441 KiB (M18 430 KiB); LFNFOR and FOR checked |
+| Conventional memory | FreeCOM PC88VA configuration drops kernel swap, LOADHIGH, LOADFIX, MEMORY, FDDEBUG (long filenames and LFNFOR kept at the owner's request); FreeCOM heap patched to 3 KiB with its own `ptchsize`; `BUFFERS=4`; `PC88VA_LOADSEG` stays 1000h (owner decision A) | VAEG VA/VA2 640 KiB: FreeCOM 63,040 B (M18 70,096), system block 9,520 B (M18 13,696), increased idle largest block (earlier decimal-byte summaries were incorrectly labeled KiB); LFNFOR and FOR checked |
 
 `PC88VA_LOADSEG=1340h` was evaluated and kept out of the default for now
 (owner decision): its expanded image overlaps the 256 KiB staging plan at

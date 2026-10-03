@@ -25,7 +25,7 @@ class ReadbackTests(unittest.TestCase):
                       'HELLO.COM': b'\xcd\x20'})
         for name, value in [('ENV', 'OK'), ('FOR', 'ONE\r\nTWO'), ('EXIST', 'COPYOK'),
                             ('PIPE', 'PIPEOK'), ('CHILD', 'CHILDOK'), ('CALL', 'CALLOK'),
-                            ('BATCH', 'BATCHOK'), ('DONE', 'FINISHED')]:
+                            ('BATCH', 'BATCHOK'), ('DONE', 'FINISHED'), ('SWITCH', 'SWITCHOK')]:
             guest[name + '.TXT'] = (value + '\r\n').encode()
         mz = bytearray(28)
         mz[:2] = b'MZ'
@@ -35,6 +35,11 @@ class ReadbackTests(unittest.TestCase):
 
     def test_complete_fixture(self):
         self.assertTrue(qa.check(*self.fixture())['mcb_checks_before_after'])
+
+    def test_captured_switch_diagnostic_requires_completion(self):
+        base, guest = self.fixture()
+        guest['SWITCH.TXT'] = b'Invalid switch\r\nSWITCHOK\r\n'
+        qa.check(base, guest)
 
     def test_missing_outputs_and_payload_drift_fail(self):
         base, guest = self.fixture()
@@ -51,6 +56,7 @@ class ReadbackTests(unittest.TestCase):
         base, guest = self.fixture()
         for name, value in [('VER.TXT', b'4.00'), ('POST.TXT', b'invalid chain'),
                             ('RUNCOM.TXT', b'not run'), ('PIPE.TXT', b'wrong'),
+                            ('SWITCH.TXT', b'Invalid switch\r\n'),
                             ('CLS.TXT', b''), ('HELLO.COM', b''), ('MZDEMO.EXE', b'MZ'), ('BAD.TXT', b'')]:
             with self.subTest(name=name), self.assertRaises(ValueError):
                 qa.check(base, dict(guest, **{name: value}))
