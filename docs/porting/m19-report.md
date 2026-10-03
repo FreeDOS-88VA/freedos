@@ -1,5 +1,54 @@
 # M19 work report
 
+## FreeCOM kswap resumed: bounded independent PC qualification
+
+Parent work starts from the exact released shell-preview tip
+`f5f73ae09ff2037aed75de71bd5be3c503462409`. No parent gitlink, normal VA
+configuration, kernel or released image is changed. This is an owner-authorized
+common-FreeCOM repair, not a claim that the upstream DOS baseline has changed.
+
+The public FreeCOM fork branch `fix/kswap-state` is now qualified at
+`f5512b5a1756768830b541a274ac48973c46de12` (source archive SHA-256
+`38c6a980e6584e6cdc257de438c61da60dde01a279ce56ea2e2a3b18f197efd9`).
+A fresh public fetch reproduced that exact archive identity. The OOM fallback
+uses the resident `dos_write` helper rather than CRT `fputs`: release FreeCOM
+uses handle-valued FILE pointers, so CRT stream operations do not match that
+contract. The diagnostic stays independent of STRINGS loading and the shell
+executes normally without swapping when its environment backup cannot grow.
+
+**HOST PASS, bounded independent IBM-PC/Open Watcom 1.9/no-XMS regression:**
+
+- Two complete clean container-export builds produced identical COMMAND,
+  KSSF and test-program bytes. Six negative/package host tests passed.
+- Public PC FreeDOS kernel 2043/QEMU controls passed `/E:512` and `/E:8192`,
+  twenty consecutive COM swaps each, environment/alias/history/command-tail
+  preservation, relocated MZ execution and child return code 7.
+- The `/E:32752` severe-pressure control printed its required allocation
+  warning, retained the shell, and completed two ordinary executions with
+  stable allocation accounting and valid MCB topology. The previously failed
+  diagnostic case is now closed for this tested configuration.
+- Exact-head native CI `37112286094`, attempt 1, job `pc-kswap`, passed the
+  same two-build and three-case verifier used locally.
+
+The separate DOS NASM launch defect was in CI dependency extraction: the
+public package has Unix-origin uppercase paths, which `unzip -L` leaves
+uppercase. `-LL` now establishes the lowercase path the recipe expects;
+an original synthetic ZIP regression executes the actual extraction command.
+The DOS recipe resolves NASM through PATH and preflights `nasm.exe -v`.
+This is still the DOS assembler, not a host-assembler substitution. Exact-head
+legacy build/test CI `37112286102`, attempt 1, passed its DOS/GCC/Watcom build
+and test job and all five Watcom cross-build jobs. Earlier failing runs and
+the unsuccessful PATH-only attempt remain retained as failures.
+
+This PC acceptance is revision-specific, not VA acceptance. Batch, pipe and
+redirection of swapped commands remain unsupported; secondary-shell swapping,
+Borland repaired runtime, UMB, live environment relocation and failed-reload
+cleanup are NOT RUN. **VAEG: NOT RUN; hardware: NOT RUN** for repaired kswap.
+No repaired VA disk, FreeCOM gitlink update, general compatibility or milestone
+HANDOFF READY is claimed. Next: independently clean-build/qualify a VA
+experimental KSSF/COMMAND pair before considering any normal-pin update.
+The published MS-DOS 4 COMMAND Preview 1 is unchanged.
+
 ## F8 `/Y` compatibility follow-up (bounded qualification)
 
 - START_SHA: `6b6e8520be69b1516d0a82f189a1b0681eb82996`.
@@ -12,7 +61,8 @@ message. The FreeDOS profile now recognizes `/Y` as an explicit no-op hint.
 CONFIG confirmations remain in the kernel; AUTOEXEC still executes normally.
 This is not batch single-stepping. Unknown/malformed switches still diagnose
 errors. Kernel and FreeCOM pins, kernel/loader bytes, and the complete normal
-FreeCOM D88 are unchanged. Independent kswap work is separate and remains paused.
+FreeCOM D88 are unchanged. At this shell checkpoint, independent kswap work was separate and paused;
+its subsequent PC qualification is recorded above.
 
 **HOST PASS:** two complete normal-plus-shell builds agree; a clean public,
 allowlisted checkout repeated both builds with other milestones absent and
@@ -60,7 +110,7 @@ below. The earlier shell-only checkpoints retain their original scope and
 kernel identity. The normal distribution is not replaced; hardware retesting
 is **NOT RUN**, and this is not milestone HANDOFF READY.
 
-## FreeCOM kswap follow-up (independent repair; paused)
+## FreeCOM kswap follow-up (earlier independent attempts; historical)
 
 The follow-up starts at the fetched, exact MS-DOS-shell publication tip
 `6d4e2dda024d21d3a8380adfa8900201be3bfdcc`. At that starting checkpoint,
