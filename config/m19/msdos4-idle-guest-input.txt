@@ -1,8 +1,4 @@
-@wait 300
-@enter
-@wait 400
-@enter
-@wait 400
+@wait 30000
 CLS
 @wait 200
 VER > VER.TXT

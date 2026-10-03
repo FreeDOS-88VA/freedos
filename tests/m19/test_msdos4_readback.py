@@ -36,6 +36,25 @@ class ReadbackTests(unittest.TestCase):
     def test_complete_fixture(self):
         self.assertTrue(qa.check(*self.fixture())['mcb_checks_before_after'])
 
+    def test_idle_io_is_required_when_the_probe_source_is_on_media(self):
+        base, guest = self.fixture()
+        base['IDLEIO.ASM'] = guest['IDLEIO.ASM'] = b'; synthetic probe source'
+        outputs = {'IDLELOG.TXT': b'IDLEOK\r\n',
+                   'IDLE.DAT': b'BEFORE\r\nAFTER\r\n',
+                   'IDLEIO.COM': b'compiled probe', 'IDLEASM.TXT': b'0 errors'}
+        guest.update(outputs)
+        self.assertTrue(qa.check(base, guest)['open_handle_idle_io_checked'])
+        for name in outputs:
+            broken = dict(guest)
+            del broken[name]
+            with self.subTest(missing=name), self.assertRaises(ValueError):
+                qa.check(base, broken)
+        for name, value in [('IDLELOG.TXT', b'IDLEFAIL\r\n'),
+                            ('IDLE.DAT', b'BEFORE\r\n'),
+                            ('IDLEIO.COM', b''), ('IDLEASM.TXT', b'1 errors')]:
+            with self.subTest(corrupt=name), self.assertRaises(ValueError):
+                qa.check(base, dict(guest, **{name: value}))
+
     def test_captured_switch_diagnostic_requires_completion(self):
         base, guest = self.fixture()
         guest['SWITCH.TXT'] = b'Invalid switch\r\nSWITCHOK\r\n'

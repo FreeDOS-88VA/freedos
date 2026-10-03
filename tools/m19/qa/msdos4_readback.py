@@ -18,6 +18,15 @@ sys.path.insert(0, str(ROOT / 'tools/m19'))
 from media import inspect
 
 
+def check_idle_io(guest):
+    if guest.get('IDLELOG.TXT') != b'IDLEOK\r\n':
+        raise ValueError('open-handle idle probe did not complete')
+    if guest.get('IDLE.DAT') != b'BEFORE\r\nAFTER\r\n':
+        raise ValueError('open-handle idle write/readback differs')
+    if not guest.get('IDLEIO.COM') or b'0 errors' not in guest.get('IDLEASM.TXT', b''):
+        raise ValueError('idle probe was not assembled')
+
+
 def check(base, guest):
     for name, data in base.items():
         if guest.get(name) != data:
@@ -63,7 +72,10 @@ def check(base, guest):
     mz = guest['MZDEMO.EXE']
     if len(mz) < 28 or mz[:2] != b'MZ' or struct.unpack_from('<H', mz, 6)[0] < 1:
         raise ValueError('missing relocatable MZ')
+    if 'IDLEIO.ASM' in base:
+        check_idle_io(guest)
     return {'scope': 'settled file/readback checks only; screen/CLS checked separately',
+            'open_handle_idle_io_checked': 'IDLEIO.ASM' in base,
             'original_payloads_unchanged': True,
             'file_batch_pipe_child_shell_com_mz_checks': True,
             'mcb_checks_before_after': True,

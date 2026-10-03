@@ -305,7 +305,12 @@ repair. Its two host tests cover the assembled FAR adapter ABI, actual driver
 policy, geometry/identity drift, read errors, absent identity, explicit change,
 and the non-VA control. The existing nine media-lifetime host tests also pass.
 The parent M19 suite now invokes both component tests. These synthetic results
-are not firmware, hardware or complete-build qualification.
+are not firmware, hardware or complete-build qualification. The new QA media
+also carries an original `IDLEIO.ASM` fixture, built inside the guest with
+JWASMR: it keeps a reader and writer open across five DOS clock second changes.
+Readback requires its success marker and exact before/after write contents.
+The new unattended-input script delays all keys until after its startup wait.
+The existing common CONFIG reader's handling of read errors is not changed.
 
 Pending: exact-source two-build comparison through final media; placement and
 carrier verification; native CI; unattended/F5/F8 startup and normal-shell

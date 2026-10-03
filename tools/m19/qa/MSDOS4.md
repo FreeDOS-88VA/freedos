@@ -89,7 +89,14 @@ for the early-Enter control. Separately inject
 `config/m19/msdos4-f8-guest-input.txt` for F8 plus six CONFIG confirmations.
 Capture the F8 startup screen before CLS; reaching the prompt must not be
 inferred solely from file contents. Both paths run an invalid-switch child
-and require its completion marker. Neither path qualifies unattended startup
+and require its completion marker. The current batch also builds `IDLEIO.COM`
+from `IDLEIO.ASM` with the source-built JWASMR, holds a reader and writer open
+across five DOS clock second changes, then verifies the reader and completes
+the write. Readback requires both its success marker and exact file bytes.
+For unattended testing, `config/m19/msdos4-idle-guest-input.txt` supplies no key
+until its initial 30000-frame wait expires; verify startup without input
+separately before treating that workflow as unattended coverage.
+Neither early-key path qualifies unattended startup
 or F5 bypass, which changes the configuration being processed.
 After stopping the guest, run `python3 -B tools/m19/qa/msdos4_readback.py
 --baseline build/m19-msdos4-qa-NEW/MSDOS4-QA.D88 --guest PRIVATE-COPY.d88
