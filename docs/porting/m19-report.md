@@ -7,9 +7,10 @@ START_SHA: `ba868e2e33447fe5fcb3a2bed0711464f7968d82`, fetched from
 were verified before starting. This new parent branch is
 `experiment/m19-kswap-va`; it does not change the published shell-preview tag
 or the normal release branch. The pinned FreeCOM VA experiment is
-`afc4d56a913597e9b85eb697fe03e6905ab68e49`, merging the independently
-requalified child-status correction into config-only VA experiment
-`fbf735f63ceb3e263adad5c210904321c1c605c7`. Component source
+`b334f316988f714086b47a3cabb336fe7e8a8145`, with independently requalified
+child-status decoding and an explicit 8086 instruction boundary, descending
+from config-only VA experiment `fbf735f63ceb3e263adad5c210904321c1c605c7`.
+Component source
 remains in its public fork and was pushed before the parent gitlink update.
 
 The complete M19-local build now produces the matched KSSF/COMMAND pair and
@@ -39,9 +40,28 @@ strengthened screen/decoder tests. Exact-head PC regression CI `37114741339`
 and full build/test CI `37114741324`, both attempt 1, succeeded before VA
 integration. The screen gate now rejects
 `String #`/corruption diagnostics even when all files and return codes exist.
-Pending: matched VA clean rebuild, VA2/640 KiB retest, then alternate
-VA/stale-retained controls. Hardware and those
-alternate configurations are **NOT RUN**. No disk handover or HANDOFF READY.
+The matched status-correction VA rebuild also passed public clean build and
+native source CI `37115623416`, attempt 1, on
+`1473fe6674684efd704059813ac63df8548fd516`, but its VA2/640 KiB reload failed
+the strengthened gate. Code growth crossed the signed-byte branch range;
+unconstrained NASM emitted a 386 near conditional for `jne mainloop`, which
+is not a V30-compatible reload instruction. This candidate is **not qualified**.
+The code bytes/disassembly are reproducible public build outputs, not firmware
+observations. Component `fd2b3eb5586ac94ec7624742497ac6ecd5c4926c` explicitly
+sets `CPU 8086`; its host regression assembles the actual reload span, checks
+the inverted-short/near-jump expansion, and proves the unconstrained span
+would still emit a 386 opcode. The first dispatched CPU-regression CI `37116539915` failed because its host
+NASM dependency was absent; it did not reach runtime and is retained as failed.
+The explicit host-tool recipe correction is
+`b334f316988f714086b47a3cabb336fe7e8a8145`. Its nine host tests, two complete
+clean PC builds and all three PC runtime cases passed. Exact-head dedicated
+CI `37116808065` and full build/test/cross-build CI `37116808110`, attempt 1,
+succeeded before the updated VA pin/rebuild. Fresh public source archive
+identity also agrees. Both failed VA candidates and their evidence are retained.
+
+Pending: matched VA rebuild and the same VA2/640 KiB retest, then alternate
+VA/stale-retained controls. Hardware and
+those alternate configurations are **NOT RUN**. No disk handover or HANDOFF READY.
 See `tools/m19/qa/KSWAP.md`. Previous PC results do not qualify VA.
 
 ## FreeCOM kswap resumed: bounded independent PC qualification

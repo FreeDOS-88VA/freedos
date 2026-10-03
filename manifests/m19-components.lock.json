@@ -23,12 +23,11 @@
       "repository": "https://github.com/nakatamaho/freecom_dbcs2.git",
       "branch": "experiment/m19-kswap-va",
       "upstream_repository": "https://github.com/lpproj/freecom_dbcs2.git",
-      "commit": "afc4d56a913597e9b85eb697fe03e6905ab68e49",
+      "commit": "b334f316988f714086b47a3cabb336fe7e8a8145",
       "parents": [
-        "fbf735f63ceb3e263adad5c210904321c1c605c7",
-        "52dd9a9af1048ceecd147e100c740c9d3f9b2c70"
+        "fd2b3eb5586ac94ec7624742497ac6ecd5c4926c"
       ],
-      "source_archive_sha256": "c48c6068349f3550475e01e4d5a752464df766b0c1e274788f8749b500d6091e",
+      "source_archive_sha256": "a5ac37b154dbb65d77eb77b64cec657fc7411afcb46433ed16d6ebf5fad42624",
       "license": "GPL-2.0-or-later"
     },
     {
