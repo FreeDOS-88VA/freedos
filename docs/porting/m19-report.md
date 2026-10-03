@@ -1,5 +1,30 @@
 # M19 work report
 
+## Experimental VA kswap verification (in progress)
+
+START_SHA: `ba868e2e33447fe5fcb3a2bed0711464f7968d82`, fetched from
+`fix/m19-shell-startup`; its bounded report-only diff and source/scaffold CI
+were verified before starting. This new parent branch is
+`experiment/m19-kswap-va`; it does not change the published shell-preview tag
+or the normal release branch. The pinned FreeCOM VA experiment is
+`fbf735f63ceb3e263adad5c210904321c1c605c7`, a config-only child of the qualified
+common repair `f5512b5a1756768830b541a274ac48973c46de12`. Component source
+remains in its public fork and was pushed before the parent gitlink update.
+
+The complete M19-local build now produces the matched KSSF/COMMAND pair and
+component-owned original test fixtures. `tools/m19/qa/kswap_media.py` composes
+separate fresh `/E:512` and `/E:8192` QA disks after two entire normal builds.
+`kswap_readback.py`, host negatives and the committed guest-input script require
+state preservation, twenty stable swaps, relocated MZ exit 7, normal guest
+COM/MZ assembly/execution and settled MCB/file checks. The producer/verifier
+and usage instructions are public source inputs, not private helpers.
+
+Pending: full clean public build/rebuild, exact-head dedicated native CI,
+VA2/640 KiB first runtime, then VA and stale-retained 512-KiB controls if the
+first case succeeds. VAEG and hardware for this pair are **NOT RUN** at this
+implementation checkpoint. Fail closed; no disk handover or HANDOFF READY.
+See `tools/m19/qa/KSWAP.md`. Previous PC results do not qualify VA.
+
 ## FreeCOM kswap resumed: bounded independent PC qualification
 
 Parent work starts from the exact released shell-preview tip

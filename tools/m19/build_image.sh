@@ -65,6 +65,11 @@ bash build.sh pc88va no-xms-swap wc english
 # every heap byte stays resident; ptchsize estimates its minimum at about
 # 1.8 KiB. Use FreeCOM's own tool to set 3 KiB.
 utils/ptchsize.exe command.com +3KB
+# Experimental pair and original component-owned DOS regression fixtures.
+(cd tools && nasm -f bin kssf.asm -o kssf.com)
+nasm -f bin tests/kswap/probe.asm -o tests/kswap/PROBE.COM
+nasm -f bin tests/kswap/hog.asm -o tests/kswap/HOG.COM
+nasm -f bin tests/kswap/mz.asm -o tests/kswap/SWAPMZ.EXE
 cd /work/source
 python3 -B tools/m19/finish_image.py /work/result
 python3 -B tools/m19/verify_m13_linked_placement.py \

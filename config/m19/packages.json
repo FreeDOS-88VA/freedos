@@ -30,18 +30,19 @@
     },
     {
       "id": "freecom",
-      "version": "FreeCOM 0.87",
+      "version": "FreeCOM 0.87 experimental repaired KSSF pair",
       "files": [
-        "COMMAND.COM"
+        "COMMAND.COM",
+        "KSSF.COM"
       ],
       "source_lock": "freecom",
       "license": "GPL-2.0-or-later",
       "cpu": "8086 real mode",
-      "va_adaptation": "Pinned NECPC88VA FreeCOM configuration, English build, fixed reproducible timestamp",
+      "va_adaptation": "Experimental repaired KSSF/COMMAND pair, NECPC88VA English build, no XMS, fixed reproducible timestamp; not the normal release pin",
       "tests": [
-        "clean source build",
-        "matched VA/VA2 shell, file/edit/assembly/batch commands and input regression",
-        "source-generated B: media exchange and SYS boot checked separately"
+        "clean source build and paired generated context",
+        "independent PC regression qualified at the common repair base",
+        "VA/VA2 swap, state and runtime qualification recorded separately; not inferred from PC results"
       ]
     },
     {

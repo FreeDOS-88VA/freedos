@@ -186,11 +186,18 @@ def main():
     if not freecom.is_file():
         raise FileNotFoundError("isolated FreeCOM build did not produce command.com")
     shutil.copy2(freecom, out / "COMMAND.COM")
+    shutil.copy2(ROOT / "components/freecom/tools/kssf.com", out / "KSSF.COM")
+    # Kept outside the normal filesystem; kswap_media composes separate QA disks.
+    for name in ("PROBE.COM", "HOG.COM", "SWAPMZ.EXE"):
+        shutil.copy2(ROOT / "components/freecom/tests/kswap" / name, out / name)
     timestamp_path = ROOT / "config/m19/freecom-build-timestamp.json"
     timestamp_config = json.loads(timestamp_path.read_text(encoding="ascii"))
     freecom_build = {
         "command": "bash build.sh pc88va no-xms-swap wc english; utils/ptchsize.exe command.com +3KB",
         "resident_heap_bytes": 3072,
+        "kswap_wrapper_command": "cd tools && nasm -f bin kssf.asm -o kssf.com",
+        "kswap_wrapper_source_sha256": sha256((ROOT / "components/freecom/tools/kssf.asm").read_bytes()),
+        "kswap_context_sha256": sha256((ROOT / "components/freecom/context.inc").read_bytes()),
         "build_script_sha256": sha256((ROOT / "components/freecom/build.sh").read_bytes()),
         "configuration_sha256": sha256((ROOT / "components/freecom/config.std").read_bytes()),
         "timestamp_config_sha256": sha256(timestamp_path.read_bytes()),
@@ -214,7 +221,7 @@ def main():
     payloads = {name: (out / name).read_bytes() for name in (
         "LOADER.BIN", "KERNEL.SYS", "COMMAND.COM", "COUNTRY.SYS", "EDLIN.EXE",
         "MORE.EXE", "CHKDSK.EXE", "FORMAT.EXE", "SYS.EXE", "MEMMAP.EXE",
-        "JWASMR.EXE",
+        "JWASMR.EXE", "KSSF.COM",
     )}
     for name, relative in (
         ("CONFIG.SYS", "config/m19/CONFIG.SYS"),
