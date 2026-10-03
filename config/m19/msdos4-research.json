@@ -5,9 +5,9 @@
     "repository": "https://github.com/nakatamaho/MS-DOS.git",
     "upstream": "https://github.com/microsoft/MS-DOS.git",
     "upstream_base": "2d04cacc5322951f187bb17e017c12920ac8ebe2",
-    "branch": "fix/m19-freedos-message-tables",
-    "commit": "04a52f29cc4f8cd3289cbc8b645f42d7cbe4ad5c",
-    "source_archive_sha256": "ac102a69533a5618a35a8db8abeec39b69701b19a1d359c260bb67f8b6cddd55",
+    "branch": "fix/m19-freedos-y-option",
+    "commit": "e46d23b474f9406160a03c08dd4d931435f8781c",
+    "source_archive_sha256": "140784832cb27be7b8444baea0dc3ced63ebce4df16a59cca62683e730ca9657",
     "license": "MIT"
   },
   "emu2": {

@@ -1,5 +1,22 @@
 # M19 work report
 
+## F8 `/Y` compatibility follow-up (in progress)
+
+START_SHA: `6b6e8520be69b1516d0a82f189a1b0681eb82996`.
+The owner confirmed F8 startup but requested removal of its invalid-switch
+message. Microsoft fork `e46d23b474f9406160a03c08dd4d931435f8781c`
+(`fix/m19-freedos-y-option`) recognizes `/Y` only in the FreeDOS profile, as an
+explicit no-op hint. CONFIG stepping stays in the kernel; AUTOEXEC still runs
+normally. This is not an implementation of batch single-stepping. Unknown
+and malformed switches retain their diagnostics. Kernel and FreeCOM pins are
+unchanged. Independent FreeCOM kswap work remains paused for this request.
+
+The original-profile binary remains byte-identical to its upstream control.
+A fresh PC FreeDOS 2043/QEMU control accepted `/Y` and repeated/lowercase `/Y`,
+preserved `/C ECHO /Y`, and diagnosed `/Z`, `/YY`, and `/Y:1` before returning
+to the parent. Full VA-media rebuild, dedicated CI and new VAEG qualification
+are pending; hardware is NOT RUN. The previous qualified disk remains intact.
+
 Latest status: the kernel media-uncertainty repair has **HOST PASS** and the
 bounded **VAEG PASS** recorded under "Unattended-startup repair qualification"
 below. The earlier shell-only checkpoints retain their original scope and

@@ -55,6 +55,28 @@ class ReadbackTests(unittest.TestCase):
             with self.subTest(corrupt=name), self.assertRaises(ValueError):
                 qa.check(base, dict(guest, **{name: value}))
 
+    def test_y_compatibility_does_not_hide_other_errors_or_change_command_tail(self):
+        base, guest = self.fixture()
+        base['YOPTIONS.BAT'] = guest['YOPTIONS.BAT'] = b'; option fixture'
+        outputs = {'YREPEAT.TXT': b'REPEATOK\r\n',
+                   'UNKNOWN.TXT': b'Invalid switch\r\nUNKNOWNOK\r\n',
+                   'MALFORM.TXT': b'Invalid switch\r\nMALFORMOK\r\n',
+                   'YVALUE.TXT': b'Parameter format not correct\r\nVALUEOK\r\n',
+                   'YTAIL.TXT': b'/Y\r\n'}
+        guest.update(outputs)
+        self.assertTrue(qa.check(base, guest)['freedos_y_compatibility_checked'])
+        for name in outputs:
+            broken = dict(guest)
+            del broken[name]
+            with self.subTest(missing=name), self.assertRaises(ValueError):
+                qa.check(base, broken)
+        for name, value in [('SWITCH.TXT', b'Invalid switch\r\nSWITCHOK\r\n'),
+                            ('UNKNOWN.TXT', b'UNKNOWNOK\r\n'),
+                            ('MALFORM.TXT', b'MALFORMOK\r\n'),
+                            ('YVALUE.TXT', b'VALUEOK\r\n'), ('YTAIL.TXT', b'')]:
+            with self.subTest(corrupt=name), self.assertRaises(ValueError):
+                qa.check(base, dict(guest, **{name: value}))
+
     def test_captured_switch_diagnostic_requires_completion(self):
         base, guest = self.fixture()
         guest['SWITCH.TXT'] = b'Invalid switch\r\nSWITCHOK\r\n'

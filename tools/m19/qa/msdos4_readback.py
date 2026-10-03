@@ -27,6 +27,18 @@ def check_idle_io(guest):
         raise ValueError('idle probe was not assembled')
 
 
+def check_y_options(guest):
+    expected = {'SWITCH.TXT': ['SWITCHOK'], 'YREPEAT.TXT': ['REPEATOK'],
+                'UNKNOWN.TXT': ['Invalid switch', 'UNKNOWNOK'],
+                'MALFORM.TXT': ['Invalid switch', 'MALFORMOK'],
+                'YVALUE.TXT': ['Parameter format not correct', 'VALUEOK'],
+                'YTAIL.TXT': ['/Y']}
+    for name, lines in expected.items():
+        actual = [s.strip() for s in guest.get(name, b'').decode('ascii').splitlines() if s.strip()]
+        if actual != lines:
+            raise ValueError('startup option behavior differs: ' + name)
+
+
 def check(base, guest):
     for name, data in base.items():
         if guest.get(name) != data:
@@ -72,10 +84,13 @@ def check(base, guest):
     mz = guest['MZDEMO.EXE']
     if len(mz) < 28 or mz[:2] != b'MZ' or struct.unpack_from('<H', mz, 6)[0] < 1:
         raise ValueError('missing relocatable MZ')
+    if 'YOPTIONS.BAT' in base:
+        check_y_options(guest)
     if 'IDLEIO.ASM' in base:
         check_idle_io(guest)
     return {'scope': 'settled file/readback checks only; screen/CLS checked separately',
             'open_handle_idle_io_checked': 'IDLEIO.ASM' in base,
+            'freedos_y_compatibility_checked': 'YOPTIONS.BAT' in base,
             'original_payloads_unchanged': True,
             'file_batch_pipe_child_shell_com_mz_checks': True,
             'mcb_checks_before_after': True,

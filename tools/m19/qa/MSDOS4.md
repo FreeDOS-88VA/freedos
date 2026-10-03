@@ -57,7 +57,9 @@ the original binary; `--profile freedos` keeps IBM console CLS for PC testing.
   spoof VERSION=4.00. Skip unsupported OS/2 extended attributes in COPY/TYPE;
   ordinary I/O and timestamp error handling remain intact. Message tables are
   shell-local because FreeDOS ignores MS-DOS INT 2Fh/122Eh registration.
-  `/Y` still prints `Invalid switch`; AUTOEXEC single-stepping is not implemented.
+  `/Y` is accepted as an explicit no-op startup hint, so F8 does not emit
+  `Invalid switch`. Kernel CONFIG confirmations remain intact; AUTOEXEC runs
+  normally, not single-stepped. Unknown/malformed switches still report errors.
 - `/DPC88VA`: CLS uses the native text BIOS for standard CON, avoiding IBM
   INT 10h and the DOS adapter's control-byte filter. Redirected CLS writes the
   ANSI clear/home bytes through DOS file I/O instead. A missing BIOS vector
@@ -88,8 +90,10 @@ Inject `config/m19/msdos4-guest-input.txt` with the owner's emulator adapter
 for the early-Enter control. Separately inject
 `config/m19/msdos4-f8-guest-input.txt` for F8 plus six CONFIG confirmations.
 Capture the F8 startup screen before CLS; reaching the prompt must not be
-inferred solely from file contents. Both paths run an invalid-switch child
-and require its completion marker. The current batch also builds `IDLEIO.COM`
+inferred solely from file contents. Both paths require a diagnostic-free `/Y`
+child, lowercase/repeated `/Y`, and unchanged `/C` command text. `YOPTIONS.BAT`
+also requires diagnostics and completion for `/Z`, `/YY`, and `/Y:1`; the
+compatibility option must not hide other parsing errors. The current batch also builds `IDLEIO.COM`
 from `IDLEIO.ASM` with the source-built JWASMR, holds a reader and writer open
 across five DOS clock second changes, then verifies the reader and completes
 the write. Readback requires both its success marker and exact file bytes.
