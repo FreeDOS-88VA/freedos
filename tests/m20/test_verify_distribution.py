@@ -13,7 +13,8 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools/m20'))
 from verify_distribution import (BUILD_FIELDS, COMPONENTS, VerificationError,
-                                 bound_file, check_manifest, fields, verify)
+                                 bound_file, check_manifest, check_utility, fields, verify)
+from compose_image import compose_data
 
 
 def sha(data):
@@ -44,12 +45,17 @@ def instances():
                     parent_start_sha=start, component_revisions=revisions,
                     source_archives_sha256=archives, two_independent_clean_builds_equal=True,
                     toolchain_identity='sha256:' + sha(b'lock'),
-                    distribution_d88={'sha256': 'e' * 64, 'size_bytes': 100})
+                    distribution_d88={'sha256': 'e' * 64, 'size_bytes': 100},
+                    utility_d88={'sha256': 'd' * 64, 'size_bytes': 100},
+                    utility_manifest_sha256='d' * 64)
     comparison = dict(schema_version=1, independent_clean_builds=2,
                       media_d88_byte_identical=True,
                       release_capacity_records_identical=True,
                       release_package_records_identical=True,
                       media_d88_sha256='e' * 64,
+                      utility_d88_byte_identical=True,
+                      release_utility_records_identical=True,
+                      utility_d88_sha256='d' * 64,
                       diagnostic_maps_are_not_part_of_the_distribution_reproducibility_claim=True)
     files = {'TEST.TXT': b'hello', 'CONFIG.SYS': b'config'}
     budget = dict(schema_version=1, profile_id='synthetic', geometry={},
@@ -100,6 +106,8 @@ class DistributionInstanceTests(unittest.TestCase):
                               (2, lambda a: a['filesystem']['file_records']['TEST.TXT']
                                .update(sha256='f' * 64)),
                               (1, lambda a: a.update(media_d88_sha256='f' * 64)),
+                              (1, lambda a: a.update(utility_d88_sha256='f' * 64)),
+                              (1, lambda a: a.pop('utility_d88_byte_identical')),
                               (3, lambda a: a.update(parent_revision='f' * 40)),
                               (3, lambda a: a.update(toolchain_identity='sha256:' + 'f' * 64))):
             values = copy.deepcopy(baseline)
@@ -136,7 +144,8 @@ class DistributionInstanceTests(unittest.TestCase):
             (dist / manifest['source_bundle']['filename']).write_bytes(bundle)
             with patch('verify_distribution.inspect', return_value=(
                     {'fat_copies_equal': True}, files)), patch(
-                    'verify_distribution.check_manifest') as check:
+                    'verify_distribution.check_manifest') as check, patch(
+                    'verify_distribution.check_utility'):
                 (dist / 'build-manifest.json').write_text(json.dumps(manifest))
                 verify(root, dist)
                 check.assert_called_once()
@@ -149,6 +158,63 @@ class DistributionInstanceTests(unittest.TestCase):
                     with self.subTest(key=key), self.assertRaisesRegex(
                             VerificationError, 'filename differs'):
                         verify(root, dist)
+
+    def test_utility_disk_instance_and_negatives(self):
+        root_source = Path(__file__).resolve().parents[2]
+        config = {'schema_version': 1, 'milestone': 'M20',
+                  'disk': {'filename': 'freedos-PC88VA-M20-UTIL.D88', 'd88_disk_name': 'FDOS-PC88VA-UTIL',
+                           'volume_label': 'M20-UTIL', 'role': 'data'},
+                  'readme': 'config/m20/utility/README.TXT',
+                  'notices': {'COPYING': 'COPYING'},
+                  'packages': [{'id': 'find', 'files': ['FIND.EXE'], 'source_locks': ['find'],
+                                'license': 'GPL', 'builder': 'utilities.build_find'}]}
+        payloads = {'FIND.EXE': b'MZ' + bytes(100), 'COPYING': b'gpl\r\n', 'README.TXT': b'r\r\n'}
+        lock = {'start_sha': 'c' * 40, 'components': [
+            {'name': 'find', 'commit': '1' * 40, 'source_archive_sha256': '2' * 64}]}
+
+        def build(mutate=None):
+            tmp = tempfile.mkdtemp()
+            root = Path(tmp)
+            (root / 'config/m20').mkdir(parents=True)
+            (root / 'config/m20/media.json').write_bytes((root_source / 'config/m20/media.json').read_bytes())
+            dist = root / 'dist'
+            dist.mkdir()
+            image = compose_data(payloads, dist, 1791023315, 'FDOS-PC88VA-UTIL', 'M20-UTIL')
+            (dist / config['disk']['filename']).write_bytes(image)
+            utility = {'schema_version': 1, 'milestone': 'M20', 'parent_revision': 'a' * 40,
+                       'toolchain_identity': 'sha256:' + 'b' * 64,
+                       'guest_qualification': 'NOT RUN BY make m20-disk',
+                       'disk': dict(config['disk'], sha256=sha(image), size_bytes=len(image)),
+                       'files': {n: {'sha256': sha(d), 'size_bytes': len(d)} for n, d in payloads.items()},
+                       'notices': {'COPYING': {}},
+                       'packages': [{'id': 'find', 'files': ['FIND.EXE'], 'license': 'GPL',
+                                     'built_files': {'FIND.EXE': {'sha256': sha(payloads['FIND.EXE'])}},
+                                     'source_identity': {'find': {'commit': '1' * 40,
+                                                                  'source_archive_sha256': '2' * 64}}}]}
+            cfg = copy.deepcopy(config)
+            if mutate:
+                mutate(utility, cfg)
+            (root / 'config/m20/utility-disk.json').write_text(json.dumps(cfg))
+            data = json.dumps(utility).encode()
+            (dist / 'utility-manifest.json').write_bytes(data)
+            manifest = {'parent_revision': 'a' * 40, 'toolchain_identity': 'sha256:' + 'b' * 64,
+                        'utility_d88': {'filename': cfg['disk']['filename'], 'sha256': sha(image),
+                                        'size_bytes': len(image)},
+                        'utility_manifest_sha256': sha(data)}
+            return root, dist, manifest
+
+        root, dist, manifest = build()
+        check_utility(root, dist, manifest, lock)
+        for mutate in (
+                lambda u, c: u['files']['FIND.EXE'].update(sha256='f' * 64),
+                lambda u, c: u['packages'][0]['source_identity']['find'].update(commit='9' * 40),
+                lambda u, c: u.update(packages=[]),
+                lambda u, c: u.update(parent_revision='f' * 40),
+                lambda u, c: c['notices'].update({'EXTRA.TXT': 'COPYING'}),
+                lambda u, c: u.update(unknown=True)):
+            root, dist, manifest = build(mutate)
+            with self.subTest(mutate=mutate), self.assertRaises((VerificationError, KeyError)):
+                check_utility(root, dist, manifest, lock)
 
     def test_source_bundle_missing_archive_member(self):
         values = list(instances())

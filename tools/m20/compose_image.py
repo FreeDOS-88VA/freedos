@@ -77,3 +77,65 @@ def compose(payloads, overlay, output, epoch):
     (output / 'media.d88').write_bytes(d88)
     (output / 'media.json').write_text(json.dumps({'allocations': allocations, 'filesystem': report}, indent=2)+'\n')
     return d88
+
+
+def data_disk_spec(disk_name, volume_label):
+    """Return the native 2HD media profile with a data disk's D88 name and label."""
+    spec = json.loads((ROOT / 'config/m20/media.json').read_text())
+    spec['d88']['disk_name'] = disk_name
+    spec['image']['volume_label'] = volume_label
+    return spec
+
+
+def compose_data(payloads, output, epoch, disk_name, volume_label, stem='util'):
+    """Compose a non-bootable native 2HD FAT12 data disk for drive B:.
+
+    Same geometry and FAT12 layout as the system disk, with the public data
+    boot record (no loader) used for disposable B: targets.
+    """
+    spec = data_disk_spec(disk_name, volume_label)
+    layout = derive_layout(spec)
+    geo, fs = spec['geometry'], spec['filesystem']
+    bps = geo['bytes_per_sector']
+    if len(payloads) + 1 > fs['root_entries']:
+        raise ValueError('Too many directory entries including the volume label')
+    label = volume_label.encode('ascii')
+    if not label or len(label) > 11:
+        raise ValueError('Volume label must be 1..11 ASCII bytes')
+    raw = bytearray(geo['total_bytes'])
+    raw[:bps] = build_boot_record(spec)
+    fat = bytearray(fs['sectors_per_fat'] * bps)
+    set_fat12_entry(fat, 0, 0xf00 | fs['media_descriptor'])
+    set_fat12_entry(fat, 1, 0xfff)
+    root_start = (fs['reserved_sectors'] + fs['fat_count'] * fs['sectors_per_fat']) * bps
+    volume_entry = bytearray(32)
+    volume_entry[:11] = label.ljust(11, b' ')
+    volume_entry[11] = 0x08
+    raw[root_start:root_start + 32] = volume_entry
+    allocations, cluster, root_index = {}, 2, 1
+    for name in sorted(payloads):
+        data = payloads[name]
+        count = (len(data) + bps - 1) // bps
+        if cluster + count > layout['data_clusters'] + 2:
+            raise ValueError('Data disk payloads exceed FAT12 capacity')
+        first = cluster if count else 0
+        for n in range(count):
+            set_fat12_entry(fat, cluster + n, cluster + n + 1 if n + 1 < count else 0xfff)
+            offset = (layout['first_data_sector'] + cluster + n - 2) * bps
+            raw[offset:offset + bps] = data[n*bps:(n+1)*bps].ljust(bps, b'\0')
+        entry, _ = build_directory_entry(dict(dos_name=name, size=len(data), source_date_epoch=epoch), first)
+        raw[root_start + root_index*32:root_start + (root_index+1)*32] = entry
+        root_index += 1
+        allocations[name] = dict(first_lba=layout['first_data_sector'] + cluster - 2,
+                                 sector_count=count, file_size=len(data))
+        cluster += count
+    for n in range(fs['fat_count']):
+        offset = (fs['reserved_sectors'] + n * fs['sectors_per_fat']) * bps
+        raw[offset:offset + len(fat)] = fat
+    d88 = build_d88(spec, bytes(raw))
+    report, files = inspect(d88, spec)
+    if files != payloads or not report['fat_copies_equal']:
+        raise ValueError('Fresh data disk readback differs from source-built payloads')
+    (output / (stem + '.d88')).write_bytes(d88)
+    (output / (stem + '-media.json')).write_text(json.dumps({'allocations': allocations, 'filesystem': report}, indent=2)+'\n')
+    return d88

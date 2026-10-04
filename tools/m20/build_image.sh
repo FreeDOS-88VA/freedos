@@ -14,7 +14,8 @@ export LC_ALL=C LANG=C TZ=UTC SOURCE_DATE_EPOCH="$M20_SOURCE_DATE_EPOCH" PYTHOND
 umask 022
 mkdir -p /work/source /work/result /work/pydeps
 tar -xf /input/parent.tar -C /work/source
-for name in fdkernel freecom country edlin jwasm; do
+component_names=$(python3 -B /work/source/tools/m20/component_set.py)
+for name in $component_names; do
     mkdir -p "/work/source/components/$name"
     tar -xf "/input/$name.tar" -C "/work/source/components/$name"
 done

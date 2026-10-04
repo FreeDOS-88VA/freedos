@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 import re
+import sys
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[2]
 MILESTONE_PARENTS = ("tools", "config", "tests", "containers")
@@ -32,6 +33,11 @@ def verify(root: Path = DEFAULT_ROOT) -> None:
                 "manifests/toolchains.lock.json", "components/fdkernel",
                 "components/freecom", "components/country", "components/edlin",
                 "components/jwasm")
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from component_set import locked_names
+    if (root / "manifests/m20-components.lock.json").is_file():
+        required = required + tuple("components/" + name for name in locked_names(root)
+                                    if "components/" + name not in required)
     missing = [name for name in required if not (root / name).exists()]
     if missing:
         raise IsolationError("M20 source export is missing: " + ", ".join(missing))

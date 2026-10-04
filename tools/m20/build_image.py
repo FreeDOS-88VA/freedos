@@ -29,7 +29,9 @@ PARENT_INPUTS = (
     "manifests/m20-components.lock.json", "manifests/toolchains.lock.json",
     "COPYING", "LICENSE.md",
 )
-COMPONENTS = ("fdkernel", "freecom", "country", "edlin", "jwasm")
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from component_set import locked_names
+COMPONENTS = locked_names(ROOT)
 DIST_MARKER = "M20-generated-distribution-root-v1\n"
 BUILD_MARKER = "M20-generated-build-root-v1\n"
 
@@ -282,17 +284,18 @@ def tar_member(tar: tarfile.TarFile, name: str, data: bytes, epoch: int) -> None
 def build_source_bundle(inputs: Path, output: Path, source_record: dict, epoch: int) -> dict:
     package_readme = b"""PC-88VA FreeDOS M20 corresponding source bundle
 
-This host-side bundle accompanies one native 2HD D88. It is not another DOS
-disk. It contains the complete allowlisted M20 parent build inputs and the
-full source archives of fdkernel, FreeCOM, COUNTRY.SYS, FreeDOS EDLIN, and JWasm.
-Each source archive preserves its upstream license and notices. The root COPYING
+This host-side bundle accompanies the M20 native 2HD D88 set. It is not another
+DOS disk. It contains the complete allowlisted M20 parent build inputs and the
+full source archive of every pinned component listed in SOURCE-MANIFEST.json
+(kernel, FreeCOM, COUNTRY.SYS, EDLIN, JWasm and the floppy-set programs and
+libraries). Each source archive preserves its upstream license and notices. The root COPYING
 is GPL version 2; JWasm's Sybase Open Watcom Public License 1.0 is included in
 its source archive and as JWASM.LIC on the disk. The unmodified Open Watcom
 1.9 DOS compiler runtime has independently pinned publicly obtainable source:
 https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.9/open_watcom_1.9.0-src.tar.bz2
 SHA-256: 6d303327988ee2dda60cfabebf3f45a9758aee4da117d41cf3153fccb7e5e4bf
-It is a toolchain source release, not one of the five component archives in
-this bundle. Its Sybase Open Watcom Public License 1.0 text matches JWASM.LIC
+It is a toolchain source release, not one of the component archives in this
+bundle. Its Sybase Open Watcom Public License 1.0 text matches JWASM.LIC
 when normalized for line endings; the official *binary* compiler is pinned
 separately by the project's toolchain lock.
 
@@ -347,7 +350,8 @@ def build_source_bundle_pinned(image_id: str, inputs: Path, output: Path,
         "mkdir -p /work/entry /work/result && "
         "tar -xf /input/parent.tar -C /work/entry "
         "tools/m20/build_image.py tools/m20/normalize_parent_archive.py "
-        "tools/m20/toolchain.py && "
+        "tools/m20/toolchain.py tools/m20/component_set.py "
+        "manifests/m20-components.lock.json && "
         "python3 -B -c 'import json,sys; from pathlib import Path; "
         "sys.path.insert(0,\"/work/entry/tools/m20\"); "
         "from build_image import build_source_bundle; "
@@ -411,8 +415,8 @@ def copy_container_run(image_id: str, toolchain_identity: str, inputs: Path, run
         subprocess.run(["docker", "rm", "-f", cid], check=True,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     record = json.loads((run_dir / "artifacts.json").read_text(encoding="ascii"))
-    if "media.d88" not in record:
-        raise ValueError("M20 clean build omitted its D88")
+    if "media.d88" not in record or "util.d88" not in record:
+        raise ValueError("M20 clean build omitted a D88")
     return record
 
 
@@ -454,7 +458,10 @@ def main() -> None:
     second_d88 = (output / "run-2/media.d88").read_bytes()
     if first_d88 != second_d88:
         raise ValueError("independent clean M20 builds produced different D88 bytes")
-    for relative in ("package-manifest.json", "capacity-budget.json"):
+    first_util = (output / "run-1/util.d88").read_bytes()
+    if first_util != (output / "run-2/util.d88").read_bytes():
+        raise ValueError("independent clean M20 builds produced different utility D88 bytes")
+    for relative in ("package-manifest.json", "capacity-budget.json", "utility-manifest.json"):
         if (output / "run-1" / relative).read_bytes() != (output / "run-2" / relative).read_bytes():
             raise ValueError("independent M20 build release records differ: " + relative)
     run_one_artifacts = json.loads((output / "run-1/artifacts.json").read_text(encoding="ascii"))
@@ -463,11 +470,18 @@ def main() -> None:
     for record in (run_one_artifacts.get("media.d88"), run_two_artifacts.get("media.d88")):
         if record != expected_d88:
             raise ValueError("M20 artifact records do not bind the clean-built D88")
+    expected_util = {"size_bytes": len(first_util), "sha256": sha256(first_util)}
+    for record in (run_one_artifacts.get("util.d88"), run_two_artifacts.get("util.d88")):
+        if record != expected_util:
+            raise ValueError("M20 artifact records do not bind the clean-built utility D88")
     comparison = {
         "schema_version": 1,
         "independent_clean_builds": 2,
         "media_d88_byte_identical": True,
         "media_d88_sha256": sha256(first_d88),
+        "utility_d88_byte_identical": True,
+        "utility_d88_sha256": sha256(first_util),
+        "release_utility_records_identical": True,
         "release_package_records_identical": True,
         "release_capacity_records_identical": True,
         "diagnostic_maps_are_not_part_of_the_distribution_reproducibility_claim": True,
@@ -497,6 +511,10 @@ def main() -> None:
         output / "freedos-PC88VA-M20-SOURCES.tar.xz", source_record, epoch)
     target_d88 = staging_dist / "freedos-PC88VA-M20-2HD.D88"
     target_d88.write_bytes(first_d88)
+    utility_config = json.loads((ROOT / "config/m20/utility-disk.json").read_text())
+    target_util = staging_dist / utility_config["disk"]["filename"]
+    target_util.write_bytes(first_util)
+    shutil.copy2(output / "run-1/utility-manifest.json", staging_dist / "utility-manifest.json")
     shutil.copy2(output / "run-1/capacity-budget.json", staging_dist / "capacity-budget.json")
     shutil.copy2(output / "run-1/package-manifest.json", staging_dist / "package-manifest.json")
     shutil.copy2(output / "two-build-comparison.json", staging_dist / "two-build-comparison.json")
@@ -519,6 +537,10 @@ def main() -> None:
         "distribution_d88": {"filename": target_d88.name,
                              "size_bytes": len(first_d88),
                              "sha256": sha256(first_d88)},
+        "utility_d88": {"filename": target_util.name,
+                        "size_bytes": len(first_util),
+                        "sha256": sha256(first_util)},
+        "utility_manifest_sha256": sha256((staging_dist / "utility-manifest.json").read_bytes()),
         "source_bundle": bundle_record,
         "capacity_budget_sha256": sha256((staging_dist / "capacity-budget.json").read_bytes()),
         "package_manifest_sha256": sha256((staging_dist / "package-manifest.json").read_bytes()),
@@ -537,6 +559,7 @@ def main() -> None:
     else:
         staging_dist.replace(dist)
     print("M20 D88: {} bytes SHA-256 {}".format(len(first_d88), sha256(first_d88)))
+    print("M20 utilities D88: {} bytes SHA-256 {}".format(len(first_util), sha256(first_util)))
     print("M20 source bundle: {} bytes SHA-256 {}".format(
         bundle_record["size_bytes"], bundle_record["sha256"]))
     print("M20 public files: {}".format(dist))

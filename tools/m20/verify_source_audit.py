@@ -6,9 +6,9 @@ import argparse
 import json
 from pathlib import Path
 import re
+import sys
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[2]
-REQUIRED_COMPONENTS = {"fdkernel", "freecom", "country", "edlin", "jwasm"}
 DOS_83 = re.compile(r"[A-Z0-9!#$%&'()@^_`{}~-]{1,8}(?:\.[A-Z0-9!#$%&'()@^_`{}~-]{1,3})?")
 PRIVATE_NAMES = {".private-evidence", "pc88va-private-docs", "private", "roms"}
 
@@ -32,8 +32,13 @@ def verify(root: Path = DEFAULT_ROOT) -> None:
     if lock.get("milestone") != "M20" or lock.get("start_sha") != "ba868e2e33447fe5fcb3a2bed0711464f7968d82":
         raise AuditError("M20 start/source lock identity differs")
     components = {item.get("name"): item for item in lock.get("components", [])}
-    if set(components) != REQUIRED_COMPONENTS:
-        raise AuditError("M20 public component set differs")
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from component_set import locked_names
+    try:
+        if set(components) != set(locked_names(root)):
+            raise AuditError("M20 public component set differs")
+    except ValueError as exc:
+        raise AuditError("M20 public component set differs") from exc
     for name, item in components.items():
         if (not re.fullmatch(r"[0-9a-f]{40}", item.get("commit", "")) or
                 not re.fullmatch(r"[0-9a-f]{64}", item.get("source_archive_sha256", "")) or
@@ -53,6 +58,21 @@ def verify(root: Path = DEFAULT_ROOT) -> None:
         for filename in item.get("files", []):
             if not isinstance(filename, str) or not DOS_83.fullmatch(filename):
                 raise AuditError("M20 disk path is not uppercase DOS 8.3: " + str(filename))
+
+    utility = json.loads((root / "config/m20/utility-disk.json").read_text(encoding="ascii"))
+    if utility.get("milestone") != "M20" or not isinstance(utility.get("packages"), list):
+        raise AuditError("M20 utility disk configuration is malformed")
+    for item in utility["packages"]:
+        if not item.get("source_locks") or any(name not in components for name in item["source_locks"]):
+            raise AuditError("M20 utility package refers to an unpinned component")
+        for filename in item.get("files", []):
+            if not isinstance(filename, str) or not DOS_83.fullmatch(filename):
+                raise AuditError("M20 utility disk path is not uppercase DOS 8.3: " + str(filename))
+    for filename in list(utility.get("notices", {})) + ["README.TXT"]:
+        if not DOS_83.fullmatch(filename):
+            raise AuditError("M20 utility notice path is not uppercase DOS 8.3: " + filename)
+    if not (root / utility["readme"]).read_bytes().isascii():
+        raise AuditError("M20 utility README is not ASCII")
 
     payload = root / "config/m20/payload"
     for path in payload.iterdir():

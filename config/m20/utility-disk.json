@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "milestone": "M20",
+  "disk": {
+    "filename": "freedos-PC88VA-M20-UTIL.D88",
+    "d88_disk_name": "FDOS-PC88VA-UTIL",
+    "volume_label": "M20-UTIL",
+    "role": "data disk for drive B:; not bootable"
+  },
+  "readme": "config/m20/utility/README.TXT",
+  "notices": {
+    "COPYING": "COPYING",
+    "KITTEN.LIC": "components/kitten/LICENSE"
+  },
+  "packages": [
+    {
+      "id": "find",
+      "upstream": "FreeDOS 1.4 package find 3.0b; FDOS find a6e245d with FDOS kitten 6265435 and tnyprntf 450ab90",
+      "files": [
+        "FIND.EXE"
+      ],
+      "source_locks": [
+        "find",
+        "kitten",
+        "tnyprntf"
+      ],
+      "builder": "utilities.build_find",
+      "license": "FIND GPL-2.0-or-later (COPYING); tnyprntf GPL-2.0 (COPYING); kitten LGPL-2.1 (KITTEN.LIC)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; DOS services only",
+      "messages": "built-in English",
+      "tests": [
+        "clean source build",
+        "VAEG guest run pending"
+      ]
+    }
+  ]
+}

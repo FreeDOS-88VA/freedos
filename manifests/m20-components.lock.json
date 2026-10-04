@@ -73,6 +73,48 @@
       ],
       "source_archive_sha256": "5511d3666107009b58d94912ebdc6a0c4e8013aad4850fb15b087872071013bf",
       "license": "Sybase Open Watcom Public License 1.0"
+    },
+    {
+      "name": "find",
+      "path": "components/find",
+      "repository": "https://github.com/FDOS/find.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/find.git",
+      "commit": "a6e245d50bc6c4513651e65c3defab554be44da1",
+      "parents": [
+        "ebd746a133b8af5e9688970b9d6aa44d9833b59a"
+      ],
+      "source_archive_sha256": "e1d111c599fcffd564e77d3293cf226464594ce6b4462e86a0200fab1d0b3cb3",
+      "license": "GPL-2.0-or-later",
+      "role": "utility disk: FreeDOS 1.4 FIND"
+    },
+    {
+      "name": "kitten",
+      "path": "components/kitten",
+      "repository": "https://github.com/FDOS/kitten.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/kitten.git",
+      "commit": "62654352bd887fbed99db72bdb6c4dc3e99493a1",
+      "parents": [
+        "26c57769165e603021e2a0a4aee24a2b0db2e050"
+      ],
+      "source_archive_sha256": "e9739312a70e1ecf8c6a652f6172656c17535acb383f9f3368467bc8bde7a287",
+      "license": "LGPL-2.1",
+      "role": "library linked into FIND"
+    },
+    {
+      "name": "tnyprntf",
+      "path": "components/tnyprntf",
+      "repository": "https://github.com/FDOS/tnyprntf.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/tnyprntf.git",
+      "commit": "450ab904dab1e48ba6632937bc1dbfb4b8b45078",
+      "parents": [
+        "37caa86b4801a7674401bc97501360d4ddd189e5"
+      ],
+      "source_archive_sha256": "485cb18fee9bf970921fbaee027dd107b758183818fa2d84108c60bd69214c69",
+      "license": "GPL-2.0",
+      "role": "library linked into FIND"
     }
   ],
   "toolchain": {

@@ -380,6 +380,9 @@ def main():
         json.dumps(package_manifest, indent=2, sort_keys=True) + "\n", encoding="ascii"
     )
 
+    utility = build_utility_disk(out, source, source_epoch, parent_revision,
+                                 toolchain_identity, spec)
+
     artifacts = {
         path.relative_to(out).as_posix(): {
             "size_bytes": path.stat().st_size,
@@ -392,8 +395,78 @@ def main():
         json.dumps(artifacts, indent=2, sort_keys=True) + "\n", encoding="ascii"
     )
     print("M20 native 2HD D88: {} bytes, SHA-256 {}".format(len(d88), sha256(d88)))
+    print("M20 utilities D88: {} bytes, SHA-256 {}".format(utility["size_bytes"], utility["sha256"]))
     print("M20 capacity: {} free clusters ({} bytes), reserve floor {} clusters".format(
         free_clusters, free_clusters * 1024, minimum_free))
+
+
+UTILITY_BUILDERS = {"utilities.build_find": ("find", ("find", "kitten", "tnyprntf"))}
+
+
+def build_utility_disk(out, source, epoch, parent_revision, toolchain_identity, spec):
+    """Build the utilities data disk declared by config/m20/utility-disk.json."""
+    import importlib
+    from compose_image import compose_data, data_disk_spec
+    config = json.loads((ROOT / "config/m20/utility-disk.json").read_text(encoding="ascii"))
+    if config.get("schema_version") != 1 or config.get("milestone") != "M20":
+        raise ValueError("M20 utility disk configuration is malformed")
+    disk = config["disk"]
+    payloads, packages = {}, []
+    for item in config["packages"]:
+        builder = item["builder"]
+        if builder not in UTILITY_BUILDERS:
+            raise ValueError("unknown utility builder: " + builder)
+        output_name, inputs = UTILITY_BUILDERS[builder]
+        if tuple(item["source_locks"]) != inputs:
+            raise ValueError("utility source locks differ from the builder inputs: " + item["id"])
+        module = importlib.import_module(builder)
+        build_dir = out / "utility" / item["id"]
+        record = module.build({name: ROOT / "components" / name for name in inputs},
+                              build_dir, {name: source[name]["commit"] for name in inputs})
+        built = {}
+        for filename in item["files"]:
+            if filename in payloads:
+                raise ValueError("duplicate utility disk file: " + filename)
+            data = (build_dir / filename).read_bytes()
+            payloads[filename] = data
+            built[filename] = {"size_bytes": len(data), "sha256": sha256(data)}
+        package = dict(item)
+        package["built_files"] = built
+        package["build_records"] = record
+        package["source_identity"] = {
+            name: {key: source[name][key] for key in
+                   ("repository", "branch", "commit", "source_archive_sha256")}
+            for name in inputs}
+        packages.append(package)
+    notices = {}
+    for filename, relative in sorted(config["notices"].items()):
+        if filename in payloads:
+            raise ValueError("utility notice collides with a program: " + filename)
+        payloads[filename] = read_text_payload(relative)
+        notices[filename] = {"source": relative, "sha256": sha256(payloads[filename])}
+    if "README.TXT" in payloads:
+        raise ValueError("utility README collides with another file")
+    payloads["README.TXT"] = read_text_payload(config["readme"])
+    image = compose_data(payloads, out, epoch, disk["d88_disk_name"], disk["volume_label"])
+    report, files = inspect(image, data_disk_spec(disk["d88_disk_name"], disk["volume_label"]))
+    if files != payloads or not report["fat_copies_equal"]:
+        raise ValueError("independent utility disk readback differs from its payloads")
+    manifest = {
+        "schema_version": 1,
+        "milestone": "M20",
+        "parent_revision": parent_revision,
+        "toolchain_identity": toolchain_identity,
+        "disk": dict(disk, size_bytes=len(image), sha256=sha256(image),
+                     free_clusters=len(report["free_clusters"])),
+        "files": {name: {"size_bytes": len(data), "sha256": sha256(data)}
+                  for name, data in sorted(payloads.items())},
+        "notices": notices,
+        "packages": packages,
+        "guest_qualification": "NOT RUN BY make m20-disk",
+    }
+    (out / "utility-manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="ascii")
+    return {"size_bytes": len(image), "sha256": sha256(image)}
 
 
 if __name__ == "__main__":

@@ -17,3 +17,12 @@
 	path = components/jwasm
 	url = https://github.com/nakatamaho/JWasm.git
 	branch = m18-corresponding-source-notice
+[submodule "components/find"]
+	path = components/find
+	url = https://github.com/FDOS/find.git
+[submodule "components/kitten"]
+	path = components/kitten
+	url = https://github.com/FDOS/kitten.git
+[submodule "components/tnyprntf"]
+	path = components/tnyprntf
+	url = https://github.com/FDOS/tnyprntf.git

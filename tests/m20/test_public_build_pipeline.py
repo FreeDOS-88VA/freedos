@@ -24,7 +24,8 @@ class PublicBuildPipelineTests(unittest.TestCase):
     def make_export(self):
         for directory in ("tools/m20", "tests/m20", "config/m20", "manifests",
                           "components/fdkernel", "components/freecom", "components/country",
-                          "components/edlin", "components/jwasm"):
+                          "components/edlin", "components/jwasm", "components/find",
+                          "components/kitten", "components/tnyprntf"):
             (self.root / directory).mkdir(parents=True, exist_ok=True)
         shutil.copytree(ROOT / "tools/m20", self.root / "tools/m20", dirs_exist_ok=True,
                         ignore=shutil.ignore_patterns("__pycache__"))
@@ -133,7 +134,7 @@ class PublicBuildPipelineTests(unittest.TestCase):
     def test_fixed_source_bundle_is_deterministic_and_closed(self):
         inputs = self.root / "source-inputs"
         inputs.mkdir()
-        for name in ("parent", "fdkernel", "freecom", "country", "edlin", "jwasm"):
+        for name in ("parent",) + build_image.COMPONENTS:
             (inputs / (name + ".tar")).write_bytes((name + " source archive\n").encode())
         record = {
             "parent_revision": "1" * 40,
