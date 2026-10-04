@@ -317,6 +317,30 @@ VAEG (system disk A:, utilities disk B:): VA2/640 and VA/640 pass SORT
 B:), and MCB validity after the TSRs. System-disk regressions with the new
 MEMMAP: VA2/640 full workflow and VA2 512/640-retained reduced workflow pass.
 
+## Utilities disk: CHOICE and DELTREE from project forks
+
+The owner approved forks for programs that need source changes. Forks
+`nakatamaho/choice` and `nakatamaho/deltree` start at their FreeDOS 1.4
+cutoff commits (`fba7772`, `ed47278`) with one PC88VA-only commit each:
+
+- `aa63ef2`: CHOICE times `/T` with DOS function 2Ch (centiseconds, midnight
+  wrap) instead of the PC BIOS tick counter at `0040:006C`;
+- `ca8e912`: DELTREE reads its confirmation key with DOS 0Bh/07h instead of
+  INT 16h, keeping the typeahead rule.
+
+The utilities builder passes `-DPC88VA` for them. `tools/m20/pc_baseline.py`
+now also builds each forked utility without its PC88VA defines from the
+upstream base and from the pinned fork commit: both are byte-identical. A host
+test checks the fork bases against the cutoff rule.
+
+Local HOST: host tests passed; two identical builds; utilities D88
+`8ece7ea5168931912c865649b0dd3c67caf40b569406f42f2fb13d667831ee07` (system
+D88 unchanged); `make m20-accept` passed.
+
+VAEG VA2/640 and VA/640: CHOICE `/T:N,2` returns the default after the
+timeout (errorlevel 2) and a typed `Y` returns errorlevel 1; DELTREE `y`
+deletes a directory tree and `n` keeps it.
+
 ## Unrun gates
 
 Not yet run: 256/384 KiB and other RAM
