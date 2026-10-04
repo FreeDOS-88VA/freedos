@@ -116,8 +116,11 @@ Not proposed for the first set: class C (`edit`, `htmlhelp`) and all class X.
 
 ## Progress
 
-- `find`: built from FDOS `a6e245d` with pinned kitten/tnyprntf, on the M20
-  utilities disk; VAEG VA2/VA 640 KiB checks pass (see the M20 report).
+- On the utilities disk with VAEG VA2/VA 640 KiB checks: `find`, `sort`,
+  `xcopy`, `label`, `move` (8 KiB stack), `append`, `nlsfunc`, `devload`.
+- Deferred to component forks: `fc` (Open Watcom build does not return; PC
+  and VA), `choice` (`/T` uses the PC BIOS tick counter), `deltree` (INT 16h
+  prompt), `comp` (NASM 0.98 syntax).
 
 ## Open points
 

@@ -277,6 +277,46 @@ VAEG (VA2/640 and VA/640, system disk in A:, utilities disk in B:): `FIND`
 matching, `/C` count (8 `GNU` lines, equal to the host count), `/I`, and exit
 codes 1/0 for no match/match pass; both disks are otherwise unchanged.
 
+## Utilities disk: eight FreeDOS 1.4 programs
+
+Added `sort`, `xcopy`, `label`, `move`, `append`, `nlsfunc` and `devload`
+next to `find`, each pinned at its last upstream commit on or before the
+FreeDOS 1.4 release (2025-04-09), plus kitten `3b9947f` referenced by sort,
+label and move. `tools/m20/utilities/build_tools.py` reproduces each
+program's own Open Watcom or NASM settings (explicit `-0`, no UPX); host
+tests check the cutoff selection and each program's own kitten/tnyprntf
+submodule commits. No program needed a source change for the VA.
+
+Findings:
+
+- MOVE overflows the Open Watcom default 2 KiB stack (PC and VA); it is
+  built with `-k8192` (build setting only).
+- FC built with Open Watcom does not return when comparing files, on PC
+  (FreeDOS 1.4 kernel) as well as on the VA; FreeDOS 1.4 shipped a Borland
+  build. FC is deferred to a fork-based investigation.
+- CHOICE `/T` reads the PC BIOS tick counter at `0040:006C` (VA system
+  common area), DELTREE prompts through INT 16h, and COMP uses NASM 0.98
+  `equ word` syntax rejected by NASM 2.15; these need source changes in
+  component forks and are deferred.
+- A submodule-add mistake briefly left sort/xcopy/label/move/kitten at the
+  current upstream HEAD; the new cutoff host test caught it before any
+  published build.
+- MEMMAP rejected NLSFUNC's DOS-owned package block (owner `000Ah`,
+  `SC NLS P`, found in a VAEG guest memory dump). MEMMAP now treats owners
+  below `0040h` as reserved system owners; owners at or above `0040h`
+  without a PSP block are still rejected. This changes the system disk.
+
+Local HOST: host tests passed; two identical builds: system D88
+`35736d8ef4a7bbe6bf7b4c29d8612e4b7ddf80afea05d15032f5071aa373acb3`,
+utilities D88 `c4d2446aab00d9c7b0149606269bb00b1754b11885b5f93cf1f949aa4f08aed2`;
+`make m20-accept` passed.
+
+VAEG (system disk A:, utilities disk B:): VA2/640 and VA/640 pass SORT
+(line set and order), XCOPY into a subdirectory, MOVE rename, LABEL
+(`M20TEST`), DEVLOAD help, NLSFUNC (exit 0), APPEND (opens `KITTEN.LIC` from
+B:), and MCB validity after the TSRs. System-disk regressions with the new
+MEMMAP: VA2/640 full workflow and VA2 512/640-retained reduced workflow pass.
+
 ## Unrun gates
 
 Not yet run: 256/384 KiB and other RAM
