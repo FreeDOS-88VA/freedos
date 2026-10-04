@@ -341,6 +341,40 @@ VAEG VA2/640 and VA/640: CHOICE `/T:N,2` returns the default after the
 timeout (errorlevel 2) and a typed `Y` returns errorlevel 1; DELTREE `y`
 deletes a directory tree and `n` keeps it.
 
+## Utilities disk: COMP and FC from project forks
+
+- `nakatamaho/comp` `5269401` (base `ddb4e39`): NASM 0.98-only `equ word`
+  syntax removed. Built with its documented command by NASM 2.15, `COMP.COM`
+  is byte-identical to the FreeDOS 1.4 package binary (SHA-256 recorded in
+  the lock as `release_binary`; `pc_baseline.py` checks it for forks whose
+  upstream base cannot be built). `COMP.LIC` carries the MIT notice extracted
+  from the source.
+- `nakatamaho/fc` `543205a` (base `5591875`): FC's LFN calls test the carry
+  flag as zero/non-zero (Open Watcom reports 0/FFFFh) and also treat a
+  returned AX=7100h as failure.
+
+FC finding: the upstream Open Watcom build of FC loops forever on a DOS
+without LFN support. A probe program showed that **the FreeDOS 1.4 kernel
+built without FAT32 answers INT 21h AH=71h with AL=0 and the carry flag
+unchanged** (the `case 0x71` error return exists only under `WITHFAT32`).
+The PC-88VA kernel is built without FAT32, and the upstream PC kernel built
+with `XFAT=16` behaves identically, so this is the selected upstream
+behavior, not a VA defect, and the kernel stays unchanged. Open Watcom's
+`intdosx` clears the carry flag before the call, so FC took the unsupported
+call as success. FreeDOS 1.4 shipped a Borland FC; with no byte baseline,
+the lock records an explained `baseline_exemption`, and a host test keeps the
+fork diff limited to the LFN-failure tests. FC passes on PC with FAT32 and
+FAT16 FreeDOS 1.4 kernels.
+
+Local HOST: host tests passed; two identical builds; utilities D88
+`fe088486effc80d7201bc754c8e4c0c6d3721e4bbba68945de300f90c4f6feec` (system
+D88 unchanged); `make m20-accept` passed.
+
+VAEG VA2/640 and VA/640: FC text compare (no differences, exit 0;
+different, exit 1), FC `/B` (exit 1), COMP equal ("Files compare OK") and
+different files pass. Regressions of the other utilities and of
+CHOICE/DELTREE pass on VA2/640.
+
 ## Unrun gates
 
 Not yet run: 256/384 KiB and other RAM

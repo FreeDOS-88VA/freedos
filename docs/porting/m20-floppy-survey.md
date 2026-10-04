@@ -120,8 +120,9 @@ Not proposed for the first set: class C (`edit`, `htmlhelp`) and all class X.
   `xcopy`, `label`, `move` (8 KiB stack), `append`, `nlsfunc`, `devload`,
   and from project forks `choice` (DOS-clock `/T`) and `deltree` (DOS
   confirmation key).
-- Still deferred: `fc` (Open Watcom build does not return; PC and VA) and
-  `comp` (NASM 0.98 syntax).
+- From project forks with toolchain fixes: `comp` (NASM 2.x syntax;
+  reproduces the FreeDOS 1.4 binary) and `fc` (Open Watcom LFN-failure
+  detection on DOS without LFN support).
 
 ## Open points
 
