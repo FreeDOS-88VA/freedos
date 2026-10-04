@@ -388,16 +388,28 @@ CHOICE/DELTREE pass on VA2/640.
   `7e3f8360e50043927265d2ee33ab45ac645ac62129ce75a67f532da76b13e7dd`
   (system D88 unchanged).
 
-Not yet ported, each needing an owner decision:
+Owner decisions: pin `wpp` and port TREE; defer SHARE; create project
+repositories for REPLACE, EXE2BIN, SWSUBST and UNDELETE.
 
-- `tree` is C++ (`tree.cpp`, Windows/DOS shared source with Borland inline
-  assembly). The image contains Open Watcom 1.9 `wpp`, but the shared
-  toolchain lock pins only `wcc`, `wcl`, `wmake`, `wlink`, `wasm`, `wlib`.
-- `share` is a TSR with Turbo C and gcc-ia16 build paths only and works
-  with the kernel SHARE hooks, which the VA kernel routes through its own
-  FAR-call wrappers.
-- `replace`, `exe2bin`, `swsubst`, `undelete` have no FDOS Git repository;
-  component rules require their own repositories for source changes.
+- Shared toolchain lock: Open Watcom 1.9 `binl/wpp` (C++16 compiler) added
+  and verified like the other host tools.
+- `nakatamaho/tree` `29ba525` (base `f4e7e2e`, pdTree 1.03, public domain):
+  `w32fDOS/watcom/w32fDOS.cpp` translates the Borland asm DOS layer to
+  `intdosx` (AX=7100h after an LFN call counts as the carry Borland sets);
+  `__WATCOMC__` branches for the header name and `_getdrive()`; PC88VA builds
+  default to the ASCII tree (the VA character set has JIS X 0201 katakana
+  where code page 437 has box-drawing characters) and a fixed 80x25 console
+  instead of the PC BIOS data area. The Open Watcom build needs `-k32768`
+  (Borland small-model stacks use the rest of DGROUP; the 2 KiB default
+  overflows). The baseline check is now `platform-branches-only`: dropping
+  `__WATCOMC__`/PC88VA branches reproduces the upstream files and new files
+  may only be Open Watcom-only (also used for ATTRIB).
+- PC FAT32 and FAT16 FreeDOS 1.4 kernels and VAEG VA2/640, VA/640: TREE with
+  `/F`, default ASCII lines, volume label and serial number, whole disk.
+- Utilities D88 `28e09950df58883a66c1b231e1e75d2f76827d5b5372ef9a4deca6f2854da74a`
+  (system D88 unchanged).
+- SHARE: deferred (TSR, Turbo C/gcc-ia16 only, kernel SHARE hooks; little
+  use on a single-floppy system).
 
 ## Unrun gates
 

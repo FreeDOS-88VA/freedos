@@ -124,9 +124,11 @@ Not proposed for the first set: class C (`edit`, `htmlhelp`) and all class X.
   reproduces the FreeDOS 1.4 binary) and `fc` (Open Watcom LFN-failure
   detection on DOS without LFN support) and `attrib` (Open Watcom branches
   in a Borland/Turbo C program).
-- Pending owner decisions: `tree` (C++; `wpp` is not in the toolchain
-  lock), `share` (TSR, Turbo C/gcc-ia16 only), and `replace`, `exe2bin`,
-  `swsubst`, `undelete` (no FDOS Git repository).
+- `tree` from a project fork (Open Watcom DOS layer, C++ via the pinned
+  `wpp`; PC88VA ASCII/80x25 defaults).
+- `share`: deferred by owner decision.
+- `replace`, `exe2bin`, `swsubst`, `undelete`: project repositories to be
+  created from the FreeDOS 1.4 package sources (owner-approved).
 
 ## Open points
 
