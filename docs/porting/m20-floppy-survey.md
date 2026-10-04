@@ -122,7 +122,11 @@ Not proposed for the first set: class C (`edit`, `htmlhelp`) and all class X.
   confirmation key).
 - From project forks with toolchain fixes: `comp` (NASM 2.x syntax;
   reproduces the FreeDOS 1.4 binary) and `fc` (Open Watcom LFN-failure
-  detection on DOS without LFN support).
+  detection on DOS without LFN support) and `attrib` (Open Watcom branches
+  in a Borland/Turbo C program).
+- Pending owner decisions: `tree` (C++; `wpp` is not in the toolchain
+  lock), `share` (TSR, Turbo C/gcc-ia16 only), and `replace`, `exe2bin`,
+  `swsubst`, `undelete` (no FDOS Git repository).
 
 ## Open points
 

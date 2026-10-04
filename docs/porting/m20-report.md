@@ -375,6 +375,30 @@ different, exit 1), FC `/B` (exit 1), COMP equal ("Files compare OK") and
 different files pass. Regressions of the other utilities and of
 CHOICE/DELTREE pass on VA2/640.
 
+## Utilities disk: ATTRIB and the remaining Turbo C programs
+
+- `nakatamaho/attrib` `21f44cc` (base `f670ebb`): `__WATCOMC__` branches for
+  the exact header name `TYPES.H` and a `stpcpy()` replacement; the
+  Borland/Turbo C source is unchanged. FreeDOS 1.4 shipped a Borland build,
+  so the lock records a baseline exemption with a `watcom-branches-only`
+  host check (dropping the `__WATCOMC__` branches reproduces the upstream
+  file). PC (FreeDOS 1.4 kernel) and VAEG VA2/640, VA/640: set, clear and
+  list attributes, `/S` recursion, read-only file protected from `DEL`.
+- Utilities D88 with ATTRIB:
+  `7e3f8360e50043927265d2ee33ab45ac645ac62129ce75a67f532da76b13e7dd`
+  (system D88 unchanged).
+
+Not yet ported, each needing an owner decision:
+
+- `tree` is C++ (`tree.cpp`, Windows/DOS shared source with Borland inline
+  assembly). The image contains Open Watcom 1.9 `wpp`, but the shared
+  toolchain lock pins only `wcc`, `wcl`, `wmake`, `wlink`, `wasm`, `wlib`.
+- `share` is a TSR with Turbo C and gcc-ia16 build paths only and works
+  with the kernel SHARE hooks, which the VA kernel routes through its own
+  FAR-call wrappers.
+- `replace`, `exe2bin`, `swsubst`, `undelete` have no FDOS Git repository;
+  component rules require their own repositories for source changes.
+
 ## Unrun gates
 
 Not yet run: 256/384 KiB and other RAM
