@@ -60,6 +60,15 @@ TOOLS: dict[str, dict] = {
              "sources": ["tree.cpp", "stack.c", "w32fDOS/watcom/w32fDOS.cpp",
                          "w32fDOS/common/w32api.cpp"],
              "output": "TREE.EXE", "link": "tree.exe", "platform_defines": ["-DPC88VA"]},
+    # Project imports of FreeDOS 1.4 package sources (no FDOS Git repository)
+    # with Open Watcom branches; Borland small-model stacks use the rest of
+    # DGROUP, so REPLACE needs a larger stack than the 2 KiB default.
+    "replace": {"kind": "single-wcl", "directory": "SOURCE/REPLACE",
+                "options": ["-q", "-bt=DOS", "-ms", "-0", "-os", "-k8192"],
+                "sources": ["REPLACE.C"], "output": "REPLACE.EXE", "link": "replace.exe"},
+    "exe2bin": {"kind": "single-wcl", "directory": "SOURCE/EXE2BIN",
+                "options": ["-q", "-bt=DOS", "-mt", "-0", "-os", "-bcl=COM"],
+                "sources": ["EXE2BIN.C"], "output": "EXE2BIN.COM", "link": "exe2bin.com"},
     # Project forks: PC88VA builds select DOS replacements for PC BIOS use;
     # builds without the define equal the FreeDOS 1.4 source (checked by
     # tools/m20/pc_baseline.py).

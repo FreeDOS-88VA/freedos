@@ -344,6 +344,54 @@
       "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)",
       "baseline_exemption": "C++ Borland/Turbo C program; FreeDOS 1.4 shipped a Borland build, so no Open Watcom byte baseline exists. The fork adds an Open Watcom DOS layer (w32fDOS/watcom), __WATCOMC__ branches and PC88VA branches; dropping those branches reproduces the upstream sources (host test). Checked by guest runs on PC (FAT32 and FAT16 FreeDOS 1.4 kernels) and VAEG.",
       "baseline_check": "platform-branches-only"
+    },
+    {
+      "name": "replace",
+      "path": "components/replace",
+      "repository": "https://github.com/nakatamaho/replace.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/nakatamaho/replace.git",
+      "upstream_package": {
+        "url": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/base/replace.zip",
+        "zip_sha256": "968d11e2d9f303431b9c818b25bf527079a4952ebc1a03122defd6bf3b89f691",
+        "version": "1.2a",
+        "import_commit": "aa39e886742d9c417cd0382385a62b00dfe66a77"
+      },
+      "upstream_base_commit": "9ad75a707bb656ff1e21e8062bd1eda5b01ea4c9",
+      "commit": "bcc2e236de247bae0b15ab85112649187e4b959d",
+      "parents": [
+        "9ad75a707bb656ff1e21e8062bd1eda5b01ea4c9"
+      ],
+      "source_archive_sha256": "c4804e9e95868189851a7944a65889942f3ec641ce579bcca9043c629f08943e",
+      "license": "GPL-2.0",
+      "role": "utility disk: FreeDOS 1.4 REPLACE 1.2a ported to Open Watcom",
+      "selection": "project import of the FreeDOS 1.4 package source (no FDOS Git repository); upstream base is the import plus its provenance record",
+      "baseline_exemption": "Borland/Turbo C program without a Git repository; FreeDOS 1.4 shipped a Borland build, so no Open Watcom byte baseline exists. The project repository starts with a verbatim import of the FreeDOS 1.4 package source; the port only adds __WATCOMC__ branches and dropping them reproduces the import (host test). Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG.",
+      "baseline_check": "platform-branches-only"
+    },
+    {
+      "name": "exe2bin",
+      "path": "components/exe2bin",
+      "repository": "https://github.com/nakatamaho/exe2bin.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/nakatamaho/exe2bin.git",
+      "upstream_package": {
+        "url": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/base/exe2bin.zip",
+        "zip_sha256": "d7848a9bd26a717c88146e198b1dd173a6c9758221d72a5da2bd4c6c2151d511",
+        "version": "1.5a",
+        "import_commit": "b0dafed43db0fb9372dbe18a417a980e58f92417"
+      },
+      "upstream_base_commit": "92c836e94d2510957a8977f1dee60b8a04e1dd7a",
+      "commit": "c12e422e86ebee7955ca9826bfd55a7ddf715c0e",
+      "parents": [
+        "92c836e94d2510957a8977f1dee60b8a04e1dd7a"
+      ],
+      "source_archive_sha256": "b4169ff2387e5065ddc8cc6b68f02b320b2409064b1ed81468952e6a1659ce5c",
+      "license": "Sybase Open Watcom Public License 1.0",
+      "role": "utility disk: FreeDOS 1.4 EXE2BIN 1.5a ported to Open Watcom",
+      "selection": "project import of the FreeDOS 1.4 package source (no FDOS Git repository); upstream base is the import plus its provenance record",
+      "baseline_exemption": "Borland/Turbo C program without a Git repository; FreeDOS 1.4 shipped a Borland build, so no Open Watcom byte baseline exists. The project repository starts with a verbatim import of the FreeDOS 1.4 package source; the port only adds __WATCOMC__ branches and dropping them reproduces the import (host test). Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG.",
+      "baseline_check": "platform-branches-only"
     }
   ],
   "toolchain": {

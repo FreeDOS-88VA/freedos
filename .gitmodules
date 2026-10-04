@@ -68,3 +68,9 @@
 [submodule "components/tree"]
 	path = components/tree
 	url = https://github.com/nakatamaho/tree.git
+[submodule "components/replace"]
+	path = components/replace
+	url = https://github.com/nakatamaho/replace.git
+[submodule "components/exe2bin"]
+	path = components/exe2bin
+	url = https://github.com/nakatamaho/exe2bin.git

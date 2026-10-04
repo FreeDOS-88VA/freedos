@@ -16,7 +16,8 @@
       "from": "Copyright (c) 2003  Paul Vojta",
       "through": "THE USE OR OTHER DEALINGS IN THE SOFTWARE.",
       "strip_comment": ";"
-    }
+    },
+    "EXE2BIN.LIC": "components/exe2bin/DOC/EXE2BIN/LICENSE.TXT"
   },
   "packages": [
     {
@@ -315,6 +316,48 @@
       "tests": [
         "clean source build",
         "PC FreeDOS 1.4 FAT32/FAT16 kernel runs",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "replace",
+      "upstream": "FreeDOS 1.4 REPLACE 1.2a package source",
+      "files": [
+        "REPLACE.EXE"
+      ],
+      "source_locks": [
+        "replace"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0 (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; project repository nakatamaho/replace imports the FreeDOS 1.4 package source and adds Open Watcom branches",
+      "messages": "English",
+      "description": "Replace or add files.",
+      "tests": [
+        "clean source build",
+        "PC FreeDOS 1.4 kernel run",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "exe2bin",
+      "upstream": "FreeDOS 1.4 EXE2BIN 1.5a package source",
+      "files": [
+        "EXE2BIN.COM"
+      ],
+      "source_locks": [
+        "exe2bin"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "Sybase Open Watcom Public License 1.0 (EXE2BIN.LIC)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; project repository nakatamaho/exe2bin imports the FreeDOS 1.4 package source and adds Open Watcom branches",
+      "messages": "English",
+      "description": "Convert an MZ program to a binary or COM file.",
+      "tests": [
+        "clean source build",
+        "PC FreeDOS 1.4 kernel run",
         "VAEG guest check pending"
       ]
     }

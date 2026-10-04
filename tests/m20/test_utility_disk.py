@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -123,7 +124,7 @@ class UtilityDiskTests(unittest.TestCase):
     def test_baseline_exemptions_are_explained_and_narrow(self):
         lock = json.loads((ROOT / "manifests/m20-components.lock.json").read_text())
         exempt = {item["name"]: item for item in lock["components"] if item.get("baseline_exemption")}
-        self.assertEqual(set(exempt), {"fc", "attrib", "tree"})
+        self.assertEqual(set(exempt), {"fc", "attrib", "tree", "replace", "exe2bin"})
         for name, item in exempt.items():
             with self.subTest(component=name):
                 self.assertGreater(len(item["baseline_exemption"]), 80)
@@ -134,6 +135,33 @@ class UtilityDiskTests(unittest.TestCase):
                     self.check_platform_branches_only(item)
                 else:
                     self.fail("unknown baseline check: " + check)
+
+    @unittest.skipUnless(shutil.which("git") and (ROOT / "components/replace/.git").exists(),
+                         "host-only: requires component checkouts and git")
+    def test_package_imports_match_their_provenance_record(self):
+        lock = json.loads((ROOT / "manifests/m20-components.lock.json").read_text())
+        imports = [item for item in lock["components"] if item.get("upstream_package")]
+        self.assertEqual({item["name"] for item in imports}, {"replace", "exe2bin"})
+        for item in imports:
+            path, package = ROOT / item["path"], item["upstream_package"]
+            git = lambda *args: subprocess.run(["git", "-C", str(path), *args], check=True,
+                                               capture_output=True).stdout
+            with self.subTest(component=item["name"]):
+                self.assertEqual(git("rev-list", "--max-parents=0", item["commit"]).decode().split(),
+                                 [package["import_commit"]])
+                subprocess.run(["git", "-C", str(path), "merge-base", "--is-ancestor",
+                                item["upstream_base_commit"], item["commit"]], check=True)
+                provenance = git("show", item["upstream_base_commit"] + ":PROVENANCE.md").decode()
+                self.assertIn(package["url"], provenance)
+                self.assertIn(package["zip_sha256"], provenance)
+                rows = re.findall(r"^\| `([^`]+)` \| `([0-9a-f]{64})` \|$", provenance, re.M)
+                committed = [(name, digest) for name, digest in rows if "!" not in name and
+                             "not committed" not in name]
+                imported = git("ls-tree", "-r", "--name-only", package["import_commit"]).decode().split()
+                self.assertEqual(sorted(name for name, _ in committed), sorted(imported))
+                for name, digest in committed:
+                    data = git("show", package["import_commit"] + ":" + name)
+                    self.assertEqual(hashlib.sha256(data).hexdigest(), digest, name)
 
     def test_upstream_view_drops_only_platform_branches(self):
         fork = ["a", "#ifdef __WATCOMC__", "w", "#else", "b", "#endif",
