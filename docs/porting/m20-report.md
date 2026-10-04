@@ -102,7 +102,7 @@ qualified only on PC; it is a candidate for separate import, not baseline.
 6. Publish `docs/porting/m20-memory-layout.md` before the M20 layout differs
    from the M17 contract.
 
-## Kernel on the FreeDOS 1.4 baseline (local, not yet pushed)
+## Kernel on the FreeDOS 1.4 baseline
 
 Component branch `m20/pc88va` in `nakatamaho/fdkernel`, from `ke2043`:
 
@@ -148,8 +148,29 @@ selects the M20 lock and requires the kernel/FreeCOM pins to descend from
 identical disks from clean exports (D88 SHA-256
 `906504f733e3f8ca3a722708169415013518e30b13c89d7faa73dc64cf9e22b9`), with
 linked-placement verification, source/privacy audit and the acceptance
-instance inside the build. Not yet a published checkpoint: component and
-parent commits are local, so no native CI or fresh public rebuild has run.
+instance inside the build.
+
+**Published work checkpoint:** kernel branch `nakatamaho/fdkernel`
+`m20/pc88va` = `4cc954c1a759b036a554acb79e777825ba3a8c61` (pushed before the
+parent); parent `m20/freedos-1.4-base` =
+`4471245bc2a845efe9d0bab25a58768b8db128bb`, remote equal to local.
+
+- Fresh public rebuild: a new clone of that revision with submodules ran
+  `make m20-disk` and produced the same D88 SHA-256 `906504f7...`.
+- Native CI `M20 isolated native 2HD source build`, run `37171083835`,
+  attempt 1, head `4471245`: success (host suite, source audit, toolchain,
+  PC baseline identity `identical: true`, two complete builds, allocator QA
+  media, acceptance instance, clean checkouts). The runner produced the same
+  D88 SHA-256.
+- Scaffold validation on the same head: success.
+- Historical workflows M01-M09 also triggered on the new branch name and
+  failed. They are not M20 gates and are left unchanged: M03/M04/M04R1/M05
+  predecessor-scope checks (also failing on other new branches, e.g.
+  `experiment/m19-kswap-va`); M06/M07/M07R2-R6 M04R1 `COPYING` digest
+  (identical blob; the upstream `ke2043` `.gitattributes` `* text eol=crlf`,
+  which lpproj had disabled, gives CRLF in a fresh checkout); M01R1 expects
+  lpproj's form of the kernel date-macro line; M02 tracked-path check on an
+  M18 task document; M08/M09 drifted external Ubuntu package index.
 
 **VAEG (local candidate above, private evidence retained):**
 
@@ -166,7 +187,6 @@ retained test-script failure, not a guest result.
 
 ## Unrun gates
 
-Not yet run: FreeCOM rebase onto `com086`; push of component branches and the
-parent; native CI; fresh public clean rebuild; 256/384 KiB and other RAM
+Not yet run: FreeCOM rebase onto `com086`; 256/384 KiB and other RAM
 matrix entries; F5/F8 startup paths; PC regression beyond the scratch boot
 smoke test. Hardware: **NOT RUN**. No M20 distribution is designated.
