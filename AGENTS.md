@@ -11,12 +11,45 @@ component's own repository and branch, commit there, and then update the
 parent gitlink. Never vendor a submodule file as a copy in the parent.
 
 The `origin` remote for the kernel and FreeCOM components is the
-`nakatamaho` fork. Their `upstream` remote is the corresponding `lpproj`
-repository. Do not push directly to an upstream branch. Preserve provenance
-and exact source SHAs in the parent metadata.
+`nakatamaho` fork. From M20 onward, their `upstream` remote is the official
+FreeDOS repository (`https://github.com/FDOS/kernel` and
+`https://github.com/FDOS/freecom`), and the corresponding `lpproj`
+repository is the `lpproj` remote: a reference source of NEC PC-98 and DBCS
+patches, not the baseline. Through M19, `upstream` meant `lpproj`; that
+history, its pins and acceptance records remain unchanged. Do not push
+directly to an upstream or `lpproj` branch. Preserve provenance and exact
+source SHAs in the parent metadata.
+
+## M20 baseline: FreeDOS 1.4 release
+
+M20 restarts the port on the FreeDOS 1.4 release components:
+
+- kernel: `FDOS/kernel` tag `ke2043`, commit
+  `4f7bdda16a84c416a82a2616aa67335ca4f2bd74`;
+- shell: `FDOS/freecom` tag `com086`, commit
+  `f1b8f4f464eae5a70348b6d362484d733d45c427`.
+
+These are the components shipped in FreeDOS 1.4, which is also the PC
+comparison control. Create M20 component branches from these exact commits.
+Move to a newer upstream release only as a separate, recorded rebase step.
+
+Add PC-88VA support on top of that baseline in small, focused commits. Port
+M19 PC-88VA work and import `lpproj` NEC PC-98/DBCS commits selectively, one
+reviewed change at a time, by cherry-pick or an equivalent recorded
+backport. Record for every imported change its source repository, commit,
+classification (PC-88VA required, shared platform infrastructure needed by
+PC-88VA, PC-98 specific, or common fix) and reason. Do not merge a whole PC-98
+branch, and do not import a PC-98 specific change without a stated PC-88VA
+need. Keep a non-PC-88VA build of each component that behaves as the selected
+baseline, so that a defect can be attributed to the baseline, an imported
+PC-98 change or the VA adapter by build and bisection.
+
+The MS-DOS 4 COMMAND.COM work is outside the initial M20 scope; it will be
+integrated separately. The released M19 preview, stable M18 distribution and
+existing M19 branches remain unchanged.
 
 For the PC-88VA port, keep the selected upstream FreeDOS behavior as the DOS
-implementation baseline. MS-DOS references can inform API review but do not
+implementation baseline; for M20 this is the FreeDOS 1.4 baseline above. MS-DOS references can inform API review but do not
 require exact MS-DOS behavior or changes solely to match it. Do not repair an
 existing upstream FreeDOS bug as part of the port; record it when relevant and
 leave the upstream behavior intact. Fix defects introduced by the VA adapter,
@@ -137,8 +170,9 @@ packages, images, emulator tests, or hardware tests.
 M01 builds must run in the pinned Linux/amd64 container, never in a component
 submodule or a host bind-mounted source tree. The kernel, FreeCOM, and
 COUNTRY.SYS sources are exported with deterministic git archives. The two
-kernel/FreeCOM fork remotes remain `origin=https://github.com/nakatamaho/...`
-and `upstream=https://github.com/lpproj/...`; component source changes belong
+kernel/FreeCOM fork remotes for M01 were `origin=https://github.com/nakatamaho/...`
+and `upstream=https://github.com/lpproj/...` (M20 remote roles are defined
+above); component source changes belong
 in the component repository and branch before the parent gitlink is updated.
 The parent must preserve exact component, source-archive, contract, and
 toolchain identities.
@@ -268,6 +302,9 @@ conventional RAM and effective layout addresses from the runtime records.
 
 The active M17 memory contract is `docs/porting/m17-memory-layout.md`; its
 required gate is recorded in `docs/tasks/M17-storage-contracts-media-formats-goal-Codex.md`.
+M20 keeps applying it to ported VA layout code until M20 publishes its own
+`docs/porting/m20-memory-layout.md`; that document then becomes the active
+contract and must state every change from M17.
 Historical M13-M16 sizing instructions and capacity results remain history and
 do not override it. Writable capacity does not establish free-memory ownership
 or a safe lower bound. Keep the LOADSEG lower-bound policy explicit. Validate

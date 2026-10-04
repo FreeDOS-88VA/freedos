@@ -286,16 +286,25 @@ def verify_remotes(root: Path) -> None:
             raise VerificationError(f"origin URL mismatch in {path}: {origin}")
         if path == "components/country":
             continue
-        try:
-            upstream = run(root, "git", "-C", path, "remote", "get-url", "upstream").strip()
-        except VerificationError as exc:
-            raise VerificationError(f"missing upstream remote in {path}") from exc
-        expected_upstream = {
-            "components/fdkernel": "https://github.com/lpproj/fdkernel.git",
-            "components/freecom": "https://github.com/lpproj/freecom_dbcs2.git",
+        # From M20 upstream is the official FreeDOS repository and lpproj is
+        # the NEC PC-98/DBCS reference remote; through M19 upstream was lpproj.
+        expected_remotes = {
+            "components/fdkernel": {
+                "upstream": "https://github.com/FDOS/kernel.git",
+                "lpproj": "https://github.com/lpproj/fdkernel.git",
+            },
+            "components/freecom": {
+                "upstream": "https://github.com/FDOS/freecom.git",
+                "lpproj": "https://github.com/lpproj/freecom_dbcs2.git",
+            },
         }[path]
-        if upstream != expected_upstream:
-            raise VerificationError(f"upstream URL mismatch in {path}: {upstream}")
+        for name, expected_url in expected_remotes.items():
+            try:
+                url = run(root, "git", "-C", path, "remote", "get-url", name).strip()
+            except VerificationError as exc:
+                raise VerificationError(f"missing {name} remote in {path}") from exc
+            if url != expected_url:
+                raise VerificationError(f"{name} URL mismatch in {path}: {url}")
 
 
 def verify_tracked_safety(root: Path, tracked: list[str]) -> None:
