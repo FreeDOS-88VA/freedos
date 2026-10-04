@@ -5,6 +5,12 @@
 #define M20_MCB_NORMAL 0x4d
 #define M20_MCB_LAST   0x5a
 #define M20_MCB_SYSTEM_PSP 8
+/* Owner values below 0040h address the interrupt vector table and cannot
+   be PSP segments. DOS conventions use such values for system-owned
+   blocks (0008h DOS; NLSFUNC marks its package block 000Ah "SC NLS P").
+   They are reserved system owners, not missing PSPs. */
+#define M20_MCB_RESERVED_OWNER_LIMIT 0x0040U
+#define M20_MCB_SYSTEM_OWNER(owner) ((owner) != 0 && (owner) < M20_MCB_RESERVED_OWNER_LIMIT)
 #define M20_MCB_HEADER_BYTES 16UL
 #define M20_MCB_LIMIT_PARAGRAPHS 0x10000UL
 #define M20_MCB_MAX_OWNERS 128

@@ -93,7 +93,7 @@ static int print_entry(void *context, m20_u16 segment, m20_u8 type,
   end = start + (unsigned long)paragraphs * 16UL;
   if (owner == 0)
     classification = "FREE";
-  else if (owner == M20_MCB_SYSTEM_PSP)
+  else if (M20_MCB_SYSTEM_OWNER(owner))
     classification = "SYSTEM";
   else
     classification = "PSP";

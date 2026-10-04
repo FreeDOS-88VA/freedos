@@ -209,6 +209,28 @@ static int rejects_owner_limit(void)
                M20_MCB_TOO_MANY_OWNERS, "distinct-owner traversal is bounded");
 }
 
+static int accepts_reserved_system_owner(void)
+{
+  struct m20_mcb_summary s;
+  blank();
+  /* NLSFUNC marks its package block as DOS-owned: owner 000Ah "SC NLS P". */
+  put_mcb(0x1000, M20_MCB_NORMAL, 0x000A, 0x10, "SC NLS P");
+  put_mcb(0x1011, M20_MCB_LAST, 0, 0, "");
+  return check(m20_mcb_walk(0x1000, 0, read_header, NULL, NULL, &s) == M20_MCB_OK &&
+               s.system_payload_bytes == 0x100UL && s.allocated_payload_bytes == 0x100UL,
+               "reserved low owner is a system owner, not a missing PSP");
+}
+
+static int rejects_missing_psp_at_reserved_limit(void)
+{
+  struct m20_mcb_summary s;
+  blank();
+  put_mcb(0x1000, M20_MCB_NORMAL, M20_MCB_RESERVED_OWNER_LIMIT, 1, "ORPHAN");
+  put_mcb(0x1002, M20_MCB_LAST, 0, 0, "");
+  return check(m20_mcb_walk(0x1000, 0, read_header, NULL, NULL, &s) ==
+               M20_MCB_OWNER_MISSING, "owner at the reserved limit still needs a PSP");
+}
+
 int main(void)
 {
   if (!valid_chain() || !zero_sized_blocks() || !rejects_bad_type() ||
@@ -216,7 +238,8 @@ int main(void)
       !rejects_truncated_header() || !rejects_unterminated_chain() ||
       !rejects_missing_psp() || !rejects_missing_current_psp() ||
       !rejects_wrong_psp_owner() || !rejects_short_psp() ||
-      !rejects_owner_limit())
+      !rejects_owner_limit() || !accepts_reserved_system_owner() ||
+      !rejects_missing_psp_at_reserved_limit())
     return 1;
   puts("M20 MCB parser tests passed");
   return 0;

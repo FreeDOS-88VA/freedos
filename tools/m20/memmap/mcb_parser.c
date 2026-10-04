@@ -53,7 +53,7 @@ static enum m20_mcb_status collect_owners(
         reader, context, (m20_u16)segment, header, &owner, &paragraphs, &next);
     if (status != M20_MCB_OK)
       return status;
-    if (owner != 0 && owner != M20_MCB_SYSTEM_PSP) {
+    if (owner != 0 && !M20_MCB_SYSTEM_OWNER(owner)) {
       for (i = 0; i < nowners && owners[i].segment != owner; ++i)
         ;
       if (i == nowners) {
@@ -159,7 +159,7 @@ enum m20_mcb_status m20_mcb_walk(
         result.largest_free_bytes = payload_bytes;
     } else {
       result.allocated_payload_bytes += payload_bytes;
-      if (owner == M20_MCB_SYSTEM_PSP)
+      if (M20_MCB_SYSTEM_OWNER(owner))
         result.system_payload_bytes += payload_bytes;
       if (current_psp != 0 && owner == current_psp)
         result.own_payload_bytes += payload_bytes;
@@ -184,7 +184,7 @@ enum m20_mcb_status m20_mcb_walk(
   status = collect_owners(first_segment, reader, context, owners, &owner_count);
   if (status != M20_MCB_OK)
     return status;
-  if (current_psp != 0 && current_psp != M20_MCB_SYSTEM_PSP) {
+  if (current_psp != 0 && !M20_MCB_SYSTEM_OWNER(current_psp)) {
     m20_u16 i;
     for (i = 0; i < owner_count && owners[i].segment != current_psp; ++i)
       ;
