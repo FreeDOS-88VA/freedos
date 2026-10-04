@@ -22,10 +22,8 @@ class PublicBuildPipelineTests(unittest.TestCase):
         self.temp.cleanup()
 
     def make_export(self):
-        for directory in ("tools/m20", "tests/m20", "config/m20", "manifests",
-                          "components/fdkernel", "components/freecom", "components/country",
-                          "components/edlin", "components/jwasm", "components/find",
-                          "components/kitten", "components/tnyprntf"):
+        for directory in ("tools/m20", "tests/m20", "config/m20", "manifests") + tuple(
+                "components/" + name for name in build_image.COMPONENTS):
             (self.root / directory).mkdir(parents=True, exist_ok=True)
         shutil.copytree(ROOT / "tools/m20", self.root / "tools/m20", dirs_exist_ok=True,
                         ignore=shutil.ignore_patterns("__pycache__"))
