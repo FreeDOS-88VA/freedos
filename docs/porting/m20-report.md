@@ -484,11 +484,48 @@ Verification:
   which M20 does not ship); its records are retained and the corrected
   harness was rerun.
 
-DEBUG is next, by owner approval: a host JWasm built from the pinned JWasm
-source added to the toolchain lock, a `nakatamaho` fork of
-Baron-von-Riedesel/DOS-debug at `3d3655e` (last commit before the FreeDOS
-1.4 release), and PC-88VA replacements for its INT 10h/16h and BIOS data
-area use.
+## Archiver disk: DEBUG
+
+By owner approval:
+
+- `nakatamaho/DOS-debug` forks Baron-von-Riedesel/DOS-debug (FDOS/debug
+  stops at 1.18 in 2010; the FreeDOS 1.4 package is this DEBUG) at
+  `3d3655e`, the last commit before the FreeDOS 1.4 release (v2.50+1).
+  `d0f149d` names `LINEASM.INC` by its file name (case-sensitive host);
+  `95812fa` adds a `PC88VA` option that replaces the PC BIOS console use:
+  INT 29h output (with TAB expansion) and a read request sent directly to
+  the CON device driver (List of Lists + 0Ch) while DOS is busy and in the
+  help pager, a 25-row pager instead of the BIOS data area, a beep through
+  INT 29h and no video page query. The option is limited to the real-mode
+  DOS program (assembly error otherwise).
+- `pc_baseline.py` builds the fork without `PC88VA` and the upstream base
+  (with the recorded `baseline_aliases` lower-case include copy) and
+  requires equal bytes; both are `c4a6b987...`.
+- The shared toolchain lock records a derived host tool: JWasm built by
+  `make -f GccUnix.mak` from the pinned jwasm component inside the locked
+  image, with its binary hash. The builder builds and checks it before
+  assembling DEBUG as in its `MAKE.BAT`. `DEBUG.LIC` is Paul Vojta's MIT
+  notice extracted from the source; Japheth's extensions are public domain.
+
+Verification:
+
+- HOST: host tests, PC baseline gate (kernel, FreeCOM, CHOICE, DELTREE,
+  COMP and DEBUG), two identical clean builds and acceptance pass. System
+  and utilities D88 unchanged; archiver D88
+  `f17f7531cbfed9d9b34dca3a3020478860dbf89a1992061c7149b9e5901e2024`.
+- VAEG VA2/640, VA/640 and VA2/512 with the archiver D88: the help pager,
+  `R`, `A`, `D`, `U`, `N`/`RCX`/`W` (the written COM has the assembled
+  bytes and prints its message), `G` with exit code 5.
+- VAEG VA2/640 and VA/640, debugger entered while DOS is busy (an INT 28h
+  handler executing INT 3 during a console read): the `!-` prompt, `R`, `D`
+  and `E` read through the CON driver and echoed through INT 29h, `G`
+  returns to DOS, and the program ends normally.
+- Archiver checks rerun with this D88 on VA2/640, VA/640 and VA2/512 pass.
+- Retained failed runs: two harness errors (an off-by-one in the test
+  program's string address/length; one long script exceeding the driver's
+  wall-clock limit) and two archiver runs that exceeded the limit with four
+  emulators in parallel; DEBUG and the archivers behaved correctly in them,
+  and the corrected runs above pass.
 
 ## Unrun gates
 

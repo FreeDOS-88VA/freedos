@@ -112,7 +112,8 @@ the generated `survey.md`; the largest class-A items are `zip` and `unzip`.
    `share` after a build port to Open Watcom.
 3. **Archivers/tools disk:** `unzip`, `zip`, `gzip`, `debug`. UNZIP, ZIP
    and GZIP are on `freedos-PC88VA-M20-ARC.D88` (16-bit builds of the
-   unmodified package sources; 640 KiB required); DEBUG is pending.
+   unmodified package sources; 640 KiB required) and DEBUG (DOS-debug
+   fork with a PC88VA console option).
 
 Not proposed for the first set: class C (`edit`, `htmlhelp`) and all class X.
 
