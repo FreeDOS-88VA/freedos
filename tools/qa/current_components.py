@@ -17,6 +17,13 @@ M10_LOCK = Path("manifests/m10-components.lock.json")
 M17_LOCK = Path("manifests/m17-components.lock.json")
 M19_LOCK = Path("manifests/m19-components.lock.json")
 M19_START_SHA = "0c66cd8242cb2a751fa473a5704c606269ab28d0"
+M20_LOCK = Path("manifests/m20-components.lock.json")
+M20_START_SHA = "ba868e2e33447fe5fcb3a2bed0711464f7968d82"
+# M20 restarts on the FreeDOS 1.4 release: FDOS kernel ke2043, FreeCOM com086.
+M20_BASELINE = {
+    "fdkernel": "4f7bdda16a84c416a82a2616aa67335ca4f2bd74",
+    "freecom": "f1b8f4f464eae5a70348b6d362484d733d45c427",
+}
 CURRENT_SOURCE = Path("manifests/current-components.json")
 M16_LOCK = Path("manifests/m16-components.lock.json")
 HISTORICAL_LOCK = Path("manifests/components.lock.json")
@@ -178,6 +185,20 @@ def _select_current_lock(root: Path) -> tuple[Path, str | None]:
         if set(selector) != expected_fields or selector.get("kind") != "current-component-source":
             raise CurrentComponentError("current-component selector schema is invalid")
         source = selector.get("source")
+        if selector.get("milestone") == "M20":
+            if (type(selector.get("schema_version")) is not int or selector["schema_version"] != 1
+                    or not isinstance(source, dict)
+                    or set(source) != {"path", "schema_version", "sha256"}
+                    or source.get("path") != M20_LOCK.as_posix()
+                    or type(source.get("schema_version")) is not int
+                    or source["schema_version"] != 1
+                    or not isinstance(source.get("sha256"), str)
+                    or HEX64.fullmatch(source["sha256"]) is None):
+                raise CurrentComponentError("current-component selector does not identify the M20 lock")
+            lock_path = root / M20_LOCK
+            if lock_path.is_symlink() or not lock_path.is_file() or _sha256(lock_path) != source["sha256"]:
+                raise CurrentComponentError("selected M20 lock is missing or has digest drift")
+            return M20_LOCK, "M20"
         if selector.get("milestone") == "M19":
             if (type(selector.get("schema_version")) is not int or selector["schema_version"] != 1
                     or not isinstance(source, dict)
@@ -262,12 +283,62 @@ def _resolve_m19(root: Path) -> dict[str, str]:
     return current
 
 
+def _resolve_m20(root: Path) -> dict[str, str]:
+    """Bind the M20 lock to its start commit and to the FreeDOS 1.4 baseline.
+
+    M20 deliberately restarts the kernel and shell on the FreeDOS 1.4 release
+    instead of descending from the M17/M19 pins; country keeps its M19 pin.
+    """
+    _, lock = _load_json(root / M20_LOCK)
+    if (lock.get("schema_version") != 1 or lock.get("milestone") != "M20"
+            or lock.get("start_sha") != M20_START_SHA):
+        raise CurrentComponentError("M20 lock schema, milestone or start commit is invalid")
+    if _sha256(root / HISTORICAL_LOCK) != HISTORICAL_LOCK_SHA256:
+        raise CurrentComponentError("historical component lock identity changed")
+    by_name = {}
+    for item in lock.get("components", []):
+        if not isinstance(item, dict) or item.get("name") in by_name:
+            raise CurrentComponentError("M20 lock has an invalid or duplicate component")
+        by_name[item.get("name")] = item
+    policy = {
+        "country": "https://github.com/FDOS/country.git",
+        "fdkernel": "https://github.com/nakatamaho/fdkernel.git",
+        "freecom": "https://github.com/nakatamaho/freecom_dbcs2.git",
+    }
+    try:
+        ancestors = dict(M20_BASELINE)
+        ancestors["country"] = {item["name"]: item["commit"]
+                                for item in _load_json(root / M19_LOCK)[1]["components"]}["country"]
+    except (KeyError, TypeError) as exc:
+        raise CurrentComponentError("M19 predecessor lock is unreadable") from exc
+    current = {}
+    for name, repository in policy.items():
+        item = by_name.get(name)
+        commit = item.get("commit") if item else None
+        if (item is None or item.get("path") != "components/" + name
+                or item.get("repository") != repository
+                or not isinstance(commit, str) or HEX40.fullmatch(commit) is None
+                or not isinstance(item.get("source_archive_sha256"), str)
+                or HEX64.fullmatch(item["source_archive_sha256"]) is None):
+            raise CurrentComponentError(f"M20 component provenance is invalid: {name}")
+        result = subprocess.run(
+            ("git", "merge-base", "--is-ancestor", ancestors[name], commit),
+            cwd=root / "components" / name, check=False,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if result.returncode:
+            raise CurrentComponentError(f"M20 {name} does not descend from its baseline")
+        current["components/" + name] = commit
+    return current
+
+
 def resolve_current_components(root: Path, historical: dict[str, str]) -> dict[str, str]:
     """Return current gitlink expectations after validating the selected source."""
     root = root.resolve()
     if set(historical) != EXPECTED_PATHS:
         raise CurrentComponentError("historical component path set is invalid")
     selected_lock, milestone = _select_current_lock(root)
+    if milestone == "M20":
+        return _resolve_m20(root)
     if milestone == "M19":
         return _resolve_m19(root)
     if milestone is None and not (root / selected_lock).exists():

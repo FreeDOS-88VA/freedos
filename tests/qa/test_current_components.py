@@ -21,8 +21,8 @@ class CurrentComponentTests(unittest.TestCase):
 
     def test_selector_names_and_hash_binds_the_current_lock(self):
         lock_path, milestone = current_components._select_current_lock(ROOT)
-        self.assertEqual(lock_path, current_components.M19_LOCK)
-        self.assertEqual(milestone, 'M19')
+        self.assertEqual(lock_path, current_components.M20_LOCK)
+        self.assertEqual(milestone, 'M20')
         selector = current_components._load_canonical_json(ROOT / current_components.CURRENT_SOURCE)
         self.assertEqual(selector['source']['sha256'],
                          hashlib.sha256((ROOT / lock_path).read_bytes()).hexdigest())
@@ -120,8 +120,8 @@ class CurrentComponentTests(unittest.TestCase):
         historical = {item['path']: item['commit']
                       for item in historical_lock['components']}
         resolved = current_components.resolve_current_components(ROOT, historical)
-        m19 = json.loads((ROOT / current_components.M19_LOCK).read_text())
-        expected = {item['path']: item['commit'] for item in m19['components']
+        m20 = json.loads((ROOT / current_components.M20_LOCK).read_text())
+        expected = {item['path']: item['commit'] for item in m20['components']
                     if item['path'] in current_components.EXPECTED_PATHS}
         self.assertEqual(resolved, expected)
         for path, commit in resolved.items():
@@ -147,6 +147,39 @@ class CurrentComponentTests(unittest.TestCase):
                 (root / 'components' / name).symlink_to(ROOT / 'components' / name)
             with self.assertRaises(current_components.CurrentComponentError):
                 current_components._resolve_m19(root)
+
+    def test_m20_lock_binds_start_and_freedos_14_baseline(self):
+        import shutil
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name in ('manifests', 'components'):
+                (root / name).mkdir()
+            for name in ('components.lock.json', 'm19-components.lock.json'):
+                shutil.copyfile(ROOT / 'manifests' / name, root / 'manifests' / name)
+            for name in ('country', 'fdkernel', 'freecom'):
+                (root / 'components' / name).symlink_to(ROOT / 'components' / name)
+            original = json.loads((ROOT / current_components.M20_LOCK).read_text())
+            (root / current_components.M20_LOCK).write_text(json.dumps(original))
+            self.assertEqual(set(current_components._resolve_m20(root)),
+                             current_components.EXPECTED_PATHS)
+            # lpproj PC-98 history from 2015 does not descend from ke2043.
+            for mutation in ('start', 'not-baseline', 'repository', 'archive'):
+                lock = copy.deepcopy(original)
+                kernel = next(i for i in lock['components'] if i['name'] == 'fdkernel')
+                if mutation == 'start':
+                    lock['start_sha'] = current_components.M19_START_SHA
+                elif mutation == 'not-baseline':
+                    kernel['commit'] = 'b883d1373' + subprocess.run(
+                        ('git', 'rev-parse', 'b883d1373'), cwd=ROOT / 'components/fdkernel',
+                        check=True, capture_output=True, text=True).stdout.strip()[9:]
+                elif mutation == 'repository':
+                    kernel['repository'] = 'https://github.com/lpproj/fdkernel.git'
+                else:
+                    kernel['source_archive_sha256'] = 'bad'
+                (root / current_components.M20_LOCK).write_text(json.dumps(lock))
+                with self.subTest(mutation=mutation), self.assertRaises(
+                        current_components.CurrentComponentError):
+                    current_components._resolve_m20(root)
 
 
 if __name__ == '__main__':
