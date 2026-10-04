@@ -30,14 +30,14 @@
     },
     {
       "id": "freecom",
-      "version": "FreeCOM 0.87",
+      "version": "FreeCOM 0.86 (FreeDOS 1.4 release source)",
       "files": [
         "COMMAND.COM"
       ],
       "source_lock": "freecom",
       "license": "GPL-2.0-or-later",
       "cpu": "8086 real mode",
-      "va_adaptation": "Pinned NECPC88VA FreeCOM configuration, English build, fixed reproducible timestamp",
+      "va_adaptation": "FDOS com086 with the PC88VA target selector, VA console hooks and feature set; English build, fixed reproducible timestamp",
       "tests": [
         "clean source build",
         "matched VA/VA2 shell, file/edit/assembly/batch commands and input regression",

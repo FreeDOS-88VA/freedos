@@ -23,15 +23,16 @@
       "name": "freecom",
       "path": "components/freecom",
       "repository": "https://github.com/nakatamaho/freecom_dbcs2.git",
-      "branch": "topic/m19-pc88va-compact",
+      "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/freecom.git",
-      "commit": "62dfacb4a88ca0a2b5a2b9b9c2c8ad5f8c917699",
+      "commit": "18b692a2a8db6fb46dee1d64dbe0297d1d5ab530",
       "parents": [
-        "450d49b7a7756721b30afcfa8cb7cd75bde16de8"
+        "b16d8512112132010d57018d8f205c85f0ba9e63"
       ],
-      "source_archive_sha256": "035c2f5406429af2e0c4ec7fb1f4087e111cbe13bed2f45253ec72e003b05699",
+      "source_archive_sha256": "8cce77d7b7351d755bc2df8bc80140b7007026187c34031aaddace6211c0a7cd",
       "license": "GPL-2.0-or-later",
-      "interim": "M19 normal pin retained until the M20 FreeCOM branch on FDOS com086 (f1b8f4f464eae5a70348b6d362484d733d45c427) is ready"
+      "upstream_base_tag": "com086",
+      "upstream_base_commit": "f1b8f4f464eae5a70348b6d362484d733d45c427"
     },
     {
       "name": "country",

@@ -1,9 +1,10 @@
 PC-88VA FreeDOS M20 - English/ASCII basic system
 
 This disk is one native PC-88VA 2HD boot disk. It contains the FreeDOS kernel,
-the NECPC88VA FreeCOM shell, and a compact set of public DOS tools. It is not a
-complete FreeDOS distribution and does not include Japanese/NLS support, a
-protected-mode toolchain, XMS/EMS, or a hard-disk boot path.
+the FreeCOM 0.86 shell built for PC-88VA, and a compact set of public DOS
+tools. It is not a complete FreeDOS distribution and does not include
+Japanese/NLS support, a protected-mode toolchain, XMS/EMS, or a hard-disk
+boot path.
 
 Boot
 ----

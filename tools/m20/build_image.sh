@@ -59,7 +59,6 @@ line='CFLAGS2 = -DFREECOM_BUILD_DATE=\\"'+stamp['formatted_date']+'\\" -DFREECOM
 assert source.count('$(CFG):')==1
 Path('config.mak').write_text(source.replace('$(CFG):',line+'$(CFG):',1))
 PY
-gcc utilsc/critstrs.c -o utilsc/critstrs.exe
 bash build.sh pc88va no-xms-swap wc english
 # FreeCOM's own build patches a 6 KiB heap. The VA build has no XMS swap, so
 # every heap byte stays resident; ptchsize estimates its minimum at about
