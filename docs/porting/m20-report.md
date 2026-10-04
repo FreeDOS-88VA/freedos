@@ -234,8 +234,17 @@ before/after) reduced workflow passes; startup screen shows FreeCOM 0.86;
 `CLS` clears the console. The largest free block at 640 KiB is 359,312
 bytes, 160 bytes below the M19 FreeCOM.
 
+**Published:** FreeCOM branch `m20/pc88va` = `18b692a` pushed before the
+parent; parent `m20/freedos-1.4-base` = `2829bcb982dd1ee22e9f0f2e7af207dd024e6931`,
+remote equal to local. A fresh public clone of that revision rebuilt the same
+D88 (`e25abef6...`). Native CI run `37172655995`, attempt 1, exact head:
+success, including kernel `identical: true` and FreeCOM
+`freecom_identical_except_timestamps: true`, and the same D88 hash; scaffold
+validation success. Historical M01-M09 workflows fail on this branch for the
+reasons recorded above.
+
 ## Unrun gates
 
-Not yet run: publication of the FreeCOM step (push, CI, fresh rebuild); 256/384 KiB and other RAM
+Not yet run: 256/384 KiB and other RAM
 matrix entries; F5/F8 startup paths; PC regression beyond the scratch boot
 smoke test. Hardware: **NOT RUN**. No M20 distribution is designated.
