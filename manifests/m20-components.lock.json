@@ -298,15 +298,15 @@
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/fc.git",
       "upstream_base_commit": "5591875a7298a5dd17f342cebe6a500746ee674d",
-      "commit": "6c8b83e3a7fe11c48a196885e41ab85a6341a34b",
+      "commit": "543205af5aaa2a3e63c2a8e2133a613f785f70f7",
       "parents": [
-        "5591875a7298a5dd17f342cebe6a500746ee674d"
+        "6c8b83e3a7fe11c48a196885e41ab85a6341a34b"
       ],
-      "source_archive_sha256": "04e3e88874ff615a32061169d11d705cc7cdb9a1c17eadb1d3a5ead485a9e46c",
+      "source_archive_sha256": "7e546b6eb1b5f79500c7fa2e20b91b2d6836b70ce7e9ec57440fad4438677f78",
       "license": "GPL-2.0",
-      "role": "utility disk: FreeDOS 1.4 FC 3.03 with an Open Watcom carry-flag portability fix",
+      "role": "utility disk: FreeDOS 1.4 FC 3.03 with Open Watcom LFN-failure detection fixes",
       "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)",
-      "baseline_exemption": "Open Watcom portability fix affecting every Open Watcom build; the upstream Open Watcom build loops forever and FreeDOS 1.4 shipped a Borland build, so no byte baseline exists. Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG."
+      "baseline_exemption": "Open Watcom portability fixes affecting every Open Watcom build: carry flag tested as zero/non-zero and AX=7100h treated as LFN failure. The upstream Open Watcom build loops forever on a DOS without LFN support (FreeDOS 1.4 FAT16 kernels, including the PC-88VA kernel); FreeDOS 1.4 shipped a Borland build, so no byte baseline exists. Checked by guest runs on PC (FAT32 and FAT16 FreeDOS 1.4 kernels) and VAEG."
     }
   ],
   "toolchain": {

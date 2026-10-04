@@ -142,7 +142,7 @@
       "builder": "utilities.build_tools",
       "license": "GPL-2.0 (COPYING); kitten LGPL-2.1 (KITTEN.LIC); tnyprntf GPL-2.0 (COPYING)",
       "cpu": "8086 real mode",
-      "va_adaptation": "none; fork nakatamaho/fc fixes the Open Watcom carry-flag test (all Open Watcom builds)",
+      "va_adaptation": "none; fork nakatamaho/fc fixes Open Watcom LFN-failure detection (all Open Watcom builds)",
       "messages": "built-in English",
       "description": "Compare files.",
       "tests": [

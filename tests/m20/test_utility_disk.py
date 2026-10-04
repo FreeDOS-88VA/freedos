@@ -132,8 +132,15 @@ class UtilityDiskTests(unittest.TestCase):
         changed = [line for line in diff.splitlines()
                    if line[:1] in "+-" and not line.startswith(("+++", "---"))]
         self.assertTrue(changed)
+        comment = False
         for line in changed:
-            self.assertIn("r.x.cflag", line)
+            body = line[1:].strip()
+            if body.startswith("/*"):
+                comment = True
+            allowed = (comment or not body or "r.x.cflag" in body or "LFN_FAILED" in body)
+            if body.endswith("*/"):
+                comment = False
+            self.assertTrue(allowed, line)
 
 
 if __name__ == "__main__":
