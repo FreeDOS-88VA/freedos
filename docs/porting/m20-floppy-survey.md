@@ -127,8 +127,10 @@ Not proposed for the first set: class C (`edit`, `htmlhelp`) and all class X.
 - `tree` from a project fork (Open Watcom DOS layer, C++ via the pinned
   `wpp`; PC88VA ASCII/80x25 defaults).
 - `share`: deferred by owner decision.
-- `replace`, `exe2bin`, `swsubst`, `undelete`: project repositories to be
-  created from the FreeDOS 1.4 package sources (owner-approved).
+- `replace`, `exe2bin`: project repositories importing the FreeDOS 1.4
+  package sources, with Open Watcom branches; on the utilities disk.
+- `undelete` (512-byte sectors only) and `swsubst` (SUPPL/msglib and CDS
+  rewriting): repositories created and imported, port pending decision.
 
 ## Open points
 

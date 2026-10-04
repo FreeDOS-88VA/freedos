@@ -411,6 +411,39 @@ repositories for REPLACE, EXE2BIN, SWSUBST and UNDELETE.
 - SHARE: deferred (TSR, Turbo C/gcc-ia16 only, kernel SHARE hooks; little
   use on a single-floppy system).
 
+## Utilities disk: REPLACE and EXE2BIN from project package imports
+
+Owner-approved new repositories `nakatamaho/replace`, `nakatamaho/exe2bin`,
+`nakatamaho/swsubst` and `nakatamaho/undelete` start with verbatim imports
+of the FreeDOS 1.4 repository package sources (`SOURCE/`, `DOC/`, English
+LSM; binaries and translations not imported) and a `PROVENANCE.md` with the
+package URL, zip SHA-256 and member hashes. The EXE2BIN package metadata was
+updated after the release, but its source files date from 2006.
+
+- REPLACE `bcc2e23`: an `#elif __WATCOMC__` branch maps the Borland
+  `<dir.h>`/`<dos.h>` functions (find, disk free, file time, `_chmod`);
+  built with `-k8192` (stack, as for MOVE/TREE).
+- EXE2BIN `c12e422`: exact header names for Open Watcom; built as a COM
+  program like the FreeDOS 1.4 binary.
+- The lock records `upstream_package` (URL, zip hash, import commit); host
+  tests check the import against its provenance record and that dropping
+  the `__WATCOMC__` branches reproduces it. `EXE2BIN.LIC` carries the Sybase
+  Open Watcom Public License.
+- PC (FreeDOS 1.4 kernel) and VAEG VA2/640, VA/640: REPLACE replaces and,
+  with `/A`, adds files (`/U` checked on PC); EXE2BIN converts a JWasm-built
+  MZ to a COM that runs. Regressions of the other utilities pass on VA2/640.
+- Utilities D88 `c6f360f3381eed9970b273919d09b178b710bbc965ec0c1109dd679a9bb01b91`
+  (system D88 unchanged).
+
+Not ported, pending an owner decision:
+
+- UNDELETE assumes 512-byte sectors and stops with "not 512" on other media;
+  the PC-88VA disks use 1024-byte sectors. Supporting them would extend a
+  raw-sector FAT writer beyond its upstream behavior.
+- SWSUBST needs the SUPPL and msglib libraries and generated message files
+  (the `msgcomp` tool and its output are not in the package) and rewrites the
+  DOS CDS directly.
+
 ## Unrun gates
 
 Not yet run: 256/384 KiB and other RAM
