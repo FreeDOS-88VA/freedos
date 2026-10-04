@@ -1,7 +1,7 @@
 # M20 report: restart on the FreeDOS 1.4 release baseline
 
-Status: **IN PROGRESS — kernel restarted on FreeDOS 1.4 and booting on VAEG;
-FreeCOM still on its interim M19 pin.** No M20 distribution is designated.
+Status: **IN PROGRESS — kernel and FreeCOM restarted on the FreeDOS 1.4
+release sources and booting on VAEG.** No M20 distribution is designated.
 Hardware is **NOT RUN**.
 
 ## Decision
@@ -185,8 +185,57 @@ free block at 640 KiB: 359,472 bytes). A first 512 KiB run used `MORE` in an
 injected script; `MORE` consumed the following keystrokes, so that run is a
 retained test-script failure, not a guest result.
 
+## FreeCOM on the FreeDOS 1.4 baseline
+
+Component branch `m20/pc88va` in `nakatamaho/freecom_dbcs2`, from `com086`
+(FreeCOM 0.86 as shipped in FreeDOS 1.4):
+
+1. `876eaf8` — deterministic `FREECOM_BUILD_DATE`/`TIME` macros (project
+   `855281a`; defaults unchanged; lpproj `middle_version()` context dropped).
+2. `1d41828` — `build.sh pc88va` / `config.std` `-DPC88VA` selector, reduced
+   from lpproj's platform selector to the PC-88VA target only.
+3. `b16d851` — PC-88VA console hooks: cursor position/shape and `goxy()`
+   through the VA text BIOS INT 83h; DOS AH=06h key check; fixed 80x25;
+   no PC BIOS tick counter in `COPY`; `CLS` through INT 83h AH=02h
+   `ESC[2J ESC[H`.
+4. `18b692a2a8db6fb46dee1d64dbe0297d1d5ab530` — PC-88VA feature set
+   (project `450d49b` + `62dfacb`).
+
+Findings:
+
+- Plain `com086` builds with the pinned Linux Open Watcom 1.9 toolchain and
+  its own host tools; the post-0.86 upstream build changes are not needed.
+  The M20 recipe no longer compiles the M19-era `utilsc/critstrs.c`;
+  FreeCOM 0.86 `ptchsize` sets the 3 KiB heap.
+- Keyboard input needs no VA change: FreeCOM 0.86 already reads through
+  DOS AH=07h; only cursor, `CLS`, key status, screen size and the `COPY`
+  tick counter used PC BIOS services.
+- The M19 FreeCOM used lpproj's enhanced-input editor; M20 uses FreeCOM
+  0.86's own line editor with the VA cursor hooks. lpproj DBCS/NEC98 code is
+  not taken.
+- **M19 FreeCOM `CLS` did not clear the VA screen**: its form feed is
+  rejected by the VA kernel console and the lpproj generic branch did
+  nothing else. M20 clears through the VA text BIOS, as the project's
+  MS-DOS 4 COMMAND port does (VAEG screenshot checked).
+- Not imported: project `6cd372b` (malformed date input returns a syntax
+  error; an upstream FreeCOM behavior, recorded as an upstream defect
+  candidate) and `9cf57b2` (`MEM` alias; `MEMORY` is disabled on the VA).
+- **Gate:** `tools/m20/pc_baseline.py` now also builds `com086` and the M20
+  FreeCOM in the default configuration (Open Watcom, XMS swap, English):
+  `COMMAND.COM` is identical apart from the embedded build timestamp.
+
+Local HOST: `make m20-host-tests` passed; `make m20-disk` built two
+identical disks, D88 SHA-256
+`e25abef6df563dc418e04f4f7a766c112574812d39c507147df115ac95a7877d`.
+
+VAEG with this candidate (private evidence retained): VA2/640 and VA/640
+full workflow pass; VA2 installed 512 KiB with retained 640 KiB (unchanged
+before/after) reduced workflow passes; startup screen shows FreeCOM 0.86;
+`CLS` clears the console. The largest free block at 640 KiB is 359,312
+bytes, 160 bytes below the M19 FreeCOM.
+
 ## Unrun gates
 
-Not yet run: FreeCOM rebase onto `com086`; 256/384 KiB and other RAM
+Not yet run: publication of the FreeCOM step (push, CI, fresh rebuild); 256/384 KiB and other RAM
 matrix entries; F5/F8 startup paths; PC regression beyond the scratch boot
 smoke test. Hardware: **NOT RUN**. No M20 distribution is designated.

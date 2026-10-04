@@ -65,7 +65,7 @@ jobs:
           python3 -B tools/m20/verify_source_audit.py
       - name: Build or verify the pinned Linux/amd64 Open Watcom toolchain
         run: make m20-toolchain
-      - name: Require the non-PC-88VA kernel build to equal FreeDOS 1.4 (ke2043)
+      - name: Require non-PC-88VA kernel and FreeCOM builds to equal FreeDOS 1.4
         run: python3 -B tools/m20/pc_baseline.py
       - name: Build the complete disk twice and compose separate allocator QA media
         run: make m20-allocator-qa

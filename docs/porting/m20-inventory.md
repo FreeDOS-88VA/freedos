@@ -137,6 +137,14 @@ M19 normal pin `62dfacb` = `com086` + 79 non-merge commits:
    5 code and 5 test/CI commits) is common code qualified only on PC; it is
    a separate later import candidate.
 
+## Outcome so far
+
+Kernel: `d1e1ead` imported (adapted); VA work ported without lpproj shared
+changes; see `docs/porting/m20-report.md`. FreeCOM: the platform selector
+was reduced to a PC-88VA-only option instead of backporting `ab90394`;
+VA console hooks were written directly against FreeCOM 0.86, whose keyboard
+input is already DOS-based. No lpproj DBCS/NEC98 code was needed.
+
 ## Proposed first M20 steps
 
 1. Kernel branch at `ke2043`: build the unmodified non-VA (IBM PC) kernel
