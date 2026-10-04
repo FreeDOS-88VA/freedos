@@ -169,4 +169,4 @@ retained test-script failure, not a guest result.
 Not yet run: FreeCOM rebase onto `com086`; push of component branches and the
 parent; native CI; fresh public clean rebuild; 256/384 KiB and other RAM
 matrix entries; F5/F8 startup paths; PC regression beyond the scratch boot
-smoke test. Hardware: **NOT RUN**. No M20 distribution is designated. No M20 image exists. Hardware: **NOT RUN**.
+smoke test. Hardware: **NOT RUN**. No M20 distribution is designated.
