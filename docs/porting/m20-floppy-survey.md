@@ -114,6 +114,11 @@ the generated `survey.md`; the largest class-A items are `zip` and `unzip`.
 
 Not proposed for the first set: class C (`edit`, `htmlhelp`) and all class X.
 
+## Progress
+
+- `find`: built from FDOS `a6e245d` with pinned kitten/tnyprntf, on the M20
+  utilities disk; VAEG VA2/VA 640 KiB checks pass (see the M20 report).
+
 ## Open points
 
 - Exact Floppy Edition package versions versus current repository versions;

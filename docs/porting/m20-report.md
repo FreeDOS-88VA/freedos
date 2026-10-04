@@ -243,6 +243,40 @@ success, including kernel `identical: true` and FreeCOM
 validation success. Historical M01-M09 workflows fail on this branch for the
 reasons recorded above.
 
+## Floppy set: utilities disk with FIND
+
+Survey and selection: `docs/porting/m20-floppy-survey.md` (owner approved the
+proposed English 3-disk set and porting Turbo-C-only packages to Open
+Watcom; Open Watcom 1.9 remains the only compiler).
+
+First program, establishing the pipeline:
+
+- Components `find` (FDOS `a6e245d`, FreeDOS 1.4 FIND 3.0b), `kitten`
+  (`6265435`, LGPL-2.1) and `tnyprntf` (`450ab90`, GPL-2.0), pinned as parent
+  submodules. `git archive` omits find's nested submodules, so the libraries
+  are pinned separately and staged as `find/kitten` and `find/tnyprntf`; a
+  host test checks that the pins equal find's own submodule commits.
+- `tools/m20/utilities/build_find.py`: Open Watcom 1.9, find's Watcom options
+  plus explicit `-0` (8086), no UPX; `FIND.EXE` 13,430 bytes, built-in English
+  messages.
+- `config/m20/utility-disk.json`: non-bootable utilities disk for drive B:
+  (`freedos-PC88VA-M20-UTIL.D88`, label `M20-UTIL`) with `FIND.EXE`,
+  `README.TXT`, `COPYING` (GPL-2) and `KITTEN.LIC` (LGPL-2.1).
+- The build composes and reads back the disk, compares it across the two
+  clean builds, publishes it with `utility-manifest.json`, includes the new
+  component archives in the source bundle, and `verify_distribution` /
+  `verify_source_audit` check it. The component set is read from the lock
+  (`tools/m20/component_set.py`).
+
+Local HOST: host tests passed; `make m20-disk` built both disks twice with
+identical bytes (system D88 unchanged at `e25abef6...`; utilities D88
+`af74b6ae566630b750b3521c31450af8717a7504ff473a73251f962c72a8c107`);
+`make m20-accept` passed.
+
+VAEG (VA2/640 and VA/640, system disk in A:, utilities disk in B:): `FIND`
+matching, `/C` count (8 `GNU` lines, equal to the host count), `/I`, and exit
+codes 1/0 for no match/match pass; both disks are otherwise unchanged.
+
 ## Unrun gates
 
 Not yet run: 256/384 KiB and other RAM
