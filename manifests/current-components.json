@@ -1,10 +1,10 @@
 {
   "kind": "current-component-source",
-  "milestone": "M19",
+  "milestone": "M20",
   "schema_version": 1,
   "source": {
-    "path": "manifests/m19-components.lock.json",
+    "path": "manifests/m20-components.lock.json",
     "schema_version": 1,
-    "sha256": "36b7e0caefe9b2483afaec4ace65492f81c45ee11b3427e87eb52128c6001f7b"
+    "sha256": "07dbe5221579191f640d2f468fda4f4e441e8fe2c5879b4ab5669e49dd1214f3"
   }
 }

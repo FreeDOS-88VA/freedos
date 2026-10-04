@@ -1,0 +1,39 @@
+{
+  "bootstrap": {
+    "call_flags": 2,
+    "drive_context": 7,
+    "image_offset": 0,
+    "image_segment": 12288,
+    "loaded_bytes": 1024
+  },
+  "firmware_callback": "%macro PC88VA_FIRMWARE_READ_ONE 0\nmov ax, 1\nxor cx, cx\nretf\n%endmacro\n",
+  "layout": {
+    "cache": {
+      "bitmap_bytes": 256,
+      "fat_bytes": 2048,
+      "root_bytes": 6144
+    },
+    "disk": {
+      "heads": 2,
+      "sector_bytes": 1024,
+      "sectors_track": 8,
+      "total_sectors": 1280
+    },
+    "firmware_regions": [[0, 65536], [983040, 1048576]],
+    "profile_class": "synthetic_rom_free",
+    "regions": {
+      "stage2": [65536, 78848],
+      "loader_stack": [492512, 495584],
+      "scratch": [262144, 327664],
+      "kernel_file": [78848, 143344],
+      "kernel_allocation": [196608, 262128]
+    },
+    "schema_version": 1,
+    "stack": {
+      "pointer": 4080,
+      "reserve": 3072,
+      "segment": 30719
+    }
+  },
+  "schema_version": 1
+}

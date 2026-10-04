@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "purpose": "separate nonbooting data-only A: native-2HD/B: 360-KiB 2D-D88 mixed-floppy regression; never normal distribution",
+  "provenance": "Maintained M20-local public FAT12 fixture for the 40x2x9 512-byte FDD profile in the M16 accepted storage contract; source baseline d81bba18f0e4793d7165fb0acfdf7e229e160c83. No M16 tool/config runtime dependency or earlier acceptance claim.",
+  "geometry": {"bytes_per_sector": 512, "cylinders": 40, "heads": 2, "sectors_per_track": 9, "total_sectors": 720, "total_bytes": 368640},
+  "fat12": {"reserved_sectors": 1, "fat_count": 2, "sectors_per_fat": 2, "sectors_per_cluster": 2, "root_entries": 112, "media_descriptor": 253, "hidden_sectors": 0},
+  "volume_label": "M20MIXED",
+  "volume_serial": 1295060993
+}

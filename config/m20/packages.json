@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "milestone": "M20",
+  "disk_profile": "PC-88VA native 2HD: 80 cylinders, 2 heads, 8 sectors/track, 1024 bytes/sector, 1280 logical sectors, FAT12",
+  "cpu_contract": "Native boot path uses the documented VA/V30 profile; required DOS applications and examples target 8086 real mode and require no FPU, XMS, EMS, or protected mode.",
+  "compiler_runtime_source": {
+    "archive_url": "https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.9/open_watcom_1.9.0-src.tar.bz2",
+    "archive_sha256": "6d303327988ee2dda60cfabebf3f45a9758aee4da117d41cf3153fccb7e5e4bf",
+    "license": "Sybase Open Watcom Public License 1.0",
+    "source_location": "public upstream; not copied into the M20 project/component source bundle",
+    "binary_lock": "manifests/toolchains.lock.json canonical.open_watcom; independently hash-verified official final 1.9 Linux archive"
+  },
+  "packages": [
+    {
+      "id": "fdkernel",
+      "version": "FreeDOS kernel DOS 6.22 interface, revision 43, OEM ID FD (pinned source commit supplies the image)",
+      "files": [
+        "LOADER.BIN",
+        "KERNEL.SYS"
+      ],
+      "source_lock": "fdkernel",
+      "license": "GPL-2.0-or-later",
+      "cpu": "Native PC-88VA V30 boot adapter; common FreeDOS kernel application interface",
+      "va_adaptation": "Pinned fdkernel PC-88VA loader/kernel integration and M20 native 2HD profile",
+      "tests": [
+        "clean kernel/carrier build",
+        "linked-placement verifier",
+        "matched VA/VA2 guest boot on current normal candidate; full memory/media acceptance pending"
+      ]
+    },
+    {
+      "id": "freecom",
+      "version": "FreeCOM 0.87",
+      "files": [
+        "COMMAND.COM"
+      ],
+      "source_lock": "freecom",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 real mode",
+      "va_adaptation": "Pinned NECPC88VA FreeCOM configuration, English build, fixed reproducible timestamp",
+      "tests": [
+        "clean source build",
+        "matched VA/VA2 shell, file/edit/assembly/batch commands and input regression",
+        "source-generated B: media exchange and SYS boot checked separately"
+      ]
+    },
+    {
+      "id": "country",
+      "version": "COUNTRY.SYS 2.0",
+      "files": [
+        "COUNTRY.SYS"
+      ],
+      "source_lock": "country",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 data file",
+      "va_adaptation": "Unmodified pinned public COUNTRY.SYS source; Japanese/NLS support is out of scope",
+      "tests": [
+        "clean NASM build",
+        "DOS use not enabled in default configuration"
+      ]
+    },
+    {
+      "id": "edlin",
+      "version": "EDLIN 2.10c",
+      "files": [
+        "EDLIN.EXE"
+      ],
+      "source_lock": "edlin",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 DOS MZ",
+      "va_adaptation": "Pinned FreeDOS EDLIN source, English ASCII messages, Open Watcom large-model build; the upstream IBM INT16h keyboard path is guarded by disabled SHIFT_JIS",
+      "tests": [
+        "clean build",
+        "matched VA/VA2 512-KiB guest edit/save/reopen and byte-identical backup readback; 256-KiB editing is outside the owner's supported scope"
+      ]
+    },
+    {
+      "id": "more",
+      "version": "M20 project-authored DOS-service pager 1",
+      "files": [
+        "MORE.EXE"
+      ],
+      "source": "tools/m20/programs/more.c",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 DOS MZ",
+      "va_adaptation": "Original small pager uses DOS file I/O and DOS stdout; console keys via DOS AH=06h, or a raw CON handle when standard input is redirected or piped; no IBM BIOS access",
+      "tests": [
+        "clean build",
+        "matched VA/VA2 guest paging/help and subsequent valid shell memory check; broader input regression pending"
+      ]
+    },
+    {
+      "id": "maintenance",
+      "version": "M20 project-authored native 2HD maintenance 1",
+      "files": [
+        "CHKDSK.EXE",
+        "FORMAT.EXE",
+        "SYS.EXE"
+      ],
+      "source": "tools/m20/maintenance/",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 DOS MZ",
+      "va_adaptation": "Project-owned native 1024-byte-sector FAT12 maintenance for the 2HD profile in 80 or NEC-compatible 77 cylinders; CHKDSK is read-only; FORMAT formats every B: track through INT 80h AH=03h (mode 23h), verifies sectors and writes a fresh volume, or with /Q rewrites only metadata on a valid native BPB; SYS transfers selected native system files and boot code to B: while keeping B:'s BPB geometry and label; media binding uses the normal DOS media check (INT 21h AH=36h)",
+      "tests": [
+        "synthetic FAT/volume/FORMAT/SYS host fixtures for 80 and 77 cylinders",
+        "M20 VAEG VA/VA2: blank-disk FORMAT (80 and /T:77), CHKDSK, SYS, boot and write/readback of the SYS-output disks, redirected CHKDSK A: and SYS output to A:"
+      ]
+    },
+    {
+      "id": "memmap",
+      "version": "M20 MEMMAP 1",
+      "files": [
+        "MEMMAP.EXE"
+      ],
+      "source": "tools/m20/memmap/",
+      "license": "GPL-2.0-or-later",
+      "cpu": "8086 DOS MZ",
+      "va_adaptation": "FreeDOS-version/layout-checked AH=52h MCB-chain reader; MZ maximum allocation equals minimum at EXEC, while the OW 1.9 runtime may grow its own heaps; after priming stdout, the documented near/far heap-shrink APIs release only unused own heap tails before observation; no direct BIOS calls",
+      "tests": [
+        "synthetic bounded MCB and runtime trim/failure tests",
+        "matched VA/VA2 checked guest MCB reports and independent observer-only footprint comparison; physical/outside-arena view unavailable"
+      ]
+    },
+    {
+      "id": "jwasm",
+      "version": "JWasm 2.20 real-mode DOS16 build",
+      "files": [
+        "JWASMR.EXE",
+        "JWASM.LIC"
+      ],
+      "source_lock": "jwasm",
+      "license": "Sybase Open Watcom Public License 1.0",
+      "cpu": "8086 real-mode DOS MZ; no protected-mode extender",
+      "va_adaptation": "Pinned JWasm DOS16 source recipe, Open Watcom 1.9 build with optional host/COFF/ELF/386 features disabled; require the actual linked DOS software 8087 emulator for REAL4/REAL8 conversion without a coprocessor; reproducible M20 source/license notice",
+      "sample_workflow_qualified_installed_kib": 640,
+      "installed_512_kib_result": "DOS EXEC allocation failed on VA and VA2 for both sample formats; no executable output, preserved shell and MCB chain",
+      "tests": [
+        "clean build and MZ accounting",
+        "matched VA/VA2 640-KiB guest COM/MZ and syntax/missing-file recovery",
+        "matched VA/VA2 real REAL4 conversion and output execution with NDP8087 disabled",
+        "installed-512-KiB clean DOS allocation rejection; do not claim 512-KiB sample assembly or an arbitrary source-size guarantee"
+      ]
+    },
+    {
+      "id": "starter-material",
+      "version": "M20 original examples and quickstart 2",
+      "files": [
+        "README.TXT",
+        "QUICKSTR.TXT",
+        "HELLO.ASM",
+        "HELLO.DOC",
+        "MZDEMO.ASM",
+        "BUILD.BAT",
+        "COPYING"
+      ],
+      "source": "config/m20/payload/ and public component license files",
+      "license": "GPL-2.0-or-later; sample assembly text is project-authored",
+      "cpu": "ASCII DOS text and 8086 assembly examples",
+      "va_adaptation": "Original English/ASCII instructions, plain-text HELLO.DOC, and linker-free COM/MZ examples",
+      "tests": [
+        "8.3 names and source command inspection",
+        "matched VA/VA2 guest edit/build/run workflow",
+        "staged FAT workspace readback within committed reserve; no instantaneous disk peak claimed or required"
+      ]
+    }
+  ],
+  "optional_tools": {
+    "FIND": "omitted: not needed for the selected workflow",
+    "SORT": "omitted: not needed for the selected workflow",
+    "DISKCOPY": "omitted: separate disk-copy utility is not required",
+    "DISKCOMP": "omitted: separate disk-compare utility is not required",
+    "FC_COMP": "omitted: not needed for the selected workflow",
+    "MEM": "omitted: MEMMAP supplies the required checked MCB view",
+    "DEBUG": "omitted: debugger is not required and would broaden scope",
+    "XCOPY_MOVE_REPLACE_CHOICE": "omitted: outside the fixed compact payload",
+    "FULLSCREEN_EDIT": "omitted: EDLIN is the selected small line editor",
+    "JAPANESE_NLS_LFN": "omitted: later milestone scope"
+  }
+}

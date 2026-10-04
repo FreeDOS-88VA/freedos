@@ -173,6 +173,11 @@ help:
 		'  m19-disk          Build and compare two isolated M19 native 2HD disks' \
 		'  m19-accept        Verify the M19 distribution instance and source bindings' \
 		'  m19-clean         Remove only marked M19 intermediate build output' \
+		'  m20-toolchain     Prepare or verify the pinned M20 Linux/amd64 environment' \
+		'  m20-host-tests    Run the M20-local host test suite' \
+		'  m20-disk          Build and compare two isolated M20 native 2HD disks' \
+		'  m20-accept        Verify the M20 distribution instance and source bindings' \
+		'  m20-clean         Remove only marked M20 intermediate build output' \
 		'  help              Show this help' \
 		'  submodules        Initialize/update locked submodules' \
 		'  component-status  Show submodule status' \
@@ -599,3 +604,24 @@ m19-accept:
 	@PYTHONDONTWRITEBYTECODE=1 $(M19_PYTHON) -B tools/m19/verify_distribution.py --dist "$(M19_DIST)"
 m19-host-tests:
 	@M19_WHEEL_CACHE="$(M19_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M19_PYTHON) -B tools/m19/run_host_tests.py
+
+
+M20_PYTHON ?= python3
+M20_IMAGE ?= freedos-pc88va-m20:local
+M20_OUTPUT ?= build/m20
+M20_DIST ?= dist/m20
+M20_QA_OUTPUT ?= build/m20-allocator-qa
+M20_WHEEL_CACHE ?= $(CURDIR)/build/m20-wheel-cache
+.PHONY: m20-toolchain m20-disk m20-clean m20-host-tests m20-allocator-qa m20-accept
+m20-toolchain:
+	@PYTHONDONTWRITEBYTECODE=1 $(M20_PYTHON) -B tools/m20/toolchain.py --image "$(M20_IMAGE)"
+m20-allocator-qa: m20-disk
+	@PYTHONDONTWRITEBYTECODE=1 $(M20_PYTHON) -B tools/m20/build_allocator_qa.py --build "$(M20_OUTPUT)" --dist "$(M20_DIST)" --output "$(M20_QA_OUTPUT)" --image "$(M20_IMAGE)"
+m20-disk: m20-toolchain
+	@M20_WHEEL_CACHE="$(M20_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M20_PYTHON) -B tools/m20/build_image.py --output "$(M20_OUTPUT)" --dist "$(M20_DIST)" --image "$(M20_IMAGE)"
+m20-clean:
+	@PYTHONDONTWRITEBYTECODE=1 $(M20_PYTHON) -B tools/m20/clean.py --path "$(M20_OUTPUT)"
+m20-accept:
+	@PYTHONDONTWRITEBYTECODE=1 $(M20_PYTHON) -B tools/m20/verify_distribution.py --dist "$(M20_DIST)"
+m20-host-tests:
+	@M20_WHEEL_CACHE="$(M20_WHEEL_CACHE)" PYTHONDONTWRITEBYTECODE=1 $(M20_PYTHON) -B tools/m20/run_host_tests.py

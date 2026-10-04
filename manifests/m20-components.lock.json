@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "milestone": "M20",
+  "status": "M20 work-in-progress source pins on the FreeDOS 1.4 baseline",
+  "start_sha": "ba868e2e33447fe5fcb3a2bed0711464f7968d82",
+  "components": [
+    {
+      "name": "fdkernel",
+      "path": "components/fdkernel",
+      "repository": "https://github.com/nakatamaho/fdkernel.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/FDOS/kernel.git",
+      "commit": "4cc954c1a759b036a554acb79e777825ba3a8c61",
+      "parents": [
+        "551c8dac337aabf0b038478c66a784ecf37a4715"
+      ],
+      "source_archive_sha256": "63906156e7abfb7f8554be781ea5e853d85a54c302a73baa96c843bb017b3894",
+      "license": "GPL-2.0-or-later",
+      "upstream_base_tag": "ke2043",
+      "upstream_base_commit": "4f7bdda16a84c416a82a2616aa67335ca4f2bd74"
+    },
+    {
+      "name": "freecom",
+      "path": "components/freecom",
+      "repository": "https://github.com/nakatamaho/freecom_dbcs2.git",
+      "branch": "topic/m19-pc88va-compact",
+      "upstream_repository": "https://github.com/FDOS/freecom.git",
+      "commit": "62dfacb4a88ca0a2b5a2b9b9c2c8ad5f8c917699",
+      "parents": [
+        "450d49b7a7756721b30afcfa8cb7cd75bde16de8"
+      ],
+      "source_archive_sha256": "035c2f5406429af2e0c4ec7fb1f4087e111cbe13bed2f45253ec72e003b05699",
+      "license": "GPL-2.0-or-later",
+      "interim": "M19 normal pin retained until the M20 FreeCOM branch on FDOS com086 (f1b8f4f464eae5a70348b6d362484d733d45c427) is ready"
+    },
+    {
+      "name": "country",
+      "path": "components/country",
+      "repository": "https://github.com/FDOS/country.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/country.git",
+      "commit": "23f189cca3420606eae8723884fa92ccd65eb307",
+      "parents": [
+        "6aaf7e92ede373b4339c77ecaa57fe919b953ec9"
+      ],
+      "source_archive_sha256": "cf0b16ac57e661eeb7e19118cea2d2d200e4545507f15912e8a6462652c2cd9d",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "name": "edlin",
+      "path": "components/edlin",
+      "repository": "https://github.com/FDOS/edlin.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/edlin.git",
+      "commit": "c036c43adbdaa5693bb4cd3f4f3c65090f1c9d57",
+      "parents": [
+        "fec125a752ed82a19c7340da07e6db68aff3214a"
+      ],
+      "source_archive_sha256": "42865928e8d2c14b3970557892c53d18bd86603c857bbc587d33050f535b14ae",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "name": "jwasm",
+      "path": "components/jwasm",
+      "repository": "https://github.com/nakatamaho/JWasm.git",
+      "branch": "topic/m19-source-notice",
+      "upstream_repository": "https://github.com/Baron-von-Riedesel/JWasm.git",
+      "upstream_base_commit": "ac54827ff40b77ecd6e77ed0866a43fc60cd5fe1",
+      "commit": "c9b3a947f74d7355b1b3d8bd5728241c95ff4b19",
+      "parents": [
+        "96d1f3d4c1661c85788297d50ab032e452f48978"
+      ],
+      "source_archive_sha256": "5511d3666107009b58d94912ebdc6a0c4e8013aad4850fb15b087872071013bf",
+      "license": "Sybase Open Watcom Public License 1.0"
+    }
+  ],
+  "toolchain": {
+    "identity_lock": "manifests/toolchains.lock.json",
+    "open_watcom": "Open Watcom 1.9 Linux i386 host tools in the pinned Linux/amd64 container",
+    "cpu_target": "8086 real mode for required DOS applications; native VA boot remains V30-specific"
+  }
+}
