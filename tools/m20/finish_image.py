@@ -380,8 +380,10 @@ def main():
         json.dumps(package_manifest, indent=2, sort_keys=True) + "\n", encoding="ascii"
     )
 
-    utility = build_utility_disk(out, source, source_epoch, parent_revision,
-                                 toolchain_identity, spec)
+    from data_disks import DATA_DISKS
+    data_disks = {kind: build_utility_disk(out, source, source_epoch, parent_revision,
+                                           toolchain_identity, spec, kind)
+                  for kind in DATA_DISKS}
 
     artifacts = {
         path.relative_to(out).as_posix(): {
@@ -395,7 +397,9 @@ def main():
         json.dumps(artifacts, indent=2, sort_keys=True) + "\n", encoding="ascii"
     )
     print("M20 native 2HD D88: {} bytes, SHA-256 {}".format(len(d88), sha256(d88)))
-    print("M20 utilities D88: {} bytes, SHA-256 {}".format(utility["size_bytes"], utility["sha256"]))
+    for kind, record in data_disks.items():
+        print("M20 {} D88: {} bytes, SHA-256 {}".format(
+            DATA_DISKS[kind]["title"], record["size_bytes"], record["sha256"]))
     print("M20 capacity: {} free clusters ({} bytes), reserve floor {} clusters".format(
         free_clusters, free_clusters * 1024, minimum_free))
 
@@ -424,13 +428,16 @@ def utility_inputs(tool):
     return [tool] + ([spec["kitten"], "tnyprntf"] if spec.get("kitten") else [])
 
 
-def build_utility_disk(out, source, epoch, parent_revision, toolchain_identity, spec):
-    """Build the utilities data disk declared by config/m20/utility-disk.json."""
+def build_utility_disk(out, source, epoch, parent_revision, toolchain_identity, spec,
+                       kind="utility"):
+    """Build a data disk declared by its data_disks.DATA_DISKS configuration."""
     from compose_image import compose_data, data_disk_spec
+    from data_disks import DATA_DISKS
     from utilities.build_tools import TOOLS, build as build_tools
-    config = json.loads((ROOT / "config/m20/utility-disk.json").read_text(encoding="ascii"))
+    entry = DATA_DISKS[kind]
+    config = json.loads((ROOT / entry["config"]).read_text(encoding="ascii"))
     if config.get("schema_version") != 1 or config.get("milestone") != "M20":
-        raise ValueError("M20 utility disk configuration is malformed")
+        raise ValueError("M20 {} disk configuration is malformed".format(kind))
     disk = config["disk"]
     names = [item["id"] for item in config["packages"]]
     for item in config["packages"]:
@@ -440,7 +447,7 @@ def build_utility_disk(out, source, epoch, parent_revision, toolchain_identity, 
             raise ValueError("utility source locks differ from the builder inputs: " + item["id"])
         if item["files"] != [TOOLS[item["id"]]["output"]]:
             raise ValueError("utility file list differs from the builder output: " + item["id"])
-    build_dir = out / "utility"
+    build_dir = out / kind
     records = build_tools(ROOT / "components", build_dir, names,
                           {n: {c: source[c]["commit"] for c in utility_inputs(n)} for n in names})
     payloads, packages = {}, []
@@ -470,7 +477,8 @@ def build_utility_disk(out, source, epoch, parent_revision, toolchain_identity, 
     if "README.TXT" in payloads:
         raise ValueError("utility README collides with another file")
     payloads["README.TXT"] = read_text_payload(config["readme"])
-    image = compose_data(payloads, out, epoch, disk["d88_disk_name"], disk["volume_label"])
+    image = compose_data(payloads, out, epoch, disk["d88_disk_name"], disk["volume_label"],
+                         stem=entry["stem"])
     report, files = inspect(image, data_disk_spec(disk["d88_disk_name"], disk["volume_label"]))
     if files != payloads or not report["fat_copies_equal"]:
         raise ValueError("independent utility disk readback differs from its payloads")
@@ -487,7 +495,7 @@ def build_utility_disk(out, source, epoch, parent_revision, toolchain_identity, 
         "packages": packages,
         "guest_qualification": "NOT RUN BY make m20-disk",
     }
-    (out / "utility-manifest.json").write_text(
+    (out / (kind + "-manifest.json")).write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="ascii")
     return {"size_bytes": len(image), "sha256": sha256(image)}
 

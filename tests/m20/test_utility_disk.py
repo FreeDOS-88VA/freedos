@@ -31,7 +31,21 @@ class UtilityDiskTests(unittest.TestCase):
                 compose_data({"BIG.BIN": bytes(2 * 1024 * 1024)}, out, 1, "X", "Y", stem="big")
 
     def test_configuration_names_pinned_components_and_dos_names(self):
-        config = json.loads((ROOT / "config/m20/utility-disk.json").read_text())
+        from data_disks import DATA_DISKS
+        for kind, entry in DATA_DISKS.items():
+            with self.subTest(disk=kind):
+                self.check_configuration(json.loads((ROOT / entry["config"]).read_text()))
+
+    def test_data_disks_have_distinct_names_and_programs(self):
+        from data_disks import DATA_DISKS
+        configs = [json.loads((ROOT / entry["config"]).read_text()) for entry in DATA_DISKS.values()]
+        for key in ("filename", "d88_disk_name", "volume_label"):
+            values = [config["disk"][key] for config in configs]
+            self.assertEqual(len(values), len(set(values)), key)
+        programs = [package["id"] for config in configs for package in config["packages"]]
+        self.assertEqual(len(programs), len(set(programs)))
+
+    def check_configuration(self, config):
         names = set(locked_names())
         self.assertTrue(set(CORE) <= names)
         for package in config["packages"]:
@@ -124,7 +138,8 @@ class UtilityDiskTests(unittest.TestCase):
     def test_baseline_exemptions_are_explained_and_narrow(self):
         lock = json.loads((ROOT / "manifests/m20-components.lock.json").read_text())
         exempt = {item["name"]: item for item in lock["components"] if item.get("baseline_exemption")}
-        self.assertEqual(set(exempt), {"fc", "attrib", "tree", "replace", "exe2bin"})
+        self.assertEqual(set(exempt), {"fc", "attrib", "tree", "replace", "exe2bin",
+                                       "unzip", "zip", "gzip"})
         for name, item in exempt.items():
             with self.subTest(component=name):
                 self.assertGreater(len(item["baseline_exemption"]), 80)
@@ -133,6 +148,8 @@ class UtilityDiskTests(unittest.TestCase):
                     self.check_lfn_failure_only(item)
                 elif check == "platform-branches-only":
                     self.check_platform_branches_only(item)
+                elif check == "unmodified-import":
+                    self.check_unmodified_import(item)
                 else:
                     self.fail("unknown baseline check: " + check)
 
@@ -141,7 +158,8 @@ class UtilityDiskTests(unittest.TestCase):
     def test_package_imports_match_their_provenance_record(self):
         lock = json.loads((ROOT / "manifests/m20-components.lock.json").read_text())
         imports = [item for item in lock["components"] if item.get("upstream_package")]
-        self.assertEqual({item["name"] for item in imports}, {"replace", "exe2bin"})
+        self.assertEqual({item["name"] for item in imports},
+                         {"replace", "exe2bin", "unzip", "zip", "gzip"})
         for item in imports:
             path, package = ROOT / item["path"], item["upstream_package"]
             git = lambda *args: subprocess.run(["git", "-C", str(path), *args], check=True,
@@ -155,8 +173,10 @@ class UtilityDiskTests(unittest.TestCase):
                 self.assertIn(package["url"], provenance)
                 self.assertIn(package["zip_sha256"], provenance)
                 rows = re.findall(r"^\| `([^`]+)` \| `([0-9a-f]{64})` \|$", provenance, re.M)
-                committed = [(name, digest) for name, digest in rows if "!" not in name and
-                             "not committed" not in name]
+                # Members of an inner SOURCES.ZIP are committed beside it.
+                committed = [(str(Path(name.split("!")[0]).parent / name.split("!")[1])
+                              if "!" in name else name, digest)
+                             for name, digest in rows if "not committed" not in name]
                 imported = git("ls-tree", "-r", "--name-only", package["import_commit"]).decode().split()
                 self.assertEqual(sorted(name for name, _ in committed), sorted(imported))
                 for name, digest in committed:
@@ -171,6 +191,15 @@ class UtilityDiskTests(unittest.TestCase):
         self.assertEqual(upstream_view(fork),
                          ["a", "b", "#if defined X", "x", "#else", "y", "#endif",
                           "pc", "pc2", "#ifdef OTHER", "o", "#endif"])
+
+    def check_unmodified_import(self, item):
+        """The pinned source is the package import plus its provenance record."""
+        path, package = ROOT / item["path"], item["upstream_package"]
+        self.assertEqual(item["commit"], item["upstream_base_commit"])
+        status = subprocess.run(["git", "-C", str(path), "diff", "--name-status",
+                                 package["import_commit"], item["commit"]],
+                                check=True, capture_output=True, text=True).stdout.split("\n")
+        self.assertEqual([line for line in status if line], ["A\tPROVENANCE.md"])
 
     def check_lfn_failure_only(self, item):
         diff = subprocess.run(["git", "-C", str(ROOT / item["path"]), "diff", "-U0",

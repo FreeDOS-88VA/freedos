@@ -38,12 +38,14 @@ class PublicBuildPipelineTests(unittest.TestCase):
             (self.root / "components" / path.name).rmdir()
             (self.root / "components" / path.name).mkdir()
         # Utility-disk notice sources referenced by the configuration.
-        config = json.loads((ROOT / "config/m20/utility-disk.json").read_text())
-        for notice in config["notices"].values():
-            relative = notice if isinstance(notice, str) else notice["source"]
-            target = self.root / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text("synthetic notice\n")
+        from data_disks import DATA_DISKS
+        for entry in DATA_DISKS.values():
+            config = json.loads((ROOT / entry["config"]).read_text())
+            for notice in config["notices"].values():
+                relative = notice if isinstance(notice, str) else notice["source"]
+                target = self.root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("synthetic notice\n")
 
     def test_missing_utility_notice_source_is_rejected(self):
         (self.root / "components/kitten/LICENSE").unlink()

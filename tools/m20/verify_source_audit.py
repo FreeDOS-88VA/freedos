@@ -17,6 +17,27 @@ class AuditError(RuntimeError):
     pass
 
 
+def audit_data_disk(root, components, kind, utility):
+    """A data disk configuration names pinned components, DOS names and notices."""
+    if utility.get("milestone") != "M20" or not isinstance(utility.get("packages"), list):
+        raise AuditError("M20 " + kind + " disk configuration is malformed")
+    for item in utility["packages"]:
+        if not item.get("source_locks") or any(name not in components for name in item["source_locks"]):
+            raise AuditError("M20 " + kind + " package refers to an unpinned component")
+        for filename in item.get("files", []):
+            if not isinstance(filename, str) or not DOS_83.fullmatch(filename):
+                raise AuditError("M20 " + kind + " disk path is not uppercase DOS 8.3: " + str(filename))
+    for filename in list(utility.get("notices", {})) + ["README.TXT"]:
+        if not DOS_83.fullmatch(filename):
+            raise AuditError("M20 " + kind + " notice path is not uppercase DOS 8.3: " + filename)
+    for notice in utility.get("notices", {}).values():
+        relative = notice if isinstance(notice, str) else notice.get("source", "")
+        if not (root / relative).is_file():
+            raise AuditError("M20 " + kind + " notice source is missing: " + str(relative))
+    if not (root / utility["readme"]).read_bytes().isascii():
+        raise AuditError("M20 " + kind + " README is not ASCII")
+
+
 def verify(root: Path = DEFAULT_ROOT) -> None:
     root = root.resolve()
     for path in root.rglob("*"):
@@ -59,24 +80,10 @@ def verify(root: Path = DEFAULT_ROOT) -> None:
             if not isinstance(filename, str) or not DOS_83.fullmatch(filename):
                 raise AuditError("M20 disk path is not uppercase DOS 8.3: " + str(filename))
 
-    utility = json.loads((root / "config/m20/utility-disk.json").read_text(encoding="ascii"))
-    if utility.get("milestone") != "M20" or not isinstance(utility.get("packages"), list):
-        raise AuditError("M20 utility disk configuration is malformed")
-    for item in utility["packages"]:
-        if not item.get("source_locks") or any(name not in components for name in item["source_locks"]):
-            raise AuditError("M20 utility package refers to an unpinned component")
-        for filename in item.get("files", []):
-            if not isinstance(filename, str) or not DOS_83.fullmatch(filename):
-                raise AuditError("M20 utility disk path is not uppercase DOS 8.3: " + str(filename))
-    for filename in list(utility.get("notices", {})) + ["README.TXT"]:
-        if not DOS_83.fullmatch(filename):
-            raise AuditError("M20 utility notice path is not uppercase DOS 8.3: " + filename)
-    for notice in utility.get("notices", {}).values():
-        relative = notice if isinstance(notice, str) else notice.get("source", "")
-        if not (root / relative).is_file():
-            raise AuditError("M20 utility notice source is missing: " + str(relative))
-    if not (root / utility["readme"]).read_bytes().isascii():
-        raise AuditError("M20 utility README is not ASCII")
+    from data_disks import DATA_DISKS
+    for kind, entry in DATA_DISKS.items():
+        audit_data_disk(root, components, kind,
+                        json.loads((root / entry["config"]).read_text(encoding="ascii")))
 
     payload = root / "config/m20/payload"
     for path in payload.iterdir():

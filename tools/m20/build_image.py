@@ -350,7 +350,7 @@ def build_source_bundle_pinned(image_id: str, inputs: Path, output: Path,
         "mkdir -p /work/entry /work/result && "
         "tar -xf /input/parent.tar -C /work/entry "
         "tools/m20/build_image.py tools/m20/normalize_parent_archive.py "
-        "tools/m20/toolchain.py tools/m20/component_set.py "
+        "tools/m20/toolchain.py tools/m20/component_set.py tools/m20/data_disks.py "
         "manifests/m20-components.lock.json && "
         "python3 -B -c 'import json,sys; from pathlib import Path; "
         "sys.path.insert(0,\"/work/entry/tools/m20\"); "
@@ -458,10 +458,15 @@ def main() -> None:
     second_d88 = (output / "run-2/media.d88").read_bytes()
     if first_d88 != second_d88:
         raise ValueError("independent clean M20 builds produced different D88 bytes")
-    first_util = (output / "run-1/util.d88").read_bytes()
-    if first_util != (output / "run-2/util.d88").read_bytes():
-        raise ValueError("independent clean M20 builds produced different utility D88 bytes")
-    for relative in ("package-manifest.json", "capacity-budget.json", "utility-manifest.json"):
+    from data_disks import DATA_DISKS
+    first_data = {}
+    for kind, entry in DATA_DISKS.items():
+        image = (output / "run-1" / (entry["stem"] + ".d88")).read_bytes()
+        if image != (output / "run-2" / (entry["stem"] + ".d88")).read_bytes():
+            raise ValueError("independent clean M20 builds produced different {} D88 bytes".format(kind))
+        first_data[kind] = image
+    for relative in ["package-manifest.json", "capacity-budget.json"] + [
+            kind + "-manifest.json" for kind in DATA_DISKS]:
         if (output / "run-1" / relative).read_bytes() != (output / "run-2" / relative).read_bytes():
             raise ValueError("independent M20 build release records differ: " + relative)
     run_one_artifacts = json.loads((output / "run-1/artifacts.json").read_text(encoding="ascii"))
@@ -470,22 +475,25 @@ def main() -> None:
     for record in (run_one_artifacts.get("media.d88"), run_two_artifacts.get("media.d88")):
         if record != expected_d88:
             raise ValueError("M20 artifact records do not bind the clean-built D88")
-    expected_util = {"size_bytes": len(first_util), "sha256": sha256(first_util)}
-    for record in (run_one_artifacts.get("util.d88"), run_two_artifacts.get("util.d88")):
-        if record != expected_util:
-            raise ValueError("M20 artifact records do not bind the clean-built utility D88")
+    for kind, image in first_data.items():
+        expected = {"size_bytes": len(image), "sha256": sha256(image)}
+        name = DATA_DISKS[kind]["stem"] + ".d88"
+        for record in (run_one_artifacts.get(name), run_two_artifacts.get(name)):
+            if record != expected:
+                raise ValueError("M20 artifact records do not bind the clean-built {} D88".format(kind))
     comparison = {
         "schema_version": 1,
         "independent_clean_builds": 2,
         "media_d88_byte_identical": True,
         "media_d88_sha256": sha256(first_d88),
-        "utility_d88_byte_identical": True,
-        "utility_d88_sha256": sha256(first_util),
-        "release_utility_records_identical": True,
         "release_package_records_identical": True,
         "release_capacity_records_identical": True,
         "diagnostic_maps_are_not_part_of_the_distribution_reproducibility_claim": True,
     }
+    for kind, image in first_data.items():
+        comparison[kind + "_d88_byte_identical"] = True
+        comparison[kind + "_d88_sha256"] = sha256(image)
+        comparison["release_" + kind + "_records_identical"] = True
     (output / "two-build-comparison.json").write_text(
         json.dumps(comparison, indent=2, sort_keys=True) + "\n", encoding="ascii"
     )
@@ -511,10 +519,17 @@ def main() -> None:
         output / "freedos-PC88VA-M20-SOURCES.tar.xz", source_record, epoch)
     target_d88 = staging_dist / "freedos-PC88VA-M20-2HD.D88"
     target_d88.write_bytes(first_d88)
-    utility_config = json.loads((ROOT / "config/m20/utility-disk.json").read_text())
-    target_util = staging_dist / utility_config["disk"]["filename"]
-    target_util.write_bytes(first_util)
-    shutil.copy2(output / "run-1/utility-manifest.json", staging_dist / "utility-manifest.json")
+    data_records = {}
+    for kind, image in first_data.items():
+        disk_config = json.loads((ROOT / DATA_DISKS[kind]["config"]).read_text())
+        target = staging_dist / disk_config["disk"]["filename"]
+        target.write_bytes(image)
+        shutil.copy2(output / "run-1" / (kind + "-manifest.json"),
+                     staging_dist / (kind + "-manifest.json"))
+        data_records[kind + "_d88"] = {"filename": target.name, "size_bytes": len(image),
+                                       "sha256": sha256(image)}
+        data_records[kind + "_manifest_sha256"] = sha256(
+            (staging_dist / (kind + "-manifest.json")).read_bytes())
     shutil.copy2(output / "run-1/capacity-budget.json", staging_dist / "capacity-budget.json")
     shutil.copy2(output / "run-1/package-manifest.json", staging_dist / "package-manifest.json")
     shutil.copy2(output / "two-build-comparison.json", staging_dist / "two-build-comparison.json")
@@ -537,10 +552,7 @@ def main() -> None:
         "distribution_d88": {"filename": target_d88.name,
                              "size_bytes": len(first_d88),
                              "sha256": sha256(first_d88)},
-        "utility_d88": {"filename": target_util.name,
-                        "size_bytes": len(first_util),
-                        "sha256": sha256(first_util)},
-        "utility_manifest_sha256": sha256((staging_dist / "utility-manifest.json").read_bytes()),
+        **data_records,
         "source_bundle": bundle_record,
         "capacity_budget_sha256": sha256((staging_dist / "capacity-budget.json").read_bytes()),
         "package_manifest_sha256": sha256((staging_dist / "package-manifest.json").read_bytes()),
@@ -559,7 +571,9 @@ def main() -> None:
     else:
         staging_dist.replace(dist)
     print("M20 D88: {} bytes SHA-256 {}".format(len(first_d88), sha256(first_d88)))
-    print("M20 utilities D88: {} bytes SHA-256 {}".format(len(first_util), sha256(first_util)))
+    for kind, image in first_data.items():
+        print("M20 {} D88: {} bytes SHA-256 {}".format(
+            DATA_DISKS[kind]["title"], len(image), sha256(image)))
     print("M20 source bundle: {} bytes SHA-256 {}".format(
         bundle_record["size_bytes"], bundle_record["sha256"]))
     print("M20 public files: {}".format(dist))

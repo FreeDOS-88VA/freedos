@@ -26,8 +26,9 @@ BUILD_FIELDS = {
     "package_manifest_sha256", "parent_revision", "parent_start_sha",
     "schema_version", "source_archives_sha256", "source_bundle",
     "toolchain_identity", "two_build_comparison_sha256", "two_independent_clean_builds_equal",
-    "utility_d88", "utility_manifest_sha256",
 }
+from data_disks import DATA_DISKS, comparison_fields, manifest_fields
+BUILD_FIELDS |= manifest_fields()
 from component_set import locked_names
 COMPONENTS = set(locked_names(ROOT))
 
@@ -99,17 +100,18 @@ def check_manifest(manifest: dict, comparison: dict, budget: dict,
     fields(comparison, {"diagnostic_maps_are_not_part_of_the_distribution_reproducibility_claim",
                         "independent_clean_builds", "media_d88_byte_identical",
                         "media_d88_sha256", "release_capacity_records_identical",
-                        "release_package_records_identical", "release_utility_records_identical",
-                        "schema_version", "utility_d88_byte_identical", "utility_d88_sha256"},
+                        "release_package_records_identical",
+                        "schema_version"} | comparison_fields(),
            "two-build comparison")
     require(comparison["schema_version"] == 1 and comparison["independent_clean_builds"] == 2
             and comparison["media_d88_byte_identical"] is True
             and comparison["release_capacity_records_identical"] is True
             and comparison["release_package_records_identical"] is True
             and comparison["media_d88_sha256"] == manifest["distribution_d88"]["sha256"]
-            and comparison["utility_d88_byte_identical"] is True
-            and comparison["release_utility_records_identical"] is True
-            and comparison["utility_d88_sha256"] == manifest["utility_d88"]["sha256"],
+            and all(comparison[kind + "_d88_byte_identical"] is True
+                    and comparison["release_" + kind + "_records_identical"] is True
+                    and comparison[kind + "_d88_sha256"] == manifest[kind + "_d88"]["sha256"]
+                    for kind in DATA_DISKS),
             "two-build instance disagrees with distribution")
     fields(budget, {"container", "d88_and_fat_readback", "filesystem", "geometry",
                     "profile_id", "schema_version", "workspace_budget"}, "capacity budget")
@@ -167,53 +169,54 @@ def check_manifest(manifest: dict, comparison: dict, budget: dict,
                     "source archive payload digest differs: " + name)
 
 
-def check_utility(root: Path, distribution: Path, manifest: dict, source_lock: dict) -> None:
-    """Check the utilities data disk against its configuration and sources."""
-    config = json.loads((root / "config/m20/utility-disk.json").read_text())
-    record = manifest["utility_d88"]
-    fields(record, {"filename", "sha256", "size_bytes"}, "utility D88 record")
-    require(record["filename"] == config["disk"]["filename"], "utility disk filename differs")
+def check_utility(root: Path, distribution: Path, manifest: dict, source_lock: dict,
+                  kind: str = "utility") -> None:
+    """Check a data disk against its configuration and sources."""
+    config = json.loads((root / DATA_DISKS[kind]["config"]).read_text())
+    record = manifest[kind + "_d88"]
+    fields(record, {"filename", "sha256", "size_bytes"}, kind + " D88 record")
+    require(record["filename"] == config["disk"]["filename"], kind + " disk filename differs")
     image = bound_file(distribution, record["filename"], record["sha256"], record["size_bytes"])
-    utility = json.loads(bound_file(distribution, "utility-manifest.json",
-                                    manifest["utility_manifest_sha256"]))
+    utility = json.loads(bound_file(distribution, kind + "-manifest.json",
+                                    manifest[kind + "_manifest_sha256"]))
     fields(utility, {"disk", "files", "guest_qualification", "milestone", "notices", "packages",
-                     "parent_revision", "schema_version", "toolchain_identity"}, "utility manifest")
+                     "parent_revision", "schema_version", "toolchain_identity"}, kind + " manifest")
     require(utility["schema_version"] == 1 and utility["milestone"] == "M20" and
             utility["parent_revision"] == manifest["parent_revision"] and
             utility["toolchain_identity"] == manifest["toolchain_identity"] and
             utility["guest_qualification"] == "NOT RUN BY make m20-disk" and
             utility["disk"]["sha256"] == record["sha256"] and
             utility["disk"]["size_bytes"] == record["size_bytes"],
-            "utility manifest identity differs")
+            kind + " manifest identity differs")
     spec = json.loads((root / "config/m20/media.json").read_text())
     spec["d88"]["disk_name"] = config["disk"]["d88_disk_name"]
     spec["image"]["volume_label"] = config["disk"]["volume_label"]
     readback, files = inspect(image, spec)
-    require(readback["fat_copies_equal"], "utility D88 FAT copies differ")
+    require(readback["fat_copies_equal"], kind + " D88 FAT copies differ")
     require(set(files) == set(utility["files"]) and all(
         digest(files[n]) == utility["files"][n]["sha256"] and
         len(files[n]) == utility["files"][n]["size_bytes"] for n in files),
-        "utility disk files differ from their manifest")
+        kind + " disk files differ from their manifest")
     locked = {item["name"]: item for item in source_lock["components"]}
     declared = {"README.TXT"} | set(config["notices"])
-    require(set(utility["notices"]) == set(config["notices"]), "utility notices differ")
+    require(set(utility["notices"]) == set(config["notices"]), kind + " notices differ")
     require([p["id"] for p in utility["packages"]] == [p["id"] for p in config["packages"]],
-            "utility package records missing, unknown or reordered")
+            kind + " package records missing, unknown or reordered")
     for package, expected in zip(utility["packages"], config["packages"]):
         require(bool(package["license"]) and package["files"] == expected["files"] and
                 set(package["built_files"]) == set(expected["files"]) and
                 set(package["source_identity"]) == set(expected["source_locks"]),
-                "utility package record differs: " + package["id"])
+                kind + " package record differs: " + package["id"])
         for name in expected["source_locks"]:
             identity = package["source_identity"][name]
             require(name in locked and identity["commit"] == locked[name]["commit"] and
                     identity["source_archive_sha256"] == locked[name]["source_archive_sha256"],
-                    "utility package source identity differs: " + package["id"])
+                    kind + " package source identity differs: " + package["id"])
         for name in expected["files"]:
             require(name in files and package["built_files"][name]["sha256"] == digest(files[name]),
-                    "utility package file bytes differ: " + name)
+                    kind + " package file bytes differ: " + name)
             declared.add(name)
-    require(set(files) == declared, "utility package-to-media file topology differs")
+    require(set(files) == declared, kind + " package-to-media file topology differs")
 
 
 def verify(root: Path, distribution: Path) -> None:
@@ -244,8 +247,9 @@ def verify(root: Path, distribution: Path) -> None:
                    records["capacity-budget.json"], records["package-manifest.json"],
                    files, bundle, json.loads((root / "manifests/m20-components.lock.json").read_text()),
                    digest((root / "manifests/toolchains.lock.json").read_bytes()))
-    check_utility(root, distribution, manifest,
-                  json.loads((root / "manifests/m20-components.lock.json").read_text()))
+    for kind in DATA_DISKS:
+        check_utility(root, distribution, manifest,
+                      json.loads((root / "manifests/m20-components.lock.json").read_text()), kind)
     print("M20 public acceptance instance: PASS (no emulator or hardware claim)")
 
 

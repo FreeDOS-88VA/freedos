@@ -69,6 +69,39 @@ TOOLS: dict[str, dict] = {
     "exe2bin": {"kind": "single-wcl", "directory": "SOURCE/EXE2BIN",
                 "options": ["-q", "-bt=DOS", "-mt", "-0", "-os", "-bcl=COM"],
                 "sources": ["EXE2BIN.C"], "output": "EXE2BIN.COM", "link": "exe2bin.com"},
+    # Archivers from project imports of the FreeDOS 1.4 package sources,
+    # unmodified. FreeDOS 1.4 shipped 32-bit UNZIP/ZIP binaries; these are
+    # the 16-bit 8086 builds of the Info-ZIP msdos/makefile.wat settings
+    # (large model, assembler CRC/match) and of gzip's Borland makefile
+    # (compact model, DYN_ALLOC as tailor.h sets it for Turbo C; the
+    # TASM match.asm is replaced by the C code with NO_ASM).
+    "unzip": {"kind": "single-wcl", "directory": "SOURCE/UNZIP",
+              "assemble": [["-q", "-bt=DOS", "-ml", "-0", "-zq", "-fo=crc_i86.obj",
+                            "msdos/crc_i86.asm"]],
+              "options": ["-q", "-bt=DOS", "-ml", "-0", "-zt", "-zq", "-wx", "-s", "-oehiklrt",
+                          "-DASM_CRC", "-DMSDOS"],
+              "sources": ["unzip.c", "crc32.c", "crypt.c", "envargs.c", "explode.c",
+                          "extract.c", "fileio.c", "globals.c", "inflate.c", "list.c",
+                          "match.c", "process.c", "ttyio.c", "unreduce.c", "unshrink.c",
+                          "zipinfo.c", "msdos/msdos.c", "crc_i86.obj"],
+              "output": "UNZIP.EXE", "link": "unzip.exe"},
+    "zip": {"kind": "single-wcl", "directory": "SOURCE/ZIP",
+            "assemble": [["-q", "-bt=DOS", "-ml", "-0", "-zq", "-DDYN_ALLOC", "-DMEDIUM_MEM",
+                          "-fo=crc_i86.obj", "msdos/crc_i86.asm"],
+                         ["-q", "-bt=DOS", "-ml", "-0", "-zq", "-DDYN_ALLOC", "-DMEDIUM_MEM",
+                          "-fo=match.obj", "msdos/match.asm"]],
+            "options": ["-q", "-bt=DOS", "-ml", "-0", "-zt", "-zq", "-s", "-oehiklrt",
+                        "-DDYN_ALLOC", "-DASM_CRC", "-DASMV", "-DDOS", "-DMEDIUM_MEM"],
+            "sources": ["zip.c", "crypt.c", "ttyio.c", "zipfile.c", "zipup.c", "util.c",
+                        "fileio.c", "deflate.c", "trees.c", "globals.c", "crc32.c",
+                        "msdos/msdos.c", "crc_i86.obj", "match.obj"],
+            "output": "ZIP.EXE", "link": "zip.exe"},
+    "gzip": {"kind": "single-wcl", "directory": "SOURCE/GZIP",
+             "options": ["-q", "-bt=DOS", "-mc", "-0", "-os", "-DNO_ASM", "-DDYN_ALLOC"],
+             "sources": ["gzip.c", "zip.c", "deflate.c", "trees.c", "bits.c", "unzip.c",
+                         "inflate.c", "util.c", "crypt.c", "lzw.c", "unlzw.c", "unpack.c",
+                         "unlzh.c", "getopt.c", "msdos/tailor.c"],
+             "output": "GZIP.EXE", "link": "gzip.exe"},
     # Project forks: PC88VA builds select DOS replacements for PC BIOS use;
     # builds without the define equal the FreeDOS 1.4 source (checked by
     # tools/m20/pc_baseline.py).
@@ -149,7 +182,8 @@ def build_one(name: str, components: Path, output: Path, env: dict,
                      *spec.get("objects", ["tnyprntf.obj", "kitten.obj"])]]
     elif kind == "single-wcl":
         src = tree / spec["directory"]
-        commands = [["wcl", *spec["options"], *defines, "-fe=" + spec["link"], *spec["sources"]]]
+        commands = [["wasm", *arguments] for arguments in spec.get("assemble", [])]
+        commands.append(["wcl", *spec["options"], *defines, "-fe=" + spec["link"], *spec["sources"]])
     elif kind == "nasm":
         src = tree / spec["directory"]
         commands = [["nasm", *defines, *spec["command"]]]
@@ -157,7 +191,7 @@ def build_one(name: str, components: Path, output: Path, env: dict,
         raise ValueError("unknown build kind: " + kind)
     for command in commands:
         subprocess.run(command, cwd=src, env=env, check=True,
-                       stdout=subprocess.DEVNULL if command[0] == "wcl" else None)
+                       stdout=subprocess.DEVNULL if command[0] in ("wcl", "wasm") else None)
     record = check_program(src / spec["link"])
     record["commands"] = [" ".join(c) for c in commands]
     record["platform_defines"] = defines
@@ -172,9 +206,8 @@ def build(components: Path, output: Path, names: list[str], revisions: dict[str,
     if output.exists():
         raise FileExistsError("utility output directory must not already exist")
     watcom = Path(os.environ.get("WATCOM", ""))
-    if (not watcom.is_dir() or shutil.which("wcl") is None or shutil.which("wpp") is None
-            or shutil.which("nasm") is None):
-        raise RuntimeError("the pinned Open Watcom installation, wcl, wpp and nasm are required")
+    if not watcom.is_dir() or any(shutil.which(tool) is None for tool in ("wcl", "wpp", "wasm", "nasm")):
+        raise RuntimeError("the pinned Open Watcom installation, wcl, wpp, wasm and nasm are required")
     output.mkdir(parents=True)
     env = os.environ.copy()
     env["INCLUDE"] = str(watcom / "h")

@@ -392,6 +392,78 @@
       "selection": "project import of the FreeDOS 1.4 package source (no FDOS Git repository); upstream base is the import plus its provenance record",
       "baseline_exemption": "Borland/Turbo C program without a Git repository; FreeDOS 1.4 shipped a Borland build, so no Open Watcom byte baseline exists. The project repository starts with a verbatim import of the FreeDOS 1.4 package source; the port only adds __WATCOMC__ branches and dropping them reproduces the import (host test). Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG.",
       "baseline_check": "platform-branches-only"
+    },
+    {
+      "name": "unzip",
+      "path": "components/unzip",
+      "repository": "https://github.com/nakatamaho/unzip.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/nakatamaho/unzip.git",
+      "upstream_package": {
+        "url": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/archiver/unzip.zip",
+        "zip_sha256": "da3960cf77a30b02d182b9a1fdf6ac1ded331834ca60fb10810edcae084c3628",
+        "version": "6.00a",
+        "import_commit": "226f54818fce090fd91d1b24c242ddddc9bfee87"
+      },
+      "upstream_base_commit": "cae95c63b3dd1113ddb8003bd1c56c4956282a28",
+      "commit": "cae95c63b3dd1113ddb8003bd1c56c4956282a28",
+      "parents": [
+        "226f54818fce090fd91d1b24c242ddddc9bfee87"
+      ],
+      "source_archive_sha256": "177b8a1eeb0cad0c8c41e37299c2db1313d56d6579da4935f5649a32ddbbcc8e",
+      "license": "Info-ZIP license (version 2009-Jan-02)",
+      "role": "archiver disk: FreeDOS 1.4 UNZIP 6.00a built as a 16-bit 8086 program",
+      "selection": "project import of the FreeDOS 1.4 package source (no FDOS Git repository); built unmodified from the import plus its provenance record",
+      "baseline_exemption": "FreeDOS 1.4 shipped a different build of this program (32-bit DJGPP UNZIP, 32-bit UPX-packed ZIP, Borland GZIP), so no Open Watcom 16-bit byte baseline exists. The source is the unmodified FreeDOS 1.4 package import (host test); only the documented build settings differ. Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG.",
+      "baseline_check": "unmodified-import"
+    },
+    {
+      "name": "zip",
+      "path": "components/zip",
+      "repository": "https://github.com/nakatamaho/zip.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/nakatamaho/zip.git",
+      "upstream_package": {
+        "url": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/archiver/zip.zip",
+        "zip_sha256": "d5d313b1a2bb33432e9b8aed8628d84a5ec29f23db0cd1e9320197db3804f762",
+        "version": "3.0",
+        "import_commit": "c7a69fa7c3402f41697e8417c8188b18f4204430"
+      },
+      "upstream_base_commit": "1fdf656583b7823446dd3bdec96a1656adb25038",
+      "commit": "1fdf656583b7823446dd3bdec96a1656adb25038",
+      "parents": [
+        "c7a69fa7c3402f41697e8417c8188b18f4204430"
+      ],
+      "source_archive_sha256": "14f9b5d4f3a943d32a7adfcca9d1f08dcece51bbfcf3b9c4b4ee3572210ea52c",
+      "license": "Info-ZIP license (version 2007-Mar-4)",
+      "role": "archiver disk: FreeDOS 1.4 ZIP 3.0 built as a 16-bit 8086 program",
+      "selection": "project import of the FreeDOS 1.4 package source (no FDOS Git repository); built unmodified from the import plus its provenance record",
+      "baseline_exemption": "FreeDOS 1.4 shipped a different build of this program (32-bit DJGPP UNZIP, 32-bit UPX-packed ZIP, Borland GZIP), so no Open Watcom 16-bit byte baseline exists. The source is the unmodified FreeDOS 1.4 package import (host test); only the documented build settings differ. Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG.",
+      "baseline_check": "unmodified-import"
+    },
+    {
+      "name": "gzip",
+      "path": "components/gzip",
+      "repository": "https://github.com/nakatamaho/gzip.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/nakatamaho/gzip.git",
+      "upstream_package": {
+        "url": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/archiver/gzip.zip",
+        "zip_sha256": "d086eafc5bf021d6c7a96af7d9c33b34680fa24c293c3052791751329321e94f",
+        "version": "1.2.4a",
+        "import_commit": "e06b56485f217f43540f1cbd2668788df1747e75"
+      },
+      "upstream_base_commit": "cfae273770fd57b8903dce2aa4eb304afa62e7ed",
+      "commit": "cfae273770fd57b8903dce2aa4eb304afa62e7ed",
+      "parents": [
+        "e06b56485f217f43540f1cbd2668788df1747e75"
+      ],
+      "source_archive_sha256": "e15ddb28c4ad0467a98c789f215d31773ccd84102a728742d6eb729b8ad1f088",
+      "license": "GPL-2.0",
+      "role": "archiver disk: FreeDOS 1.4 GZIP 1.2.4a built as a 16-bit 8086 program",
+      "selection": "project import of the FreeDOS 1.4 package source (no FDOS Git repository); built unmodified from the import plus its provenance record",
+      "baseline_exemption": "FreeDOS 1.4 shipped a different build of this program (32-bit DJGPP UNZIP, 32-bit UPX-packed ZIP, Borland GZIP), so no Open Watcom 16-bit byte baseline exists. The source is the unmodified FreeDOS 1.4 package import (host test); only the documented build settings differ. Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG.",
+      "baseline_check": "unmodified-import"
     }
   ],
   "toolchain": {

@@ -74,3 +74,12 @@
 [submodule "components/exe2bin"]
 	path = components/exe2bin
 	url = https://github.com/nakatamaho/exe2bin.git
+[submodule "components/unzip"]
+	path = components/unzip
+	url = https://github.com/nakatamaho/unzip.git
+[submodule "components/zip"]
+	path = components/zip
+	url = https://github.com/nakatamaho/zip.git
+[submodule "components/gzip"]
+	path = components/gzip
+	url = https://github.com/nakatamaho/gzip.git

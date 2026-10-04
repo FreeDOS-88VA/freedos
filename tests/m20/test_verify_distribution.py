@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools/m20'))
 from verify_distribution import (BUILD_FIELDS, COMPONENTS, VerificationError,
                                  bound_file, check_manifest, check_utility, fields, verify)
 from compose_image import compose_data
+from data_disks import DATA_DISKS
 
 
 def sha(data):
@@ -46,16 +47,16 @@ def instances():
                     source_archives_sha256=archives, two_independent_clean_builds_equal=True,
                     toolchain_identity='sha256:' + sha(b'lock'),
                     distribution_d88={'sha256': 'e' * 64, 'size_bytes': 100},
-                    utility_d88={'sha256': 'd' * 64, 'size_bytes': 100},
-                    utility_manifest_sha256='d' * 64)
+                    **{k + '_d88': {'sha256': 'd' * 64, 'size_bytes': 100} for k in DATA_DISKS},
+                    **{k + '_manifest_sha256': 'd' * 64 for k in DATA_DISKS})
     comparison = dict(schema_version=1, independent_clean_builds=2,
                       media_d88_byte_identical=True,
                       release_capacity_records_identical=True,
                       release_package_records_identical=True,
                       media_d88_sha256='e' * 64,
-                      utility_d88_byte_identical=True,
-                      release_utility_records_identical=True,
-                      utility_d88_sha256='d' * 64,
+                      **{k + '_d88_byte_identical': True for k in DATA_DISKS},
+                      **{'release_' + k + '_records_identical': True for k in DATA_DISKS},
+                      **{k + '_d88_sha256': 'd' * 64 for k in DATA_DISKS},
                       diagnostic_maps_are_not_part_of_the_distribution_reproducibility_claim=True)
     files = {'TEST.TXT': b'hello', 'CONFIG.SYS': b'config'}
     budget = dict(schema_version=1, profile_id='synthetic', geometry={},
@@ -108,6 +109,9 @@ class DistributionInstanceTests(unittest.TestCase):
                               (1, lambda a: a.update(media_d88_sha256='f' * 64)),
                               (1, lambda a: a.update(utility_d88_sha256='f' * 64)),
                               (1, lambda a: a.pop('utility_d88_byte_identical')),
+                              (1, lambda a: a.update(archive_d88_sha256='f' * 64)),
+                              (1, lambda a: a.update(release_archive_records_identical=False)),
+                              (0, lambda a: a.pop('archive_manifest_sha256')),
                               (3, lambda a: a.update(parent_revision='f' * 40)),
                               (3, lambda a: a.update(toolchain_identity='sha256:' + 'f' * 64))):
             values = copy.deepcopy(baseline)

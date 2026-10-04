@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "milestone": "M20",
+  "disk": {
+    "filename": "freedos-PC88VA-M20-ARC.D88",
+    "d88_disk_name": "FDOS-PC88VA-ARC",
+    "volume_label": "M20-ARC",
+    "role": "data disk for drive B:; not bootable"
+  },
+  "readme": "config/m20/archive/README.TXT",
+  "notices": {
+    "COPYING": "COPYING",
+    "UNZIP.LIC": "components/unzip/DOC/UNZIP/LICENSE",
+    "ZIP.LIC": "components/zip/DOC/ZIP/LICENSE"
+  },
+  "packages": [
+    {
+      "id": "unzip",
+      "upstream": "FreeDOS 1.4 UNZIP 6.00a package source",
+      "files": [
+        "UNZIP.EXE"
+      ],
+      "source_locks": [
+        "unzip"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "Info-ZIP license (UNZIP.LIC)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; project repository nakatamaho/unzip imports the FreeDOS 1.4 package source unmodified",
+      "messages": "English",
+      "description": "Extract, list and test ZIP archives.",
+      "tests": [
+        "clean source build",
+        "PC FreeDOS 1.4 kernel run",
+        "VAEG guest run"
+      ]
+    },
+    {
+      "id": "zip",
+      "upstream": "FreeDOS 1.4 ZIP 3.0 package source",
+      "files": [
+        "ZIP.EXE"
+      ],
+      "source_locks": [
+        "zip"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "Info-ZIP license (ZIP.LIC)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; project repository nakatamaho/zip imports the FreeDOS 1.4 package source unmodified",
+      "messages": "English",
+      "description": "Create and update ZIP archives.",
+      "tests": [
+        "clean source build",
+        "PC FreeDOS 1.4 kernel run",
+        "VAEG guest run"
+      ]
+    },
+    {
+      "id": "gzip",
+      "upstream": "FreeDOS 1.4 GZIP 1.2.4a package source",
+      "files": [
+        "GZIP.EXE"
+      ],
+      "source_locks": [
+        "gzip"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0 (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; project repository nakatamaho/gzip imports the FreeDOS 1.4 package source unmodified",
+      "messages": "English",
+      "description": "Compress and decompress gzip files.",
+      "tests": [
+        "clean source build",
+        "PC FreeDOS 1.4 kernel run",
+        "VAEG guest run"
+      ]
+    }
+  ]
+}
