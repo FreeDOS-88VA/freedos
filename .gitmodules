@@ -62,3 +62,6 @@
 [submodule "components/fc"]
 	path = components/fc
 	url = https://github.com/nakatamaho/fc.git
+[submodule "components/attrib"]
+	path = components/attrib
+	url = https://github.com/nakatamaho/attrib.git

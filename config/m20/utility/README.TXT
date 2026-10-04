@@ -18,12 +18,13 @@ DEVLOAD.COM  Load device drivers from the command line.
 CHOICE.EXE   Wait for a key choice in batch files.
 DELTREE.COM  Delete a directory tree.
 COMP.COM     Compare two files byte by byte.
+ATTRIB.COM   Display or change file attributes.
 
 Every program is built from its pinned public FreeDOS source (as of the
 FreeDOS 1.4 release) with Open Watcom 1.9 or NASM for 8086 real mode;
 messages are English. CHOICE and DELTREE use small PC-88VA-only changes
-that replace PC BIOS services with DOS ones; FC and COMP carry small
-fixes for the Open Watcom and NASM toolchains. The corresponding source of
+that replace PC BIOS services with DOS ones; FC, COMP and ATTRIB carry
+small fixes for the Open Watcom and NASM toolchains. The corresponding source of
 every program is in the separate host-side M20 source bundle.
 
 Licenses

@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 import json
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -121,10 +122,20 @@ class UtilityDiskTests(unittest.TestCase):
                          "host-only: requires component checkouts and git")
     def test_baseline_exemptions_are_explained_and_narrow(self):
         lock = json.loads((ROOT / "manifests/m20-components.lock.json").read_text())
-        exempt = [item for item in lock["components"] if item.get("baseline_exemption")]
-        self.assertEqual([item["name"] for item in exempt], ["fc"])
-        item = exempt[0]
-        self.assertGreater(len(item["baseline_exemption"]), 80)
+        exempt = {item["name"]: item for item in lock["components"] if item.get("baseline_exemption")}
+        self.assertEqual(set(exempt), {"fc", "attrib"})
+        for name, item in exempt.items():
+            with self.subTest(component=name):
+                self.assertGreater(len(item["baseline_exemption"]), 80)
+                check = item["baseline_check"]
+                if check == "lfn-failure-tests-only":
+                    self.check_lfn_failure_only(item)
+                elif check == "watcom-branches-only":
+                    self.check_watcom_branches_only(item)
+                else:
+                    self.fail("unknown baseline check: " + check)
+
+    def check_lfn_failure_only(self, item):
         diff = subprocess.run(["git", "-C", str(ROOT / item["path"]), "diff", "-U0",
                                item["upstream_base_commit"], item["commit"]],
                               check=True, capture_output=True, text=True,
@@ -142,6 +153,33 @@ class UtilityDiskTests(unittest.TestCase):
                 comment = False
             self.assertTrue(allowed, line)
 
+    def check_watcom_branches_only(self, item):
+        """Dropping every __WATCOMC__ branch must give the upstream file back."""
+        path = ROOT / item["path"]
+        names = subprocess.run(["git", "-C", str(path), "diff", "--name-only",
+                                item["upstream_base_commit"], item["commit"]],
+                               check=True, capture_output=True, text=True).stdout.split()
+        self.assertTrue(names)
+        for name in names:
+            def show(rev):
+                return subprocess.run(["git", "-C", str(path), "show", rev + ":" + name],
+                                      check=True, capture_output=True).stdout.decode("latin-1")
+            base = show(item["upstream_base_commit"]).replace("\r\n", "\n").split("\n")
+            out, state = [], None
+            for line in show(item["commit"]).replace("\r\n", "\n").split("\n"):
+                word = line.strip()
+                if word.startswith("#ifdef __WATCOMC__"):
+                    state = "watcom"; continue
+                if state == "watcom" and word.startswith("#else"):
+                    state = "other"; continue
+                if state and word.startswith("#endif"):
+                    state = None; continue
+                if state == "watcom":
+                    continue
+                out.append(line)
+            # Whitespace around a preprocessor '#' does not change the source.
+            normalize = lambda lines: [re.sub(r"^#\s+", "#", l.strip()) for l in lines]
+            self.assertEqual(normalize(out), normalize(base), name)
 
 if __name__ == "__main__":
     unittest.main()

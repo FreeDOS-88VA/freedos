@@ -47,6 +47,10 @@ TOOLS: dict[str, dict] = {
     # shipped a Borland build, so there is no byte baseline (see the lock).
     "fc": {"kind": KITTEN_C, "kitten": "kitten", "model": "-mc", "pack": True,
            "sources": ["fc.c", "fctools.c"], "output": "FC.EXE", "link": "fc.exe"},
+    # Fork that adds __WATCOMC__ branches to a Borland/Turbo C program.
+    "attrib": {"kind": "single-wcl", "directory": ".",
+               "options": ["-q", "-bt=DOS", "-mt", "-0", "-os", "-s", "-bcl=COM"],
+               "sources": ["ATTRIB.C"], "output": "ATTRIB.COM", "link": "attrib.com"},
     # Project forks: PC88VA builds select DOS replacements for PC BIOS use;
     # builds without the define equal the FreeDOS 1.4 source (checked by
     # tools/m20/pc_baseline.py).

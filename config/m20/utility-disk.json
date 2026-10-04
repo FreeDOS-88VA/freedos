@@ -275,6 +275,27 @@
         "output equals the FreeDOS 1.4 package binary",
         "VAEG guest check pending"
       ]
+    },
+    {
+      "id": "attrib",
+      "upstream": "FreeDOS 1.4 ATTRIB 2.1 source as of the FreeDOS 1.4 release",
+      "files": [
+        "ATTRIB.COM"
+      ],
+      "source_locks": [
+        "attrib"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0 (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; fork nakatamaho/attrib adds Open Watcom branches (Borland/Turbo C source unchanged)",
+      "messages": "English",
+      "description": "Display or change file attributes.",
+      "tests": [
+        "clean source build",
+        "PC FreeDOS 1.4 kernel run",
+        "VAEG guest check pending"
+      ]
     }
   ]
 }

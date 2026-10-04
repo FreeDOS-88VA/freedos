@@ -306,7 +306,26 @@
       "license": "GPL-2.0",
       "role": "utility disk: FreeDOS 1.4 FC 3.03 with Open Watcom LFN-failure detection fixes",
       "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)",
-      "baseline_exemption": "Open Watcom portability fixes affecting every Open Watcom build: carry flag tested as zero/non-zero and AX=7100h treated as LFN failure. The upstream Open Watcom build loops forever on a DOS without LFN support (FreeDOS 1.4 FAT16 kernels, including the PC-88VA kernel); FreeDOS 1.4 shipped a Borland build, so no byte baseline exists. Checked by guest runs on PC (FAT32 and FAT16 FreeDOS 1.4 kernels) and VAEG."
+      "baseline_exemption": "Open Watcom portability fixes affecting every Open Watcom build: carry flag tested as zero/non-zero and AX=7100h treated as LFN failure. The upstream Open Watcom build loops forever on a DOS without LFN support (FreeDOS 1.4 FAT16 kernels, including the PC-88VA kernel); FreeDOS 1.4 shipped a Borland build, so no byte baseline exists. Checked by guest runs on PC (FAT32 and FAT16 FreeDOS 1.4 kernels) and VAEG.",
+      "baseline_check": "lfn-failure-tests-only"
+    },
+    {
+      "name": "attrib",
+      "path": "components/attrib",
+      "repository": "https://github.com/nakatamaho/attrib.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/FDOS/attrib.git",
+      "upstream_base_commit": "f670ebb0cb18dc08712bfcf56584ecb89e0bbd18",
+      "commit": "21f44cc47e71c8b437932d101670750f00fa9309",
+      "parents": [
+        "f670ebb0cb18dc08712bfcf56584ecb89e0bbd18"
+      ],
+      "source_archive_sha256": "6b0f35d4fff3a9572d6c8da80a9455dee42c8aa7dc0bc7cffb2cddefcdc23917",
+      "license": "GPL-2.0",
+      "role": "utility disk: FreeDOS 1.4 ATTRIB 2.1 ported to Open Watcom",
+      "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)",
+      "baseline_exemption": "Borland/Turbo C program; FreeDOS 1.4 shipped a Borland build, so no Open Watcom byte baseline exists. The fork only adds __WATCOMC__ branches; removing them reproduces the upstream source (host test). Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG.",
+      "baseline_check": "watcom-branches-only"
     }
   ],
   "toolchain": {
