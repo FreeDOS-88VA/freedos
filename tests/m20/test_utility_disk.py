@@ -117,5 +117,24 @@ class UtilityDiskTests(unittest.TestCase):
             notice_payload(dict(config["notices"]["COMP.LIC"], through="NOT PRESENT"))
 
 
+    @unittest.skipUnless(shutil.which("git") and (ROOT / "components/fc/.git").exists(),
+                         "host-only: requires component checkouts and git")
+    def test_baseline_exemptions_are_explained_and_narrow(self):
+        lock = json.loads((ROOT / "manifests/m20-components.lock.json").read_text())
+        exempt = [item for item in lock["components"] if item.get("baseline_exemption")]
+        self.assertEqual([item["name"] for item in exempt], ["fc"])
+        item = exempt[0]
+        self.assertGreater(len(item["baseline_exemption"]), 80)
+        diff = subprocess.run(["git", "-C", str(ROOT / item["path"]), "diff", "-U0",
+                               item["upstream_base_commit"], item["commit"]],
+                              check=True, capture_output=True, text=True,
+                              errors="replace").stdout
+        changed = [line for line in diff.splitlines()
+                   if line[:1] in "+-" and not line.startswith(("+++", "---"))]
+        self.assertTrue(changed)
+        for line in changed:
+            self.assertIn("r.x.cflag", line)
+
+
 if __name__ == "__main__":
     unittest.main()

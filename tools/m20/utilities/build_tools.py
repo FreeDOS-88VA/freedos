@@ -43,6 +43,10 @@ TOOLS: dict[str, dict] = {
                           "-fm", "-k12288"],
               "sources": ["xcopy.c", "kitten.c", "prf.c"], "output": "XCOPY.EXE",
               "link": "xcopy.exe"},
+    # Fork with an Open Watcom portability fix (carry flag test); FreeDOS 1.4
+    # shipped a Borland build, so there is no byte baseline (see the lock).
+    "fc": {"kind": KITTEN_C, "kitten": "kitten", "model": "-mc", "pack": True,
+           "sources": ["fc.c", "fctools.c"], "output": "FC.EXE", "link": "fc.exe"},
     # Project forks: PC88VA builds select DOS replacements for PC BIOS use;
     # builds without the define equal the FreeDOS 1.4 source (checked by
     # tools/m20/pc_baseline.py).

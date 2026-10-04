@@ -89,7 +89,8 @@ def utility_baselines(root: Path, work: Path, image: str) -> dict[str, bool]:
     lock = json.loads((root / "manifests/m20-components.lock.json").read_text())
     commits = {item["name"]: item["commit"] for item in lock["components"]}
     forks = [item for item in lock["components"]
-             if item.get("upstream_base_commit") and item["name"] in TOOLS]
+             if item.get("upstream_base_commit") and item["name"] in TOOLS
+             and not item.get("baseline_exemption")]
     results: dict[str, bool] = {}
     for item in forks:
         name = item["name"]

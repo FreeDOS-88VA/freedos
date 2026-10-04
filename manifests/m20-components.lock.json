@@ -290,6 +290,23 @@
         "member": "BIN/COMP.COM",
         "sha256": "a667e37c0a0b9da51c66ee7b9aa958e190b4fc83f08fd2b9ca0d9a228615f5b4"
       }
+    },
+    {
+      "name": "fc",
+      "path": "components/fc",
+      "repository": "https://github.com/nakatamaho/fc.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/FDOS/fc.git",
+      "upstream_base_commit": "5591875a7298a5dd17f342cebe6a500746ee674d",
+      "commit": "6c8b83e3a7fe11c48a196885e41ab85a6341a34b",
+      "parents": [
+        "5591875a7298a5dd17f342cebe6a500746ee674d"
+      ],
+      "source_archive_sha256": "04e3e88874ff615a32061169d11d705cc7cdb9a1c17eadb1d3a5ead485a9e46c",
+      "license": "GPL-2.0",
+      "role": "utility disk: FreeDOS 1.4 FC 3.03 with an Open Watcom carry-flag portability fix",
+      "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)",
+      "baseline_exemption": "Open Watcom portability fix affecting every Open Watcom build; the upstream Open Watcom build loops forever and FreeDOS 1.4 shipped a Borland build, so no byte baseline exists. Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG."
     }
   ],
   "toolchain": {
