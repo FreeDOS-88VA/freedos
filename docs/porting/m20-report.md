@@ -435,7 +435,7 @@ updated after the release, but its source files date from 2006.
 - Utilities D88 `c6f360f3381eed9970b273919d09b178b710bbc965ec0c1109dd679a9bb01b91`
   (system D88 unchanged).
 
-Not ported, pending an owner decision:
+Not ported, by owner decision (deferred):
 
 - UNDELETE assumes 512-byte sectors and stops with "not 512" on other media;
   the PC-88VA disks use 1024-byte sectors. Supporting them would extend a

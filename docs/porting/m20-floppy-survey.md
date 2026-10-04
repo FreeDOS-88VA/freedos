@@ -130,7 +130,8 @@ Not proposed for the first set: class C (`edit`, `htmlhelp`) and all class X.
 - `replace`, `exe2bin`: project repositories importing the FreeDOS 1.4
   package sources, with Open Watcom branches; on the utilities disk.
 - `undelete` (512-byte sectors only) and `swsubst` (SUPPL/msglib and CDS
-  rewriting): repositories created and imported, port pending decision.
+  rewriting): repositories created and imported; port deferred by owner
+  decision.
 
 ## Open points
 
