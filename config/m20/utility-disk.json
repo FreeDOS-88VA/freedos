@@ -15,7 +15,7 @@
   "packages": [
     {
       "id": "find",
-      "upstream": "FreeDOS 1.4 package find 3.0b; FDOS find a6e245d with FDOS kitten 6265435 and tnyprntf 450ab90",
+      "upstream": "FreeDOS 1.4 FIND 3.0b source as of the FreeDOS 1.4 release",
       "files": [
         "FIND.EXE"
       ],
@@ -24,14 +24,183 @@
         "kitten",
         "tnyprntf"
       ],
-      "builder": "utilities.build_find",
-      "license": "FIND GPL-2.0-or-later (COPYING); tnyprntf GPL-2.0 (COPYING); kitten LGPL-2.1 (KITTEN.LIC)",
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0-or-later (COPYING); kitten LGPL-2.1 (KITTEN.LIC); tnyprntf GPL-2.0 (COPYING)",
       "cpu": "8086 real mode",
       "va_adaptation": "none; DOS services only",
       "messages": "built-in English",
+      "description": "Search for text in files.",
       "tests": [
         "clean source build",
-        "VAEG guest run pending"
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "sort",
+      "upstream": "FreeDOS 1.4 SORT 1.5.1 source as of the FreeDOS 1.4 release",
+      "files": [
+        "SORT.EXE"
+      ],
+      "source_locks": [
+        "sort",
+        "kitten-3b9947f",
+        "tnyprntf"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0-or-later (COPYING); kitten LGPL-2.1 (KITTEN.LIC); tnyprntf GPL-2.0 (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; DOS services only",
+      "messages": "built-in English",
+      "description": "Sort lines of text.",
+      "tests": [
+        "clean source build",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "xcopy",
+      "upstream": "FreeDOS 1.4 XCOPY 1.8 source as of the FreeDOS 1.4 release",
+      "files": [
+        "XCOPY.EXE"
+      ],
+      "source_locks": [
+        "xcopy"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0 (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; DOS services only",
+      "messages": "built-in English",
+      "description": "Copy files and directory trees.",
+      "tests": [
+        "clean source build",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "label",
+      "upstream": "FreeDOS 1.4 LABEL 1.5 source as of the FreeDOS 1.4 release",
+      "files": [
+        "LABEL.EXE"
+      ],
+      "source_locks": [
+        "label",
+        "kitten-3b9947f",
+        "tnyprntf"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0-or-later (COPYING); kitten LGPL-2.1 (KITTEN.LIC); tnyprntf GPL-2.0 (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; DOS services only",
+      "messages": "built-in English",
+      "description": "Create, change or delete a volume label.",
+      "tests": [
+        "clean source build",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "move",
+      "upstream": "FreeDOS 1.4 MOVE 3.5 source as of the FreeDOS 1.4 release",
+      "files": [
+        "MOVE.EXE"
+      ],
+      "source_locks": [
+        "move",
+        "kitten-3b9947f",
+        "tnyprntf"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0-or-later (COPYING); kitten LGPL-2.1 (KITTEN.LIC); tnyprntf GPL-2.0 (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; DOS services only",
+      "messages": "built-in English",
+      "description": "Move or rename files and directories.",
+      "tests": [
+        "clean source build",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "fc",
+      "upstream": "FreeDOS 1.4 FC 3.03 source as of the FreeDOS 1.4 release",
+      "files": [
+        "FC.EXE"
+      ],
+      "source_locks": [
+        "fc",
+        "kitten",
+        "tnyprntf"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0 (COPYING); kitten LGPL-2.1 (KITTEN.LIC); tnyprntf GPL-2.0 (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; DOS services only",
+      "messages": "built-in English",
+      "description": "Compare files.",
+      "tests": [
+        "clean source build",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "append",
+      "upstream": "FreeDOS 1.4 APPEND 5.0-0.7 source as of the FreeDOS 1.4 release",
+      "files": [
+        "APPEND.EXE"
+      ],
+      "source_locks": [
+        "append"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0-or-later (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; DOS services only",
+      "messages": "built-in English",
+      "description": "Data file search path (TSR).",
+      "tests": [
+        "clean source build",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "nlsfunc",
+      "upstream": "FreeDOS 1.4 NLSFUNC 0.4 source as of the FreeDOS 1.4 release",
+      "files": [
+        "NLSFUNC.EXE"
+      ],
+      "source_locks": [
+        "nlsfunc"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0-or-later (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; DOS services only",
+      "messages": "built-in English",
+      "description": "Load country-specific information (TSR).",
+      "tests": [
+        "clean source build",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "devload",
+      "upstream": "FreeDOS 1.4 DEVLOAD 3.25 source as of the FreeDOS 1.4 release",
+      "files": [
+        "DEVLOAD.COM"
+      ],
+      "source_locks": [
+        "devload"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0-or-later (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; DOS services only",
+      "messages": "built-in English",
+      "description": "Load device drivers from the command line.",
+      "tests": [
+        "clean source build",
+        "VAEG guest check pending"
       ]
     }
   ]

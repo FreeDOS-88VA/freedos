@@ -26,3 +26,30 @@
 [submodule "components/tnyprntf"]
 	path = components/tnyprntf
 	url = https://github.com/FDOS/tnyprntf.git
+[submodule "components/sort"]
+	path = components/sort
+	url = https://github.com/FDOS/sort.git
+[submodule "components/xcopy"]
+	path = components/xcopy
+	url = https://github.com/FDOS/xcopy.git
+[submodule "components/label"]
+	path = components/label
+	url = https://github.com/FDOS/label.git
+[submodule "components/move"]
+	path = components/move
+	url = https://github.com/FDOS/move.git
+[submodule "components/fc"]
+	path = components/fc
+	url = https://github.com/FDOS/fc.git
+[submodule "components/append"]
+	path = components/append
+	url = https://github.com/FDOS/append.git
+[submodule "components/nlsfunc"]
+	path = components/nlsfunc
+	url = https://github.com/FDOS/nlsfunc.git
+[submodule "components/devload"]
+	path = components/devload
+	url = https://github.com/FDOS/devload.git
+[submodule "kitten-3b9947f"]
+	path = components/kitten-3b9947f
+	url = https://github.com/FDOS/kitten.git

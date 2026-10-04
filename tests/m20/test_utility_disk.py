@@ -41,16 +41,44 @@ class UtilityDiskTests(unittest.TestCase):
         self.assertTrue((ROOT / config["readme"]).read_bytes().isascii())
 
     @unittest.skipUnless(shutil.which("git") and (ROOT / "components/find/.git").exists(),
-                         "host-only: requires the find checkout and git")
-    def test_library_pins_equal_finds_own_submodule_commits(self):
+                         "host-only: requires component checkouts and git")
+    def test_library_pins_equal_each_programs_own_submodule_commits(self):
+        from utilities.build_tools import TOOLS
         lock = {item["name"]: item["commit"] for item in
                 json.loads((ROOT / "manifests/m20-components.lock.json").read_text())["components"]}
-        for library in ("kitten", "tnyprntf"):
-            entry = subprocess.run(["git", "-C", str(ROOT / "components/find"), "ls-tree",
-                                    lock["find"], library], check=True, capture_output=True,
-                                   text=True).stdout.split()
-            self.assertEqual(entry[1], "commit")
-            self.assertEqual(entry[2], lock[library])
+        checked = 0
+        for name, spec in TOOLS.items():
+            if not spec.get("kitten"):
+                continue
+            for library, component in (("kitten", spec["kitten"]), ("tnyprntf", "tnyprntf")):
+                entry = subprocess.run(["git", "-C", str(ROOT / "components" / name), "ls-tree",
+                                        lock[name], library], check=True, capture_output=True,
+                                       text=True).stdout.split()
+                with self.subTest(program=name, library=library):
+                    self.assertEqual(entry[1], "commit")
+                    self.assertEqual(entry[2], lock[component])
+                checked += 1
+        self.assertGreater(checked, 0)
+
+    @unittest.skipUnless(shutil.which("git") and (ROOT / "components/sort/.git").exists(),
+                         "host-only: requires component checkouts and git")
+    def test_release_cutoff_selection_is_the_last_commit_before_freedos_14(self):
+        rule = "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+        items = [item for item in json.loads(
+            (ROOT / "manifests/m20-components.lock.json").read_text())["components"]
+            if item.get("selection") == rule]
+        self.assertTrue(items)
+        for item in items:
+            path = ROOT / item["path"]
+            branch = subprocess.run(["git", "-C", str(path), "rev-parse", "--verify", "-q",
+                                     "origin/" + item["branch"]], capture_output=True, text=True)
+            if branch.returncode:
+                self.skipTest("upstream branch is not fetched: " + item["name"])
+            expected = subprocess.run(["git", "-C", str(path), "rev-list", "-1",
+                                       "--before=2025-04-10T00:00:00", branch.stdout.strip()],
+                                      check=True, capture_output=True, text=True).stdout.strip()
+            with self.subTest(component=item["name"]):
+                self.assertEqual(item["commit"], expected)
 
 
 if __name__ == "__main__":

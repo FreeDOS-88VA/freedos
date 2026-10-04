@@ -400,29 +400,34 @@ def main():
         free_clusters, free_clusters * 1024, minimum_free))
 
 
-UTILITY_BUILDERS = {"utilities.build_find": ("find", ("find", "kitten", "tnyprntf"))}
+def utility_inputs(tool):
+    """Components a utility is built from: itself plus any staged libraries."""
+    from utilities.build_tools import TOOLS
+    spec = TOOLS[tool]
+    return [tool] + ([spec["kitten"], "tnyprntf"] if spec.get("kitten") else [])
 
 
 def build_utility_disk(out, source, epoch, parent_revision, toolchain_identity, spec):
     """Build the utilities data disk declared by config/m20/utility-disk.json."""
-    import importlib
     from compose_image import compose_data, data_disk_spec
+    from utilities.build_tools import TOOLS, build as build_tools
     config = json.loads((ROOT / "config/m20/utility-disk.json").read_text(encoding="ascii"))
     if config.get("schema_version") != 1 or config.get("milestone") != "M20":
         raise ValueError("M20 utility disk configuration is malformed")
     disk = config["disk"]
+    names = [item["id"] for item in config["packages"]]
+    for item in config["packages"]:
+        if item["builder"] != "utilities.build_tools" or item["id"] not in TOOLS:
+            raise ValueError("unknown utility builder or program: " + item["id"])
+        if item["source_locks"] != utility_inputs(item["id"]):
+            raise ValueError("utility source locks differ from the builder inputs: " + item["id"])
+        if item["files"] != [TOOLS[item["id"]]["output"]]:
+            raise ValueError("utility file list differs from the builder output: " + item["id"])
+    build_dir = out / "utility"
+    records = build_tools(ROOT / "components", build_dir, names,
+                          {n: {c: source[c]["commit"] for c in utility_inputs(n)} for n in names})
     payloads, packages = {}, []
     for item in config["packages"]:
-        builder = item["builder"]
-        if builder not in UTILITY_BUILDERS:
-            raise ValueError("unknown utility builder: " + builder)
-        output_name, inputs = UTILITY_BUILDERS[builder]
-        if tuple(item["source_locks"]) != inputs:
-            raise ValueError("utility source locks differ from the builder inputs: " + item["id"])
-        module = importlib.import_module(builder)
-        build_dir = out / "utility" / item["id"]
-        record = module.build({name: ROOT / "components" / name for name in inputs},
-                              build_dir, {name: source[name]["commit"] for name in inputs})
         built = {}
         for filename in item["files"]:
             if filename in payloads:
@@ -432,11 +437,11 @@ def build_utility_disk(out, source, epoch, parent_revision, toolchain_identity, 
             built[filename] = {"size_bytes": len(data), "sha256": sha256(data)}
         package = dict(item)
         package["built_files"] = built
-        package["build_records"] = record
+        package["build_records"] = records[item["id"]]
         package["source_identity"] = {
             name: {key: source[name][key] for key in
                    ("repository", "branch", "commit", "source_archive_sha256")}
-            for name in inputs}
+            for name in item["source_locks"]}
         packages.append(package)
     notices = {}
     for filename, relative in sorted(config["notices"].items()):

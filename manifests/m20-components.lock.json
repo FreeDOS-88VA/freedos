@@ -86,7 +86,8 @@
       ],
       "source_archive_sha256": "e1d111c599fcffd564e77d3293cf226464594ce6b4462e86a0200fab1d0b3cb3",
       "license": "GPL-2.0-or-later",
-      "role": "utility disk: FreeDOS 1.4 FIND"
+      "role": "utility disk: FreeDOS 1.4 FIND",
+      "selection": "upstream HEAD (no later commits)"
     },
     {
       "name": "kitten",
@@ -100,7 +101,8 @@
       ],
       "source_archive_sha256": "e9739312a70e1ecf8c6a652f6172656c17535acb383f9f3368467bc8bde7a287",
       "license": "LGPL-2.1",
-      "role": "library linked into FIND"
+      "role": "library linked into FIND",
+      "selection": "commit referenced by the programs' own submodule"
     },
     {
       "name": "tnyprntf",
@@ -114,7 +116,141 @@
       ],
       "source_archive_sha256": "485cb18fee9bf970921fbaee027dd107b758183818fa2d84108c60bd69214c69",
       "license": "GPL-2.0",
-      "role": "library linked into FIND"
+      "role": "library linked into FIND",
+      "selection": "commit referenced by the programs' own submodule"
+    },
+    {
+      "name": "sort",
+      "path": "components/sort",
+      "repository": "https://github.com/FDOS/sort.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/sort.git",
+      "commit": "7177d3ab720cb24b7076edbe1bb9eac9ee8e742f",
+      "parents": [
+        "f578c5bf19989bc9df13399c4e27c89264289388"
+      ],
+      "source_archive_sha256": "04426e24017b65335aefc9957b3fd28c2fd6dacdf7e094a01848707c49e99b72",
+      "license": "GPL-2.0-or-later",
+      "role": "utility disk: FreeDOS 1.4 SORT 1.5.1",
+      "selection": "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+    },
+    {
+      "name": "xcopy",
+      "path": "components/xcopy",
+      "repository": "https://github.com/FDOS/xcopy.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/xcopy.git",
+      "commit": "a52cb4bb11e82bb309c8620f55539274d6081a35",
+      "parents": [
+        "4a7e43838cd7d9927dc1d2b7bd132c39b220daeb"
+      ],
+      "source_archive_sha256": "ac448f3c842f3602865bdad30eb77c439cb2b963ccd4900c01021f2c321abf58",
+      "license": "GPL-2.0",
+      "role": "utility disk: FreeDOS 1.4 XCOPY 1.8",
+      "selection": "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+    },
+    {
+      "name": "label",
+      "path": "components/label",
+      "repository": "https://github.com/FDOS/label.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/label.git",
+      "commit": "64030e1f31de3d78094ebc83104cf1bd94810843",
+      "parents": [
+        "673ef6e98a03df45e37d685ec60d9c34da96aa4e"
+      ],
+      "source_archive_sha256": "d2bd0566546c93afbeac7579a76fda5184bf52f6482a7623d53dc3aa65100bb9",
+      "license": "GPL-2.0-or-later",
+      "role": "utility disk: FreeDOS 1.4 LABEL 1.5",
+      "selection": "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+    },
+    {
+      "name": "move",
+      "path": "components/move",
+      "repository": "https://github.com/FDOS/move.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/move.git",
+      "commit": "1e2de517d7639fca7d94a20c98ca30193d8615aa",
+      "parents": [
+        "3b082b0f2979c2d1481ed61f1ed34ca62859d92f"
+      ],
+      "source_archive_sha256": "c40e04a78f905e733a1788f438fe5809e7dcf8dc1bb80acaed63997370ea990b",
+      "license": "GPL-2.0-or-later",
+      "role": "utility disk: FreeDOS 1.4 MOVE 3.5",
+      "selection": "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+    },
+    {
+      "name": "fc",
+      "path": "components/fc",
+      "repository": "https://github.com/FDOS/fc.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/fc.git",
+      "commit": "5591875a7298a5dd17f342cebe6a500746ee674d",
+      "parents": [
+        "3c2a6048adb41483774f67332fc0fdcc21820184"
+      ],
+      "source_archive_sha256": "459f21002f9d0a0720bbbf61e770a5da17a33102606863db186b7e54849041b7",
+      "license": "GPL-2.0",
+      "role": "utility disk: FreeDOS 1.4 FC 3.03",
+      "selection": "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+    },
+    {
+      "name": "append",
+      "path": "components/append",
+      "repository": "https://github.com/FDOS/append.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/append.git",
+      "commit": "50924e492d959cd94b1f58539a9579a2ec9d3fee",
+      "parents": [
+        "b51b105837aa33e3bb2c45caaefa0e596b87f810"
+      ],
+      "source_archive_sha256": "f959548b6d5156ebb59c2e3c36dd1db0f7dd3615ea2795be472d076b4fc0d1eb",
+      "license": "GPL-2.0-or-later",
+      "role": "utility disk: FreeDOS 1.4 APPEND 5.0-0.7",
+      "selection": "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+    },
+    {
+      "name": "nlsfunc",
+      "path": "components/nlsfunc",
+      "repository": "https://github.com/FDOS/nlsfunc.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/nlsfunc.git",
+      "commit": "d102e4cab774a090eb0eb236b8af1e5bcdc22ea2",
+      "parents": [],
+      "source_archive_sha256": "82195013cfee53d79fd8acc3daeda60f0d93ce2f2a13efca82dc8a222ec25cd8",
+      "license": "GPL-2.0-or-later",
+      "role": "utility disk: FreeDOS 1.4 NLSFUNC 0.4",
+      "selection": "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+    },
+    {
+      "name": "devload",
+      "path": "components/devload",
+      "repository": "https://github.com/FDOS/devload.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/devload.git",
+      "commit": "7f1f0877972dea3ec1d8b6d9d3473e46cba44608",
+      "parents": [
+        "3fd3dd6ef5c0c96c97662ad9e2656747001ec47d"
+      ],
+      "source_archive_sha256": "a27305c8fe09fb32775bd3cdc2ea33377758a02f0bffa134cf23e4fa78504c3a",
+      "license": "GPL-2.0-or-later",
+      "role": "utility disk: FreeDOS 1.4 DEVLOAD 3.25",
+      "selection": "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+    },
+    {
+      "name": "kitten-3b9947f",
+      "path": "components/kitten-3b9947f",
+      "repository": "https://github.com/FDOS/kitten.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/FDOS/kitten.git",
+      "commit": "3b9947fc5ae08434d0d3f61cb2ea22d13911732d",
+      "parents": [
+        "7a8c6de73537906975d6b4eeeaca48ce5e72289d"
+      ],
+      "source_archive_sha256": "523d73226d0531f8e00949bf6e6da6e16b2ecf25eee3774c698299b44c444cda",
+      "license": "LGPL-2.1",
+      "role": "library linked into SORT, LABEL and MOVE",
+      "selection": "commit referenced by the programs' own kitten submodule"
     }
   ],
   "toolchain": {
