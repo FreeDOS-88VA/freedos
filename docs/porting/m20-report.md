@@ -1,8 +1,8 @@
 # M20 report: restart on the FreeDOS 1.4 release baseline
 
-Status: **STARTED — planning only.** No component source, build recipe, image
-or qualification has changed in M20 yet. HOST, VAEG and hardware gates are
-**NOT RUN** for M20.
+Status: **IN PROGRESS — kernel restarted on FreeDOS 1.4 and booting on VAEG;
+FreeCOM still on its interim M19 pin.** No M20 distribution is designated.
+Hardware is **NOT RUN**.
 
 ## Decision
 
@@ -102,8 +102,71 @@ qualified only on PC; it is a candidate for separate import, not baseline.
 6. Publish `docs/porting/m20-memory-layout.md` before the M20 layout differs
    from the M17 contract.
 
+## Kernel on the FreeDOS 1.4 baseline (local, not yet pushed)
+
+Component branch `m20/pc88va` in `nakatamaho/fdkernel`, from `ke2043`:
+
+1. `b479209` — backport of lpproj `d1e1ead` (BIG_SECTOR, classified shared
+   infrastructure needed by PC-88VA); the original `config_init_buffers()`
+   is kept verbatim for 512-byte builds.
+2. `551c8da` — the M19 `pc88va/` adapter tree, unchanged.
+3. `4cc954c1a759b036a554acb79e777825ba3a8c61` — the M19 shared-file
+   integration, ported without the underlying lpproj changes.
+
+Findings:
+
+- **The M19 kernel never had a working non-VA build.** Built for the IBM PC
+  target, its shared-file changes altered calling conventions and common
+  code, and that kernel hung after the banner (QEMU, FreeDOS 1.4 floppy).
+  All such changes are now confined to PC88VA builds; the guards were
+  generated with `tools/m20/confine_platform_changes.py` and reviewed, with
+  `fatfs.c` `rqblockio()` rewritten by hand for readability.
+- **Gate:** `tools/m20/pc_baseline.py` builds `ke2043` and the M20 commit for
+  the IBM PC target (8086, FAT32, Open Watcom 1.9, no UPX) and compares
+  `KERNEL.SYS`, `SYS.COM` and `COUNTRY.SYS`: **identical**. The unmodified
+  baseline kernel also boots the FreeDOS 1.4 floppy under QEMU with its
+  FreeCOM 0.86 (scratch smoke test; PC control only).
+- Part of the M19 VA code depended on lpproj `f342d33` (an adaptation of
+  post-1.4 FDOS `3d1ba0d`, master environment built during FDCONFIG
+  processing, and `FSTRCPY` in INIT). It is not imported; the VA code uses the
+  `ke2043` model (`CONFIG=` menu export via the near `envp`).
+- Kept only for PC88VA builds, as qualified in M19: `blk_driver()` clears the
+  transfer count on an invalid unit and rejects `r_command == NENTRY`
+  (`>` → `>=`). The latter addresses an upstream out-of-range dispatch;
+  recorded as an upstream defect candidate, unchanged for other builds.
+- lpproj `GUARD_MEMORY_ON_INIT` (`e83ebfa`), NEC98/DBCS variants and other
+  lpproj shared changes are not taken (see `docs/porting/m20-inventory.md`).
+
+M20 tooling: `tools/m20`, `config/m20`, `tests/m20` are maintained copies of
+the M19 normal-distribution build (MS-DOS 4 QA omitted); isolation forbids
+M00–M19 inputs; `manifests/m20-components.lock.json` pins the kernel above and
+FreeCOM's M19 normal pin as an explicit interim. `tools/qa/current_components.py`
+selects the M20 lock and requires the kernel/FreeCOM pins to descend from
+`ke2043`/`com086`.
+
+**HOST (local):** `make m20-host-tests` passed; `make m20-disk` built two
+identical disks from clean exports (D88 SHA-256
+`906504f733e3f8ca3a722708169415013518e30b13c89d7faa73dc64cf9e22b9`), with
+linked-placement verification, source/privacy audit and the acceptance
+instance inside the build. Not yet a published checkpoint: component and
+parent commits are local, so no native CI or fresh public rebuild has run.
+
+**VAEG (local candidate above, private evidence retained):**
+
+| Model | Installed | Retained selection | Workflow | Result |
+| --- | --- | --- | --- | --- |
+| VA2 | 640 KiB | none | startup, COM/MZ assembly and execution, file write/readback, MCB | pass |
+| VA | 640 KiB | none | same | pass |
+| VA2 | 512 KiB | 640 KiB (unchanged before/after) | startup, file write/readback, MCB (no assembler, known M19 limit) | pass |
+
+The resident kernel and work area end 16 bytes lower than in M19 (largest
+free block at 640 KiB: 359,472 bytes). A first 512 KiB run used `MORE` in an
+injected script; `MORE` consumed the following keystrokes, so that run is a
+retained test-script failure, not a guest result.
+
 ## Unrun gates
 
-First-pass inventory: done (`docs/porting/m20-inventory.md`,
-`tools/m20/inventory.py`, `tests/m20/test_inventory.py`). Component
-branches, builds, VAEG and hardware are **NOT RUN**. No M20 image exists. Hardware: **NOT RUN**.
+Not yet run: FreeCOM rebase onto `com086`; push of component branches and the
+parent; native CI; fresh public clean rebuild; 256/384 KiB and other RAM
+matrix entries; F5/F8 startup paths; PC regression beyond the scratch boot
+smoke test. Hardware: **NOT RUN**. No M20 distribution is designated. No M20 image exists. Hardware: **NOT RUN**.
