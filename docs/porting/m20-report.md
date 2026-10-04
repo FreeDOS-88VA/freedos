@@ -444,6 +444,52 @@ Not ported, by owner decision (deferred):
   (the `msgcomp` tool and its output are not in the package) and rewrites the
   DOS CDS directly.
 
+## Archiver disk: UNZIP, ZIP and GZIP
+
+Owner-approved new repositories `nakatamaho/unzip`, `nakatamaho/zip` and
+`nakatamaho/gzip` hold verbatim imports of the FreeDOS 1.4 archiver package
+sources (inner `SOURCES.ZIP` committed extracted) with `PROVENANCE.md`. The
+pinned sources are the import plus its provenance record, unmodified
+(`baseline_check: unmodified-import`, host test). FreeDOS 1.4 shipped a
+32-bit DJGPP UNZIP and a 32-bit UPX-packed ZIP, which do not run on the
+V30; the archiver disk carries 16-bit 8086 builds:
+
+- UNZIP 6.00 and ZIP 3.0: Info-ZIP `msdos/makefile.wat` 16-bit settings
+  (large model, `-s -oehiklrt`, assembler CRC and, for ZIP, match).
+- GZIP 1.2.4: the Borland makefile's compact model with `DYN_ALLOC` (as
+  `tailor.h` sets it for Turbo C); the TASM `match.asm` is replaced by the
+  C code with `NO_ASM`.
+
+`tools/m20/data_disks.py` generalizes the data disks: the producer,
+two-build comparison, distribution verifier and source audit handle the
+utility and archive disks by kind. `freedos-PC88VA-M20-ARC.D88` (label
+`M20-ARC`) carries the three programs, `COPYING`, `UNZIP.LIC` and
+`ZIP.LIC` (two Info-ZIP license versions) and a README.
+
+Verification:
+
+- HOST: host tests, two identical clean builds and acceptance pass. System
+  and utilities D88 unchanged; archiver D88
+  `9970958ca2dd5592f4231b4770b72c468e34deb967f0f0fd78c92eb97d61b913`.
+- PC (FreeDOS 1.4 kernel): ZIP -r, UNZIP -t/-d and GZIP -9/-d -N round trips
+  reproduce the original bytes.
+- VAEG VA2/640 and VA/640 with the archiver D88 in B:: ZIP -r, UNZIP -t and
+  -d, GZIP -9/-d round trips match; MEMMAP reports a valid MCB chain
+  afterwards. Without `TZ`, UNZIP warns and returns 1 (upstream behavior);
+  with `SET TZ=JST-9` it returns 0.
+- VAEG VA2/512: all three exit cleanly with their out-of-memory messages
+  (UNZIP/ZIP 4, GZIP 1). By owner decision the README states that the
+  archivers need 640 KiB; no reduced-memory build is made.
+- A first VAEG run of the D88 failed in the harness only (it called MEM,
+  which M20 does not ship); its records are retained and the corrected
+  harness was rerun.
+
+DEBUG is next, by owner approval: a host JWasm built from the pinned JWasm
+source added to the toolchain lock, a `nakatamaho` fork of
+Baron-von-Riedesel/DOS-debug at `3d3655e` (last commit before the FreeDOS
+1.4 release), and PC-88VA replacements for its INT 10h/16h and BIOS data
+area use.
+
 ## Unrun gates
 
 Not yet run: 256/384 KiB and other RAM

@@ -110,7 +110,9 @@ the generated `survey.md`; the largest class-A items are `zip` and `unzip`.
    `devload`, `nlsfunc`, `fc`, `comp`, `deltree`, `callver`; then the Turbo-C
    ports `attrib`, `tree`, `replace`, `exe2bin`, `swsubst`, `undelete`,
    `share` after a build port to Open Watcom.
-3. **Archivers/tools disk:** `unzip`, `zip`, `gzip`, `debug`.
+3. **Archivers/tools disk:** `unzip`, `zip`, `gzip`, `debug`. UNZIP, ZIP
+   and GZIP are on `freedos-PC88VA-M20-ARC.D88` (16-bit builds of the
+   unmodified package sources; 640 KiB required); DEBUG is pending.
 
 Not proposed for the first set: class C (`edit`, `htmlhelp`) and all class X.
 
