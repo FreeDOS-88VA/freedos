@@ -53,6 +53,11 @@ TOOLS: dict[str, dict] = {
                 "command": ["-o", "deltree.com", "deltree.asm"],
                 "output": "DELTREE.COM", "link": "deltree.com",
                 "platform_defines": ["-DPC88VA"]},
+    # Fork with a NASM 2.x syntax fix; the output equals the FreeDOS 1.4
+    # package binary (checked by tools/m20/pc_baseline.py).
+    "comp": {"kind": "nasm", "directory": ".",
+             "command": ["comp.asm", "-o", "comp.com", "-O", "2"],
+             "output": "COMP.COM", "link": "comp.com"},
     "append": {"kind": "nasm", "directory": "source",
                "command": ["-dNEW_NASM", "-fbin", "append.asm", "-o", "append.exe"],
                "output": "APPEND.EXE", "link": "append.exe"},

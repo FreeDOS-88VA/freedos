@@ -56,3 +56,6 @@
 [submodule "components/deltree"]
 	path = components/deltree
 	url = https://github.com/nakatamaho/deltree.git
+[submodule "components/comp"]
+	path = components/comp
+	url = https://github.com/nakatamaho/comp.git

@@ -36,7 +36,8 @@ class UtilityDiskTests(unittest.TestCase):
             self.assertTrue(set(package["source_locks"]) <= names)
             for filename in package["files"]:
                 self.assertRegex(filename, r"^[A-Z0-9_-]{1,8}\.[A-Z0-9]{1,3}$")
-        for relative in config["notices"].values():
+        for notice in config["notices"].values():
+            relative = notice if isinstance(notice, str) else notice["source"]
             self.assertTrue((ROOT / relative).is_file())
         self.assertTrue((ROOT / config["readme"]).read_bytes().isascii())
 
@@ -102,6 +103,18 @@ class UtilityDiskTests(unittest.TestCase):
                 self.assertEqual(item["upstream_base_commit"], expected)
                 subprocess.run(["git", "-C", str(path), "merge-base", "--is-ancestor",
                                 expected, item["commit"]], check=True)
+
+
+    def test_extracted_license_block_is_complete(self):
+        from finish_image import notice_payload
+        config = json.loads((ROOT / "config/m20/utility-disk.json").read_text())
+        text = notice_payload(config["notices"]["COMP.LIC"]).decode("ascii")
+        self.assertTrue(text.startswith("Copyright (c) 2003  Paul Vojta\r\n"))
+        self.assertIn("Permission is hereby granted", text)
+        self.assertIn("shall be included", text)
+        self.assertTrue(text.endswith("THE USE OR OTHER DEALINGS IN THE SOFTWARE.\r\n"))
+        with self.assertRaises(ValueError):
+            notice_payload(dict(config["notices"]["COMP.LIC"], through="NOT PRESENT"))
 
 
 if __name__ == "__main__":

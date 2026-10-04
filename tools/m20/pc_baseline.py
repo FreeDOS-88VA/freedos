@@ -14,8 +14,10 @@ invocation. FreeCOM is checked the same way against FDOS com086 with its own
 default build (Open Watcom, XMS swap, English); COMMAND.COM may differ only
 inside its embedded __DATE__/__TIME__ strings. Forked utilities (lock entries
 with an upstream_base_commit) are built without their PC88VA defines from the
-upstream base and from the pinned fork commit and must be byte-identical. A
-mismatch is a defect of the PC-88VA port, not of the baseline.
+upstream base and from the pinned fork commit and must be byte-identical; a
+fork whose upstream base cannot be built by the pinned tools must instead
+reproduce its recorded FreeDOS 1.4 package binary. A mismatch is a defect of
+the PC-88VA port, not of the baseline.
 """
 from __future__ import annotations
 
@@ -94,7 +96,12 @@ def utility_baselines(root: Path, work: Path, image: str) -> dict[str, bool]:
         spec = TOOLS[name]
         libraries = [spec["kitten"], "tnyprntf"] if spec.get("kitten") else []
         outputs = {}
-        for label, revision in (("base", item["upstream_base_commit"]), ("current", commits[name])):
+        release = item.get("release_binary")
+        # A fork that only makes old source build with the pinned tools has no
+        # buildable upstream base; it must reproduce the FreeDOS 1.4 binary.
+        revisions = ((("current", commits[name]),) if release else
+                     (("base", item["upstream_base_commit"]), ("current", commits[name])))
+        for label, revision in revisions:
             components = (work / ("utility-" + label) / name / "components").resolve()
             for component, rev in [(name, revision)] + [(lib, commits[lib]) for lib in libraries]:
                 target = components / component
@@ -112,7 +119,10 @@ def utility_baselines(root: Path, work: Path, image: str) -> dict[str, bool]:
                                 "--components /w/components --output /w/out --no-platform " + name],
                                stdout=stream, stderr=subprocess.STDOUT, check=True)
             outputs[label] = (out / spec["output"]).read_bytes()
-        results[name] = outputs["base"] == outputs["current"]
+        if release:
+            results[name] = hashlib.sha256(outputs["current"]).hexdigest() == release["sha256"]
+        else:
+            results[name] = outputs["base"] == outputs["current"]
     return results
 
 

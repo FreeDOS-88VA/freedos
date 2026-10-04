@@ -400,6 +400,23 @@ def main():
         free_clusters, free_clusters * 1024, minimum_free))
 
 
+def notice_payload(notice):
+    """A whole ASCII license file, or a license block extracted from a source."""
+    if isinstance(notice, str):
+        return read_text_payload(notice)
+    text = read_text_payload(notice["source"]).decode("ascii").split("\r\n")
+    starts = [i for i, line in enumerate(text) if notice["from"] in line]
+    ends = [i for i, line in enumerate(text) if notice["through"] in line]
+    if len(starts) != 1 or len(ends) != 1 or ends[0] < starts[0]:
+        raise ValueError("license block is missing or ambiguous: " + notice["source"])
+    lines = []
+    for line in text[starts[0]:ends[0] + 1]:
+        if not line.startswith(notice["strip_comment"]):
+            raise ValueError("license block line is not a comment: " + notice["source"])
+        lines.append(line[len(notice["strip_comment"]):].strip())
+    return ("\r\n".join(lines) + "\r\n").encode("ascii")
+
+
 def utility_inputs(tool):
     """Components a utility is built from: itself plus any staged libraries."""
     from utilities.build_tools import TOOLS
@@ -444,10 +461,11 @@ def build_utility_disk(out, source, epoch, parent_revision, toolchain_identity, 
             for name in item["source_locks"]}
         packages.append(package)
     notices = {}
-    for filename, relative in sorted(config["notices"].items()):
+    for filename, notice in sorted(config["notices"].items()):
         if filename in payloads:
             raise ValueError("utility notice collides with a program: " + filename)
-        payloads[filename] = read_text_payload(relative)
+        payloads[filename] = notice_payload(notice)
+        relative = notice if isinstance(notice, str) else notice["source"]
         notices[filename] = {"source": relative, "sha256": sha256(payloads[filename])}
     if "README.TXT" in payloads:
         raise ValueError("utility README collides with another file")

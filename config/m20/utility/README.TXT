@@ -16,6 +16,7 @@ NLSFUNC.EXE  Load country-specific information (TSR).
 DEVLOAD.COM  Load device drivers from the command line.
 CHOICE.EXE   Wait for a key choice in batch files.
 DELTREE.COM  Delete a directory tree.
+COMP.COM     Compare two files byte by byte.
 
 Every program is built from its pinned public FreeDOS source (as of the
 FreeDOS 1.4 release) with Open Watcom 1.9 or NASM for 8086 real mode;
@@ -28,3 +29,4 @@ Licenses
 COPYING      GNU General Public License version 2 (all programs, tnyprntf).
 KITTEN.LIC   GNU Lesser General Public License version 2.1 (kitten library
              linked into FIND, SORT, LABEL, MOVE and CHOICE).
+COMP.LIC     Copyright and MIT permission notice of COMP.

@@ -268,6 +268,28 @@
       "license": "GPL-2.0-or-later",
       "role": "utility disk: FreeDOS 1.4 DELTREE 1.02g with a PC88VA-only DOS replacement for PC BIOS use",
       "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+    },
+    {
+      "name": "comp",
+      "path": "components/comp",
+      "repository": "https://github.com/nakatamaho/comp.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/FDOS/comp.git",
+      "upstream_base_commit": "ddb4e396e78debd5121e3598b12a2ea25eb6ba8f",
+      "commit": "5269401d61322b47acb17e73b4e8c8d328c17722",
+      "parents": [
+        "ddb4e396e78debd5121e3598b12a2ea25eb6ba8f"
+      ],
+      "source_archive_sha256": "9c7dab1dd9e6dc3e23007ed2dafffe031aca17dcccd27b073e7d8ade6df89394",
+      "license": "MIT",
+      "role": "utility disk: FreeDOS 1.4 COMP 1.04 with a NASM 2.x syntax fix",
+      "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)",
+      "release_binary": {
+        "package": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/base/comp.zip",
+        "package_sha256": "937035db6aa77f5ed412cc9fd6b0ab6309e639d67f475c05928f08dc910dd9e5",
+        "member": "BIN/COMP.COM",
+        "sha256": "a667e37c0a0b9da51c66ee7b9aa958e190b4fc83f08fd2b9ca0d9a228615f5b4"
+      }
     }
   ],
   "toolchain": {

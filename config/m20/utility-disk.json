@@ -10,7 +10,13 @@
   "readme": "config/m20/utility/README.TXT",
   "notices": {
     "COPYING": "COPYING",
-    "KITTEN.LIC": "components/kitten/LICENSE"
+    "KITTEN.LIC": "components/kitten/LICENSE",
+    "COMP.LIC": {
+      "source": "components/comp/comp.asm",
+      "from": "Copyright (c) 2003  Paul Vojta",
+      "through": "THE USE OR OTHER DEALINGS IN THE SOFTWARE.",
+      "strip_comment": ";"
+    }
   },
   "packages": [
     {
@@ -223,6 +229,27 @@
       "tests": [
         "clean source build",
         "non-PC-88VA build equals FreeDOS 1.4 source",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "comp",
+      "upstream": "FreeDOS 1.4 COMP 1.04 source as of the FreeDOS 1.4 release",
+      "files": [
+        "COMP.COM"
+      ],
+      "source_locks": [
+        "comp"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "MIT (see the source bundle)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "none; fork nakatamaho/comp only fixes NASM 2.x EQU syntax and reproduces the FreeDOS 1.4 binary",
+      "messages": "English",
+      "description": "Compare two files byte by byte.",
+      "tests": [
+        "clean source build",
+        "output equals the FreeDOS 1.4 package binary",
         "VAEG guest check pending"
       ]
     }

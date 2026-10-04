@@ -71,6 +71,10 @@ def verify(root: Path = DEFAULT_ROOT) -> None:
     for filename in list(utility.get("notices", {})) + ["README.TXT"]:
         if not DOS_83.fullmatch(filename):
             raise AuditError("M20 utility notice path is not uppercase DOS 8.3: " + filename)
+    for notice in utility.get("notices", {}).values():
+        relative = notice if isinstance(notice, str) else notice.get("source", "")
+        if not (root / relative).is_file():
+            raise AuditError("M20 utility notice source is missing: " + str(relative))
     if not (root / utility["readme"]).read_bytes().isascii():
         raise AuditError("M20 utility README is not ASCII")
 
