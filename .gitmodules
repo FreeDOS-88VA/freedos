@@ -38,9 +38,6 @@
 [submodule "components/move"]
 	path = components/move
 	url = https://github.com/FDOS/move.git
-[submodule "components/fc"]
-	path = components/fc
-	url = https://github.com/FDOS/fc.git
 [submodule "components/append"]
 	path = components/append
 	url = https://github.com/FDOS/append.git

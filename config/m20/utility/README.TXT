@@ -11,7 +11,6 @@ SORT.EXE     Sort lines of text.
 XCOPY.EXE    Copy files and directory trees.
 LABEL.EXE    Create, change or delete a volume label.
 MOVE.EXE     Move or rename files and directories.
-FC.EXE       Compare files.
 APPEND.EXE   Data file search path (TSR).
 NLSFUNC.EXE  Load country-specific information (TSR).
 DEVLOAD.COM  Load device drivers from the command line.
@@ -25,4 +24,4 @@ Licenses
 --------
 COPYING      GNU General Public License version 2 (all programs, tnyprntf).
 KITTEN.LIC   GNU Lesser General Public License version 2.1 (kitten library
-             linked into FIND, SORT, LABEL, MOVE and FC).
+             linked into FIND, SORT, LABEL and MOVE).

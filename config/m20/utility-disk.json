@@ -119,29 +119,8 @@
       "tests": [
         "clean source build",
         "VAEG guest check pending"
-      ]
-    },
-    {
-      "id": "fc",
-      "upstream": "FreeDOS 1.4 FC 3.03 source as of the FreeDOS 1.4 release",
-      "files": [
-        "FC.EXE"
       ],
-      "source_locks": [
-        "fc",
-        "kitten",
-        "tnyprntf"
-      ],
-      "builder": "utilities.build_tools",
-      "license": "GPL-2.0 (COPYING); kitten LGPL-2.1 (KITTEN.LIC); tnyprntf GPL-2.0 (COPYING)",
-      "cpu": "8086 real mode",
-      "va_adaptation": "none; DOS services only",
-      "messages": "built-in English",
-      "description": "Compare files.",
-      "tests": [
-        "clean source build",
-        "VAEG guest check pending"
-      ]
+      "build_adaptation": "8 KiB stack (-k8192): the Open Watcom default 2 KiB stack overflows (PC and VA); no source change"
     },
     {
       "id": "append",

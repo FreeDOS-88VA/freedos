@@ -27,10 +27,11 @@ TOOLS: dict[str, dict] = {
     "sort": {"kind": KITTEN_C, "kitten": "kitten-3b9947f", "model": "-ms", "pack": True,
              "sources": ["sort.c"], "output": "SORT.EXE", "link": "sort.exe",
              "objects": ["kitten.obj", "tnyprntf.obj"]},
+    # MOVE overflows Open Watcom's default 2 KiB stack (checked on PC and VA);
+    # an 8 KiB stack is a build setting only, no source change.
     "move": {"kind": KITTEN_C, "kitten": "kitten-3b9947f", "model": "-ms", "pack": False,
-             "sources": ["move.c", "movedir.c", "misc.c"], "output": "MOVE.EXE", "link": "move.exe"},
-    "fc": {"kind": KITTEN_C, "kitten": "kitten", "model": "-mc", "pack": True,
-           "sources": ["fc.c", "fctools.c"], "output": "FC.EXE", "link": "fc.exe"},
+             "sources": ["move.c", "movedir.c", "misc.c"], "output": "MOVE.EXE", "link": "move.exe",
+             "link_options": ["-k8192"]},
     # label's build.sh compiles everything in one wcl invocation.
     "label": {"kind": "single-wcl", "kitten": "kitten-3b9947f", "directory": "src",
               "options": ["-bt=DOS", "-bcl=DOS", "-D__MSDOS__", "-zp1", "-ms", "-0", "-lr"],
@@ -101,7 +102,7 @@ def build_one(name: str, components: Path, output: Path, env: dict) -> dict[str,
         options = C_BASE + (["-zp1"] if spec["pack"] else []) + [spec["model"], "-0", "-lr"]
         commands = [["wcl", *options, "-fo=kitten.obj", "-c", "../kitten/kitten.c"],
                     ["wcl", *options, "-fo=tnyprntf.obj", "-c", "../tnyprntf/tnyprntf.c"],
-                    ["wcl", *options, "-fe=" + spec["link"], *spec["sources"],
+                    ["wcl", *options, *spec.get("link_options", []), "-fe=" + spec["link"], *spec["sources"],
                      *spec.get("objects", ["tnyprntf.obj", "kitten.obj"])]]
     elif kind == "single-wcl":
         src = tree / spec["directory"]

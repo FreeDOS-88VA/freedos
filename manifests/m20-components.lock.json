@@ -180,21 +180,6 @@
       "selection": "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
     },
     {
-      "name": "fc",
-      "path": "components/fc",
-      "repository": "https://github.com/FDOS/fc.git",
-      "branch": "master",
-      "upstream_repository": "https://github.com/FDOS/fc.git",
-      "commit": "5591875a7298a5dd17f342cebe6a500746ee674d",
-      "parents": [
-        "3c2a6048adb41483774f67332fc0fdcc21820184"
-      ],
-      "source_archive_sha256": "459f21002f9d0a0720bbbf61e770a5da17a33102606863db186b7e54849041b7",
-      "license": "GPL-2.0",
-      "role": "utility disk: FreeDOS 1.4 FC 3.03",
-      "selection": "last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
-    },
-    {
       "name": "append",
       "path": "components/append",
       "repository": "https://github.com/FDOS/append.git",
