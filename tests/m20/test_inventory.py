@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 import importlib.util
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -40,6 +41,9 @@ class InventoryTests(unittest.TestCase):
         # An official upstream change is reported as such regardless of paths.
         self.assertEqual(inventory.classify({"shared"}, True), "upstream-backport")
 
+    # The inventory tool is a host analysis aid that reads Git history; the
+    # pinned build container has no Git. make m20-host-tests runs this test.
+    @unittest.skipUnless(shutil.which("git"), "host-only: requires git")
     def test_actual_history_patch_id_markers_and_sjis(self):
         with tempfile.TemporaryDirectory() as temporary:
             repo = Path(temporary)
