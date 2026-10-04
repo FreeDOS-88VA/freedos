@@ -43,6 +43,16 @@ TOOLS: dict[str, dict] = {
                           "-fm", "-k12288"],
               "sources": ["xcopy.c", "kitten.c", "prf.c"], "output": "XCOPY.EXE",
               "link": "xcopy.exe"},
+    # Project forks: PC88VA builds select DOS replacements for PC BIOS use;
+    # builds without the define equal the FreeDOS 1.4 source (checked by
+    # tools/m20/pc_baseline.py).
+    "choice": {"kind": KITTEN_C, "kitten": "kitten", "model": "-ms", "pack": True,
+               "sources": ["choice.c"], "output": "CHOICE.EXE", "link": "choice.exe",
+               "platform_defines": ["-DPC88VA"]},
+    "deltree": {"kind": "nasm", "directory": ".",
+                "command": ["-o", "deltree.com", "deltree.asm"],
+                "output": "DELTREE.COM", "link": "deltree.com",
+                "platform_defines": ["-DPC88VA"]},
     "append": {"kind": "nasm", "directory": "source",
                "command": ["-dNEW_NASM", "-fbin", "append.asm", "-o", "append.exe"],
                "output": "APPEND.EXE", "link": "append.exe"},
@@ -93,13 +103,15 @@ def stage(name: str, spec: dict, components: Path, output: Path) -> Path:
     return tree
 
 
-def build_one(name: str, components: Path, output: Path, env: dict) -> dict[str, object]:
+def build_one(name: str, components: Path, output: Path, env: dict,
+              platform: bool = True) -> dict[str, object]:
     spec = TOOLS[name]
     tree = stage(name, spec, components, output)
     kind = spec["kind"]
+    defines = spec.get("platform_defines", []) if platform else []
     if kind == KITTEN_C:
         src = tree / "src"
-        options = C_BASE + (["-zp1"] if spec["pack"] else []) + [spec["model"], "-0", "-lr"]
+        options = C_BASE + defines + (["-zp1"] if spec["pack"] else []) + [spec["model"], "-0", "-lr"]
         commands = [["wcl", *options, "-fo=kitten.obj", "-c", "../kitten/kitten.c"],
                     ["wcl", *options, "-fo=tnyprntf.obj", "-c", "../tnyprntf/tnyprntf.c"],
                     ["wcl", *options, *spec.get("link_options", []), "-fe=" + spec["link"], *spec["sources"],
@@ -109,7 +121,7 @@ def build_one(name: str, components: Path, output: Path, env: dict) -> dict[str,
         commands = [["wcl", *spec["options"], "-fe=" + spec["link"], *spec["sources"]]]
     elif kind == "nasm":
         src = tree / spec["directory"]
-        commands = [["nasm", *spec["command"]]]
+        commands = [["nasm", *defines, *spec["command"]]]
     else:
         raise ValueError("unknown build kind: " + kind)
     for command in commands:
@@ -117,12 +129,14 @@ def build_one(name: str, components: Path, output: Path, env: dict) -> dict[str,
                        stdout=subprocess.DEVNULL if command[0] == "wcl" else None)
     record = check_program(src / spec["link"])
     record["commands"] = [" ".join(c) for c in commands]
+    record["platform_defines"] = defines
     record["working_directory"] = str(src.relative_to(output))
     shutil.copy2(src / spec["link"], output / spec["output"])
     return record
 
 
-def build(components: Path, output: Path, names: list[str], revisions: dict[str, str]) -> dict:
+def build(components: Path, output: Path, names: list[str], revisions: dict[str, str],
+          platform: bool = True) -> dict:
     output = output.resolve()
     if output.exists():
         raise FileExistsError("utility output directory must not already exist")
@@ -134,7 +148,7 @@ def build(components: Path, output: Path, names: list[str], revisions: dict[str,
     env["INCLUDE"] = str(watcom / "h")
     records = {}
     for name in names:
-        record = build_one(name, components, output, env)
+        record = build_one(name, components, output, env, platform)
         record.update(source_revisions=revisions[name], upx=False,
                       toolchain="Open Watcom 1.9 and NASM 2.15; identities are verified by the M20 toolchain lock",
                       messages="built-in English; kitten NLS catalogs are not installed")
@@ -143,3 +157,20 @@ def build(components: Path, output: Path, names: list[str], revisions: dict[str,
     (output / "utilities-build.json").write_text(json.dumps(records, indent=2, sort_keys=True) + "\n",
                                                  encoding="ascii")
     return records
+
+
+def main() -> None:
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--components", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--no-platform", action="store_true",
+                        help="omit PC88VA defines (non-PC-88VA baseline build)")
+    parser.add_argument("names", nargs="+")
+    args = parser.parse_args()
+    build(args.components, args.output, args.names, {n: {} for n in args.names},
+          platform=not args.no_platform)
+
+
+if __name__ == "__main__":
+    main()

@@ -80,6 +80,29 @@ class UtilityDiskTests(unittest.TestCase):
             with self.subTest(component=item["name"]):
                 self.assertEqual(item["commit"], expected)
 
+    @unittest.skipUnless(shutil.which("git") and (ROOT / "components/choice/.git").exists(),
+                         "host-only: requires component checkouts and git")
+    def test_fork_bases_are_freedos_14_cutoff_commits_and_ancestors(self):
+        forks = [item for item in json.loads(
+            (ROOT / "manifests/m20-components.lock.json").read_text())["components"]
+            if item.get("selection", "").startswith("project fork; upstream base is")]
+        self.assertTrue(forks)
+        for item in forks:
+            path = ROOT / item["path"]
+            upstream = subprocess.run(["git", "-C", str(path), "rev-parse", "--verify", "-q",
+                                       "upstream/master"], capture_output=True, text=True)
+            if upstream.returncode:
+                self.skipTest("upstream is not fetched: " + item["name"])
+            expected = subprocess.run(["git", "-C", str(path), "rev-list", "-1",
+                                       "--before=2025-04-10T00:00:00", upstream.stdout.strip()],
+                                      check=True, capture_output=True, text=True).stdout.strip()
+            with self.subTest(component=item["name"]):
+                self.assertTrue(item["repository"].startswith("https://github.com/nakatamaho/"))
+                self.assertTrue(item["upstream_repository"].startswith("https://github.com/FDOS/"))
+                self.assertEqual(item["upstream_base_commit"], expected)
+                subprocess.run(["git", "-C", str(path), "merge-base", "--is-ancestor",
+                                expected, item["commit"]], check=True)
+
 
 if __name__ == "__main__":
     unittest.main()

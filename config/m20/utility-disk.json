@@ -181,6 +181,50 @@
         "clean source build",
         "VAEG guest check pending"
       ]
+    },
+    {
+      "id": "choice",
+      "upstream": "FreeDOS 1.4 CHOICE 4.4 source as of the FreeDOS 1.4 release",
+      "files": [
+        "CHOICE.EXE"
+      ],
+      "source_locks": [
+        "choice",
+        "kitten",
+        "tnyprntf"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0-or-later (COPYING); kitten LGPL-2.1 (KITTEN.LIC); tnyprntf GPL-2.0 (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "fork nakatamaho/choice: /T timeout measured with DOS function 2Ch instead of the PC BIOS tick counter (PC88VA builds only)",
+      "messages": "built-in English",
+      "description": "Wait for a key choice in batch files.",
+      "tests": [
+        "clean source build",
+        "non-PC-88VA build equals FreeDOS 1.4 source",
+        "VAEG guest check pending"
+      ]
+    },
+    {
+      "id": "deltree",
+      "upstream": "FreeDOS 1.4 DELTREE 1.02g source as of the FreeDOS 1.4 release",
+      "files": [
+        "DELTREE.COM"
+      ],
+      "source_locks": [
+        "deltree"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "GPL-2.0-or-later (COPYING)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "fork nakatamaho/deltree: confirmation key read through DOS (0Bh/07h) instead of INT 16h (PC88VA builds only)",
+      "messages": "built-in English",
+      "description": "Delete a directory tree.",
+      "tests": [
+        "clean source build",
+        "non-PC-88VA build equals FreeDOS 1.4 source",
+        "VAEG guest check pending"
+      ]
     }
   ]
 }

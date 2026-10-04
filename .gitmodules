@@ -50,3 +50,9 @@
 [submodule "kitten-3b9947f"]
 	path = components/kitten-3b9947f
 	url = https://github.com/FDOS/kitten.git
+[submodule "components/choice"]
+	path = components/choice
+	url = https://github.com/nakatamaho/choice.git
+[submodule "components/deltree"]
+	path = components/deltree
+	url = https://github.com/nakatamaho/deltree.git

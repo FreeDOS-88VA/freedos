@@ -236,6 +236,38 @@
       "license": "LGPL-2.1",
       "role": "library linked into SORT, LABEL and MOVE",
       "selection": "commit referenced by the programs' own kitten submodule"
+    },
+    {
+      "name": "choice",
+      "path": "components/choice",
+      "repository": "https://github.com/nakatamaho/choice.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/FDOS/choice.git",
+      "upstream_base_commit": "fba777282f44aa2ab81d170b1f1655bfc7544473",
+      "commit": "aa63ef2959420cad54032236bd0817d890bd32de",
+      "parents": [
+        "fba777282f44aa2ab81d170b1f1655bfc7544473"
+      ],
+      "source_archive_sha256": "c0d402297f5e504fb297d262eae69a53c3e757c2b4feb48aa9bb8d33750e4d16",
+      "license": "GPL-2.0-or-later",
+      "role": "utility disk: FreeDOS 1.4 CHOICE 4.4 with a PC88VA-only DOS replacement for PC BIOS use",
+      "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
+    },
+    {
+      "name": "deltree",
+      "path": "components/deltree",
+      "repository": "https://github.com/nakatamaho/deltree.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/FDOS/deltree.git",
+      "upstream_base_commit": "ed472787c705ecc19c4d087f0ead1e6d599cad5d",
+      "commit": "ca8e912016b046a87946647f462769419842a076",
+      "parents": [
+        "ed472787c705ecc19c4d087f0ead1e6d599cad5d"
+      ],
+      "source_archive_sha256": "9675b8818da6a40836a38626f8c8d1a4e459a00935ccaa35cd2d95ff5f5cbd24",
+      "license": "GPL-2.0-or-later",
+      "role": "utility disk: FreeDOS 1.4 DELTREE 1.02g with a PC88VA-only DOS replacement for PC BIOS use",
+      "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"
     }
   ],
   "toolchain": {

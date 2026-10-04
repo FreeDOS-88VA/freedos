@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Check that the non-PC-88VA kernel and FreeCOM builds equal the FreeDOS 1.4 baseline.
+"""Check that non-PC-88VA kernel, FreeCOM and forked-utility builds equal FreeDOS 1.4.
 
 M20 adds PC-88VA support on top of FDOS kernel ke2043. Every PC-88VA change
 to shared files must be confined to PC88VA builds, so the IBM PC target of
@@ -12,8 +12,10 @@ image and compares KERNEL.SYS, SYS.COM and COUNTRY.SYS byte for byte.
 The kernel banner embeds the compile date, so both builds run in one
 invocation. FreeCOM is checked the same way against FDOS com086 with its own
 default build (Open Watcom, XMS swap, English); COMMAND.COM may differ only
-inside its embedded __DATE__/__TIME__ strings. A mismatch is a defect of the
-PC-88VA port, not of the baseline.
+inside its embedded __DATE__/__TIME__ strings. Forked utilities (lock entries
+with an upstream_base_commit) are built without their PC88VA defines from the
+upstream base and from the pinned fork commit and must be byte-identical. A
+mismatch is a defect of the PC-88VA port, not of the baseline.
 """
 from __future__ import annotations
 
@@ -77,6 +79,43 @@ def same_except_timestamps(a: bytes, b: bytes) -> bool:
     return all(a[i] == b[i] or i in masked for i in range(len(a)))
 
 
+def utility_baselines(root: Path, work: Path, image: str) -> dict[str, bool]:
+    """Build forked utilities without PC88VA from their upstream base and pin."""
+    import sys
+    sys.path.insert(0, str(root / "tools/m20"))
+    from utilities.build_tools import TOOLS
+    lock = json.loads((root / "manifests/m20-components.lock.json").read_text())
+    commits = {item["name"]: item["commit"] for item in lock["components"]}
+    forks = [item for item in lock["components"]
+             if item.get("upstream_base_commit") and item["name"] in TOOLS]
+    results: dict[str, bool] = {}
+    for item in forks:
+        name = item["name"]
+        spec = TOOLS[name]
+        libraries = [spec["kitten"], "tnyprntf"] if spec.get("kitten") else []
+        outputs = {}
+        for label, revision in (("base", item["upstream_base_commit"]), ("current", commits[name])):
+            components = (work / ("utility-" + label) / name / "components").resolve()
+            for component, rev in [(name, revision)] + [(lib, commits[lib]) for lib in libraries]:
+                target = components / component
+                target.mkdir(parents=True)
+                archive = subprocess.run(["git", "-C", str(root / "components" / component),
+                                          "archive", rev], check=True, capture_output=True).stdout
+                subprocess.run(["tar", "-x", "-C", str(target)], input=archive, check=True)
+            out = components.parent / "out"
+            with (components.parent / "build.log").open("wb") as stream:
+                subprocess.run(["docker", "run", "--rm", "--platform", "linux/amd64",
+                                "--network", "none", "-u", f"{os.getuid()}:{os.getgid()}",
+                                "-v", f"{root.resolve()}:/src:ro", "-v", f"{components.parent}:/w",
+                                "-w", "/w", image, "-c",
+                                "python3 -B /src/tools/m20/utilities/build_tools.py "
+                                "--components /w/components --output /w/out --no-platform " + name],
+                               stdout=stream, stderr=subprocess.STDOUT, check=True)
+            outputs[label] = (out / spec["output"]).read_bytes()
+        results[name] = outputs["base"] == outputs["current"]
+    return results
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo", type=Path, default=ROOT / "components/fdkernel")
@@ -102,6 +141,7 @@ def main() -> None:
                                    work / "freecom-baseline", args.image)
         shell_current = build_freecom(args.freecom_repo, freecom,
                                       work / "freecom-current", args.image)
+        utilities = utility_baselines(ROOT, work, args.image)
     finally:
         if args.output is None:
             shutil.rmtree(work, ignore_errors=True)
@@ -109,12 +149,15 @@ def main() -> None:
     record = {"baseline": BASELINE, "revision": revision, "baseline_sha256": base,
               "revision_sha256": current, "identical": base == current,
               "freecom_baseline": FREECOM_BASELINE, "freecom_revision": freecom,
-              "freecom_identical_except_timestamps": shell_same}
+              "freecom_identical_except_timestamps": shell_same,
+              "forked_utilities_identical_without_pc88va": utilities}
     print(json.dumps(record, indent=2))
     if base != current:
         raise SystemExit("non-PC-88VA kernel build differs from the FreeDOS 1.4 baseline")
     if not shell_same:
         raise SystemExit("non-PC-88VA FreeCOM build differs from the FreeDOS 1.4 baseline")
+    if not utilities or not all(utilities.values()):
+        raise SystemExit("a forked utility built without PC88VA differs from its FreeDOS 1.4 source")
 
 
 if __name__ == "__main__":
