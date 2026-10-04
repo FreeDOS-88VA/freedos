@@ -65,3 +65,6 @@
 [submodule "components/attrib"]
 	path = components/attrib
 	url = https://github.com/nakatamaho/attrib.git
+[submodule "components/tree"]
+	path = components/tree
+	url = https://github.com/nakatamaho/tree.git

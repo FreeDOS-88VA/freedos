@@ -123,17 +123,26 @@ class UtilityDiskTests(unittest.TestCase):
     def test_baseline_exemptions_are_explained_and_narrow(self):
         lock = json.loads((ROOT / "manifests/m20-components.lock.json").read_text())
         exempt = {item["name"]: item for item in lock["components"] if item.get("baseline_exemption")}
-        self.assertEqual(set(exempt), {"fc", "attrib"})
+        self.assertEqual(set(exempt), {"fc", "attrib", "tree"})
         for name, item in exempt.items():
             with self.subTest(component=name):
                 self.assertGreater(len(item["baseline_exemption"]), 80)
                 check = item["baseline_check"]
                 if check == "lfn-failure-tests-only":
                     self.check_lfn_failure_only(item)
-                elif check == "watcom-branches-only":
-                    self.check_watcom_branches_only(item)
+                elif check == "platform-branches-only":
+                    self.check_platform_branches_only(item)
                 else:
                     self.fail("unknown baseline check: " + check)
+
+    def test_upstream_view_drops_only_platform_branches(self):
+        fork = ["a", "#ifdef __WATCOMC__", "w", "#else", "b", "#endif",
+                "#if defined X", "x", "#elif defined __WATCOMC__", "w2", "#else", "y", "#endif",
+                "#ifdef PC88VA", "va", "#else", "pc", "#endif", "#ifndef PC88VA", "pc2", "#endif",
+                "#ifdef OTHER", "o", "#endif"]
+        self.assertEqual(upstream_view(fork),
+                         ["a", "b", "#if defined X", "x", "#else", "y", "#endif",
+                          "pc", "pc2", "#ifdef OTHER", "o", "#endif"])
 
     def check_lfn_failure_only(self, item):
         diff = subprocess.run(["git", "-C", str(ROOT / item["path"]), "diff", "-U0",
@@ -153,33 +162,69 @@ class UtilityDiskTests(unittest.TestCase):
                 comment = False
             self.assertTrue(allowed, line)
 
-    def check_watcom_branches_only(self, item):
-        """Dropping every __WATCOMC__ branch must give the upstream file back."""
+    def check_platform_branches_only(self, item):
+        """Dropping __WATCOMC__ and PC88VA branches must give the upstream files back.
+
+        New files are allowed only in an Open Watcom-only directory.
+        """
         path = ROOT / item["path"]
-        names = subprocess.run(["git", "-C", str(path), "diff", "--name-only",
-                                item["upstream_base_commit"], item["commit"]],
-                               check=True, capture_output=True, text=True).stdout.split()
-        self.assertTrue(names)
-        for name in names:
+        status = subprocess.run(["git", "-C", str(path), "diff", "--name-status",
+                                 item["upstream_base_commit"], item["commit"]],
+                                check=True, capture_output=True, text=True).stdout.split("\n")
+        changed = [line.split("\t") for line in status if line]
+        self.assertTrue(changed)
+        for kind, name in changed:
+            if kind == "A":
+                self.assertIn("/watcom/", "/" + name, name)
+                continue
+            self.assertEqual(kind, "M", name)
+
             def show(rev):
                 return subprocess.run(["git", "-C", str(path), "show", rev + ":" + name],
                                       check=True, capture_output=True).stdout.decode("latin-1")
             base = show(item["upstream_base_commit"]).replace("\r\n", "\n").split("\n")
-            out, state = [], None
-            for line in show(item["commit"]).replace("\r\n", "\n").split("\n"):
-                word = line.strip()
-                if word.startswith("#ifdef __WATCOMC__"):
-                    state = "watcom"; continue
-                if state == "watcom" and word.startswith("#else"):
-                    state = "other"; continue
-                if state and word.startswith("#endif"):
-                    state = None; continue
-                if state == "watcom":
-                    continue
-                out.append(line)
+            out = upstream_view(show(item["commit"]).replace("\r\n", "\n").split("\n"))
             # Whitespace around a preprocessor '#' does not change the source.
             normalize = lambda lines: [re.sub(r"^#\s+", "#", l.strip()) for l in lines]
             self.assertEqual(normalize(out), normalize(base), name)
+
+
+PLATFORM = r"(__WATCOMC__|PC88VA)"
+
+
+def upstream_view(lines):
+    """Lines of a fork file with __WATCOMC__ and PC88VA undefined, keeping
+    every other preprocessor directive (the upstream view)."""
+    out, stack = [], []   # entries: [kind, keep] kind: known/added-elif/other
+    for line in lines:
+        word = re.sub(r"^#\s+", "#", line.strip())
+        keep = all(entry[1] for entry in stack)
+        if re.match(r"#ifdef\s+" + PLATFORM + r"\b", word):
+            stack.append(["known", False]); continue
+        if re.match(r"#ifndef\s+" + PLATFORM + r"\b", word):
+            stack.append(["known", True]); continue
+        if word.startswith("#if"):
+            stack.append(["other", True])
+            if keep: out.append(line)
+            continue
+        if re.match(r"#elif\s+defined\s*\(?\s*" + PLATFORM + r"\b", word) and stack \
+                and stack[-1][0] == "other":
+            stack[-1] = ["added-elif", False]; continue
+        if word.startswith("#else") and stack:
+            entry = stack[-1]
+            if entry[0] == "known":
+                entry[1] = not entry[1]; continue
+            if entry[0] == "added-elif":
+                stack[-1] = ["other", True]
+            if all(e[1] for e in stack[:-1]): out.append(line)
+            continue
+        if word.startswith("#endif") and stack:
+            entry = stack.pop()
+            if entry[0] != "known" and all(e[1] for e in stack): out.append(line)
+            continue
+        if keep:
+            out.append(line)
+    return out
 
 if __name__ == "__main__":
     unittest.main()

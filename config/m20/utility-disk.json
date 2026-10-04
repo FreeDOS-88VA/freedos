@@ -296,6 +296,27 @@
         "PC FreeDOS 1.4 kernel run",
         "VAEG guest check pending"
       ]
+    },
+    {
+      "id": "tree",
+      "upstream": "FreeDOS 1.4 TREE (pdTree 1.03) source as of the FreeDOS 1.4 release",
+      "files": [
+        "TREE.EXE"
+      ],
+      "source_locks": [
+        "tree"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "Public domain (pdTree; built without the optional LGPL Cats files)",
+      "cpu": "8086 real mode",
+      "va_adaptation": "fork nakatamaho/tree: Open Watcom DOS layer; PC88VA builds default to the ASCII tree (/A) and a fixed 80x25 console",
+      "messages": "built-in English",
+      "description": "Display the directory structure.",
+      "tests": [
+        "clean source build",
+        "PC FreeDOS 1.4 FAT32/FAT16 kernel runs",
+        "VAEG guest check pending"
+      ]
     }
   ]
 }

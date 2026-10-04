@@ -51,6 +51,15 @@ TOOLS: dict[str, dict] = {
     "attrib": {"kind": "single-wcl", "directory": ".",
                "options": ["-q", "-bt=DOS", "-mt", "-0", "-os", "-s", "-bcl=COM"],
                "sources": ["ATTRIB.C"], "output": "ATTRIB.COM", "link": "attrib.com"},
+    # pdTree (C++, compiled by wcl through the pinned wpp) with an Open
+    # Watcom DOS layer; Borland's small-model stack is the rest of DGROUP,
+    # so the Open Watcom build needs a larger stack than the 2 KiB default.
+    "tree": {"kind": "single-wcl", "directory": ".",
+             "options": ["-q", "-bt=DOS", "-ms", "-0", "-os", "-k32768", "-DDOS",
+                         "-Iw32fDOS/common"],
+             "sources": ["tree.cpp", "stack.c", "w32fDOS/watcom/w32fDOS.cpp",
+                         "w32fDOS/common/w32api.cpp"],
+             "output": "TREE.EXE", "link": "tree.exe", "platform_defines": ["-DPC88VA"]},
     # Project forks: PC88VA builds select DOS replacements for PC BIOS use;
     # builds without the define equal the FreeDOS 1.4 source (checked by
     # tools/m20/pc_baseline.py).
@@ -131,7 +140,7 @@ def build_one(name: str, components: Path, output: Path, env: dict,
                      *spec.get("objects", ["tnyprntf.obj", "kitten.obj"])]]
     elif kind == "single-wcl":
         src = tree / spec["directory"]
-        commands = [["wcl", *spec["options"], "-fe=" + spec["link"], *spec["sources"]]]
+        commands = [["wcl", *spec["options"], *defines, "-fe=" + spec["link"], *spec["sources"]]]
     elif kind == "nasm":
         src = tree / spec["directory"]
         commands = [["nasm", *defines, *spec["command"]]]
@@ -154,8 +163,9 @@ def build(components: Path, output: Path, names: list[str], revisions: dict[str,
     if output.exists():
         raise FileExistsError("utility output directory must not already exist")
     watcom = Path(os.environ.get("WATCOM", ""))
-    if not watcom.is_dir() or shutil.which("wcl") is None or shutil.which("nasm") is None:
-        raise RuntimeError("the pinned Open Watcom installation, wcl and nasm are required")
+    if (not watcom.is_dir() or shutil.which("wcl") is None or shutil.which("wpp") is None
+            or shutil.which("nasm") is None):
+        raise RuntimeError("the pinned Open Watcom installation, wcl, wpp and nasm are required")
     output.mkdir(parents=True)
     env = os.environ.copy()
     env["INCLUDE"] = str(watcom / "h")

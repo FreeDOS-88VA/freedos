@@ -49,6 +49,7 @@
       "stability": "stable-final-open-watcom-1.x-release",
       "host_tools": [
         {"name": "wcc", "path": "binl/wcc", "size": 861645, "sha256": "d882c85922da81aa7956cc5ee5aacc3e2a85932ef346c424ce508ff499d1aba6", "banner": "Open Watcom C16 Optimizing Compiler Version 1.9"},
+        {"name": "wpp", "path": "binl/wpp", "size": 1472381, "sha256": "c579b223248d52884d43ce8e339dd4540a1eeb11b97235bbb7a7583b06af9380", "banner": "Open Watcom C++16 Optimizing Compiler Version 1.9"},
         {"name": "wcl", "path": "binl/wcl", "size": 51343, "sha256": "47911ca4b28875d5d9157e9054a68e88180eedd08a5f66a82e1cd864e6f38ba3", "banner": "Open Watcom C/C++16 Compile and Link Utility Version 1.9"},
         {"name": "wmake", "path": "binl/wmake", "size": 188973, "sha256": "d13292a724fb000b51e719bf3a411c6870ab26e13b8e32855e88458a850de5b4", "banner": "Open Watcom Make Version 1.9"},
         {"name": "wlink", "path": "binl/wlink", "size": 457386, "sha256": "e285c328f48b17e115cb6fd0f91f348a915adfd9eeb932eb3e7b4f3b50fc2838", "banner": "Open Watcom Linker Version 1.9"},

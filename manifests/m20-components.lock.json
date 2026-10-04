@@ -325,7 +325,25 @@
       "role": "utility disk: FreeDOS 1.4 ATTRIB 2.1 ported to Open Watcom",
       "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)",
       "baseline_exemption": "Borland/Turbo C program; FreeDOS 1.4 shipped a Borland build, so no Open Watcom byte baseline exists. The fork only adds __WATCOMC__ branches; removing them reproduces the upstream source (host test). Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG.",
-      "baseline_check": "watcom-branches-only"
+      "baseline_check": "platform-branches-only"
+    },
+    {
+      "name": "tree",
+      "path": "components/tree",
+      "repository": "https://github.com/nakatamaho/tree.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/FDOS/tree.git",
+      "upstream_base_commit": "f4e7e2e35ba913b1361f2ed710b2c50312ff8ecc",
+      "commit": "29ba525a78d12068a723bd46a5a11e9b93409232",
+      "parents": [
+        "1344b7d01ceb0defd53217e217d3d0e555638905"
+      ],
+      "source_archive_sha256": "cc3fc3e6b61f3bba53bc1cfe7062df69533d177df6a2dc6eca7c7d6129ad2306",
+      "license": "Public domain (pdTree 1.03; built without the optional LGPL Cats files)",
+      "role": "utility disk: FreeDOS 1.4 TREE (pdTree) ported to Open Watcom with PC-88VA console defaults",
+      "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)",
+      "baseline_exemption": "C++ Borland/Turbo C program; FreeDOS 1.4 shipped a Borland build, so no Open Watcom byte baseline exists. The fork adds an Open Watcom DOS layer (w32fDOS/watcom), __WATCOMC__ branches and PC88VA branches; dropping those branches reproduces the upstream sources (host test). Checked by guest runs on PC (FAT32 and FAT16 FreeDOS 1.4 kernels) and VAEG.",
+      "baseline_check": "platform-branches-only"
     }
   ],
   "toolchain": {
