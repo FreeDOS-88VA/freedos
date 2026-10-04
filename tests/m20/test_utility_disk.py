@@ -115,7 +115,9 @@ class UtilityDiskTests(unittest.TestCase):
                                       check=True, capture_output=True, text=True).stdout.strip()
             with self.subTest(component=item["name"]):
                 self.assertTrue(item["repository"].startswith("https://github.com/nakatamaho/"))
-                self.assertTrue(item["upstream_repository"].startswith("https://github.com/FDOS/"))
+                if not item["upstream_repository"].startswith("https://github.com/FDOS/"):
+                    # Only with a stated reason (DEBUG: FDOS/debug is obsolete).
+                    self.assertGreater(len(item.get("upstream_reason", "")), 40)
                 self.assertEqual(item["upstream_base_commit"], expected)
                 subprocess.run(["git", "-C", str(path), "merge-base", "--is-ancestor",
                                 expected, item["commit"]], check=True)
@@ -182,6 +184,19 @@ class UtilityDiskTests(unittest.TestCase):
                 for name, digest in committed:
                     data = git("show", package["import_commit"] + ":" + name)
                     self.assertEqual(hashlib.sha256(data).hexdigest(), digest, name)
+
+    def test_host_jwasm_is_locked_from_the_pinned_jwasm_component(self):
+        from utilities.build_tools import TOOLS, derived_tool
+        lock = {item["name"]: item for item in
+                json.loads((ROOT / "manifests/m20-components.lock.json").read_text())["components"]}
+        record = derived_tool("jwasm")
+        self.assertEqual(record["source_commit"], lock[record["source_component"]]["commit"])
+        self.assertRegex(record["sha256"], r"^[0-9a-f]{64}$")
+        users = [name for name, spec in TOOLS.items() if spec["kind"] == "jwasm"]
+        self.assertEqual(users, ["debug"])
+        for name in users:
+            self.assertEqual(TOOLS[name]["host_components"], ["jwasm"])
+            self.assertNotIn("baseline_exemption", lock[name])
 
     def test_upstream_view_drops_only_platform_branches(self):
         fork = ["a", "#ifdef __WATCOMC__", "w", "#else", "b", "#endif",

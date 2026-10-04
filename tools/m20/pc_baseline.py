@@ -95,7 +95,8 @@ def utility_baselines(root: Path, work: Path, image: str) -> dict[str, bool]:
     for item in forks:
         name = item["name"]
         spec = TOOLS[name]
-        libraries = [spec["kitten"], "tnyprntf"] if spec.get("kitten") else []
+        libraries = (([spec["kitten"], "tnyprntf"] if spec.get("kitten") else [])
+                     + spec.get("host_components", []))
         outputs = {}
         release = item.get("release_binary")
         # A fork that only makes old source build with the pinned tools has no
@@ -110,6 +111,11 @@ def utility_baselines(root: Path, work: Path, image: str) -> dict[str, bool]:
                 archive = subprocess.run(["git", "-C", str(root / "components" / component),
                                           "archive", rev], check=True, capture_output=True).stdout
                 subprocess.run(["tar", "-x", "-C", str(target)], input=archive, check=True)
+            if label == "base":
+                # File-name case only: the recorded upstream base names an
+                # include in other case than the file (case-sensitive host).
+                for alias, existing in item.get("baseline_aliases", {}).items():
+                    shutil.copyfile(components / name / existing, components / name / alias)
             out = components.parent / "out"
             with (components.parent / "build.log").open("wb") as stream:
                 subprocess.run(["docker", "run", "--rm", "--platform", "linux/amd64",

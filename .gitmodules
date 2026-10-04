@@ -83,3 +83,6 @@
 [submodule "components/gzip"]
 	path = components/gzip
 	url = https://github.com/nakatamaho/gzip.git
+[submodule "components/debug"]
+	path = components/debug
+	url = https://github.com/nakatamaho/DOS-debug.git

@@ -425,7 +425,8 @@ def utility_inputs(tool):
     """Components a utility is built from: itself plus any staged libraries."""
     from utilities.build_tools import TOOLS
     spec = TOOLS[tool]
-    return [tool] + ([spec["kitten"], "tnyprntf"] if spec.get("kitten") else [])
+    return ([tool] + ([spec["kitten"], "tnyprntf"] if spec.get("kitten") else [])
+            + spec.get("host_components", []))
 
 
 def build_utility_disk(out, source, epoch, parent_revision, toolchain_identity, spec,

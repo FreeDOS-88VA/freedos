@@ -57,6 +57,9 @@
         {"name": "wlib", "path": "binl/wlib", "size": 188291, "sha256": "0391b9363048520eb3e1da0712c42d096f9ef8407b2a450c2ae97b345a08ed84", "banner": "Open Watcom Library Manager Version 1.9"}
       ]
     },
+    "derived_host_tools": [
+      {"name": "jwasm", "source_component": "jwasm", "source_commit": "c9b3a947f74d7355b1b3d8bd5728241c95ff4b19", "build": "make -f GccUnix.mak in a git archive of the source commit, inside the locked image (its gcc and make)", "path": "build/GccUnixR/jwasm", "size": 431816, "sha256": "da920bd7e1b2d4bd988d82474ac7434e0890a1a214b6e035bb0d6f64bdc4237e", "banner": "JWasm v2.20, PC-88VA FreeDOS reproducible build"}
+    ],
     "versions": {
       "nasm": "nasm 2.15.05",
       "gnu_make": "GNU Make 4.3",

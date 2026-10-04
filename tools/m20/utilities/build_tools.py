@@ -102,6 +102,14 @@ TOOLS: dict[str, dict] = {
                          "inflate.c", "util.c", "crypt.c", "lzw.c", "unlzw.c", "unpack.c",
                          "unlzh.c", "getopt.c", "msdos/tailor.c"],
              "output": "GZIP.EXE", "link": "gzip.exe"},
+    # DEBUG 2.50+ (DOS-debug fork at the last commit before the FreeDOS 1.4
+    # release) assembled as in its MAKE.BAT by the host JWasm, which is built
+    # from the pinned jwasm component; PC88VA=1 replaces its PC BIOS console
+    # use with DOS interfaces.
+    "debug": {"kind": "jwasm", "directory": ".", "host_components": ["jwasm"],
+              "command": ["-nologo", "-bin", "-FoDEBUG.COM", "src/DEBUG.ASM"],
+              "output": "DEBUG.COM", "link": "DEBUG.COM",
+              "platform_defines": ["-DPC88VA=1"]},
     # Project forks: PC88VA builds select DOS replacements for PC BIOS use;
     # builds without the define equal the FreeDOS 1.4 source (checked by
     # tools/m20/pc_baseline.py).
@@ -128,6 +136,34 @@ TOOLS: dict[str, dict] = {
                 "output": "DEVLOAD.COM", "link": "devload.com"},
 }
 C_BASE = ["-q", "-bt=DOS", "-bcl=DOS", "-D__MSDOS__"]
+
+
+TOOLCHAIN_LOCK = Path(__file__).resolve().parents[3] / "manifests/toolchains.lock.json"
+
+
+def derived_tool(name: str) -> dict:
+    """The lock record of a host tool built from a pinned component."""
+    lock = json.loads(TOOLCHAIN_LOCK.read_text())["canonical"]
+    records = [item for item in lock["derived_host_tools"] if item["name"] == name]
+    if len(records) != 1:
+        raise ValueError("derived host tool is not locked exactly once: " + name)
+    return records[0]
+
+
+def host_jwasm(components: Path, output: Path, env: dict) -> Path:
+    """Build the host JWasm from the pinned component and check its lock record."""
+    record = derived_tool("jwasm")
+    tree = output / "host-jwasm"
+    binary = tree / record["path"]
+    if not binary.exists():
+        shutil.copytree(components / record["source_component"], tree,
+                        ignore=shutil.ignore_patterns(".git"))
+        subprocess.run(["make", "-s", "-f", "GccUnix.mak"], cwd=tree, env=env, check=True,
+                       stdout=subprocess.DEVNULL)
+    data = binary.read_bytes()
+    if len(data) != record["size"] or hashlib.sha256(data).hexdigest() != record["sha256"]:
+        raise ValueError("host JWasm differs from its toolchain lock record")
+    return binary
 
 
 def sha256(path: Path) -> str:
@@ -187,11 +223,17 @@ def build_one(name: str, components: Path, output: Path, env: dict,
     elif kind == "nasm":
         src = tree / spec["directory"]
         commands = [["nasm", *defines, *spec["command"]]]
+    elif kind == "jwasm":
+        src = tree / spec["directory"]
+        commands = [[str(host_jwasm(components, output, env)), *defines, *spec["command"]]]
     else:
         raise ValueError("unknown build kind: " + kind)
     for command in commands:
         subprocess.run(command, cwd=src, env=env, check=True,
                        stdout=subprocess.DEVNULL if command[0] in ("wcl", "wasm") else None)
+    if kind == "jwasm":
+        # Record the tool by its lock name, not by the build directory.
+        commands[0][0] = "jwasm"
     record = check_program(src / spec["link"])
     record["commands"] = [" ".join(c) for c in commands]
     record["platform_defines"] = defines

@@ -11,7 +11,13 @@
   "notices": {
     "COPYING": "COPYING",
     "UNZIP.LIC": "components/unzip/DOC/UNZIP/LICENSE",
-    "ZIP.LIC": "components/zip/DOC/ZIP/LICENSE"
+    "ZIP.LIC": "components/zip/DOC/ZIP/LICENSE",
+    "DEBUG.LIC": {
+      "source": "components/debug/src/DEBUG.ASM",
+      "from": "Copyright (c) 1995-2003  Paul Vojta",
+      "through": "OR OTHER DEALINGS IN THE SOFTWARE.",
+      "strip_comment": ";"
+    }
   },
   "packages": [
     {
@@ -74,6 +80,28 @@
       "tests": [
         "clean source build",
         "PC FreeDOS 1.4 kernel run",
+        "VAEG guest run"
+      ]
+    },
+    {
+      "id": "debug",
+      "upstream": "DEBUG 2.50 (DOS-debug) source as of the FreeDOS 1.4 release",
+      "files": [
+        "DEBUG.COM"
+      ],
+      "source_locks": [
+        "debug",
+        "jwasm"
+      ],
+      "builder": "utilities.build_tools",
+      "license": "MIT (DEBUG.LIC); Japheth's extensions public domain",
+      "cpu": "8086 real mode",
+      "va_adaptation": "PC88VA build option: INT 29h output and CON device driver input while DOS is busy, 25-row help pager",
+      "messages": "English",
+      "description": "Debug, assemble and disassemble programs.",
+      "tests": [
+        "clean source build",
+        "non-PC88VA build equals the upstream base (pc_baseline)",
         "VAEG guest run"
       ]
     }

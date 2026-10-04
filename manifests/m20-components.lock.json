@@ -464,6 +464,26 @@
       "selection": "project import of the FreeDOS 1.4 package source (no FDOS Git repository); built unmodified from the import plus its provenance record",
       "baseline_exemption": "FreeDOS 1.4 shipped a different build of this program (32-bit DJGPP UNZIP, 32-bit UPX-packed ZIP, Borland GZIP), so no Open Watcom 16-bit byte baseline exists. The source is the unmodified FreeDOS 1.4 package import (host test); only the documented build settings differ. Checked by guest runs on PC (FreeDOS 1.4 kernel) and VAEG.",
       "baseline_check": "unmodified-import"
+    },
+    {
+      "name": "debug",
+      "path": "components/debug",
+      "repository": "https://github.com/nakatamaho/DOS-debug.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/Baron-von-Riedesel/DOS-debug.git",
+      "upstream_reason": "FDOS/debug stops at DEBUG 1.18 (2010); the FreeDOS 1.4 DEBUG package is Japheth's DOS-debug, maintained in this repository",
+      "upstream_base_commit": "3d3655e39157564813353b1dae9eb071b9ada366",
+      "commit": "95812fa550a2e3cb12c7e048df3a044d1f6b4804",
+      "parents": [
+        "d0f149d37ecd0b85a4b00c9f7df9c5578156f4b8"
+      ],
+      "source_archive_sha256": "b84dac0d286c366b4d92e4c13ebd1b95abb5559733128e37c0b84ebb4cc75743",
+      "license": "MIT (Paul Vojta); Japheth's extensions public domain",
+      "role": "archiver disk: DEBUG 2.50 with a PC88VA option that replaces its PC BIOS console use by DOS interfaces",
+      "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)",
+      "baseline_aliases": {
+        "src/lineasm.inc": "src/LINEASM.INC"
+      }
     }
   ],
   "toolchain": {

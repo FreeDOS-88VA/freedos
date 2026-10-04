@@ -5,6 +5,6 @@
   "source": {
     "path": "manifests/m20-components.lock.json",
     "schema_version": 1,
-    "sha256": "e39e51f41158e4b4cd96586f428af5839eac7c0a4f18f5d26d1260d9f6b9b630"
+    "sha256": "5dff121fd68a1973655c04593251ef9446f360488127e53b56c31f9780338627"
   }
 }
