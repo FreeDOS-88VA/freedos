@@ -80,8 +80,9 @@ qualified only on PC; it is a candidate for separate import, not baseline.
 
 ## Plan
 
-1. Inventory: classify each M19 PC-88VA kernel/FreeCOM commit and each
-   relevant `lpproj` commit as PC-88VA required, shared platform
+1. Inventory (first pass done, see `docs/porting/m20-inventory.md`):
+   classify each M19 PC-88VA kernel/FreeCOM commit and each relevant
+   `lpproj` commit as PC-88VA required, shared platform
    infrastructure needed by PC-88VA, PC-98 specific, or common fix. Record
    dependencies and the M19 defects already found in each area. No source
    change in this step.
@@ -103,5 +104,6 @@ qualified only on PC; it is a candidate for separate import, not baseline.
 
 ## Unrun gates
 
-Everything: inventory, component branches, builds, host tests, VAEG and
-hardware are **NOT RUN**. No M20 image exists. Hardware: **NOT RUN**.
+First-pass inventory: done (`docs/porting/m20-inventory.md`,
+`tools/m20/inventory.py`, `tests/m20/test_inventory.py`). Component
+branches, builds, VAEG and hardware are **NOT RUN**. No M20 image exists. Hardware: **NOT RUN**.
