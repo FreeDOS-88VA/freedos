@@ -86,3 +86,10 @@
 [submodule "components/debug"]
 	path = components/debug
 	url = https://github.com/FreeDOS-88VA/DOS-debug.git
+[submodule "components/emu2"]
+	path = components/emu2
+	url = https://github.com/dmsc/emu2.git
+[submodule "components/msdos"]
+	path = components/msdos
+	url = https://github.com/FreeDOS-88VA/MS-DOS.git
+	branch = m20/pc88va

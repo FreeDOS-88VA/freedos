@@ -225,6 +225,9 @@ def create_exports(inputs: Path, parent: str, sources: dict[str, str], entries: 
         command = ["git", "-C", str(repo), "archive", revision]
         if name == "parent":
             command.extend(PARENT_INPUTS)
+        else:
+            # A large component may pin only the paths its build and sources use.
+            command.extend(entries[name].get("archive_paths", []))
         with archive.open("xb") as target:
             subprocess.run(command, cwd=ROOT, stdout=target, check=True)
         digest = sha256(archive.read_bytes())

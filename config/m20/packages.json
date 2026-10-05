@@ -160,6 +160,22 @@
       ]
     },
     {
+      "id": "msdos-command",
+      "version": "MS-DOS 4.0 COMMAND.COM (Microsoft MIT source) with the FreeDOS and PC88VA build options",
+      "files": [
+        "MSDOS/COMMAND.COM",
+        "MSDOS/MSDOS.LIC"
+      ],
+      "source_lock": "msdos",
+      "license": "MIT (MSDOS/MSDOS.LIC)",
+      "cpu": "8086 real-mode DOS COM",
+      "va_adaptation": "Alternative shell selected by the CONFIG.SYS menu; the M19 Preview 1 source (FreeDOS version acceptance, F8 /Y no-op, VA console); built with the original MASM 5.10, LINK 3.65 and EXE2BIN under emu2",
+      "tests": [
+        "clean source build",
+        "VAEG: menu selection, shell startup, commands, file write/readback"
+      ]
+    },
+    {
       "id": "starter-material",
       "version": "M20 original examples and quickstart 2",
       "files": [

@@ -185,6 +185,12 @@ def main():
         ROOT / "components", debug_dir, ["debug"],
         {"debug": {c: system_source[c]["commit"] for c in utility_inputs("debug")}})["debug"]
 
+    # MS-DOS 4 COMMAND.COM, the alternative shell offered by the CONFIG.SYS menu.
+    from msdos4.build_command import build as build_msdos4
+    msdos4_records = build_msdos4(
+        ROOT / "components/msdos", ROOT / "components/emu2", out / "msdos4",
+        {name: system_source[name]["commit"] for name in ("msdos", "emu2")})
+
     source_epoch = int(os.environ["SOURCE_DATE_EPOCH"])
     country_source = ROOT / "components/country/country.asm"
     import subprocess
@@ -244,6 +250,8 @@ def main():
         payloads[name] = read_text_payload(relative)
     payloads["COPYING"] = read_text_payload("COPYING")
     payloads["JWASM.LIC"] = extract_jwasm_license()
+    payloads["MSDOS/COMMAND.COM"] = (out / "msdos4/COMMAND.COM").read_bytes()
+    payloads["MSDOS/MSDOS.LIC"] = read_text_payload("components/msdos/LICENSE")
     payloads["DEBUG.LIC"] = notice_payload(json.loads(
         (ROOT / "config/m20/archive-disk.json").read_text(encoding="ascii"))["notices"]["DEBUG.LIC"])
 
@@ -387,6 +395,8 @@ def main():
             record["build_records"] = edlin
         elif item["id"] == "jwasm":
             record["build_records"] = jwasmr
+        elif item["id"] == "msdos-command":
+            record["build_records"] = msdos4_records
         elif item["id"] == "debug":
             record["build_records"] = debug_records
         elif item["id"] == "memmap":

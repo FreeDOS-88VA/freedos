@@ -10,11 +10,11 @@
       "repository": "https://github.com/FreeDOS-88VA/kernel.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/kernel.git",
-      "commit": "9d2c3f6239028d87cda89224a5b0b9019d4d2a4e",
+      "commit": "24d196b9bd924c952ed819360a14a8af5200776a",
       "parents": [
-        "4cc954c1a759b036a554acb79e777825ba3a8c61"
+        "9d2c3f6239028d87cda89224a5b0b9019d4d2a4e"
       ],
-      "source_archive_sha256": "d59f4a761d826aecf70929e39615213321e0a5610534da7b4e2ac2e140a319fa",
+      "source_archive_sha256": "a6c836e96f20eb5b69482f5ea5f6f4743e931780a8cf168f9286a96b50d6131e",
       "license": "GPL-2.0-or-later",
       "upstream_base_tag": "ke2043",
       "upstream_base_commit": "4f7bdda16a84c416a82a2616aa67335ca4f2bd74"
@@ -488,6 +488,50 @@
       "baseline_aliases": {
         "src/lineasm.inc": "src/LINEASM.INC"
       }
+    },
+    {
+      "name": "msdos",
+      "path": "components/msdos",
+      "repository": "https://github.com/FreeDOS-88VA/MS-DOS.git",
+      "branch": "m20/pc88va",
+      "upstream_repository": "https://github.com/microsoft/MS-DOS.git",
+      "upstream_base_commit": "2d04cacc5322951f187bb17e017c12920ac8ebe2",
+      "commit": "e46d23b474f9406160a03c08dd4d931435f8781c",
+      "parents": [
+        "b0364bb954dee1752a5a2113087efea46c92a344"
+      ],
+      "archive_paths": [
+        "LICENSE",
+        "README.md",
+        "v4.0/COMMAND-FREEDOS.md",
+        "v4.0/LICENSE",
+        "v4.0/src/INC",
+        "v4.0/src/CMD/COMMAND",
+        "v4.0/src/MESSAGES/USA-MS.MSG",
+        "v4.0/src/TOOLS/BUILDIDX.EXE",
+        "v4.0/src/TOOLS/BUILDMSG.EXE",
+        "v4.0/src/TOOLS/MASM.EXE",
+        "v4.0/src/TOOLS/LINK.EXE",
+        "v4.0/src/TOOLS/EXE2BIN.EXE"
+      ],
+      "source_archive_sha256": "e278d132298e31327063eff823c3d055b135562d8c04d7e0213baf5238d198be",
+      "license": "MIT",
+      "role": "system disk: MS-DOS 4.0 COMMAND.COM as an alternative shell (A:\\MSDOS), the M19 Preview 1 source with the FreeDOS and PC88VA build options; built with the original MASM, LINK and EXE2BIN from this tree",
+      "import_record": "M19 branch fix/m19-freedos-y-option at e46d23b, unchanged (owner decision for M20)"
+    },
+    {
+      "name": "emu2",
+      "path": "components/emu2",
+      "repository": "https://github.com/dmsc/emu2.git",
+      "branch": "master",
+      "upstream_repository": "https://github.com/dmsc/emu2.git",
+      "commit": "9d8698d06e67359bc8b230c2d19d5b1503e60819",
+      "parents": [
+        "0856587b398ba100a27680e12b381ae56d6994c7"
+      ],
+      "source_archive_sha256": "f014df25b076c3671f14104640de1e230b317592b6b1c217323f586cc3e750ac",
+      "license": "GPL-2.0",
+      "role": "host build tool only: runs the original MS-DOS 4 MASM/LINK/EXE2BIN inside the build container; nothing from it is on a disk"
     }
   ],
   "toolchain": {

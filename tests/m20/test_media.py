@@ -62,6 +62,23 @@ class Native2HDMediaTests(unittest.TestCase):
             with self.assertRaises((ValueError, RuntimeError)):
                 inspect(bytes(image), self.spec)
 
+    def test_one_directory_level_reads_back(self):
+        payloads = {
+            "LOADER.BIN": b"L" * 1024,
+            "CONFIG.SYS": b"FILES=16\r\n",
+            "MSDOS/COMMAND.COM": bytes(range(256)) * 9,
+            "MSDOS/README.TXT": b"x\r\n",
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            compose(payloads, self.profile, output, 1787814827)
+            report, files = inspect((output / "media.d88").read_bytes(), self.spec)
+            self.assertEqual(files, payloads)
+            self.assertEqual(set(report["directories"]), {"MSDOS"})
+            with self.assertRaises(ValueError):
+                compose({"LOADER.BIN": b"L", "A/B/C.TXT": b"x"}, self.profile,
+                        output / "deep", 1787814827)
+
     def test_native_root_capacity_is_enforced(self):
         payloads = {"LOADER.BIN": b"L" * 1024}
         payloads.update({"F{:07d}.TXT".format(index): b"x"

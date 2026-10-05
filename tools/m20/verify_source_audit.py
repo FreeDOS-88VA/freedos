@@ -71,13 +71,15 @@ def verify(root: Path = DEFAULT_ROOT) -> None:
         raise AuditError("M20 package manifest configuration is malformed")
     package_ids = {item.get("id") for item in packages["packages"]}
     if package_ids != {"fdkernel", "freecom", "country", "edlin", "more",
-                       "maintenance", "memmap", "jwasm", "debug", "starter-material"}:
+                       "maintenance", "memmap", "jwasm", "debug", "msdos-command", "starter-material"}:
         raise AuditError("M20 mandatory package set differs")
     for item in packages["packages"]:
         if item.get("source_lock") and item["source_lock"] not in components:
             raise AuditError("M20 package refers to an unpinned component")
         for filename in item.get("files", []):
-            if not isinstance(filename, str) or not DOS_83.fullmatch(filename):
+            # The system disk allows one directory level: DIR/FILE, each part 8.3.
+            if (not isinstance(filename, str) or filename.count("/") > 1 or
+                    not all(DOS_83.fullmatch(part) for part in filename.split("/"))):
                 raise AuditError("M20 disk path is not uppercase DOS 8.3: " + str(filename))
 
     from data_disks import DATA_DISKS

@@ -7,5 +7,13 @@ FILES=16
 LASTDRIVE=E
 SET PATH=A:\
 DOS=LOW
-REM KSSF swaps the shell out while a program runs (/SWAP makes it the default; CALL /S forces it); COMMAND.COM and KSSF.COM are built together.
-SHELL=A:\KSSF.COM A:\COMMAND.COM /E:512 /P /SWAP
+REM Shell menu: a digit selects, Enter or 5 seconds takes 1, F5 skips and F8 traces.
+MENUDEFAULT=1,5
+MENU Select the command shell:
+MENU   1 = FreeCOM 0.86 (swaps itself out while a program runs)
+MENU   2 = MS-DOS 4.0 COMMAND.COM
+MENU
+REM KSSF swaps FreeCOM out (/SWAP makes it the default; CALL /S forces it).
+1?SHELL=A:\KSSF.COM A:\COMMAND.COM /E:512 /P /SWAP
+REM MS-DOS 4 COMMAND sets COMSPEC from its directory argument.
+2?SHELL=A:\MSDOS\COMMAND.COM A:\MSDOS\ /E:512 /P

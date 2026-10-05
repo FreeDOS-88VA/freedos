@@ -23,7 +23,14 @@ def compose(payloads, overlay, output, epoch):
     layout = derive_layout(spec)
     geo, fs = spec['geometry'], spec['filesystem']
     bps = geo['bytes_per_sector']
-    if len(payloads) + 1 > fs['root_entries']:
+    # One directory level is supported: "DIR/FILE" payload names.
+    if any(name.count('/') > 1 for name in payloads):
+        raise ValueError('Payload paths deeper than one directory are unsupported')
+    subdirs = sorted({name.split('/')[0] for name in payloads if '/' in name})
+    if set(subdirs) & set(payloads):
+        raise ValueError('A payload name collides with a directory name')
+    root_files = [name for name in payloads if '/' not in name]
+    if len(root_files) + len(subdirs) + 1 > fs['root_entries']:
         raise ValueError('Too many directory entries including the volume label')
     raw = bytearray(geo['total_bytes'])
     fat = bytearray(fs['sectors_per_fat'] * bps)
@@ -40,9 +47,10 @@ def compose(payloads, overlay, output, epoch):
     raw[root_start:root_start + 32] = volume_entry
     root_index = 1
     # Stage 1 reads a contiguous LOADER.BIN extent derived from this allocation.
-    names = ['LOADER.BIN'] + sorted(set(payloads) - {'LOADER.BIN'})
-    for name in names:
-        data = payloads[name]
+    names = ['LOADER.BIN'] + sorted((set(root_files) | set(subdirs)) - {'LOADER.BIN'})
+
+    def allocate(data):
+        nonlocal cluster
         count = (len(data) + bps - 1) // bps
         if cluster + count > layout['data_clusters'] + 2:
             raise ValueError('Payloads exceed FAT12 capacity')
@@ -51,12 +59,41 @@ def compose(payloads, overlay, output, epoch):
             set_fat12_entry(fat, cluster + n, cluster + n + 1 if n + 1 < count else 0xfff)
             offset = (layout['first_data_sector'] + cluster + n - 2) * bps
             raw[offset:offset + bps] = data[n*bps:(n+1)*bps].ljust(bps, b'\0')
-        entry, _ = build_directory_entry(dict(dos_name=name, size=len(data), source_date_epoch=epoch), first)
+        cluster += count
+        return first, count
+
+    for name in names:
+        if name in subdirs:
+            members = sorted(n for n in payloads if n.startswith(name + '/'))
+            # Reserve the directory clusters, then allocate its files after them.
+            dir_count = ((len(members) + 2) * 32 + bps - 1) // bps
+            first, _ = allocate(bytes(dir_count * bps))
+            table = bytearray(dir_count * bps)
+            for index, dot in enumerate(('.', '..')):
+                entry = bytearray(build_directory_entry(
+                    dict(dos_name='X', size=0, source_date_epoch=epoch), first if dot == '.' else 0)[0])
+                entry[:11] = dot.encode('ascii').ljust(11, b' ')
+                entry[11] = 0x10
+                table[index*32:(index+1)*32] = entry
+            for index, member in enumerate(members, 2):
+                data = payloads[member]
+                member_first, _ = allocate(data)
+                entry, _ = build_directory_entry(dict(dos_name=member.split('/')[1], size=len(data),
+                                                      source_date_epoch=epoch), member_first)
+                table[index*32:(index+1)*32] = entry
+            offset = (layout['first_data_sector'] + first - 2) * bps
+            raw[offset:offset + len(table)] = table
+            entry = bytearray(build_directory_entry(dict(dos_name=name, size=0, source_date_epoch=epoch), first)[0])
+            entry[11] = 0x10
+        else:
+            data = payloads[name]
+            start = cluster
+            first, count = allocate(data)
+            entry, _ = build_directory_entry(dict(dos_name=name, size=len(data), source_date_epoch=epoch), first)
+            allocations[name] = dict(first_lba=layout['first_data_sector'] + start - 2,
+                                     sector_count=count, file_size=len(data))
         raw[root_start + root_index*32:root_start + (root_index+1)*32] = entry
         root_index += 1
-        allocations[name] = dict(first_lba=layout['first_data_sector'] + cluster - 2,
-                                 sector_count=count, file_size=len(data))
-        cluster += count
     for n in range(fs['fat_count']):
         offset = (fs['reserved_sectors'] + n * fs['sectors_per_fat']) * bps
         raw[offset:offset + len(fat)] = fat
@@ -97,7 +134,14 @@ def compose_data(payloads, output, epoch, disk_name, volume_label, stem='util'):
     layout = derive_layout(spec)
     geo, fs = spec['geometry'], spec['filesystem']
     bps = geo['bytes_per_sector']
-    if len(payloads) + 1 > fs['root_entries']:
+    # One directory level is supported: "DIR/FILE" payload names.
+    if any(name.count('/') > 1 for name in payloads):
+        raise ValueError('Payload paths deeper than one directory are unsupported')
+    subdirs = sorted({name.split('/')[0] for name in payloads if '/' in name})
+    if set(subdirs) & set(payloads):
+        raise ValueError('A payload name collides with a directory name')
+    root_files = [name for name in payloads if '/' not in name]
+    if len(root_files) + len(subdirs) + 1 > fs['root_entries']:
         raise ValueError('Too many directory entries including the volume label')
     label = volume_label.encode('ascii')
     if not label or len(label) > 11:
