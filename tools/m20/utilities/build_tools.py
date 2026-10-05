@@ -117,7 +117,10 @@ TOOLS: dict[str, dict] = {
     "mem": {"kind": "single-wcl", "directory": "source",
             "options": ["-q", "-bt=DOS", "-ms", "-0", "-j", "-wx", "-oahls", "-s", "-fm"],
             "sources": ["mem.c", "prf.c", "kitten.c"], "output": "MEM.EXE", "link": "mem.exe",
-            "platform_defines": ["-DPC88VA"]},
+            "platform_defines": ["-DPC88VA"],
+            # Fixed public timestamp (the upstream base commit, UTC) for the
+            # help banner; without it the binary embeds the build time.
+            "build_defines": ['-DMEM_BUILD_DATE="Feb 14 2021"', '-DMEM_BUILD_TIME="20:14:15"']},
     "choice": {"kind": KITTEN_C, "kitten": "kitten", "model": "-ms", "pack": True,
                "sources": ["choice.c"], "output": "CHOICE.EXE", "link": "choice.exe",
                "platform_defines": ["-DPC88VA"]},
@@ -213,7 +216,8 @@ def build_one(name: str, components: Path, output: Path, env: dict,
     spec = TOOLS[name]
     tree = stage(name, spec, components, output)
     kind = spec["kind"]
-    defines = spec.get("platform_defines", []) if platform else []
+    defines = ((spec.get("platform_defines", []) if platform else [])
+               + spec.get("build_defines", []))
     if kind == KITTEN_C:
         src = tree / "src"
         options = C_BASE + defines + (["-zp1"] if spec["pack"] else []) + [spec["model"], "-0", "-lr"]

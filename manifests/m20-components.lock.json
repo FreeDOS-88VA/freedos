@@ -496,11 +496,11 @@
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/mem.git",
       "upstream_base_commit": "2b2c83328d9301aa0e484e909f252e32def6c2c7",
-      "commit": "c7e61f8218ff264c2cc8a78fee5e291a4b8b7455",
+      "commit": "f05b302df0657dad7818de50e0af8c67844926fa",
       "parents": [
-        "2b2c83328d9301aa0e484e909f252e32def6c2c7"
+        "c7e61f8218ff264c2cc8a78fee5e291a4b8b7455"
       ],
-      "source_archive_sha256": "a88764cbdea0a3a871f017d7cbf03a71d67daf384cff9cbd444120c9e651addb",
+      "source_archive_sha256": "ab0f988e82cc6adf04a19dff9f9875151b7fdfcc74cffb41493bfc02a6859843",
       "license": "GPL-2.0",
       "role": "system disk: FreeDOS MEM 1.11 with a PC88VA option that takes conventional memory from the DOS MCB chain instead of PC BIOS services",
       "selection": "project fork; upstream base is the last upstream commit on or before the FreeDOS 1.4 release (2025-04-09)"

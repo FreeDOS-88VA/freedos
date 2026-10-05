@@ -139,9 +139,22 @@ def utility_baselines(root: Path, work: Path, image: str) -> dict[str, bool]:
             outputs[label] = (out / spec["output"]).read_bytes()
         if release:
             results[name] = hashlib.sha256(outputs["current"]).hexdigest() == release["sha256"]
+        elif spec.get("build_defines"):
+            # The current source fixes its build date/time; the base embeds
+            # the compiler's, so only those strings may differ.
+            results[name] = same_except_build_stamp(outputs["base"], outputs["current"])
         else:
             results[name] = outputs["base"] == outputs["current"]
     return results
+
+
+BUILD_STAMP = re.compile(rb"[A-Z][a-z]{2} [ 0-9][0-9] [0-9]{4}\0|[0-9]{2}:[0-9]{2}:[0-9]{2}\0")
+
+
+def same_except_build_stamp(a: bytes, b: bytes) -> bool:
+    """Equal after masking __DATE__/__TIME__-shaped strings, same length."""
+    mask = lambda data: BUILD_STAMP.sub(lambda m: b"#" * len(m.group(0)), data)
+    return len(a) == len(b) and mask(a) == mask(b)
 
 
 def main() -> None:
