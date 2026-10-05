@@ -40,7 +40,23 @@ def audit_data_disk(root, components, kind, utility):
 
 def verify(root: Path = DEFAULT_ROOT) -> None:
     root = root.resolve()
+    # A component pinned by archive_paths contributes only those paths to the
+    # build and the source bundle; the rest of its checkout is not an input.
+    subsets = {}
+    lock_file = root / "manifests/m20-components.lock.json"
+    if lock_file.is_file():
+        for item in json.loads(lock_file.read_text(encoding="ascii")).get("components", []):
+            if item.get("archive_paths"):
+                subsets[root / item["path"]] = tuple(item["archive_paths"])
     for path in root.rglob("*"):
+        excluded = False
+        for base, allowed in subsets.items():
+            if base in path.parents:
+                relative = path.relative_to(base).as_posix()
+                excluded = not any(relative == entry or relative.startswith(entry + "/")
+                                   for entry in allowed)
+        if excluded:
+            continue
         if path.name in PRIVATE_NAMES or path.name.lower().endswith((".rom", ".d88", ".hdi", ".hdd", ".img")):
             raise AuditError("private or generated-media input is present: " + str(path.relative_to(root)))
     for directory in (root / "tools/m20", root / "tests/m20", root / "config/m20"):
