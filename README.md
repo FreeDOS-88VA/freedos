@@ -1,8 +1,49 @@
 # FreeDOS PC-88VA Integration
 
-Experimental FreeDOS integration for NEC PC-88VA/VA2.
+Experimental FreeDOS port for NEC PC-88VA/VA2, built reproducibly from public sources. Organization overview: [FreeDOS-88VA](https://github.com/FreeDOS-88VA).
 
-## M18 release — emulator-validated only
+## Latest: M20 release candidate 1 (emulator validation only)
+
+**M20 restarts the port on the FreeDOS 1.4 release sources** (kernel `ke2043`, FreeCOM `com086`) with selectively imported changes. It is a prerelease validated **on emulators only (エミュレータ検証のみ)**: **HOST PASS** for the reproducible public build and **VAEG PASS** for the bounded VA/VA2 checks. **Hardware is NOT RUN** and no `HARDWARE PASS` is claimed.
+
+- [M20 release candidate 1 and downloads](https://github.com/FreeDOS-88VA/freedos/releases/tag/m20-rc.1)
+- [Release notes](docs/releases/m20.md), [image identities and licenses](images/milestones/m20/README.md), [M20 report](docs/porting/m20-report.md)
+
+Three native 2HD FAT12 floppies (English only):
+
+| Disk | Contents |
+|---|---|
+| System (A:, bootable) | kernel, FreeCOM, EDLIN, MORE, MEMMAP, JWASMR, FORMAT, CHKDSK, SYS |
+| Utilities (B:) | FIND, SORT, XCOPY, LABEL, MOVE, APPEND, NLSFUNC, DEVLOAD, CHOICE, DELTREE, COMP, FC, ATTRIB, TREE, REPLACE, EXE2BIN |
+| Archivers and tools (B:) | UNZIP, ZIP, GZIP, DEBUG (need 640 KiB) |
+
+Use writable copies in a supported VA/VA2 emulator; no ROM or private firmware is distributed. 640 KiB installed RAM is the qualified setting for JWASMR and the archivers. Not ported: UNDELETE, SWSUBST, SHARE; FAT32 is off; Japanese support is planned for the next milestone.
+
+### Known issues
+
+- Hardware is untested; the stable M18 and M19 Preview 1 kernels have a startup-key (F5/F8) defect that M20 fixes.
+- Low-memory limits (384 KiB: JWASMR; 256 KiB: SORT, XCOPY, MOVE) are listed in the release notes.
+
+### Rebuild M20 from public source
+
+```sh
+git clone --recurse-submodules https://github.com/FreeDOS-88VA/freedos.git
+cd freedos
+git checkout <qualified commit from images/milestones/m20/manifest.json>
+git submodule update --init --recursive
+make m20-toolchain
+make m20-disk
+make m20-accept
+```
+
+Docker (Linux/amd64) and host NASM are required; the pinned Open Watcom 1.9 is acquired by `make m20-toolchain`. The three D88 files are built twice in clean exports and must match the hashes in the release notes. No previous disk or saved DOS binary is an input. Component source stays in its own repository under the [FreeDOS-88VA organization](https://github.com/FreeDOS-88VA); this repository pins exact commits (`manifests/m20-components.lock.json`).
+
+## Earlier releases
+
+- **M19 MS-DOS 4 COMMAND preview**: [prerelease `m19-msdos4-preview.1`](https://github.com/FreeDOS-88VA/freedos/releases/tag/m19-msdos4-preview.1); see the [M19 report](docs/porting/m19-report.md).
+- **M18** (stable, emulator-validated only): see below.
+
+## M18 release (stable) — emulator-validated only
 
 **M18 is released with emulator validation only (エミュレータ検証のみ).**
 The evidence is **HOST PASS** for the reproducible public-source build and
@@ -55,7 +96,7 @@ and never a build input. The original metadata-bearing photo is not committed.
 
 ```sh
 git clone --branch m18 --recurse-submodules https://github.com/FreeDOS-88VA/freedos.git
-cd freedos-pc88va
+cd freedos
 make m18-toolchain
 make m18-disk
 make m18-accept

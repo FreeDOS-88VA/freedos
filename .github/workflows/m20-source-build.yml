@@ -3,7 +3,7 @@ name: M20 isolated native 2HD source build
 
 on:
   push:
-    branches: ['m20/freedos-1.4-base']
+    branches: ['main', 'm20/freedos-1.4-base']
   pull_request:
     paths:
       - '.github/workflows/m20-source-build.yml'
