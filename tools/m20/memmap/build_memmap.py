@@ -28,7 +28,7 @@ def run_wcl(output_dir, exe_name, map_name):
     env["INCLUDE"] = str(watcom / "h")
     source_dir = ROOT / "tools/m20/memmap"
     command = [
-        compiler, "-q", "-bt=dos", "-ml", "-0", "-k4096",
+        compiler, "-q", "-bt=dos", "-ms", "-0", "-k4096",
         "-i=" + str(source_dir),
         "-fm=" + map_name,
         "-fe=" + exe_name,
@@ -107,7 +107,7 @@ def parse_mz(path, map_path):
         "relocation_table_offset": reloc_offset,
         "overlay_number": overlay,
         "cpu_target": "8086",
-        "compiler_options": ["-bt=dos", "-ml", "-0", "-k4096"],
+        "compiler_options": ["-bt=dos", "-ms", "-0", "-k4096"],
     }
 
 
