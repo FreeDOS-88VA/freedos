@@ -22,7 +22,7 @@
     {
       "name": "freecom",
       "path": "components/freecom",
-      "repository": "https://github.com/FreeDOS-88VA/freecom_dbcs2.git",
+      "repository": "https://github.com/FreeDOS-88VA/freecom.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/freecom.git",
       "commit": "18b692a2a8db6fb46dee1d64dbe0297d1d5ab530",

@@ -613,6 +613,10 @@ M19 history that historical locks reference). The commit is unchanged
 lock URL changed; the scaffold lock keeps its hash-pinned historical URL and
 branch.
 
+The M20 shell moved the same way to `FreeDOS-88VA/freecom`, a fork of
+`FDOS/freecom` (the former `freecom_dbcs2` is a fork of `lpproj/freecom_dbcs2`);
+commit `18b692a` is unchanged and the scaffold lock keeps its historical URL.
+
 Japanese support is deferred to the next milestone by owner decision.
 
 Known unrelated failure: `tests/qa/test_verify_license_policy.py` rejects the

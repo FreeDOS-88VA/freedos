@@ -24,10 +24,11 @@ EXPECTED_SUBMODULES = {
     },
     "components/freecom": {
         "name": "freecom",
-        "url": "https://github.com/FreeDOS-88VA/freecom_dbcs2.git",
+        "url": "https://github.com/FreeDOS-88VA/freecom.git",
         # The scaffold lock is a hash-pinned historical record (pre-transfer URL).
         "lock_url": "https://github.com/nakatamaho/freecom_dbcs2.git",
-        "branch": "deterministic-build-timestamp",
+        "lock_branch": "deterministic-build-timestamp",
+        "branch": "m20/pc88va",
     },
     "components/country": {
         "name": "country",

@@ -303,7 +303,7 @@ def _resolve_m20(root: Path) -> dict[str, str]:
     policy = {
         "country": "https://github.com/FDOS/country.git",
         "fdkernel": "https://github.com/FreeDOS-88VA/kernel.git",
-        "freecom": "https://github.com/FreeDOS-88VA/freecom_dbcs2.git",
+        "freecom": "https://github.com/FreeDOS-88VA/freecom.git",
     }
     try:
         ancestors = dict(M20_BASELINE)

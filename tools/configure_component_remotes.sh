@@ -47,7 +47,7 @@ ensure_remote components/fdkernel origin https://github.com/FreeDOS-88VA/kernel.
 # NEC PC-98/DBCS reference remote. Through M19 upstream meant lpproj.
 ensure_remote components/fdkernel upstream https://github.com/FDOS/kernel.git
 ensure_remote components/fdkernel lpproj https://github.com/lpproj/fdkernel.git
-ensure_remote components/freecom origin https://github.com/FreeDOS-88VA/freecom_dbcs2.git
+ensure_remote components/freecom origin https://github.com/FreeDOS-88VA/freecom.git
 ensure_remote components/freecom upstream https://github.com/FDOS/freecom.git
 ensure_remote components/freecom lpproj https://github.com/lpproj/freecom_dbcs2.git
 ensure_remote components/country origin https://github.com/FDOS/country.git

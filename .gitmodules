@@ -4,8 +4,8 @@
 	branch = m20/pc88va
 [submodule "components/freecom"]
 	path = components/freecom
-	url = https://github.com/FreeDOS-88VA/freecom_dbcs2.git
-	branch = deterministic-build-timestamp
+	url = https://github.com/FreeDOS-88VA/freecom.git
+	branch = m20/pc88va
 [submodule "components/country"]
 	path = components/country
 	url = https://github.com/FDOS/country.git
