@@ -602,6 +602,10 @@ the M20 resolver policy, remote configuration, scaffold remote checks, disk
 configuration text) use the new URLs; hash-pinned historical locks and
 M01-M19 records keep the URLs they were made with.
 
+The parent repository was then renamed `FreeDOS-88VA/freedos` (GitHub
+redirects `freedos-pc88va`), and the organization profile README lives in
+`FreeDOS-88VA/.github`.
+
 Japanese support is deferred to the next milestone by owner decision.
 
 Known unrelated failure: `tests/qa/test_verify_license_policy.py` rejects the
