@@ -7,3 +7,5 @@ FILES=16
 LASTDRIVE=E
 SET PATH=A:\
 DOS=LOW
+REM KSSF swaps the shell out for CALL /S programs; COMMAND.COM and KSSF.COM are built together.
+SHELL=A:\KSSF.COM A:\COMMAND.COM /E:512 /P

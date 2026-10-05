@@ -194,11 +194,16 @@ def main():
     if not freecom.is_file():
         raise FileNotFoundError("isolated FreeCOM build did not produce command.com")
     shutil.copy2(freecom, out / "COMMAND.COM")
+    # KSSF is the kernel-swap loader; it must come from the same FreeCOM source as COMMAND.COM.
+    kssf_source = ROOT / "components/freecom/tools/kssf.asm"
+    subprocess.run(["nasm", "-f", "bin", str(kssf_source), "-o", str(out / "KSSF.COM")], check=True)
     timestamp_path = ROOT / "config/m20/freecom-build-timestamp.json"
     timestamp_config = json.loads(timestamp_path.read_text(encoding="ascii"))
     freecom_build = {
         "command": "bash build.sh pc88va no-xms-swap wc english; utils/ptchsize.exe command.com +3KB",
         "resident_heap_bytes": 3072,
+        "kssf_command": "nasm -f bin components/freecom/tools/kssf.asm -o KSSF.COM",
+        "kssf_source_sha256": sha256(kssf_source.read_bytes()),
         "build_script_sha256": sha256((ROOT / "components/freecom/build.sh").read_bytes()),
         "configuration_sha256": sha256((ROOT / "components/freecom/config.std").read_bytes()),
         "timestamp_config_sha256": sha256(timestamp_path.read_bytes()),
@@ -221,7 +226,7 @@ def main():
     # Stage 2 was assembled from the selected overlay above; the composer
     # derives its contiguous FAT extent and builds the matching stage 1.
     payloads = {name: (out / name).read_bytes() for name in (
-        "LOADER.BIN", "KERNEL.SYS", "COMMAND.COM", "COUNTRY.SYS", "EDLIN.EXE",
+        "LOADER.BIN", "KERNEL.SYS", "COMMAND.COM", "KSSF.COM", "COUNTRY.SYS", "EDLIN.EXE",
         "MORE.EXE", "CHKDSK.EXE", "FORMAT.EXE", "SYS.EXE", "MEMMAP.EXE",
         "JWASMR.EXE", "DEBUG.COM",
     )}

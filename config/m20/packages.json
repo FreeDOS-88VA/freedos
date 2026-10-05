@@ -32,7 +32,8 @@
       "id": "freecom",
       "version": "FreeCOM 0.86 (FreeDOS 1.4 release source)",
       "files": [
-        "COMMAND.COM"
+        "COMMAND.COM",
+        "KSSF.COM"
       ],
       "source_lock": "freecom",
       "license": "GPL-2.0-or-later",
