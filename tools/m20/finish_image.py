@@ -246,6 +246,7 @@ def main():
         ("HELLO.DOC", "config/m20/payload/HELLO.DOC"),
         ("MZDEMO.ASM", "config/m20/payload/MZDEMO.ASM"),
         ("BUILD.BAT", "config/m20/payload/BUILD.BAT"),
+        ("AUTOEXEC.BAT", "config/m20/payload/AUTOEXEC.BAT"),
     ):
         payloads[name] = read_text_payload(relative)
     payloads["COPYING"] = read_text_payload("COPYING")

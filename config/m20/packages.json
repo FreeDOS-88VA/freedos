@@ -185,7 +185,8 @@
         "HELLO.DOC",
         "MZDEMO.ASM",
         "BUILD.BAT",
-        "COPYING"
+        "COPYING",
+        "AUTOEXEC.BAT"
       ],
       "source": "config/m20/payload/ and public component license files",
       "license": "GPL-2.0-or-later; sample assembly text is project-authored",

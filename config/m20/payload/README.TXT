@@ -13,9 +13,15 @@ Compatibility with any emulator or machine must be established by the matching
 qualification record; it is not implied by this disk. Leave B: empty for normal
 startup. At the DOS prompt, use DIR, TYPE, COPY, REN, DEL, MD, RD, CD,
 ECHO, SET, PATH, batch files, and shell redirection. Use HELP for shell help.
-The shell is loaded through KSSF and swaps itself out while an external
-program runs, so the program gets the shell's memory too. Commands in batch
-files, with redirection or in pipes run without swapping.
+At startup a menu offers two command shells; press its digit, or Enter (or
+wait 5 seconds) for 1:
+  1  FreeCOM 0.86, loaded through KSSF. It swaps itself out while an external
+     program runs, so the program gets the shell's memory too. Commands in
+     batch files, with redirection or in pipes run without swapping.
+  2  MS-DOS 4.0 COMMAND.COM in A:\MSDOS (Microsoft MIT source, MSDOS.LIC).
+     Its resident part is small; it has no HELP, history or aliases.
+0 runs neither numbered SHELL line (FreeCOM without KSSF). F5 skips CONFIG.SYS
+and AUTOEXEC.BAT; F8 asks for each line. AUTOEXEC.BAT sets PATH for both.
 
 Files and examples
 ------------------
@@ -60,7 +66,8 @@ master as a target. Read each command's confirmation and help first.
 License and corresponding source
 --------------------------------
 COPYING contains the GNU GPL version 2 terms used by the FreeDOS and M20 GPL
-programs. DEBUG.LIC contains the MIT license of DEBUG. JWASM.LIC contains the
+programs. DEBUG.LIC contains the MIT license of DEBUG, MSDOS\MSDOS.LIC that of
+MS-DOS 4.0 COMMAND.COM. JWASM.LIC contains the
 Sybase Open Watcom Public License 1.0. The
 project and component corresponding source, build recipes, patches, notices,
 and license files accompany this disk in a separate host-side source bundle.

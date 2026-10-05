@@ -10,7 +10,7 @@ PAYLOAD = ROOT / "config/m20/payload"
 
 class StarterPayloadTests(unittest.TestCase):
     def test_files_are_ascii_and_83(self):
-        expected = {"BUILD.BAT", "HELLO.ASM", "HELLO.DOC", "MZDEMO.ASM",
+        expected = {"AUTOEXEC.BAT", "BUILD.BAT", "HELLO.ASM", "HELLO.DOC", "MZDEMO.ASM",
                     "QUICKSTR.TXT", "README.TXT"}
         self.assertEqual({path.name for path in PAYLOAD.iterdir()}, expected)
         for name in expected:
