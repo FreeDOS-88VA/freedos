@@ -8,7 +8,9 @@ LASTDRIVE=E
 SET PATH=A:\
 DOS=LOW
 REM Shell menu: a digit selects, Enter or 5 seconds takes 1, F5 skips and F8 traces.
+REM 0 runs no numbered line (FreeCOM without KSSF, the kernel default shell).
 MENUDEFAULT=1,5
+MENU
 MENU Select the command shell:
 MENU   1 = FreeCOM 0.86 (swaps itself out while a program runs)
 MENU   2 = MS-DOS 4.0 COMMAND.COM
