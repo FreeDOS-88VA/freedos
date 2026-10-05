@@ -13,7 +13,7 @@ Three native 2HD FAT12 floppies (English only):
 
 | Disk | Contents |
 |---|---|
-| System (A:, bootable) | kernel, FreeCOM, EDLIN, MORE, MEMMAP, JWASMR, FORMAT, CHKDSK, SYS |
+| System (A:, bootable) | kernel, shell menu (FreeCOM or MS-DOS 4 COMMAND), EDLIN, MORE, MEM, JWASMR, DEBUG, FORMAT, CHKDSK, SYS |
 | Utilities (B:) | FIND, SORT, XCOPY, LABEL, MOVE, APPEND, NLSFUNC, DEVLOAD, CHOICE, DELTREE, COMP, FC, ATTRIB, TREE, REPLACE, EXE2BIN |
 | Archivers and tools (B:) | UNZIP, ZIP, GZIP, DEBUG (need 640 KiB) |
 
@@ -56,7 +56,7 @@ The evidence is **HOST PASS** for the reproducible public-source build and
 - [Validation scope and historical results](docs/porting/m18-report.md)
 
 The release provides one bootable native 2HD FAT12 D88, with FreeCOM,
-English/ASCII EDLIN, MORE, MEMMAP, real-mode JWASMR, profile-bounded FORMAT,
+English/ASCII EDLIN, MORE, MEM, real-mode JWASMR, profile-bounded FORMAT,
 CHKDSK and SYS, and small COM/MZ source examples. `HELLO.DOC` on the disk
 explains `HELLO.ASM` and its assembly command. The corresponding-source and
 license bundle is a host-side companion, **not another floppy**. No ROM or
