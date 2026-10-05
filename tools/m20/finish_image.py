@@ -273,7 +273,9 @@ def main():
     if free_clusters < minimum_free:
         raise ValueError("native 2HD capacity fails M20 workspace reserve: {} < {} clusters".format(
             free_clusters, minimum_free))
-    root_used = len(payloads) + 1  # The root volume-label entry owns one slot.
+    # The root volume-label entry owns one slot; a subdirectory owns one more.
+    root_used = (len([name for name in payloads if "/" not in name]) + 1 +
+                 len({name.split("/")[0] for name in payloads if "/" in name}))
     if root_used > spec["filesystem"]["root_entries"]:
         raise ValueError("release payload exceeds the FAT12 root directory")
 

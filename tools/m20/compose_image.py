@@ -77,7 +77,10 @@ def compose(payloads, overlay, output, epoch):
                 table[index*32:(index+1)*32] = entry
             for index, member in enumerate(members, 2):
                 data = payloads[member]
-                member_first, _ = allocate(data)
+                start = cluster
+                member_first, member_count = allocate(data)
+                allocations[member] = dict(first_lba=layout['first_data_sector'] + start - 2,
+                                           sector_count=member_count, file_size=len(data))
                 entry, _ = build_directory_entry(dict(dos_name=member.split('/')[1], size=len(data),
                                                       source_date_epoch=epoch), member_first)
                 table[index*32:(index+1)*32] = entry
