@@ -695,7 +695,7 @@ Same method for every disk: VAEG, 640 KiB installed, no retained selection; the 
 | M20 RC3, menu 1 | FreeCOM, not swapped (redirected/batch) | 420,544 |
 | M20 RC3, menu 2 | MS-DOS 4 COMMAND | 482,080 |
 
-Reference only (different method): MS-DOS 2.11 earlier left about 517,760 bytes for a program (CHKDSK/DEBUG). The 356,912 bytes reported for RC2 earlier included a 58,800-byte gap created by the old large-model MEMMAP itself; the old figures in this report that were measured with that MEMMAP are lower than the values above for the same disks.
+The 356,912 bytes reported for RC2 earlier included a 58,800-byte gap created by the old large-model MEMMAP itself; the old figures in this report that were measured with that MEMMAP are lower than the values above for the same disks.
 
 ## Unrun gates
 
