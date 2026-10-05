@@ -177,6 +177,14 @@ def main():
     maintenance_dir = out / "maintenance"
     maintenance = build_maintenance(maintenance_dir)
 
+    # DEBUG shares the data-disk builder; its inputs are DEBUG plus the host JWasm.
+    from utilities.build_tools import build as build_tools
+    system_source = source_lock()
+    debug_dir = out / "debug-system"
+    debug_records = build_tools(
+        ROOT / "components", debug_dir, ["debug"],
+        {"debug": {c: system_source[c]["commit"] for c in utility_inputs("debug")}})["debug"]
+
     source_epoch = int(os.environ["SOURCE_DATE_EPOCH"])
     country_source = ROOT / "components/country/country.asm"
     import subprocess
@@ -205,6 +213,7 @@ def main():
     shutil.copy2(edlin_dir / "EDLIN.EXE", out / "EDLIN.EXE")
     shutil.copy2(jwasm_dir / "JWASMR.EXE", out / "JWASMR.EXE")
     shutil.copy2(memmap_dir / "MEMMAP.EXE", out / "MEMMAP.EXE")
+    shutil.copy2(debug_dir / "DEBUG.COM", out / "DEBUG.COM")
     shutil.copy2(more_dir / "MORE.EXE", out / "MORE.EXE")
     for name in ("CHKDSK", "FORMAT", "SYS"):
         shutil.copy2(maintenance_dir / (name + ".EXE"), out / (name + ".EXE"))
@@ -214,7 +223,7 @@ def main():
     payloads = {name: (out / name).read_bytes() for name in (
         "LOADER.BIN", "KERNEL.SYS", "COMMAND.COM", "COUNTRY.SYS", "EDLIN.EXE",
         "MORE.EXE", "CHKDSK.EXE", "FORMAT.EXE", "SYS.EXE", "MEMMAP.EXE",
-        "JWASMR.EXE",
+        "JWASMR.EXE", "DEBUG.COM",
     )}
     for name, relative in (
         ("CONFIG.SYS", "config/m20/CONFIG.SYS"),
@@ -228,6 +237,8 @@ def main():
         payloads[name] = read_text_payload(relative)
     payloads["COPYING"] = read_text_payload("COPYING")
     payloads["JWASM.LIC"] = extract_jwasm_license()
+    payloads["DEBUG.LIC"] = notice_payload(json.loads(
+        (ROOT / "config/m20/archive-disk.json").read_text(encoding="ascii"))["notices"]["DEBUG.LIC"])
 
     compose(payloads, profile, out, source_epoch)
     d88 = (out / "media.d88").read_bytes()
@@ -369,6 +380,8 @@ def main():
             record["build_records"] = edlin
         elif item["id"] == "jwasm":
             record["build_records"] = jwasmr
+        elif item["id"] == "debug":
+            record["build_records"] = debug_records
         elif item["id"] == "memmap":
             record["build_records"] = memmap
         elif item["id"] == "more":

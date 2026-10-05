@@ -135,12 +135,30 @@ class UtilityDiskTests(unittest.TestCase):
             notice_payload(dict(config["notices"]["COMP.LIC"], through="NOT PRESENT"))
 
 
+    def check_kswap_reference(self, item):
+        """The baseline plus the kswap series, and the VA platform step on top."""
+        import pc_baseline
+        git = lambda *args: subprocess.run(["git", "-C", str(ROOT / item["path"]), *args], check=True,
+                                           capture_output=True, text=True).stdout.split()
+        reference = item["baseline_reference"]
+        self.assertEqual(reference, pc_baseline.FREECOM_KSWAP_REFERENCE)
+        subprocess.run(["git", "-C", str(ROOT / item["path"]), "merge-base", "--is-ancestor",
+                        item["upstream_base_commit"], reference], check=True)
+        series = git("diff", "--name-only", item["upstream_base_commit"], reference)
+        self.assertTrue(series)
+        for name in series:
+            self.assertTrue(name in pc_baseline.FREECOM_KSWAP_FILES or name.startswith("tests/kswap/"), name)
+        # The platform step may not touch the kswap series again.
+        for name in git("diff", "--name-only", reference, item["commit"]):
+            self.assertNotIn(name, pc_baseline.FREECOM_KSWAP_FILES - {"include/misc.h"}, name)
+            self.assertFalse(name.startswith("tests/kswap/"), name)
+
     @unittest.skipUnless(shutil.which("git") and (ROOT / "components/fc/.git").exists(),
                          "host-only: requires component checkouts and git")
     def test_baseline_exemptions_are_explained_and_narrow(self):
         lock = json.loads((ROOT / "manifests/m20-components.lock.json").read_text())
         exempt = {item["name"]: item for item in lock["components"] if item.get("baseline_exemption")}
-        self.assertEqual(set(exempt), {"fc", "attrib", "tree", "replace", "exe2bin",
+        self.assertEqual(set(exempt), {"freecom", "fc", "attrib", "tree", "replace", "exe2bin",
                                        "unzip", "zip", "gzip"})
         for name, item in exempt.items():
             with self.subTest(component=name):
@@ -152,6 +170,8 @@ class UtilityDiskTests(unittest.TestCase):
                     self.check_platform_branches_only(item)
                 elif check == "unmodified-import":
                     self.check_unmodified_import(item)
+                elif check == "kswap-reference-equal":
+                    self.check_kswap_reference(item)
                 else:
                     self.fail("unknown baseline check: " + check)
 

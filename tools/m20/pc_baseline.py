@@ -34,6 +34,17 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[2]
 BASELINE = "4f7bdda16a84c416a82a2616aa67335ca4f2bd74"  # FDOS kernel ke2043
 FREECOM_BASELINE = "f1b8f4f464eae5a70348b6d362484d733d45c427"  # FDOS freecom com086
+# FreeCOM is compared in two steps so a difference can be attributed: the
+# baseline plus the recorded kswap fixes (branch m20/kswap-fixes in the
+# FreeCOM repository; owner-approved import of the M19 fix series) must equal
+# the non-PC88VA build of the current branch, and only the kswap files may
+# differ between the baseline and that reference.
+FREECOM_KSWAP_REFERENCE = "5404f5c83571d56eec5efcfca073a836ee7b48a9"
+FREECOM_KSWAP_FILES = {
+    ".github/workflows/kswap-regression.yml", "ci_build.sh", "ci_prereq.sh",
+    "criter/context.x", "docs/k-swap.txt", "include/context.h", "include/misc.h",
+    "lib/exec1.c", "shell/kswap.c", "tools/kssf.asm",
+}
 TIMESTAMP = re.compile(rb"[A-Z][a-z]{2} [ 0-9][0-9] [0-9]{4}( [0-9]{2}:[0-9]{2}:[0-9]{2})?")
 OUTPUTS = ("bin/kernel.sys", "bin/sys.com", "bin/country.sys")
 CONFIG = "XNASM=nasm\nundefine XUPX\nXCPU=86\nXFAT=32\n"
@@ -154,8 +165,18 @@ def main() -> None:
                                  check=True, capture_output=True, text=True).stdout.strip()
         subprocess.run(["git", "-C", str(args.freecom_repo), "merge-base", "--is-ancestor",
                         FREECOM_BASELINE, freecom], check=True)
-        shell_base = build_freecom(args.freecom_repo, FREECOM_BASELINE,
+        subprocess.run(["git", "-C", str(args.freecom_repo), "merge-base", "--is-ancestor",
+                        FREECOM_BASELINE, FREECOM_KSWAP_REFERENCE], check=True)
+        changed = set(subprocess.run(
+            ["git", "-C", str(args.freecom_repo), "diff", "--name-only",
+             FREECOM_BASELINE, FREECOM_KSWAP_REFERENCE],
+            check=True, capture_output=True, text=True).stdout.split())
+        kswap_scope = all(name in FREECOM_KSWAP_FILES or name.startswith("tests/kswap/")
+                          for name in changed)
+        shell_base = build_freecom(args.freecom_repo, FREECOM_KSWAP_REFERENCE,
                                    work / "freecom-baseline", args.image)
+        shell_plain = build_freecom(args.freecom_repo, FREECOM_BASELINE,
+                                    work / "freecom-com086", args.image)
         shell_current = build_freecom(args.freecom_repo, freecom,
                                       work / "freecom-current", args.image)
         utilities = utility_baselines(ROOT, work, args.image)
@@ -166,13 +187,18 @@ def main() -> None:
     record = {"baseline": BASELINE, "revision": revision, "baseline_sha256": base,
               "revision_sha256": current, "identical": base == current,
               "freecom_baseline": FREECOM_BASELINE, "freecom_revision": freecom,
+              "freecom_kswap_reference": FREECOM_KSWAP_REFERENCE,
+              "freecom_reference_changes_only_kswap_files": kswap_scope,
+              "freecom_reference_differs_from_com086": not same_except_timestamps(shell_plain, shell_base),
               "freecom_identical_except_timestamps": shell_same,
               "forked_utilities_identical_without_pc88va": utilities}
     print(json.dumps(record, indent=2))
     if base != current:
         raise SystemExit("non-PC-88VA kernel build differs from the FreeDOS 1.4 baseline")
+    if not kswap_scope:
+        raise SystemExit("the kswap reference changes files outside the recorded kswap series")
     if not shell_same:
-        raise SystemExit("non-PC-88VA FreeCOM build differs from the FreeDOS 1.4 baseline")
+        raise SystemExit("non-PC-88VA FreeCOM build differs from the baseline plus kswap fixes")
     if not utilities or not all(utilities.values()):
         raise SystemExit("a forked utility built without PC88VA differs from its FreeDOS 1.4 source")
 

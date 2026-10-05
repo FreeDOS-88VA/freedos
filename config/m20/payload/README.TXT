@@ -21,6 +21,10 @@ the validated DOS MCB chain; it does not report physical or reserved memory.
 JWASMR is a real-mode 8086-class assembler. HELLO.ASM includes its COM build
 command; HELLO.DOC explains and builds it step by step. MZDEMO.ASM and BUILD.BAT
 show direct COM and MZ output without a linker.
+DEBUG is the DOS-debug 2.50 debugger (DEBUG prog.com, commands R, D, U, A, G,
+T, P, E, N, L, W, Q; type ? for help). It reads the keyboard through the
+console driver and writes through INT 29h, so it works on this machine; it
+shows no special tracing of the kernel and has no protected-mode support.
 
 Create a writable work directory before editing or assembling. Keep the
 original release image unchanged; make a writable copy for ordinary file work.
@@ -53,7 +57,8 @@ master as a target. Read each command's confirmation and help first.
 License and corresponding source
 --------------------------------
 COPYING contains the GNU GPL version 2 terms used by the FreeDOS and M20 GPL
-programs. JWASM.LIC contains the Sybase Open Watcom Public License 1.0. The
+programs. DEBUG.LIC contains the MIT license of DEBUG. JWASM.LIC contains the
+Sybase Open Watcom Public License 1.0. The
 project and component corresponding source, build recipes, patches, notices,
 and license files accompany this disk in a separate host-side source bundle.
 The unmodified Open Watcom 1.9 DOS compiler runtime, linked into programs,
