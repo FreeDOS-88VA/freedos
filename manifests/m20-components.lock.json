@@ -25,18 +25,18 @@
       "repository": "https://github.com/FreeDOS-88VA/freecom.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/freecom.git",
-      "commit": "1dd3d04e52dde0a6afde5a46e6eb2f47dc7c9c09",
+      "commit": "536e27a5c97d90591b8207f7727f684c3e2ad18c",
       "parents": [
-        "18b214cd1ca18a785e54a0042494e70c1b62876b"
+        "1dd3d04e52dde0a6afde5a46e6eb2f47dc7c9c09"
       ],
-      "source_archive_sha256": "64217db44b221377d631c1aa7038d12007f9b65f4938f019848ba82885d47da7",
+      "source_archive_sha256": "58d4a79249d9e611021db1c3d2b76c9b96625412e632fe630587427203df6475",
       "license": "GPL-2.0-or-later",
       "upstream_base_tag": "com086",
       "upstream_base_commit": "f1b8f4f464eae5a70348b6d362484d733d45c427",
       "selection": "FreeDOS 1.4 com086 plus the M19 kswap fix series, imported by owner decision (cherry-picks recorded with -x; reference branch m20/kswap-fixes), plus the PC88VA platform changes",
-      "baseline_exemption": "kernel-swap (KSSF) fixes from the M19 series change every non-PC88VA build: context ownership and counters across reload, child DOS return code, OOM fallback message and EXEC status separation; the bare com086 build differs, but the non-PC88VA build equals the m20/kswap-fixes reference",
+      "baseline_exemption": "kernel-swap (KSSF) fixes from the M19 series change every non-PC88VA build: context ownership and counters across reload, child DOS return code, OOM fallback message and EXEC status separation, no swap for redirected/piped/batch commands; the bare com086 build differs, but the non-PC88VA build equals the m20/kswap-fixes reference",
       "baseline_check": "kswap-reference-equal",
-      "baseline_reference": "5404f5c83571d56eec5efcfca073a836ee7b48a9"
+      "baseline_reference": "b646c5567dd76e0c29bbe7035b8f47a72bac030a"
     },
     {
       "name": "country",

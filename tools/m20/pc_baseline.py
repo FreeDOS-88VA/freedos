@@ -39,11 +39,11 @@ FREECOM_BASELINE = "f1b8f4f464eae5a70348b6d362484d733d45c427"  # FDOS freecom co
 # FreeCOM repository; owner-approved import of the M19 fix series) must equal
 # the non-PC88VA build of the current branch, and only the kswap files may
 # differ between the baseline and that reference.
-FREECOM_KSWAP_REFERENCE = "5404f5c83571d56eec5efcfca073a836ee7b48a9"
+FREECOM_KSWAP_REFERENCE = "b646c5567dd76e0c29bbe7035b8f47a72bac030a"
 FREECOM_KSWAP_FILES = {
     ".github/workflows/kswap-regression.yml", "ci_build.sh", "ci_prereq.sh",
     "criter/context.x", "docs/k-swap.txt", "include/context.h", "include/misc.h",
-    "lib/exec1.c", "shell/kswap.c", "tools/kssf.asm",
+    "lib/exec1.c", "shell/command.c", "shell/kswap.c", "tools/kssf.asm",
 }
 TIMESTAMP = re.compile(rb"[A-Z][a-z]{2} [ 0-9][0-9] [0-9]{4}( [0-9]{2}:[0-9]{2}:[0-9]{2})?")
 OUTPUTS = ("bin/kernel.sys", "bin/sys.com", "bin/country.sys")
