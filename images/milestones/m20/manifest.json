@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "milestone": "M20",
+  "release_candidate": "m20-rc.1",
+  "artifacts": [
+    {
+      "role": "system",
+      "file": "freedos-pc88va-m20-2hd-1280.d88.xz",
+      "compressed": {
+        "bytes": 303140,
+        "sha256": "5ac1f5a7a6cadb65d97985ef815a876ebdd3dae5860bbd519f47d6dcadec20f4"
+      },
+      "uncompressed": {
+        "file": "freedos-PC88VA-M20-2HD.D88",
+        "bytes": 1331888,
+        "sha256": "4807a6942c06066eaeb0ecbfeb59743a375f98eed5b64db6917f796d590c0704"
+      }
+    },
+    {
+      "role": "utilities",
+      "file": "freedos-pc88va-m20-util-2hd-1280.d88.xz",
+      "compressed": {
+        "bytes": 107116,
+        "sha256": "0b7a9cb6787595bcffce0c4861f71ed8f55e6ba75f53362715f0231203bd2acd"
+      },
+      "uncompressed": {
+        "file": "freedos-PC88VA-M20-UTIL.D88",
+        "bytes": 1331888,
+        "sha256": "c6f360f3381eed9970b273919d09b178b710bbc965ec0c1109dd679a9bb01b91"
+      }
+    },
+    {
+      "role": "archivers",
+      "file": "freedos-pc88va-m20-arc-2hd-1280.d88.xz",
+      "compressed": {
+        "bytes": 193108,
+        "sha256": "0218296a26b20af16735686410eba8e2cca419872a61fd331c805c6e261f00d5"
+      },
+      "uncompressed": {
+        "file": "freedos-PC88VA-M20-ARC.D88",
+        "bytes": 1331888,
+        "sha256": "f17f7531cbfed9d9b34dca3a3020478860dbf89a1992061c7149b9e5901e2024"
+      }
+    }
+  ],
+  "compression": {
+    "format": "xz",
+    "tool": "host xz (XZ Utils)",
+    "arguments": [
+      "-c",
+      "-9e",
+      "--threads=1",
+      "--check=crc64"
+    ],
+    "independent_compressions_byte_identical": true,
+    "decompression_matches_designated_d88": true
+  },
+  "profile": {
+    "media": "native PC-88VA 2HD FAT12",
+    "payload_capacity_bytes": 1310720,
+    "cylinders": 80,
+    "heads": 2,
+    "sectors_per_track": 8,
+    "bytes_per_sector": 1024,
+    "roles": {
+      "system": "bootable A: system disk",
+      "utilities": "non-bootable B: utilities disk (M20-UTIL)",
+      "archivers": "non-bootable B: archiver and tools disk (M20-ARC)"
+    }
+  },
+  "rebuild_source": {
+    "start": "ba868e2e33447fe5fcb3a2bed0711464f7968d82",
+    "parent": "42b115a3561a7bdf97a905b436a2de990da383ba",
+    "qualified_implementation": "42b115a3561a7bdf97a905b436a2de990da383ba",
+    "components": {
+      "append": "50924e492d959cd94b1f58539a9579a2ec9d3fee",
+      "attrib": "21f44cc47e71c8b437932d101670750f00fa9309",
+      "choice": "aa63ef2959420cad54032236bd0817d890bd32de",
+      "comp": "5269401d61322b47acb17e73b4e8c8d328c17722",
+      "country": "23f189cca3420606eae8723884fa92ccd65eb307",
+      "debug": "95812fa550a2e3cb12c7e048df3a044d1f6b4804",
+      "deltree": "ca8e912016b046a87946647f462769419842a076",
+      "devload": "7f1f0877972dea3ec1d8b6d9d3473e46cba44608",
+      "edlin": "c036c43adbdaa5693bb4cd3f4f3c65090f1c9d57",
+      "exe2bin": "c12e422e86ebee7955ca9826bfd55a7ddf715c0e",
+      "fc": "543205af5aaa2a3e63c2a8e2133a613f785f70f7",
+      "fdkernel": "9d2c3f6239028d87cda89224a5b0b9019d4d2a4e",
+      "find": "a6e245d50bc6c4513651e65c3defab554be44da1",
+      "freecom": "18b692a2a8db6fb46dee1d64dbe0297d1d5ab530",
+      "gzip": "cfae273770fd57b8903dce2aa4eb304afa62e7ed",
+      "jwasm": "c9b3a947f74d7355b1b3d8bd5728241c95ff4b19",
+      "kitten": "62654352bd887fbed99db72bdb6c4dc3e99493a1",
+      "kitten-3b9947f": "3b9947fc5ae08434d0d3f61cb2ea22d13911732d",
+      "label": "64030e1f31de3d78094ebc83104cf1bd94810843",
+      "move": "1e2de517d7639fca7d94a20c98ca30193d8615aa",
+      "nlsfunc": "d102e4cab774a090eb0eb236b8af1e5bcdc22ea2",
+      "parent": "42b115a3561a7bdf97a905b436a2de990da383ba",
+      "replace": "bcc2e236de247bae0b15ab85112649187e4b959d",
+      "sort": "7177d3ab720cb24b7076edbe1bb9eac9ee8e742f",
+      "tnyprntf": "450ab904dab1e48ba6632937bc1dbfb4b8b45078",
+      "tree": "29ba525a78d12068a723bd46a5a11e9b93409232",
+      "unzip": "cae95c63b3dd1113ddb8003bd1c56c4956282a28",
+      "xcopy": "a52cb4bb11e82bb309c8620f55539274d6081a35",
+      "zip": "1fdf656583b7823446dd3bdec96a1656adb25038"
+    }
+  },
+  "source_archives_sha256": {
+    "append": "f959548b6d5156ebb59c2e3c36dd1db0f7dd3615ea2795be472d076b4fc0d1eb",
+    "attrib": "6b0f35d4fff3a9572d6c8da80a9455dee42c8aa7dc0bc7cffb2cddefcdc23917",
+    "choice": "c0d402297f5e504fb297d262eae69a53c3e757c2b4feb48aa9bb8d33750e4d16",
+    "comp": "9c7dab1dd9e6dc3e23007ed2dafffe031aca17dcccd27b073e7d8ade6df89394",
+    "country": "cf0b16ac57e661eeb7e19118cea2d2d200e4545507f15912e8a6462652c2cd9d",
+    "debug": "b84dac0d286c366b4d92e4c13ebd1b95abb5559733128e37c0b84ebb4cc75743",
+    "deltree": "9675b8818da6a40836a38626f8c8d1a4e459a00935ccaa35cd2d95ff5f5cbd24",
+    "devload": "a27305c8fe09fb32775bd3cdc2ea33377758a02f0bffa134cf23e4fa78504c3a",
+    "edlin": "42865928e8d2c14b3970557892c53d18bd86603c857bbc587d33050f535b14ae",
+    "exe2bin": "b4169ff2387e5065ddc8cc6b68f02b320b2409064b1ed81468952e6a1659ce5c",
+    "fc": "7e546b6eb1b5f79500c7fa2e20b91b2d6836b70ce7e9ec57440fad4438677f78",
+    "fdkernel": "d59f4a761d826aecf70929e39615213321e0a5610534da7b4e2ac2e140a319fa",
+    "find": "e1d111c599fcffd564e77d3293cf226464594ce6b4462e86a0200fab1d0b3cb3",
+    "freecom": "8cce77d7b7351d755bc2df8bc80140b7007026187c34031aaddace6211c0a7cd",
+    "gzip": "e15ddb28c4ad0467a98c789f215d31773ccd84102a728742d6eb729b8ad1f088",
+    "jwasm": "5511d3666107009b58d94912ebdc6a0c4e8013aad4850fb15b087872071013bf",
+    "kitten": "e9739312a70e1ecf8c6a652f6172656c17535acb383f9f3368467bc8bde7a287",
+    "kitten-3b9947f": "523d73226d0531f8e00949bf6e6da6e16b2ecf25eee3774c698299b44c444cda",
+    "label": "d2bd0566546c93afbeac7579a76fda5184bf52f6482a7623d53dc3aa65100bb9",
+    "move": "c40e04a78f905e733a1788f438fe5809e7dcf8dc1bb80acaed63997370ea990b",
+    "nlsfunc": "82195013cfee53d79fd8acc3daeda60f0d93ce2f2a13efca82dc8a222ec25cd8",
+    "parent": "6223138aca108bbba68ece9beacd30a6515501c0946a680e0f1703a451359c1f",
+    "replace": "c4804e9e95868189851a7944a65889942f3ec641ce579bcca9043c629f08943e",
+    "sort": "04426e24017b65335aefc9957b3fd28c2fd6dacdf7e094a01848707c49e99b72",
+    "tnyprntf": "485cb18fee9bf970921fbaee027dd107b758183818fa2d84108c60bd69214c69",
+    "tree": "cc3fc3e6b61f3bba53bc1cfe7062df69533d177df6a2dc6eca7c7d6129ad2306",
+    "unzip": "177b8a1eeb0cad0c8c41e37299c2db1313d56d6579da4935f5649a32ddbbcc8e",
+    "xcopy": "ac448f3c842f3602865bdad30eb77c439cb2b963ccd4900c01021f2c321abf58",
+    "zip": "14f9b5d4f3a943d32a7adfcca9d1f08dcece51bbfcf3b9c4b4ee3572210ea52c"
+  },
+  "corresponding_sources": {
+    "file": "freedos-PC88VA-M20-SOURCES.tar.xz",
+    "bytes": 4213364,
+    "sha256": "b069f58d16aa222eee4604796ec8cc166fdeb1b6711447ead8be39932279a838",
+    "availability": "Generated by make m20-disk from the public parent commit and pinned component gitlinks; release asset, not a floppy or committed build product"
+  },
+  "toolchain": {
+    "identity": "sha256:9f88871b78e93932535822ee9850c0b3e5d52a55c0296ba5cf5a3b2c8ab8c976",
+    "lock": "manifests/toolchains.lock.json",
+    "host_test_wheel": {
+      "filename": "unicorn-2.1.4-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "package": "unicorn",
+      "sha256": "9d6e6dea140560de4ebd8446661f7ef84a357d428c14a3ef09dacd306ec8c239",
+      "version": "2.1.4"
+    }
+  },
+  "qualification_ci": {
+    "run_id": 37259681463,
+    "attempt": 1,
+    "exact_head_sha": "42b115a3561a7bdf97a905b436a2de990da383ba",
+    "workflow": "M20 isolated native 2HD source build",
+    "conclusion": "success"
+  },
+  "guest_emulator": {
+    "name": "VAEG (project-vaeg fork)",
+    "tested_executable_sha256": "c13cba54f95ae4b575495dd85194a43948bf59713ad1dede0d717dc072482dbf",
+    "models": [
+      "VA",
+      "VA2"
+    ],
+    "note": "External guest-only dependency; ROMs and guest media are not public build inputs."
+  },
+  "reproducibility": {
+    "independent_clean_container_builds_per_run": 2,
+    "fresh_clone_builds_compared": true,
+    "d88_bytes_identical": true,
+    "fresh_clone_of_public_revision": true
+  },
+  "validation": {
+    "host": "HOST PASS",
+    "vaeg": "VAEG PASS (bounded scope below)",
+    "hardware": "NOT RUN",
+    "hardware_status": "DEFERRED HARDWARE VALIDATION",
+    "scope": [
+      "System disk (4807a694...) on VA and VA2 at 640 KiB installed: shell startup, COM/MZ execution (JWASMR), guest file write/readback and MCB-chain checks; VA2 at 512 KiB installed with a retained 640 KiB selection, VA2 at 256 KiB and VA at 384 KiB (reduced workload).",
+      "F5 and F8 startup keys on VA (key via the input harness) and VA2 (key injected through the debugger), after the kernel configuration-source fix.",
+      "Utilities disk on VA and VA2 at 640 KiB and 384/256 KiB (see report for per-program limits); archiver disk (UNZIP, ZIP, GZIP round trips) on VA and VA2 at 640 KiB; DEBUG on VA and VA2 including entry while DOS is busy."
+    ],
+    "limits": [
+      "Hardware qualification NOT RUN; no HARDWARE PASS is claimed.",
+      "UNZIP, ZIP and GZIP need 640 KiB; at 256 KiB several utilities (SORT, XCOPY, MOVE) and at 384 KiB JWASMR cannot start for lack of memory.",
+      "UNDELETE, SWSUBST and SHARE are not ported; FAT32 and Japanese support are not included.",
+      "Kernel configuration-source defect (F5/F8 timing) exists in the stable M18 and M19 Preview 1 kernels; only M20 carries the fix.",
+      "The M20 PC regression beyond scratch boot smoke tests was not run."
+    ]
+  },
+  "licenses": {
+    "parent": [
+      "COPYING",
+      "LICENSE.md"
+    ],
+    "on_disk": [
+      "COPYING",
+      "JWASM.LIC",
+      "EXE2BIN.LIC",
+      "UNZIP.LIC",
+      "ZIP.LIC",
+      "DEBUG.LIC"
+    ],
+    "source_bundle": "full project/component license and notice files"
+  }
+}
