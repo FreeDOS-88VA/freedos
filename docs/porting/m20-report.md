@@ -623,6 +623,22 @@ Known unrelated failure: `tests/qa/test_verify_license_policy.py` rejects the
 tracked M17-M20 `CONFIG.SYS` files under its older generated-file policy; it
 fails identically before this change and is not part of the M20 gate.
 
+## Kernel swap (KSSF) and DEBUG on the system disk (release candidate 2)
+
+Owner decision: ship FreeCOM with the kernel-swap feature enabled and add DEBUG to the system disk.
+
+**kswap import.** FreeCOM `m20/kswap-fixes` is `com086` plus twelve commits cherry-picked with `-x` from the M19 branch `fix/kswap-state` (source repository `FreeDOS-88VA/freecom_dbcs2`, classified as *common fix*, imported as an owner-approved exception to the rule against repairing upstream defects): environment-backup segment/size registration, dynamic-context ownership and counters across reload, child return code, allocation-failure fallback independent of STRINGS and its resident warning, child status separated from EXEC errors, plus the `tests/kswap` regression and CI files. `fd2b3eb` (KSSF limited to 8086 instructions) is a PC-88VA port fix. `m20/pc88va` adds these and drops `#undef FEATURE_KERNEL_SWAP_SHELL`. Upstream `master` has not changed those files since `com086`; the defects are reported as FDOS/freecom#189.
+
+**Baseline gate.** `tools/m20/pc_baseline.py` now builds the non-PC88VA FreeCOM of the current branch and compares it with the `m20/kswap-fixes` reference (equal except timestamps), and checks that the reference differs from bare `com086` only in the recorded kswap files. The bare `com086` build differs by design; the lock entry carries a `baseline_exemption` with check `kswap-reference-equal`. The kernel and the four forked utilities remain byte-identical to their baselines.
+
+**Disk.** `KSSF.COM` is assembled from `components/freecom/tools/kssf.asm` (NASM, run from the `tools` directory because it includes `../context.inc`), and `CONFIG.SYS` has `SHELL=A:\KSSF.COM A:\COMMAND.COM /E:512 /P`. `DEBUG.COM` and `DEBUG.LIC` (same source and recipe as the archiver disk) are added. Fresh-clone build at the pushed revision reproduced all three D88 files and the source bundle byte for byte; CI passed on that revision.
+
+**VAEG (VA and VA2, 640 KiB).** Shell start through KSSF, MEMMAP chain valid, `COMMAND /C` inner command, JWASMR assembly of HELLO.COM with `CALL /S` and execution of the result, file write/readback, `CALL /S DEBUG` with a normal quit and the reloaded shell executing further commands, MCB chain valid afterwards. `CALL /S MEMMAP` reported a largest free block of 421,312 bytes against 356,912 without swapping (VA2). After a swap the largest block is about 400-500 bytes smaller. The reduced controls (VA2 256 KiB, VA 384 KiB, VA2 512 KiB with a retained 640 KiB selection) passed startup, MEMMAP and write/readback.
+
+**Not established.** `IF ERRORLEVEL` after `COMMAND /C EXIT 3` did not fire on either this disk or the release candidate 1 disk (an observation about the test, not a kswap regression; the child return code under a swap is not verified on the guest). Secondary shells, pipes, redirection, batch files and nested KSSF are not qualified. F5/F8 were not re-run with the SHELL line. Utilities and archivers disks were not re-run on the guest (the archiver disk changed only in lock metadata).
+
+**Owner hardware report.** The owner reports having booted release candidate 1 on a real PC-88VA2 with 640 KB: boot, command execution and file write worked. This is recorded as an owner report, not as `HARDWARE PASS`.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
