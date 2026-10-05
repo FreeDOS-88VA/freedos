@@ -527,8 +527,69 @@ Verification:
   emulators in parallel; DEBUG and the archivers behaved correctly in them,
   and the corrected runs above pass.
 
+## Startup keys: kernel configuration read from the vector table
+
+F5/F8 startup testing found a PC-88VA adapter defect. The PC88VA branch of
+`kernel/main.c` copied `InitKernelConfig` from physical 0000:0002, the link
+address of `_LowKernelConfig` relative to the kernel image; at run time the
+image starts at `PC88VA_LOADSEG`, and physical 0000:0002 is the interrupt
+vector table. `SkipConfigSeconds` was the low byte of the firmware INT 3
+vector: on the VA2 the F5/F8 prompt waited about 41 seconds (unattended
+boots continued only because the test scripts pressed Enter), on the VA it
+was negative and F5/F8 were never offered. The drive-assignment, LBA,
+boot-harddisk and version fields were vector bytes as well.
+
+- fdkernel `9d2c3f6239028d87cda89224a5b0b9019d4d2a4e` copies from
+  `&LowKernelConfig`, whose segment fixup follows the resident base (one
+  more relocation, 492; INIT and layout sizes unchanged). The component test
+  `test_m20_kernel_config_source.py` (run by the M20 gate) fails on the old
+  source. The non-VA kernel still equals `ke2043` (PC baseline gate).
+- The same code is in the stable M18 kernel (`e87e807`) and the M19 kernel
+  (`2dba27f`, Preview 1). Those releases are unchanged; this is recorded
+  here as a known issue of them.
+- System D88 `4807a6942c06066eaeb0ecbfeb59743a375f98eed5b64db6917f796d590c0704`
+  (utilities and archiver D88 unchanged).
+
+VAEG (this disk):
+
+- Register capture at `GetBiosKey`: timeout argument 2 on VA and VA2 (41
+  before the fix on VA2; the VA never reached it before the fix).
+- No key: on VA and VA2 the prompt is shown and cleared and the shell starts
+  by frame 1000.
+- VA/640 (the failing model): F5 skips CONFIG.SYS (`PATH=.`); F8 with N for
+  `SET PATH` keeps the default `PATH=.`; shell, file write/readback and MCB
+  checks pass.
+- VA2/640: the same F5 and F8 checks pass with the key injected at frame 520
+  through gdb, because VAEG's input harness cannot press a key before frame
+  600 and the 1-2 second window then has already closed on the VA2.
+- Regression controls pass: normal workload (JWASMR COM/MZ) VA2/640 and
+  VA/640; reduced workload VA2 512 KiB with a retained 640 KiB selection,
+  VA2/256 and VA/384; utilities disk VA2/640; DEBUG entered while DOS is
+  busy VA2/640; archiver disk VA/640.
+- Retained failed runs: F5/F8 scripts that pressed before or after the
+  window (frames 300 to 1180 after the harness delay), an F8 "all Y" run
+  that could not distinguish detection, and gdb harness runs that stalled or
+  lost the last write when gdb killed the emulator (fixed by passing SIGTERM
+  to it).
+
+## Conventional memory: 256 and 384 KiB
+
+With the default `PC88VA_LOADSEG=1000` and the M20 CONFIG.SYS, VAEG
+results (VA2 and VA unless noted):
+
+- 384 KiB: startup, MEMMAP, file write/readback and MCB checks pass; the
+  whole utilities workload (FIND, SORT, XCOPY, MOVE, LABEL, DEVLOAD,
+  NLSFUNC, APPEND) passes. JWASMR cannot start: DOS EXEC reports error 8
+  because it needs about 330 KB (283 KB image plus 46 KB minimum) and about
+  179 KB are free at the prompt. The system README already states that the
+  sample assembly needs 640 KiB.
+- 256 KiB: startup, MEMMAP, file write/readback and MCB checks pass; about
+  48 KB are free at the prompt (the resident FreeCOM takes about 62 KB).
+  DEVLOAD (COM), NLSFUNC, LABEL and APPEND run; XCOPY and MOVE are refused
+  by DOS and SORT reports insufficient memory. These are resource limits,
+  not layout faults.
+
 ## Unrun gates
 
-Not yet run: 256/384 KiB and other RAM
-matrix entries; F5/F8 startup paths; PC regression beyond the scratch boot
-smoke test. Hardware: **NOT RUN**. No M20 distribution is designated.
+Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
+smoke tests; Japanese support. No M20 distribution is designated.
