@@ -657,6 +657,28 @@ VAEG VA2 640 KiB, MEMMAP largest free block (MEMMAP itself loaded):
 
 Passed on VAEG: normal workflow on VA and VA2 at 640 KiB (assembly through redirected commands, COM/MZ, write/readback, MCB checks), swap scenarios including `CALL /S`, DEBUG and `COMMAND /C` on VA and VA2, BUILD.BAT, ERRORLEVEL after a swapped program, redirected MEMMAP output, and the reduced controls VA2 256 KiB, VA 384 KiB, VA2 512 KiB with a retained 640 KiB selection. F5/F8, utilities and archiver disks were not re-run.
 
+## Shell menu: FreeCOM or MS-DOS 4 COMMAND.COM
+
+Owner decision: ship MS-DOS 4.0 COMMAND.COM next to FreeCOM and select the shell with the CONFIG.SYS menu (the MS-DOS 4 COMMAND work, previously outside the initial M20 scope, is brought into M20 by this decision).
+
+- **Kernel** `24d196b` (PC88VA only): `MENU` and `MENUDEFAULT` are accepted. The upstream menu draws its colour form with INT 10h, which the VA does not have; `MENUCOLOR` stays rejected and the upstream plain-text form is used (`Select from Menu [012], or press [ENTER]`, digit key, Enter, timeout, F5, F8). Keys come from the VA `GetBiosKey`, which already reads the DOS console. The non-PC88VA build is unchanged (PC baseline gate).
+- **MS-DOS 4 COMMAND.COM**: component `msdos` = `FreeDOS-88VA/MS-DOS` branch `m20/pc88va` at `e46d23b` (the unchanged M19 Preview 1 source, MIT), exported as the subset the build and the source bundle need (`archive_paths`: INC, CMD/COMMAND, the US message file, the original BUILDIDX/BUILDMSG/MASM/LINK/EXE2BIN and the licenses). Component `emu2` (`dmsc/emu2` `9d8698d`, GPL-2.0) is a host build tool compiled in the container; nothing from it is on a disk. The recipe is a maintained M20 copy of the M19 one (`tools/m20/msdos4/`). It is placed in `A:\MSDOS` because it derives `COMSPEC` from its directory argument; the composer now supports one directory level.
+- **CONFIG.SYS**: `MENUDEFAULT=1,5`; `1?SHELL=A:\KSSF.COM A:\COMMAND.COM /E:512 /P /SWAP`; `2?SHELL=A:\MSDOS\COMMAND.COM A:\MSDOS\ /E:512 /P`. Choice 0 (always offered upstream) runs no numbered line, giving the kernel default FreeCOM without KSSF.
+- **AUTOEXEC.BAT** (new): `PATH A:\`. MS-DOS 4 COMMAND builds its own environment and does not take `SET` from CONFIG.SYS. With an AUTOEXEC.BAT, FreeCOM no longer asks for date and time at startup.
+
+VAEG (private evidence; installed RAM, no retained selection unless stated):
+
+| Check | Result |
+| --- | --- |
+| Menu shown, timeout selects 1 (FreeCOM through KSSF) | VA2 640 |
+| `2`: MS-DOS 4 COMMAND, `COMSPEC=A:\MSDOS\COMMAND.COM`, `PATH=A:\`, VER, DIR, write/readback, JWASMR, COM run | VA2 640, VA 640 |
+| MS-DOS 4 COMMAND largest free block with MEMMAP loaded | 482,080 bytes (640 KiB); 88,864 bytes (VA2 256 KiB) |
+| F5 at the menu: CONFIG.SYS/AUTOEXEC.BAT skipped, default shell | VA2 640 |
+| F8 then `2`: only the `2?SHELL` line asked, MS-DOS 4 COMMAND with /Y | VA2 640 |
+| FreeCOM regressions: normal workflow VA2/VA 640, kswap scenarios VA2 640, reduced VA2 256, VA 384, VA2 512 with retained 640 | pass |
+
+The emulator cannot inject a key before frame 600, and the menu timeout ends near frame 800, so menu keys were sent at frame 600. Not run: utilities and archiver disks with this system disk; MS-DOS 4 COMMAND at 384/512 KiB; hardware.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
