@@ -114,7 +114,7 @@ class UtilityDiskTests(unittest.TestCase):
                                        "--before=2025-04-10T00:00:00", upstream.stdout.strip()],
                                       check=True, capture_output=True, text=True).stdout.strip()
             with self.subTest(component=item["name"]):
-                self.assertTrue(item["repository"].startswith("https://github.com/nakatamaho/"))
+                self.assertTrue(item["repository"].startswith("https://github.com/FreeDOS-88VA/"))
                 if not item["upstream_repository"].startswith("https://github.com/FDOS/"):
                     # Only with a stated reason (DEBUG: FDOS/debug is obsolete).
                     self.assertGreater(len(item.get("upstream_reason", "")), 40)

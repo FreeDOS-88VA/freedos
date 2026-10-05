@@ -32,7 +32,7 @@
       "builder": "utilities.build_tools",
       "license": "Info-ZIP license (UNZIP.LIC)",
       "cpu": "8086 real mode",
-      "va_adaptation": "none; project repository nakatamaho/unzip imports the FreeDOS 1.4 package source unmodified",
+      "va_adaptation": "none; project repository FreeDOS-88VA/unzip imports the FreeDOS 1.4 package source unmodified",
       "messages": "English",
       "description": "Extract, list and test ZIP archives.",
       "tests": [
@@ -53,7 +53,7 @@
       "builder": "utilities.build_tools",
       "license": "Info-ZIP license (ZIP.LIC)",
       "cpu": "8086 real mode",
-      "va_adaptation": "none; project repository nakatamaho/zip imports the FreeDOS 1.4 package source unmodified",
+      "va_adaptation": "none; project repository FreeDOS-88VA/zip imports the FreeDOS 1.4 package source unmodified",
       "messages": "English",
       "description": "Create and update ZIP archives.",
       "tests": [
@@ -74,7 +74,7 @@
       "builder": "utilities.build_tools",
       "license": "GPL-2.0 (COPYING)",
       "cpu": "8086 real mode",
-      "va_adaptation": "none; project repository nakatamaho/gzip imports the FreeDOS 1.4 package source unmodified",
+      "va_adaptation": "none; project repository FreeDOS-88VA/gzip imports the FreeDOS 1.4 package source unmodified",
       "messages": "English",
       "description": "Compress and decompress gzip files.",
       "tests": [

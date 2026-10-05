@@ -7,7 +7,7 @@
     {
       "name": "fdkernel",
       "path": "components/fdkernel",
-      "repository": "https://github.com/nakatamaho/fdkernel.git",
+      "repository": "https://github.com/FreeDOS-88VA/fdkernel.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/kernel.git",
       "commit": "9d2c3f6239028d87cda89224a5b0b9019d4d2a4e",
@@ -22,7 +22,7 @@
     {
       "name": "freecom",
       "path": "components/freecom",
-      "repository": "https://github.com/nakatamaho/freecom_dbcs2.git",
+      "repository": "https://github.com/FreeDOS-88VA/freecom_dbcs2.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/freecom.git",
       "commit": "18b692a2a8db6fb46dee1d64dbe0297d1d5ab530",
@@ -63,7 +63,7 @@
     {
       "name": "jwasm",
       "path": "components/jwasm",
-      "repository": "https://github.com/nakatamaho/JWasm.git",
+      "repository": "https://github.com/FreeDOS-88VA/JWasm.git",
       "branch": "topic/m19-source-notice",
       "upstream_repository": "https://github.com/Baron-von-Riedesel/JWasm.git",
       "upstream_base_commit": "ac54827ff40b77ecd6e77ed0866a43fc60cd5fe1",
@@ -240,7 +240,7 @@
     {
       "name": "choice",
       "path": "components/choice",
-      "repository": "https://github.com/nakatamaho/choice.git",
+      "repository": "https://github.com/FreeDOS-88VA/choice.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/choice.git",
       "upstream_base_commit": "fba777282f44aa2ab81d170b1f1655bfc7544473",
@@ -256,7 +256,7 @@
     {
       "name": "deltree",
       "path": "components/deltree",
-      "repository": "https://github.com/nakatamaho/deltree.git",
+      "repository": "https://github.com/FreeDOS-88VA/deltree.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/deltree.git",
       "upstream_base_commit": "ed472787c705ecc19c4d087f0ead1e6d599cad5d",
@@ -272,7 +272,7 @@
     {
       "name": "comp",
       "path": "components/comp",
-      "repository": "https://github.com/nakatamaho/comp.git",
+      "repository": "https://github.com/FreeDOS-88VA/comp.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/comp.git",
       "upstream_base_commit": "ddb4e396e78debd5121e3598b12a2ea25eb6ba8f",
@@ -294,7 +294,7 @@
     {
       "name": "fc",
       "path": "components/fc",
-      "repository": "https://github.com/nakatamaho/fc.git",
+      "repository": "https://github.com/FreeDOS-88VA/fc.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/fc.git",
       "upstream_base_commit": "5591875a7298a5dd17f342cebe6a500746ee674d",
@@ -312,7 +312,7 @@
     {
       "name": "attrib",
       "path": "components/attrib",
-      "repository": "https://github.com/nakatamaho/attrib.git",
+      "repository": "https://github.com/FreeDOS-88VA/attrib.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/attrib.git",
       "upstream_base_commit": "f670ebb0cb18dc08712bfcf56584ecb89e0bbd18",
@@ -330,7 +330,7 @@
     {
       "name": "tree",
       "path": "components/tree",
-      "repository": "https://github.com/nakatamaho/tree.git",
+      "repository": "https://github.com/FreeDOS-88VA/tree.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/tree.git",
       "upstream_base_commit": "f4e7e2e35ba913b1361f2ed710b2c50312ff8ecc",
@@ -348,9 +348,9 @@
     {
       "name": "replace",
       "path": "components/replace",
-      "repository": "https://github.com/nakatamaho/replace.git",
+      "repository": "https://github.com/FreeDOS-88VA/replace.git",
       "branch": "m20/pc88va",
-      "upstream_repository": "https://github.com/nakatamaho/replace.git",
+      "upstream_repository": "https://github.com/FreeDOS-88VA/replace.git",
       "upstream_package": {
         "url": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/base/replace.zip",
         "zip_sha256": "968d11e2d9f303431b9c818b25bf527079a4952ebc1a03122defd6bf3b89f691",
@@ -372,9 +372,9 @@
     {
       "name": "exe2bin",
       "path": "components/exe2bin",
-      "repository": "https://github.com/nakatamaho/exe2bin.git",
+      "repository": "https://github.com/FreeDOS-88VA/exe2bin.git",
       "branch": "m20/pc88va",
-      "upstream_repository": "https://github.com/nakatamaho/exe2bin.git",
+      "upstream_repository": "https://github.com/FreeDOS-88VA/exe2bin.git",
       "upstream_package": {
         "url": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/base/exe2bin.zip",
         "zip_sha256": "d7848a9bd26a717c88146e198b1dd173a6c9758221d72a5da2bd4c6c2151d511",
@@ -396,9 +396,9 @@
     {
       "name": "unzip",
       "path": "components/unzip",
-      "repository": "https://github.com/nakatamaho/unzip.git",
+      "repository": "https://github.com/FreeDOS-88VA/unzip.git",
       "branch": "m20/pc88va",
-      "upstream_repository": "https://github.com/nakatamaho/unzip.git",
+      "upstream_repository": "https://github.com/FreeDOS-88VA/unzip.git",
       "upstream_package": {
         "url": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/archiver/unzip.zip",
         "zip_sha256": "da3960cf77a30b02d182b9a1fdf6ac1ded331834ca60fb10810edcae084c3628",
@@ -420,9 +420,9 @@
     {
       "name": "zip",
       "path": "components/zip",
-      "repository": "https://github.com/nakatamaho/zip.git",
+      "repository": "https://github.com/FreeDOS-88VA/zip.git",
       "branch": "m20/pc88va",
-      "upstream_repository": "https://github.com/nakatamaho/zip.git",
+      "upstream_repository": "https://github.com/FreeDOS-88VA/zip.git",
       "upstream_package": {
         "url": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/archiver/zip.zip",
         "zip_sha256": "d5d313b1a2bb33432e9b8aed8628d84a5ec29f23db0cd1e9320197db3804f762",
@@ -444,9 +444,9 @@
     {
       "name": "gzip",
       "path": "components/gzip",
-      "repository": "https://github.com/nakatamaho/gzip.git",
+      "repository": "https://github.com/FreeDOS-88VA/gzip.git",
       "branch": "m20/pc88va",
-      "upstream_repository": "https://github.com/nakatamaho/gzip.git",
+      "upstream_repository": "https://github.com/FreeDOS-88VA/gzip.git",
       "upstream_package": {
         "url": "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.4/archiver/gzip.zip",
         "zip_sha256": "d086eafc5bf021d6c7a96af7d9c33b34680fa24c293c3052791751329321e94f",
@@ -468,7 +468,7 @@
     {
       "name": "debug",
       "path": "components/debug",
-      "repository": "https://github.com/nakatamaho/DOS-debug.git",
+      "repository": "https://github.com/FreeDOS-88VA/DOS-debug.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/Baron-von-Riedesel/DOS-debug.git",
       "upstream_reason": "FDOS/debug stops at DEBUG 1.18 (2010); the FreeDOS 1.4 DEBUG package is Japheth's DOS-debug, maintained in this repository",

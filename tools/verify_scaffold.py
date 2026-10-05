@@ -16,12 +16,16 @@ from current_components import CurrentComponentError, resolve_current_components
 EXPECTED_SUBMODULES = {
     "components/fdkernel": {
         "name": "fdkernel",
-        "url": "https://github.com/nakatamaho/fdkernel.git",
+        "url": "https://github.com/FreeDOS-88VA/fdkernel.git",
+        # The scaffold lock is a hash-pinned historical record (pre-transfer URL).
+        "lock_url": "https://github.com/nakatamaho/fdkernel.git",
         "branch": "nec98-current",
     },
     "components/freecom": {
         "name": "freecom",
-        "url": "https://github.com/nakatamaho/freecom_dbcs2.git",
+        "url": "https://github.com/FreeDOS-88VA/freecom_dbcs2.git",
+        # The scaffold lock is a hash-pinned historical record (pre-transfer URL).
+        "lock_url": "https://github.com/nakatamaho/freecom_dbcs2.git",
         "branch": "deterministic-build-timestamp",
     },
     "components/country": {
@@ -258,7 +262,8 @@ def verify_lock(root: Path, shas: dict[str, str]) -> None:
         if expected is None or name != expected["name"] or name in seen:
             raise VerificationError(f"unexpected or duplicate lock component: {name!r} at {path!r}")
         seen.add(name)
-        if component.get("repository") != expected["url"] or component.get("branch") != expected["branch"]:
+        if (component.get("repository") != expected.get("lock_url", expected["url"])
+                or component.get("branch") != expected["branch"]):
             raise VerificationError(f"lock provenance mismatch for {name}")
         commit = component.get("commit")
         if not isinstance(commit, str) or not HEX40.fullmatch(commit):

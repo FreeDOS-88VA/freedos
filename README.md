@@ -9,7 +9,7 @@ The evidence is **HOST PASS** for the reproducible public-source build and
 **VAEG PASS** for the bounded VA/VA2 workflows. Hardware compatibility is
 **not qualified**: **DEFERRED HARDWARE VALIDATION**, not `HARDWARE PASS`.
 
-- [M18 release and downloads](https://github.com/nakatamaho/freedos-pc88va/releases/tag/m18)
+- [M18 release and downloads](https://github.com/FreeDOS-88VA/freedos-pc88va/releases/tag/m18)
 - [Release notes](docs/releases/m18.md)
 - [Exact image, source/toolchain identities and licenses](images/milestones/m18/README.md)
 - [Validation scope and historical results](docs/porting/m18-report.md)
@@ -37,12 +37,12 @@ SASI/SCSI and hard-disk boot are not part of M18.
   M19 implementation has not started. VAEG success does not qualify this path
   on a real machine.
 - Redirected `CHKDSK A:` output can be empty
-  ([issue #12](https://github.com/nakatamaho/freedos-pc88va/issues/12)); it is
+  ([issue #12](https://github.com/FreeDOS-88VA/freedos-pc88va/issues/12)); it is
   not counted as a successful A: filesystem check.
 
 ### Owner-provided release illustration
 
-![M18 owner-provided photo, with EXIF/GPS removed and diagnostics unmasked](https://github.com/nakatamaho/freedos-pc88va/releases/download/m18/freedos-pc88va-m18-public-photo.jpg)
+![M18 owner-provided photo, with EXIF/GPS removed and diagnostics unmasked](https://github.com/FreeDOS-88VA/freedos-pc88va/releases/download/m18/freedos-pc88va-m18-public-photo.jpg)
 
 Published with the owner's authorization: EXIF/GPS metadata is removed,
 while displayed diagnostics remain unmasked. The same
@@ -54,7 +54,7 @@ and never a build input. The original metadata-bearing photo is not committed.
 ## Rebuild M18 from public source
 
 ```sh
-git clone --branch m18 --recurse-submodules https://github.com/nakatamaho/freedos-pc88va.git
+git clone --branch m18 --recurse-submodules https://github.com/FreeDOS-88VA/freedos-pc88va.git
 cd freedos-pc88va
 make m18-toolchain
 make m18-disk
@@ -80,7 +80,8 @@ See the release notes for the exact qualified-bundle checksum and rebuild pin.
 
 Component source remains in its pinned public repositories; project-authored
 platform adapters and build recipes are versioned here. Kernel and FreeCOM
-use the `nakatamaho` forks, not direct upstream branch changes. All five pinned
+use the project forks (now in the `FreeDOS-88VA` organization), not direct
+upstream branch changes. All five pinned
 components and their source/license identities are recorded in
 `manifests/m18-components.lock.json`.
 

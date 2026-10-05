@@ -302,8 +302,8 @@ def _resolve_m20(root: Path) -> dict[str, str]:
         by_name[item.get("name")] = item
     policy = {
         "country": "https://github.com/FDOS/country.git",
-        "fdkernel": "https://github.com/nakatamaho/fdkernel.git",
-        "freecom": "https://github.com/nakatamaho/freecom_dbcs2.git",
+        "fdkernel": "https://github.com/FreeDOS-88VA/fdkernel.git",
+        "freecom": "https://github.com/FreeDOS-88VA/freecom_dbcs2.git",
     }
     try:
         ancestors = dict(M20_BASELINE)

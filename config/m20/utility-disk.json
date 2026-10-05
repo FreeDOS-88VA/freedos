@@ -143,7 +143,7 @@
       "builder": "utilities.build_tools",
       "license": "GPL-2.0 (COPYING); kitten LGPL-2.1 (KITTEN.LIC); tnyprntf GPL-2.0 (COPYING)",
       "cpu": "8086 real mode",
-      "va_adaptation": "none; fork nakatamaho/fc fixes Open Watcom LFN-failure detection (all Open Watcom builds)",
+      "va_adaptation": "none; fork FreeDOS-88VA/fc fixes Open Watcom LFN-failure detection (all Open Watcom builds)",
       "messages": "built-in English",
       "description": "Compare files.",
       "tests": [
@@ -226,7 +226,7 @@
       "builder": "utilities.build_tools",
       "license": "GPL-2.0-or-later (COPYING); kitten LGPL-2.1 (KITTEN.LIC); tnyprntf GPL-2.0 (COPYING)",
       "cpu": "8086 real mode",
-      "va_adaptation": "fork nakatamaho/choice: /T timeout measured with DOS function 2Ch instead of the PC BIOS tick counter (PC88VA builds only)",
+      "va_adaptation": "fork FreeDOS-88VA/choice: /T timeout measured with DOS function 2Ch instead of the PC BIOS tick counter (PC88VA builds only)",
       "messages": "built-in English",
       "description": "Wait for a key choice in batch files.",
       "tests": [
@@ -247,7 +247,7 @@
       "builder": "utilities.build_tools",
       "license": "GPL-2.0-or-later (COPYING)",
       "cpu": "8086 real mode",
-      "va_adaptation": "fork nakatamaho/deltree: confirmation key read through DOS (0Bh/07h) instead of INT 16h (PC88VA builds only)",
+      "va_adaptation": "fork FreeDOS-88VA/deltree: confirmation key read through DOS (0Bh/07h) instead of INT 16h (PC88VA builds only)",
       "messages": "built-in English",
       "description": "Delete a directory tree.",
       "tests": [
@@ -268,7 +268,7 @@
       "builder": "utilities.build_tools",
       "license": "MIT (see the source bundle)",
       "cpu": "8086 real mode",
-      "va_adaptation": "none; fork nakatamaho/comp only fixes NASM 2.x EQU syntax and reproduces the FreeDOS 1.4 binary",
+      "va_adaptation": "none; fork FreeDOS-88VA/comp only fixes NASM 2.x EQU syntax and reproduces the FreeDOS 1.4 binary",
       "messages": "English",
       "description": "Compare two files byte by byte.",
       "tests": [
@@ -289,7 +289,7 @@
       "builder": "utilities.build_tools",
       "license": "GPL-2.0 (COPYING)",
       "cpu": "8086 real mode",
-      "va_adaptation": "none; fork nakatamaho/attrib adds Open Watcom branches (Borland/Turbo C source unchanged)",
+      "va_adaptation": "none; fork FreeDOS-88VA/attrib adds Open Watcom branches (Borland/Turbo C source unchanged)",
       "messages": "English",
       "description": "Display or change file attributes.",
       "tests": [
@@ -310,7 +310,7 @@
       "builder": "utilities.build_tools",
       "license": "Public domain (pdTree; built without the optional LGPL Cats files)",
       "cpu": "8086 real mode",
-      "va_adaptation": "fork nakatamaho/tree: Open Watcom DOS layer; PC88VA builds default to the ASCII tree (/A) and a fixed 80x25 console",
+      "va_adaptation": "fork FreeDOS-88VA/tree: Open Watcom DOS layer; PC88VA builds default to the ASCII tree (/A) and a fixed 80x25 console",
       "messages": "built-in English",
       "description": "Display the directory structure.",
       "tests": [
@@ -331,7 +331,7 @@
       "builder": "utilities.build_tools",
       "license": "GPL-2.0 (COPYING)",
       "cpu": "8086 real mode",
-      "va_adaptation": "none; project repository nakatamaho/replace imports the FreeDOS 1.4 package source and adds Open Watcom branches",
+      "va_adaptation": "none; project repository FreeDOS-88VA/replace imports the FreeDOS 1.4 package source and adds Open Watcom branches",
       "messages": "English",
       "description": "Replace or add files.",
       "tests": [
@@ -352,7 +352,7 @@
       "builder": "utilities.build_tools",
       "license": "Sybase Open Watcom Public License 1.0 (EXE2BIN.LIC)",
       "cpu": "8086 real mode",
-      "va_adaptation": "none; project repository nakatamaho/exe2bin imports the FreeDOS 1.4 package source and adds Open Watcom branches",
+      "va_adaptation": "none; project repository FreeDOS-88VA/exe2bin imports the FreeDOS 1.4 package source and adds Open Watcom branches",
       "messages": "English",
       "description": "Convert an MZ program to a binary or COM file.",
       "tests": [

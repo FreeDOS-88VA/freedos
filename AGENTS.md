@@ -10,8 +10,11 @@ its component repository. If component source must change, work in that
 component's own repository and branch, commit there, and then update the
 parent gitlink. Never vendor a submodule file as a copy in the parent.
 
-The `origin` remote for the kernel and FreeCOM components is the
-`nakatamaho` fork. From M20 onward, their `upstream` remote is the official
+The `origin` remote for the kernel and FreeCOM components is the project
+fork. Project repositories (the parent, the kernel and FreeCOM forks, the
+utility forks and package imports) live in the `FreeDOS-88VA` GitHub
+organization; they were transferred from `nakatamaho` during M20, and GitHub
+redirects the old URLs that historical records keep. From M20 onward, their `upstream` remote is the official
 FreeDOS repository (`https://github.com/FDOS/kernel` and
 `https://github.com/FDOS/freecom`), and the corresponding `lpproj`
 repository is the `lpproj` remote: a reference source of NEC PC-98 and DBCS

@@ -589,7 +589,26 @@ results (VA2 and VA unless noted):
   by DOS and SORT reports insufficient memory. These are resource limits,
   not layout faults.
 
+## Repository organization
+
+By owner decision the project repositories were transferred from the
+`nakatamaho` account to the `FreeDOS-88VA` GitHub organization: the parent,
+`fdkernel`, `freecom_dbcs2`, `JWasm`, `MS-DOS`, the utility forks (`choice`,
+`deltree`, `comp`, `fc`, `attrib`, `tree`, `DOS-debug`) and the package
+imports (`replace`, `exe2bin`, `swsubst`, `undelete`, `unzip`, `zip`,
+`gzip`). Fork relationships, history, branches and tags are unchanged, and
+GitHub redirects the old URLs. M20 references (`.gitmodules`, the M20 lock,
+the M20 resolver policy, remote configuration, scaffold remote checks, disk
+configuration text) use the new URLs; hash-pinned historical locks and
+M01-M19 records keep the URLs they were made with.
+
+Japanese support is deferred to the next milestone by owner decision.
+
+Known unrelated failure: `tests/qa/test_verify_license_policy.py` rejects the
+tracked M17-M20 `CONFIG.SYS` files under its older generated-file policy; it
+fails identically before this change and is not part of the M20 gate.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
-smoke tests; Japanese support. No M20 distribution is designated.
+smoke tests. Japanese support is next-milestone scope. No M20 distribution is designated.
