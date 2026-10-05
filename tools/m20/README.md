@@ -242,9 +242,10 @@ DOS version/layout and PSP ownership, and reports managed DOS MCB accounting.
 Its MZ `maximum allocation` equals `minimum allocation`. The build record
 separates the linked-image lower bound from the pinned FreeDOS whole-page initial
 allocation; neither is the runtime footprint. Watcom startup can grow heaps.
-After priming stdout, MEMMAP calls the documented OW 1.9 `_nheapshrink` and
-`_fheapshrink` APIs to return only its unused heap tails, preserving live data,
-stack and buffering. It fails closed if either call fails, then measures actual
+MEMMAP makes stdout unbuffered, so no library buffer block is left above
+its own block. After priming stdout, it calls the documented OW 1.9 `_nheapshrink` and
+`_fheapshrink` APIs to return only its unused heap tails, preserving live data
+and stack. It fails closed if either call fails, then measures actual
 MCB ownership including its environment. It never resizes to a guessed linked
 minimum or frees another owner. Physical/reserved memory is labelled unavailable. CHKDSK is read-only.
 FORMAT writes filesystem metadata only to a B: volume with a readable, valid

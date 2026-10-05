@@ -116,7 +116,7 @@
       "source": "tools/m20/memmap/",
       "license": "GPL-2.0-or-later",
       "cpu": "8086 DOS MZ",
-      "va_adaptation": "FreeDOS-version/layout-checked AH=52h MCB-chain reader; MZ maximum allocation equals minimum at EXEC, while the OW 1.9 runtime may grow its own heaps; after priming stdout, the documented near/far heap-shrink APIs release only unused own heap tails before observation; no direct BIOS calls",
+      "va_adaptation": "FreeDOS-version/layout-checked AH=52h MCB-chain reader; MZ maximum allocation equals minimum at EXEC, while the OW 1.9 runtime may grow its own heaps; with unbuffered stdout (no buffer block above the program) and after priming it, the documented near/far heap-shrink APIs release only unused own heap tails before observation; no direct BIOS calls",
       "tests": [
         "synthetic bounded MCB and runtime trim/failure tests",
         "matched VA/VA2 checked guest MCB reports and independent observer-only footprint comparison; physical/outside-arena view unavailable"

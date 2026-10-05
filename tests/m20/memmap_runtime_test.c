@@ -6,11 +6,20 @@
 #include <string.h>
 #include <dos.h>
 
-static int primed, shrinks, reads, near_result, far_result;
+static int unbuffered, primed, shrinks, reads, near_result, far_result;
+
+static int test_setvbuf(FILE *stream, char *buffer, int mode, size_t size)
+{
+  /* No library buffer block may sit above the program after the trim. */
+  assert(stream == stdout && buffer == NULL && mode == _IONBF && size == 0);
+  assert(!primed && shrinks == 0);
+  unbuffered = 1;
+  return setvbuf(stream, buffer, mode, size);
+}
 
 static int test_fflush(FILE *stream)
 {
-  assert(stream == stdout);
+  assert(stream == stdout && unbuffered);
   primed = 1;
   return fflush(stream);
 }
@@ -70,14 +79,16 @@ void *m20_test_far_pointer(unsigned segment, unsigned offset)
 
 #define main m20_memmap_main
 #define fflush test_fflush
+#define setvbuf test_setvbuf
 #include "../../tools/m20/memmap/memmap.c"
+#undef setvbuf
 #undef fflush
 #undef main
 
 static void check(int near_status, int far_status, int expected, int calls)
 {
   char *arguments[] = {"MEMMAP", "/CHECK", NULL};
-  primed = shrinks = reads = 0;
+  unbuffered = primed = shrinks = reads = 0;
   near_result = near_status;
   far_result = far_status;
   assert(m20_memmap_main(2, arguments) == expected);

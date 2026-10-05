@@ -173,8 +173,10 @@ int main(int argc, char **argv)
     fputs("MEMMAP: AH=52h/AH=62h returned an unsupported layout.\n", stderr);
     return 3;
   }
-  /* Prime standard output before validation so any library-owned output
-     buffer is included in the observed process state. */
+  /* An unbuffered stdout needs no library buffer block. A buffer allocated
+     above the expanded DGROUP would remain there after the heap trim below
+     and leave a free gap between it and this program's own block. */
+  setvbuf(stdout, NULL, _IONBF, 0);
   if (check_only)
     fputs("MEMMAP /CHECK: ", stdout);
   else

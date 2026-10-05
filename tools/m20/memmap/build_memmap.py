@@ -139,7 +139,7 @@ def build(output):
         "MZ maximum extra allocation equals minimum extra allocation; required_psp_block "
         "is the linked-image lower bound, not runtime footprint. Pinned FreeDOS "
         "initial allocation rounds the last file page. CRT may grow its heaps; "
-        "after stdout priming, _nheapshrink/_fheapshrink return only unused tails "
+        "stdout is unbuffered (no library buffer block); after it is primed, _nheapshrink/_fheapshrink return only unused tails "
         "before MCB observation; failure exits nonzero. MCB ownership includes "
         "the retained stack, library data and environment."
     )
