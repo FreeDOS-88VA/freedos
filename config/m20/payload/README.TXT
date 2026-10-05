@@ -13,6 +13,9 @@ Compatibility with any emulator or machine must be established by the matching
 qualification record; it is not implied by this disk. Leave B: empty for normal
 startup. At the DOS prompt, use DIR, TYPE, COPY, REN, DEL, MD, RD, CD,
 ECHO, SET, PATH, batch files, and shell redirection. Use HELP for shell help.
+The shell is loaded through KSSF and swaps itself out while an external
+program runs, so the program gets the shell's memory too. Commands in batch
+files, with redirection or in pipes run without swapping.
 
 Files and examples
 ------------------

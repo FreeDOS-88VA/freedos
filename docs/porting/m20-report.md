@@ -639,6 +639,24 @@ Owner decision: ship FreeCOM with the kernel-swap feature enabled and add DEBUG 
 
 **Owner hardware report.** The owner reports having booted release candidate 1 on a real PC-88VA2 with 640 KB: boot, command execution and file write worked. This is recorded as an owner report, not as `HARDWARE PASS`.
 
+## Swap by default, compact MEMMAP and no LFN (after release candidate 2)
+
+Owner request: KSSF must increase the memory available to programs, the free gap reported by MEMMAP must be closed, and LFN/LOADHIGH removed.
+
+- **Why release candidate 2 reported less memory.** KSSF only swapped for `CALL /S`; otherwise it added its own resident block (784 bytes plus PSP/environment) in front of the shell. `SHELL=` now passes `/SWAP`, so every external command run from the prompt swaps the shell out.
+- **Redirection, pipes and batch files.** With `/SWAP`, upstream FreeCOM also swapped redirected commands; the shell's exit closed the redirected handle and `MEMMAP > M.TXT` left an empty file. FreeCOM `b646c55` (kswap series, common fix, also in `m20/pc88va` `536e27a`) runs such commands, batch files and FOR bodies with an ordinary EXEC, the cases `docs/k-swap.txt` lists as unsupported. The PC baseline gate compares with the updated reference and passes.
+- **LFN.** FreeCOM `1dd3d04` removes `FEATURE_LONG_FILENAMES` and `LFNFOR` for PC88VA (FAT16-only kernel); `LOADHIGH`, `LOADFIX` were already removed. COMMAND's resident block shrank from 64,800 to 62,864 bytes.
+- **The 58,800-byte gap was MEMMAP's own.** The large-model Open Watcom startup grew MEMMAP's block and allocated a small far-heap block above it; `_nheapshrink` then left a free gap between them. MEMMAP is now a small-model program with unbuffered stdout and leaves no gap.
+
+VAEG VA2 640 KiB, MEMMAP largest free block (MEMMAP itself loaded):
+
+| State | Release candidate 2 | Now |
+| --- | ---: | ---: |
+| Not swapped (redirected or batch) | 356,912 | 420,672 |
+| Swapped (from the prompt) | 356,912 (421,312 with `CALL /S`) | 483,136 |
+
+Passed on VAEG: normal workflow on VA and VA2 at 640 KiB (assembly through redirected commands, COM/MZ, write/readback, MCB checks), swap scenarios including `CALL /S`, DEBUG and `COMMAND /C` on VA and VA2, BUILD.BAT, ERRORLEVEL after a swapped program, redirected MEMMAP output, and the reduced controls VA2 256 KiB, VA 384 KiB, VA2 512 KiB with a retained 640 KiB selection. F5/F8, utilities and archiver disks were not re-run.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
