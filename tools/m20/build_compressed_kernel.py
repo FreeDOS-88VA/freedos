@@ -58,8 +58,20 @@ def split_image(body, relocations, link_map, image_segment, memory_top=0xA0000,
         raise ValueError('unsupported INIT/HMA group layout')
     init_at, init_size = init[2] * 16, init[4]
     hma_at, hma_size = hma[2] * 16, (hma[4] + 15) & ~15
+    # M10BOOT is machine initialization executed in place before INIT copies
+    # the HMA text over it; it is not part of the resident hull.
     low_end = max(seg * 16 + off + size for name, (cls, group, seg, off, size)
-                  in sections.items() if size and cls not in ('M13INIT', 'STACK'))
+                  in sections.items() if size and cls not in ('M13INIT', 'STACK', 'M10BOOT'))
+    # The bridge copies the HMA text to the hull end before the kernel runs,
+    # so the boot text must lie after the INIT source and before the stack.
+    stack_at = sections['_STACK'][2] * 16 + sections['_STACK'][3]
+    for name, (cls, group, seg, off, size) in sections.items():
+        if cls == 'M10BOOT' and size and not (
+                group == 'PC88VA_PLATFORM' and
+                init[2] * 16 + init[4] <= seg * 16 + off and
+                ((low_end + 15) & ~15) + ((hma[4] + 15) & ~15) <= seg * 16 + off and
+                seg * 16 + off + size <= stack_at):
+            raise ValueError('machine boot text is not between the INIT source and the stack')
     resident = image_segment * 16 + ((low_end + 15) & ~15)
     if init_top is None:
         init_top = memory_top

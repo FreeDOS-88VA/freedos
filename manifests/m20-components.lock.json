@@ -10,11 +10,11 @@
       "repository": "https://github.com/FreeDOS-88VA/kernel.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/kernel.git",
-      "commit": "24d196b9bd924c952ed819360a14a8af5200776a",
+      "commit": "be074e6fc533642b7a8b3f199c2e6d07bb13a264",
       "parents": [
-        "9d2c3f6239028d87cda89224a5b0b9019d4d2a4e"
+        "24d196b9bd924c952ed819360a14a8af5200776a"
       ],
-      "source_archive_sha256": "a6c836e96f20eb5b69482f5ea5f6f4743e931780a8cf168f9286a96b50d6131e",
+      "source_archive_sha256": "1050473b8991e5a13bef55e7bb9bf3920eaa3eb1c62e7d52c31e5f284f82f0cd",
       "license": "GPL-2.0-or-later",
       "upstream_base_tag": "ke2043",
       "upstream_base_commit": "4f7bdda16a84c416a82a2616aa67335ca4f2bd74"
