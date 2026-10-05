@@ -11,7 +11,7 @@ HELLO.COM
 IF ERRORLEVEL 1 GOTO FAILED
 MZDEMO.EXE
 IF ERRORLEVEL 1 GOTO FAILED
-MEMMAP /CHECK
+MEM
 GOTO DONE
 :FAILED
 ECHO Build or program execution failed. Check the error and rebuild.

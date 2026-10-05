@@ -73,7 +73,7 @@ class StarterPayloadTests(unittest.TestCase):
         self.assertLess(hello_check, mz_asm)
         self.assertLess(mz_check, hello_run)
         self.assertLess(mz_check, mz_run)
-        self.assertIn("MEMMAP /CHECK", batch)
+        self.assertIn("MEM", batch)
         self.assertIn("IF ERRORLEVEL 1 GOTO FAILED", batch)
 
     def test_quickstart_documents_edlin_backup_and_both_formats(self):
@@ -83,7 +83,7 @@ class StarterPayloadTests(unittest.TestCase):
         self.assertIn("JWASMR -0 -bin", guide)
         self.assertIn("JWASMR -0 -mz", guide)
         self.assertIn("B:", guide)
-        self.assertIn("MEMMAP /CHECK", guide)
+        self.assertIn("MEM /C", guide)
 
 
 if __name__ == "__main__":

@@ -87,7 +87,7 @@ def verify(root: Path = DEFAULT_ROOT) -> None:
         raise AuditError("M20 package manifest configuration is malformed")
     package_ids = {item.get("id") for item in packages["packages"]}
     if package_ids != {"fdkernel", "freecom", "country", "edlin", "more",
-                       "maintenance", "memmap", "jwasm", "debug", "msdos-command", "starter-material"}:
+                       "maintenance", "mem", "jwasm", "debug", "msdos-command", "starter-material"}:
         raise AuditError("M20 mandatory package set differs")
     for item in packages["packages"]:
         if item.get("source_lock") and item["source_lock"] not in components:

@@ -184,6 +184,10 @@ def main():
     debug_records = build_tools(
         ROOT / "components", debug_dir, ["debug"],
         {"debug": {c: system_source[c]["commit"] for c in utility_inputs("debug")}})["debug"]
+    mem_dir = out / "mem-system"
+    mem_records = build_tools(
+        ROOT / "components", mem_dir, ["mem"],
+        {"mem": {c: system_source[c]["commit"] for c in utility_inputs("mem")}})["mem"]
 
     # MS-DOS 4 COMMAND.COM, the alternative shell offered by the CONFIG.SYS menu.
     from msdos4.build_command import build as build_msdos4
@@ -225,7 +229,9 @@ def main():
 
     shutil.copy2(edlin_dir / "EDLIN.EXE", out / "EDLIN.EXE")
     shutil.copy2(jwasm_dir / "JWASMR.EXE", out / "JWASMR.EXE")
+    # MEMMAP remains a QA tool (allocator QA media); MEM is the release tool.
     shutil.copy2(memmap_dir / "MEMMAP.EXE", out / "MEMMAP.EXE")
+    shutil.copy2(mem_dir / "MEM.EXE", out / "MEM.EXE")
     shutil.copy2(debug_dir / "DEBUG.COM", out / "DEBUG.COM")
     shutil.copy2(more_dir / "MORE.EXE", out / "MORE.EXE")
     for name in ("CHKDSK", "FORMAT", "SYS"):
@@ -235,7 +241,7 @@ def main():
     # derives its contiguous FAT extent and builds the matching stage 1.
     payloads = {name: (out / name).read_bytes() for name in (
         "LOADER.BIN", "KERNEL.SYS", "COMMAND.COM", "KSSF.COM", "COUNTRY.SYS", "EDLIN.EXE",
-        "MORE.EXE", "CHKDSK.EXE", "FORMAT.EXE", "SYS.EXE", "MEMMAP.EXE",
+        "MORE.EXE", "CHKDSK.EXE", "FORMAT.EXE", "SYS.EXE", "MEM.EXE",
         "JWASMR.EXE", "DEBUG.COM",
     )}
     for name, relative in (
@@ -402,8 +408,8 @@ def main():
             record["build_records"] = msdos4_records
         elif item["id"] == "debug":
             record["build_records"] = debug_records
-        elif item["id"] == "memmap":
-            record["build_records"] = memmap
+        elif item["id"] == "mem":
+            record["build_records"] = mem_records
         elif item["id"] == "more":
             record["build_records"] = more
         elif item["id"] == "maintenance":

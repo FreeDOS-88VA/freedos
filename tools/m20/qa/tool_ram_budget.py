@@ -5,7 +5,7 @@ import hashlib
 import struct
 
 TOOLS = ('EDLIN.EXE', 'MORE.EXE', 'CHKDSK.EXE', 'FORMAT.EXE',
-         'SYS.EXE', 'MEMMAP.EXE', 'JWASMR.EXE')
+         'SYS.EXE', 'MEM.EXE', 'JWASMR.EXE')
 
 
 def mz_exec_floor(data):

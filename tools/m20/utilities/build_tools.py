@@ -113,6 +113,11 @@ TOOLS: dict[str, dict] = {
     # Project forks: PC88VA builds select DOS replacements for PC BIOS use;
     # builds without the define equal the FreeDOS 1.4 source (checked by
     # tools/m20/pc_baseline.py).
+    # MEM carries its own kitten and prf copies; options are its watcom.mak set.
+    "mem": {"kind": "single-wcl", "directory": "source",
+            "options": ["-q", "-bt=DOS", "-ms", "-0", "-j", "-wx", "-oahls", "-s", "-fm"],
+            "sources": ["mem.c", "prf.c", "kitten.c"], "output": "MEM.EXE", "link": "mem.exe",
+            "platform_defines": ["-DPC88VA"]},
     "choice": {"kind": KITTEN_C, "kitten": "kitten", "model": "-ms", "pack": True,
                "sources": ["choice.c"], "output": "CHOICE.EXE", "link": "choice.exe",
                "platform_defines": ["-DPC88VA"]},

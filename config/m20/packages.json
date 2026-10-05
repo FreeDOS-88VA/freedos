@@ -108,18 +108,19 @@
       ]
     },
     {
-      "id": "memmap",
-      "version": "M20 MEMMAP 1",
+      "id": "mem",
+      "version": "FreeDOS MEM 1.11 (FreeDOS 1.4 source) built for PC88VA",
       "files": [
-        "MEMMAP.EXE"
+        "MEM.EXE"
       ],
-      "source": "tools/m20/memmap/",
-      "license": "GPL-2.0-or-later",
+      "source_lock": "mem",
+      "license": "GPL-2.0",
       "cpu": "8086 DOS MZ",
-      "va_adaptation": "FreeDOS-version/layout-checked AH=52h MCB-chain reader; MZ maximum allocation equals minimum at EXEC, while the OW 1.9 runtime may grow its own heaps; with unbuffered stdout (no buffer block above the program) and after priming it, the documented near/far heap-shrink APIs release only unused own heap tails before observation; no direct BIOS calls",
+      "va_adaptation": "PC88VA build option: conventional memory is taken from the end of the DOS MCB chain instead of INT 12h, and the INT 15h/CMOS extended-memory probes are not used (on PC-88VA those vectors are hardware interrupts)",
       "tests": [
-        "synthetic bounded MCB and runtime trim/failure tests",
-        "matched VA/VA2 checked guest MCB reports and independent observer-only footprint comparison; physical/outside-arena view unavailable"
+        "clean source build",
+        "non-PC88VA build equals the upstream base (pc_baseline)",
+        "VAEG: MEM, MEM /C, MEM /D with FreeCOM swapped and not swapped"
       ]
     },
     {
@@ -205,7 +206,7 @@
     "DISKCOPY": "omitted: separate disk-copy utility is not required",
     "DISKCOMP": "omitted: separate disk-compare utility is not required",
     "FC_COMP": "omitted: not needed for the selected workflow",
-    "MEM": "omitted: MEMMAP supplies the required checked MCB view",
+    "MEM": "included: FreeDOS MEM replaces MEMMAP on the disk; MEMMAP remains a QA tool",
     "DEBUG": "included: DEBUG.COM (the debug package); no DEBUGX",
     "XCOPY_MOVE_REPLACE_CHOICE": "omitted: outside the fixed compact payload",
     "FULLSCREEN_EDIT": "omitted: EDLIN is the selected small line editor",

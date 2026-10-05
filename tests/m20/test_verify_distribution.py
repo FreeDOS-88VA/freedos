@@ -77,7 +77,7 @@ def instances():
                                                      'size_bytes': 5}}
                          if name == 'starter-material' else {}, 'license': 'GPL-2.0-or-later'}
                         for name in ('fdkernel', 'freecom', 'country', 'edlin', 'more',
-                                     'maintenance', 'memmap', 'jwasm', 'debug', 'msdos-command', 'starter-material')])
+                                     'maintenance', 'mem', 'jwasm', 'debug', 'msdos-command', 'starter-material')])
     lock = {'start_sha': start, 'components': [
         {'name': n, 'commit': revisions[n], 'source_archive_sha256': archives[n]}
         for n in COMPONENTS]}

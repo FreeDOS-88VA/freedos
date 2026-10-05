@@ -37,5 +37,5 @@ larger source files fit the same RAM setting.
 
 For the combined COM and MZ demonstration, copy MZDEMO.ASM and BUILD.BAT into
 WORK too, then run BUILD. BUILD.BAT deletes both old outputs, assembles both
-examples with JWASMR, runs the new programs, and checks DOS memory with
-MEMMAP /CHECK. QUICKSTR.TXT explains optional EDLIN editing and its backup.
+examples with JWASMR, runs the new programs, and shows DOS memory with
+MEM. QUICKSTR.TXT explains optional EDLIN editing and its backup.

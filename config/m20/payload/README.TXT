@@ -25,8 +25,9 @@ and AUTOEXEC.BAT; F8 asks for each line. AUTOEXEC.BAT sets PATH for both.
 
 Files and examples
 ------------------
-EDLIN is a line editor. MORE pages text with Space, Enter, or Q. MEMMAP lists
-the validated DOS MCB chain; it does not report physical or reserved memory.
+EDLIN is a line editor. MORE pages text with Space, Enter, or Q. MEM shows
+used and free DOS memory (MEM /C per program, MEM /D in detail); the area
+below the kernel, including the VA firmware area, is counted as SYSTEM.
 JWASMR is a real-mode 8086-class assembler. HELLO.ASM includes its COM build
 command; HELLO.DOC explains and builds it step by step. MZDEMO.ASM and BUILD.BAT
 show direct COM and MZ output without a linker.
@@ -42,7 +43,7 @@ edit/assemble/run example.
 
 RAM limits of the tested small workflow
 ---------------------------------------
-At installed 512 KiB, the shell, EDLIN editing, MORE, MEMMAP and native 2HD
+At installed 512 KiB, the shell, EDLIN editing, MORE and native 2HD
 maintenance worked on the tested VA/VA2 models. JWASMR could not start a COM
 or MZ sample build: DOS reported insufficient memory. Use at least 640 KiB
 installed for the bundled edit/assemble/run example; this is a tested sample

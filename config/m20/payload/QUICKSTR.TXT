@@ -30,7 +30,7 @@ that arbitrarily large programs or source files will fit.
    BUILD
 
    BUILD.BAT deletes old outputs before assembly, stops on an assembler error,
-   runs the fresh COM and MZ executables, and finishes with MEMMAP /CHECK.
+   runs the fresh COM and MZ executables, and finishes with MEM.
    JWASMR -bin writes a raw binary for the .model tiny COM source. JWASMR -mz
    writes a DOS MZ executable for the .model small source. Neither needs a
    separate linker. Both examples use DOS INT 21h for output and termination.
@@ -41,7 +41,7 @@ that arbitrarily large programs or source files will fit.
    HELLO.COM
    JWASMR -0 -mz -Fo=MZDEMO.EXE MZDEMO.ASM
    MZDEMO.EXE
-   MEMMAP /CHECK
+   MEM
 
 If assembly reports an error, BUILD.BAT does not run an old executable: it
 removes previous outputs first. Fix the source and run BUILD again. These
@@ -49,9 +49,9 @@ small samples are not a promise that arbitrary large source files fit memory.
 
 Other useful commands:
 
-   MEMMAP /?             Show memory-map help.
-   MEMMAP                 List the checked DOS MCB chain.
-   MEMMAP > MEMORY.TXT    Redirect the map through DOS standard output.
+   MEM /?                Show memory help.
+   MEM /C                List programs and free memory.
+   MEM /D > MEMORY.TXT   Save the detailed DOS memory list to a file.
    MORE README.TXT        Page through text (Space, Enter, or Q).
    CHKDSK B:              Check a native 2HD B: disk (80 or 77 cylinders).
    FORMAT B:              Format a blank 2HD disk in B: (80 cylinders).

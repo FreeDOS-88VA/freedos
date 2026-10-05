@@ -131,7 +131,7 @@ def check_manifest(manifest: dict, comparison: dict, budget: dict,
                 for name, record in file_records.items()),
             "capacity file reference missing, unknown or stale")
     expected_packages = {"fdkernel", "freecom", "country", "edlin", "more",
-                         "maintenance", "memmap", "jwasm", "debug", "msdos-command", "starter-material"}
+                         "maintenance", "mem", "jwasm", "debug", "msdos-command", "starter-material"}
     entries = packages["packages"]
     require(isinstance(entries, list) and len(entries) == len(expected_packages) and
             {item["id"] for item in entries} == expected_packages,

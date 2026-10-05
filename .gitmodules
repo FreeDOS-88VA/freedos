@@ -93,3 +93,6 @@
 	path = components/msdos
 	url = https://github.com/FreeDOS-88VA/MS-DOS.git
 	branch = m20/pc88va
+[submodule "components/mem"]
+	path = components/mem
+	url = https://github.com/FreeDOS-88VA/mem.git
