@@ -697,6 +697,22 @@ Same method for every disk: VAEG, 640 KiB installed, no retained selection; the 
 
 The 356,912 bytes reported for RC2 earlier included a 58,800-byte gap created by the old large-model MEMMAP itself; the old figures in this report that were measured with that MEMMAP are lower than the values above for the same disks.
 
+## Memory reduction and FreeDOS MEM (release candidate 4)
+
+Owner request: reduce memory use as far as practical, and ship FreeDOS MEM instead of MEMMAP.
+
+**Kernel (PC88VA adapter only; the non-PC88VA kernel is unchanged).**
+
+- Machine initialization (memory map, interrupt-adoption check) runs once. It now lives in `M10_BOOT_TEXT`, placed after the INIT source and before the bootstrap stack, and is not part of the resident hull. Its 1024-byte interrupt-vector snapshot and 256-byte arena moved into the initialization stack frame. The first candidate placed the boot text directly after the hull, where the unpack bridge copies the HMA text before the kernel starts; it did not boot (no banner; evidence kept). The carrier builder now rejects a boot text that is not between the INIT source and the stack.
+- The M09 console, M11 keyboard and M12 disk diagnostics are reached only from the compile-only `startup.asm` entry; the linked kernel (`PC88VA_M13`) no longer assembles them. Flat unit-test builds keep them.
+- Resident PC-88VA code: 9,072 → 6,352 bytes. `test_m10_services.py` was updated for the frame layout. 17 `test_m14_*` failures in `pc88va/tests` are pre-existing (same set at the menu commit `24d196b`) and unrelated.
+
+**CONFIG.SYS.** `STACKS=0,0` removes the 2,048-byte hardware-interrupt stack pool (8086 MS-DOS has none). The comment on `BUFFERS=4` now states that the kernel raises it to its minimum of six (upstream behavior, unchanged).
+
+**MEM.** Component `mem` = `FreeDOS-88VA/mem` (fork of `FDOS/mem`, base `2b2c833`, the last commit before the FreeDOS 1.4 cutoff, MEM 1.11). PC88VA build option: conventional memory is the end of the DOS MCB chain instead of INT 12h; the INT 15h/CMOS extended-memory probes are not used (on PC-88VA those vectors are hardware interrupts); the static heap is 10,000 instead of 30,000 bytes so that MEM starts on a 256 KiB machine. A common reproducibility change lets the build fix the help-banner date/time (`MEM_BUILD_DATE`/`MEM_BUILD_TIME`, default `__DATE__`/`__TIME__`). The non-PC88VA build equals the base except those strings (`pc_baseline`). MEM replaces MEMMAP on the system disk; MEMMAP is still built for the allocator QA media. MEM counts everything below the first MCB, including the VA firmware area below 10000h, as SYSTEM.
+
+VAEG (VA2 640 KiB, MEM /C at the prompt): FreeCOM through KSSF, swapped: SYSTEM 146,576, KSSF 928, free 507,760 bytes (largest program 507,216). MS-DOS 4 COMMAND: SYSTEM 142,528, COMMAND 6,384, free 506,352. Release candidate 3 had 505,008 free with FreeCOM swapped. Passed: normal workflow VA2/VA 640 KiB, kswap scenarios VA2 640 KiB, reduced VA2 256 KiB, VA 384 KiB, VA2 512 KiB installed with a retained 640 KiB selection (all with MEM /C replacing the earlier MEMMAP checks), and the MS-DOS 4 COMMAND menu choice VA2 640 KiB. Not re-run: F5/F8, the utilities and archiver disks with this system disk, MS-DOS 4 COMMAND below 640 KiB.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
