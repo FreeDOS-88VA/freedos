@@ -25,11 +25,11 @@
       "repository": "https://github.com/FreeDOS-88VA/freecom.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/freecom.git",
-      "commit": "18b214cd1ca18a785e54a0042494e70c1b62876b",
+      "commit": "1dd3d04e52dde0a6afde5a46e6eb2f47dc7c9c09",
       "parents": [
-        "8cdffa3cb0cf40b1592ee1901ef6fd0a41c72885"
+        "18b214cd1ca18a785e54a0042494e70c1b62876b"
       ],
-      "source_archive_sha256": "0fbf7ce35e8ba632bc33927fe8173b0b775e1ca168364e1121ff35ce5d7b14ad",
+      "source_archive_sha256": "64217db44b221377d631c1aa7038d12007f9b65f4938f019848ba82885d47da7",
       "license": "GPL-2.0-or-later",
       "upstream_base_tag": "com086",
       "upstream_base_commit": "f1b8f4f464eae5a70348b6d362484d733d45c427",
