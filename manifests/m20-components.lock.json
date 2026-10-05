@@ -10,11 +10,11 @@
       "repository": "https://github.com/nakatamaho/fdkernel.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/kernel.git",
-      "commit": "4cc954c1a759b036a554acb79e777825ba3a8c61",
+      "commit": "9d2c3f6239028d87cda89224a5b0b9019d4d2a4e",
       "parents": [
-        "551c8dac337aabf0b038478c66a784ecf37a4715"
+        "4cc954c1a759b036a554acb79e777825ba3a8c61"
       ],
-      "source_archive_sha256": "63906156e7abfb7f8554be781ea5e853d85a54c302a73baa96c843bb017b3894",
+      "source_archive_sha256": "d59f4a761d826aecf70929e39615213321e0a5610534da7b4e2ac2e140a319fa",
       "license": "GPL-2.0-or-later",
       "upstream_base_tag": "ke2043",
       "upstream_base_commit": "4f7bdda16a84c416a82a2616aa67335ca4f2bd74"
