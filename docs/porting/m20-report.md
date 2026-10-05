@@ -679,6 +679,24 @@ VAEG (private evidence; installed RAM, no retained selection unless stated):
 
 The emulator cannot inject a key before frame 600, and the menu timeout ends near frame 800, so menu keys were sent at frame 600. Not run: utilities and archiver disks with this system disk; MS-DOS 4 COMMAND at 384/512 KiB; hardware.
 
+## Free conventional memory across releases
+
+Same method for every disk: VAEG, 640 KiB installed, no retained selection; the release candidate 3 MEMMAP (small model) is run as `B:MEMMAP` from a separate data disk at the prompt; the value is the largest free block while MEMMAP itself is loaded (MEMMAP owns about 19.5 KB).
+
+| Release | Shell | Largest free block |
+| --- | --- | ---: |
+| M15 | FreeCOM | not measured (drive B: unavailable) |
+| M16 | FreeCOM | 415,760 |
+| M18 (VA model; on VA2 it loops in CONFIG.SYS, the known startup-key defect) | FreeCOM | 410,512 |
+| M19 Preview 1 | MS-DOS 4 COMMAND | 482,528 |
+| M20 RC1 | FreeCOM | 421,504 |
+| M20 RC2 | FreeCOM, KSSF without swapping | 418,736 |
+| M20 RC3, menu 1 | FreeCOM, swapped (prompt) | 483,008 |
+| M20 RC3, menu 1 | FreeCOM, not swapped (redirected/batch) | 420,544 |
+| M20 RC3, menu 2 | MS-DOS 4 COMMAND | 482,080 |
+
+Reference only (different method): MS-DOS 2.11 earlier left about 517,760 bytes for a program (CHKDSK/DEBUG). The 356,912 bytes reported for RC2 earlier included a 58,800-byte gap created by the old large-model MEMMAP itself; the old figures in this report that were measured with that MEMMAP are lower than the values above for the same disks.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot

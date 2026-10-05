@@ -137,14 +137,10 @@ def compose_data(payloads, output, epoch, disk_name, volume_label, stem='util'):
     layout = derive_layout(spec)
     geo, fs = spec['geometry'], spec['filesystem']
     bps = geo['bytes_per_sector']
-    # One directory level is supported: "DIR/FILE" payload names.
-    if any(name.count('/') > 1 for name in payloads):
-        raise ValueError('Payload paths deeper than one directory are unsupported')
-    subdirs = sorted({name.split('/')[0] for name in payloads if '/' in name})
-    if set(subdirs) & set(payloads):
-        raise ValueError('A payload name collides with a directory name')
-    root_files = [name for name in payloads if '/' not in name]
-    if len(root_files) + len(subdirs) + 1 > fs['root_entries']:
+    # Data disks hold root-directory files only.
+    if any('/' in name for name in payloads):
+        raise ValueError('Data disk payloads must be root-directory files')
+    if len(payloads) + 1 > fs['root_entries']:
         raise ValueError('Too many directory entries including the volume label')
     label = volume_label.encode('ascii')
     if not label or len(label) > 11:
