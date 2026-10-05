@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "milestone": "M20",
-  "release_candidate": "m20-rc.2",
+  "release_candidate": "m20-rc.3",
   "artifacts": [
     {
       "role": "system",
       "file": "freedos-pc88va-m20-2hd-1280.d88.xz",
       "compressed": {
-        "bytes": 320980,
-        "sha256": "74ad76fce86a6d9ea6788151aab60a1882ac64e598fb949441aaff50d2d79c33"
+        "bytes": 344916,
+        "sha256": "d2bcb6fffd52e464fa1412d69555c28391f5aecfdb07d8b4d48600a361bb9dd4"
       },
       "uncompressed": {
         "file": "freedos-PC88VA-M20-2HD.D88",
         "bytes": 1331888,
-        "sha256": "6ac4f2c3247eb14520968c1219dd019fde4bb911edf7dc941b5cf7483f2c344e"
+        "sha256": "51d6089c4ab009859c8aded4efeb4e53143c5053845599e960f015a9ae7b4073"
       }
     },
     {
@@ -70,75 +70,79 @@
   },
   "rebuild_source": {
     "start": "ba868e2e33447fe5fcb3a2bed0711464f7968d82",
-    "parent": "127b00db28426f314721922ff89729e75b1cbee6",
-    "qualified_implementation": "127b00db28426f314721922ff89729e75b1cbee6",
+    "parent": "abc380eed83d4932271672fc30c62867466dd181",
+    "qualified_implementation": "abc380eed83d4932271672fc30c62867466dd181",
     "components": {
-      "append": "50924e492d959cd94b1f58539a9579a2ec9d3fee",
-      "attrib": "21f44cc47e71c8b437932d101670750f00fa9309",
-      "choice": "aa63ef2959420cad54032236bd0817d890bd32de",
-      "comp": "5269401d61322b47acb17e73b4e8c8d328c17722",
+      "fdkernel": "24d196b9bd924c952ed819360a14a8af5200776a",
+      "freecom": "536e27a5c97d90591b8207f7727f684c3e2ad18c",
       "country": "23f189cca3420606eae8723884fa92ccd65eb307",
-      "debug": "95812fa550a2e3cb12c7e048df3a044d1f6b4804",
-      "deltree": "ca8e912016b046a87946647f462769419842a076",
-      "devload": "7f1f0877972dea3ec1d8b6d9d3473e46cba44608",
       "edlin": "c036c43adbdaa5693bb4cd3f4f3c65090f1c9d57",
-      "exe2bin": "c12e422e86ebee7955ca9826bfd55a7ddf715c0e",
-      "fc": "543205af5aaa2a3e63c2a8e2133a613f785f70f7",
-      "fdkernel": "9d2c3f6239028d87cda89224a5b0b9019d4d2a4e",
-      "find": "a6e245d50bc6c4513651e65c3defab554be44da1",
-      "freecom": "18b214cd1ca18a785e54a0042494e70c1b62876b",
-      "gzip": "cfae273770fd57b8903dce2aa4eb304afa62e7ed",
       "jwasm": "c9b3a947f74d7355b1b3d8bd5728241c95ff4b19",
+      "find": "a6e245d50bc6c4513651e65c3defab554be44da1",
       "kitten": "62654352bd887fbed99db72bdb6c4dc3e99493a1",
-      "kitten-3b9947f": "3b9947fc5ae08434d0d3f61cb2ea22d13911732d",
+      "tnyprntf": "450ab904dab1e48ba6632937bc1dbfb4b8b45078",
+      "sort": "7177d3ab720cb24b7076edbe1bb9eac9ee8e742f",
+      "xcopy": "a52cb4bb11e82bb309c8620f55539274d6081a35",
       "label": "64030e1f31de3d78094ebc83104cf1bd94810843",
       "move": "1e2de517d7639fca7d94a20c98ca30193d8615aa",
+      "append": "50924e492d959cd94b1f58539a9579a2ec9d3fee",
       "nlsfunc": "d102e4cab774a090eb0eb236b8af1e5bcdc22ea2",
-      "parent": "127b00db28426f314721922ff89729e75b1cbee6",
-      "replace": "bcc2e236de247bae0b15ab85112649187e4b959d",
-      "sort": "7177d3ab720cb24b7076edbe1bb9eac9ee8e742f",
-      "tnyprntf": "450ab904dab1e48ba6632937bc1dbfb4b8b45078",
+      "devload": "7f1f0877972dea3ec1d8b6d9d3473e46cba44608",
+      "kitten-3b9947f": "3b9947fc5ae08434d0d3f61cb2ea22d13911732d",
+      "choice": "aa63ef2959420cad54032236bd0817d890bd32de",
+      "deltree": "ca8e912016b046a87946647f462769419842a076",
+      "comp": "5269401d61322b47acb17e73b4e8c8d328c17722",
+      "fc": "543205af5aaa2a3e63c2a8e2133a613f785f70f7",
+      "attrib": "21f44cc47e71c8b437932d101670750f00fa9309",
       "tree": "29ba525a78d12068a723bd46a5a11e9b93409232",
+      "replace": "bcc2e236de247bae0b15ab85112649187e4b959d",
+      "exe2bin": "c12e422e86ebee7955ca9826bfd55a7ddf715c0e",
       "unzip": "cae95c63b3dd1113ddb8003bd1c56c4956282a28",
-      "xcopy": "a52cb4bb11e82bb309c8620f55539274d6081a35",
-      "zip": "1fdf656583b7823446dd3bdec96a1656adb25038"
+      "zip": "1fdf656583b7823446dd3bdec96a1656adb25038",
+      "gzip": "cfae273770fd57b8903dce2aa4eb304afa62e7ed",
+      "debug": "95812fa550a2e3cb12c7e048df3a044d1f6b4804",
+      "msdos": "e46d23b474f9406160a03c08dd4d931435f8781c",
+      "emu2": "9d8698d06e67359bc8b230c2d19d5b1503e60819",
+      "parent": "abc380eed83d4932271672fc30c62867466dd181"
     }
   },
   "source_archives_sha256": {
-    "append": "f959548b6d5156ebb59c2e3c36dd1db0f7dd3615ea2795be472d076b4fc0d1eb",
-    "attrib": "6b0f35d4fff3a9572d6c8da80a9455dee42c8aa7dc0bc7cffb2cddefcdc23917",
-    "choice": "c0d402297f5e504fb297d262eae69a53c3e757c2b4feb48aa9bb8d33750e4d16",
-    "comp": "9c7dab1dd9e6dc3e23007ed2dafffe031aca17dcccd27b073e7d8ade6df89394",
+    "fdkernel": "a6c836e96f20eb5b69482f5ea5f6f4743e931780a8cf168f9286a96b50d6131e",
+    "freecom": "58d4a79249d9e611021db1c3d2b76c9b96625412e632fe630587427203df6475",
     "country": "cf0b16ac57e661eeb7e19118cea2d2d200e4545507f15912e8a6462652c2cd9d",
-    "debug": "b84dac0d286c366b4d92e4c13ebd1b95abb5559733128e37c0b84ebb4cc75743",
-    "deltree": "9675b8818da6a40836a38626f8c8d1a4e459a00935ccaa35cd2d95ff5f5cbd24",
-    "devload": "a27305c8fe09fb32775bd3cdc2ea33377758a02f0bffa134cf23e4fa78504c3a",
     "edlin": "42865928e8d2c14b3970557892c53d18bd86603c857bbc587d33050f535b14ae",
-    "exe2bin": "b4169ff2387e5065ddc8cc6b68f02b320b2409064b1ed81468952e6a1659ce5c",
-    "fc": "7e546b6eb1b5f79500c7fa2e20b91b2d6836b70ce7e9ec57440fad4438677f78",
-    "fdkernel": "d59f4a761d826aecf70929e39615213321e0a5610534da7b4e2ac2e140a319fa",
-    "find": "e1d111c599fcffd564e77d3293cf226464594ce6b4462e86a0200fab1d0b3cb3",
-    "freecom": "0fbf7ce35e8ba632bc33927fe8173b0b775e1ca168364e1121ff35ce5d7b14ad",
-    "gzip": "e15ddb28c4ad0467a98c789f215d31773ccd84102a728742d6eb729b8ad1f088",
     "jwasm": "5511d3666107009b58d94912ebdc6a0c4e8013aad4850fb15b087872071013bf",
+    "find": "e1d111c599fcffd564e77d3293cf226464594ce6b4462e86a0200fab1d0b3cb3",
     "kitten": "e9739312a70e1ecf8c6a652f6172656c17535acb383f9f3368467bc8bde7a287",
-    "kitten-3b9947f": "523d73226d0531f8e00949bf6e6da6e16b2ecf25eee3774c698299b44c444cda",
+    "tnyprntf": "485cb18fee9bf970921fbaee027dd107b758183818fa2d84108c60bd69214c69",
+    "sort": "04426e24017b65335aefc9957b3fd28c2fd6dacdf7e094a01848707c49e99b72",
+    "xcopy": "ac448f3c842f3602865bdad30eb77c439cb2b963ccd4900c01021f2c321abf58",
     "label": "d2bd0566546c93afbeac7579a76fda5184bf52f6482a7623d53dc3aa65100bb9",
     "move": "c40e04a78f905e733a1788f438fe5809e7dcf8dc1bb80acaed63997370ea990b",
+    "append": "f959548b6d5156ebb59c2e3c36dd1db0f7dd3615ea2795be472d076b4fc0d1eb",
     "nlsfunc": "82195013cfee53d79fd8acc3daeda60f0d93ce2f2a13efca82dc8a222ec25cd8",
-    "parent": "b927a94d1c90d5751333799570b792e59b0bc4c0d00d2dd88eb3ca8556c086c8",
-    "replace": "c4804e9e95868189851a7944a65889942f3ec641ce579bcca9043c629f08943e",
-    "sort": "04426e24017b65335aefc9957b3fd28c2fd6dacdf7e094a01848707c49e99b72",
-    "tnyprntf": "485cb18fee9bf970921fbaee027dd107b758183818fa2d84108c60bd69214c69",
+    "devload": "a27305c8fe09fb32775bd3cdc2ea33377758a02f0bffa134cf23e4fa78504c3a",
+    "kitten-3b9947f": "523d73226d0531f8e00949bf6e6da6e16b2ecf25eee3774c698299b44c444cda",
+    "choice": "c0d402297f5e504fb297d262eae69a53c3e757c2b4feb48aa9bb8d33750e4d16",
+    "deltree": "9675b8818da6a40836a38626f8c8d1a4e459a00935ccaa35cd2d95ff5f5cbd24",
+    "comp": "9c7dab1dd9e6dc3e23007ed2dafffe031aca17dcccd27b073e7d8ade6df89394",
+    "fc": "7e546b6eb1b5f79500c7fa2e20b91b2d6836b70ce7e9ec57440fad4438677f78",
+    "attrib": "6b0f35d4fff3a9572d6c8da80a9455dee42c8aa7dc0bc7cffb2cddefcdc23917",
     "tree": "cc3fc3e6b61f3bba53bc1cfe7062df69533d177df6a2dc6eca7c7d6129ad2306",
+    "replace": "c4804e9e95868189851a7944a65889942f3ec641ce579bcca9043c629f08943e",
+    "exe2bin": "b4169ff2387e5065ddc8cc6b68f02b320b2409064b1ed81468952e6a1659ce5c",
     "unzip": "177b8a1eeb0cad0c8c41e37299c2db1313d56d6579da4935f5649a32ddbbcc8e",
-    "xcopy": "ac448f3c842f3602865bdad30eb77c439cb2b963ccd4900c01021f2c321abf58",
-    "zip": "14f9b5d4f3a943d32a7adfcca9d1f08dcece51bbfcf3b9c4b4ee3572210ea52c"
+    "zip": "14f9b5d4f3a943d32a7adfcca9d1f08dcece51bbfcf3b9c4b4ee3572210ea52c",
+    "gzip": "e15ddb28c4ad0467a98c789f215d31773ccd84102a728742d6eb729b8ad1f088",
+    "debug": "b84dac0d286c366b4d92e4c13ebd1b95abb5559733128e37c0b84ebb4cc75743",
+    "msdos": "e278d132298e31327063eff823c3d055b135562d8c04d7e0213baf5238d198be",
+    "emu2": "f014df25b076c3671f14104640de1e230b317592b6b1c217323f586cc3e750ac",
+    "parent": "bb52ca7b416fed960f0fb63284489b070e9a209cad2ee9b7a671aa5cc6615db0"
   },
   "corresponding_sources": {
     "file": "freedos-PC88VA-M20-SOURCES.tar.xz",
-    "bytes": 4225400,
-    "sha256": "e064fef03bb24ff673e5a122d20cc265fabf6a2a380b767193d9c3224bd1ed2e",
+    "bytes": 5039356,
+    "sha256": "060e20bfd1e850477926aa4a5ebfb5d82d6198979c0503e39ca741ce6b7ba7ec",
     "availability": "Generated by make m20-disk from the public parent commit and pinned component gitlinks; release asset, not a floppy or committed build product"
   },
   "toolchain": {
@@ -152,9 +156,9 @@
     }
   },
   "qualification_ci": {
-    "run_id": 37270987335,
+    "run_id": 37292425198,
     "attempt": 1,
-    "exact_head_sha": "127b00db28426f314721922ff89729e75b1cbee6",
+    "exact_head_sha": "abc380eed83d4932271672fc30c62867466dd181",
     "workflow": "M20 isolated native 2HD source build",
     "conclusion": "success"
   },
@@ -179,9 +183,9 @@
     "hardware": "NOT RUN",
     "hardware_status": "DEFERRED HARDWARE VALIDATION",
     "scope": [
-      "System disk (6ac4f2c3...) on VA and VA2 at 640 KiB installed: shell started through KSSF.COM, COM/MZ execution (JWASMR), guest file write/readback, MCB-chain checks, DEBUG on the system disk, CALL /S swapping of JWASMR and DEBUG with return to the reloaded shell, and a 64 KiB larger free block observed while a swapped program runs (VA2).",
-      "System disk at VA2 256 KiB, VA 384 KiB and VA2 512 KiB installed with a retained 640 KiB selection (reduced workload: startup, MEMMAP, file write/readback).",
-      "Utilities disk unchanged from release candidate 1 (results carried over); archiver disk differs from release candidate 1 only in its source-lock metadata and was not re-run on the guest; F5/F8 startup keys not re-run with the KSSF SHELL line."
+      "System disk (51d6089c...) on VAEG: CONFIG.SYS shell menu (timeout to 1, digit 2, F5, F8 with 2); FreeCOM through KSSF with /SWAP on VA and VA2 at 640 KiB (assembly with redirection, COM/MZ, write/readback, MCB checks, CALL /S, DEBUG, COMMAND /C, BUILD.BAT, ERRORLEVEL after a swapped program); MS-DOS 4 COMMAND.COM on VA and VA2 at 640 KiB and VA2 at 256 KiB (COMSPEC, PATH, write/readback, JWASMR, COM run).",
+      "FreeCOM reduced controls: VA2 256 KiB, VA 384 KiB, VA2 512 KiB installed with a retained 640 KiB selection.",
+      "Utilities disk unchanged since release candidate 1 and archiver disk unchanged since release candidate 2; their guest results were obtained with earlier system disks and were not re-run with this one."
     ],
     "limits": [
       "UNZIP, ZIP and GZIP need 640 KiB; at 256 KiB several utilities (SORT, XCOPY, MOVE) and at 384 KiB JWASMR cannot start for lack of memory.",
@@ -189,8 +193,9 @@
       "Kernel configuration-source defect (F5/F8 timing) exists in the stable M18 and M19 Preview 1 kernels; only M20 carries the fix.",
       "The M20 PC regression beyond scratch boot smoke tests was not run.",
       "Hardware qualification NOT RUN by the project; no HARDWARE PASS is claimed. The owner reports a boot, command execution and file write on a real PC-88VA2 with 640 KB using release candidate 1 (owner-reported, not a hardware pass).",
-      "Kernel swap (KSSF) is qualified only for CALL /S of one program from the interactive shell; secondary shells, pipes, redirection, batch files and nested KSSF are not qualified. Each swap leaves the largest free block about 400-500 bytes smaller (context allocation).",
-      "The M19 kswap fix series is imported as an owner-approved exception to the no-upstream-repair rule; upstream issue FDOS/freecom#189."
+      "FreeCOM swaps for commands typed at the prompt; batch files, redirection and pipes run without swapping. Nested KSSF and secondary-shell swapping are not qualified.",
+      "MS-DOS 4 COMMAND.COM (Microsoft MIT source) is the M19 Preview 1 build; it was not run at 384 or 512 KiB.",
+      "The M19 kswap fix series and the no-swap fallback for redirection/batch are owner-approved exceptions to the no-upstream-repair rule; upstream issue FDOS/freecom#189."
     ]
   },
   "licenses": {
@@ -204,7 +209,8 @@
       "EXE2BIN.LIC",
       "UNZIP.LIC",
       "ZIP.LIC",
-      "DEBUG.LIC"
+      "DEBUG.LIC",
+      "MSDOS/MSDOS.LIC"
     ],
     "source_bundle": "full project/component license and notice files"
   }

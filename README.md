@@ -2,11 +2,11 @@
 
 Experimental FreeDOS port for NEC PC-88VA/VA2, built reproducibly from public sources. Organization overview: [FreeDOS-88VA](https://github.com/FreeDOS-88VA).
 
-## Latest: M20 release candidate 2 (emulator validation only)
+## Latest: M20 release candidate 3 (emulator validation only)
 
 **M20 restarts the port on the FreeDOS 1.4 release sources** (kernel `ke2043`, FreeCOM `com086`) with selectively imported changes. It is a prerelease validated **on emulators only (エミュレータ検証のみ)**: **HOST PASS** for the reproducible public build and **VAEG PASS** for the bounded VA/VA2 checks. **Hardware is NOT RUN** and no `HARDWARE PASS` is claimed.
 
-- [M20 release candidate 2 and downloads](https://github.com/FreeDOS-88VA/freedos/releases/tag/m20-rc.2)
+- [M20 release candidate 3 and downloads](https://github.com/FreeDOS-88VA/freedos/releases/tag/m20-rc.3)
 - [Release notes](docs/releases/m20.md), [image identities and licenses](images/milestones/m20/README.md), [M20 report](docs/porting/m20-report.md)
 
 Three native 2HD FAT12 floppies (English only):
