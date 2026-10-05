@@ -606,6 +606,13 @@ The parent repository was then renamed `FreeDOS-88VA/freedos` (GitHub
 redirects `freedos-pc88va`), and the organization profile README lives in
 `FreeDOS-88VA/.github`.
 
+The M20 kernel moved to `FreeDOS-88VA/kernel`, a GitHub fork of `FDOS/kernel`
+(the former `fdkernel` is a fork of `lpproj/fdkernel` and keeps the M18 and
+M19 history that historical locks reference). The commit is unchanged
+(`9d2c3f6`), only the repository, `.gitmodules` branch (`m20/pc88va`) and M20
+lock URL changed; the scaffold lock keeps its hash-pinned historical URL and
+branch.
+
 Japanese support is deferred to the next milestone by owner decision.
 
 Known unrelated failure: `tests/qa/test_verify_license_policy.py` rejects the

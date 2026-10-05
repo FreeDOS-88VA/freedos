@@ -1,7 +1,7 @@
 [submodule "components/fdkernel"]
 	path = components/fdkernel
-	url = https://github.com/FreeDOS-88VA/fdkernel.git
-	branch = nec98-current
+	url = https://github.com/FreeDOS-88VA/kernel.git
+	branch = m20/pc88va
 [submodule "components/freecom"]
 	path = components/freecom
 	url = https://github.com/FreeDOS-88VA/freecom_dbcs2.git

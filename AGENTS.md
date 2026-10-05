@@ -11,7 +11,8 @@ component's own repository and branch, commit there, and then update the
 parent gitlink. Never vendor a submodule file as a copy in the parent.
 
 The `origin` remote for the kernel and FreeCOM components is the project
-fork. Project repositories (the parent, the kernel and FreeCOM forks, the
+fork (the kernel is `FreeDOS-88VA/kernel`, a fork of `FDOS/kernel`; the older
+`FreeDOS-88VA/fdkernel` is retained for M18-M19 history). Project repositories (the parent, the kernel and FreeCOM forks, the
 utility forks and package imports) live in the `FreeDOS-88VA` GitHub
 organization; they were transferred from `nakatamaho` during M20, and GitHub
 redirects the old URLs that historical records keep. From M20 onward, their `upstream` remote is the official

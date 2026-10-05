@@ -42,7 +42,7 @@ check_initialized components/fdkernel
 check_initialized components/freecom
 check_initialized components/country
 
-ensure_remote components/fdkernel origin https://github.com/FreeDOS-88VA/fdkernel.git
+ensure_remote components/fdkernel origin https://github.com/FreeDOS-88VA/kernel.git
 # From M20 the official FreeDOS repositories are upstream; lpproj is the
 # NEC PC-98/DBCS reference remote. Through M19 upstream meant lpproj.
 ensure_remote components/fdkernel upstream https://github.com/FDOS/kernel.git

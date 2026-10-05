@@ -7,7 +7,7 @@
     {
       "name": "fdkernel",
       "path": "components/fdkernel",
-      "repository": "https://github.com/FreeDOS-88VA/fdkernel.git",
+      "repository": "https://github.com/FreeDOS-88VA/kernel.git",
       "branch": "m20/pc88va",
       "upstream_repository": "https://github.com/FDOS/kernel.git",
       "commit": "9d2c3f6239028d87cda89224a5b0b9019d4d2a4e",

@@ -302,7 +302,7 @@ def _resolve_m20(root: Path) -> dict[str, str]:
         by_name[item.get("name")] = item
     policy = {
         "country": "https://github.com/FDOS/country.git",
-        "fdkernel": "https://github.com/FreeDOS-88VA/fdkernel.git",
+        "fdkernel": "https://github.com/FreeDOS-88VA/kernel.git",
         "freecom": "https://github.com/FreeDOS-88VA/freecom_dbcs2.git",
     }
     try:
