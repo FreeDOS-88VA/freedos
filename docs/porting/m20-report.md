@@ -713,6 +713,15 @@ Owner request: reduce memory use as far as practical, and ship FreeDOS MEM inste
 
 VAEG (VA2 640 KiB, MEM /C at the prompt): FreeCOM through KSSF, swapped: SYSTEM 146,576, KSSF 928, free 507,760 bytes (largest program 507,216). MS-DOS 4 COMMAND: SYSTEM 142,528, COMMAND 6,384, free 506,352. Release candidate 3 had 505,008 free with FreeCOM swapped. Passed: normal workflow VA2/VA 640 KiB, kswap scenarios VA2 640 KiB, reduced VA2 256 KiB, VA 384 KiB, VA2 512 KiB installed with a retained 640 KiB selection (all with MEM /C replacing the earlier MEMMAP checks), and the MS-DOS 4 COMMAND menu choice VA2 640 KiB. Not re-run: F5/F8, the utilities and archiver disks with this system disk, MS-DOS 4 COMMAND below 640 KiB.
 
+## PC-88VA ROM services under FreeDOS
+
+The VA ROM BIOS services were checked for the memory they use (private evidence; ROM contents and addresses observed in it are not published). Two port defects were found and fixed in the PC88VA adapter (kernel `b57c39a`; the non-PC88VA kernel is unchanged, `pc_baseline`):
+
+- FreeDOS sets INT 23h-3Fh to an empty handler at startup (upstream behavior). On PC-88VA INT 33h is the ROM mouse BIOS, so it was lost. It is now restored after that loop; the mouse initialization call returns success on VAEG.
+- The animation BIOS (INT 88h) writes into memory that the kernel occupies, and INT 90h/95h (V1/V2 supervisor and its CALLN interface) are RAM vectors pointing into the kernel. They now return CF=1 (owner decision for INT 88h). The advanced graphics BIOS (INT 87h) is still installed; its use of kernel memory is suspected from the ROM but not confirmed on the guest.
+
+VAEG regression after the change: normal workflow VA2/VA 640 KiB, kswap scenarios VA2 640 KiB, reduced VA2 256 KiB, VA 384 KiB, VA2 512 KiB with a retained 640 KiB selection, MS-DOS 4 COMMAND menu choice: passed.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
