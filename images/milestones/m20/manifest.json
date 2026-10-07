@@ -217,5 +217,12 @@
       "MSDOS/MSDOS.LIC"
     ],
     "source_bundle": "full project/component license and notice files"
+  },
+  "release": "m20",
+  "designation": {
+    "status": "designated M20 distribution",
+    "designated_from": "m20-rc.5",
+    "owner_decision": "release candidate 5 is the M20 release; images are byte-identical to it",
+    "memory_layout_contract": "docs/porting/m20-memory-layout.md"
   }
 }

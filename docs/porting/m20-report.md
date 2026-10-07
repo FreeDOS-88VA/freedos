@@ -731,6 +731,10 @@ Owner decisions after the ROM-service review:
 - **Memory.** Once the project FEP replaces the ROM one, the RAM work areas used only by the ROM FEP are returned to DOS. This changes the VA memory layout and is specified and qualified in M21 (`docs/porting/m21-memory-layout.md` or equivalent), with the 256/384/512/640 KiB and retained-selection matrix.
 - Not changed: the commit message of kernel `b57c39a` keeps its wording (owner decision; no history rewrite).
 
+## Designation
+
+Owner decision: release candidate 5 is the M20 distribution. Its disks are archived under `images/milestones/m20/` and are byte-identical to the `m20-rc.5` assets; qualified implementation `ac45fd4d873079a5b179447c80d665d9a90b0bce`. The M20 memory layout contract is [m20-memory-layout.md](m20-memory-layout.md), which supersedes the M17 contract for M20 and lists every change from it. Remaining ROM-service measurements (printer, RS-232C, fancy font, ADPCM, sound playback, sprite) were completed in private evidence; none of them writes kernel memory. Not run: F5/F8 with the final system disk, the data disks with the final system disk, hardware.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
