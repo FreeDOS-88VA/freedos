@@ -722,6 +722,15 @@ The VA ROM BIOS services were checked for the memory they use (private evidence;
 
 VAEG regression after the change: normal workflow VA2/VA 640 KiB, kswap scenarios VA2 640 KiB, reduced VA2 256 KiB, VA 384 KiB, VA2 512 KiB with a retained 640 KiB selection, MS-DOS 4 COMMAND menu choice: passed.
 
+## Decisions carried to M21 (Japanese support)
+
+Owner decisions after the ROM-service review:
+
+- **Project FEP.** M21 replaces the ROM Japanese front-end processor (INT 8Dh) with a project-authored FEP.
+- **Dictionary source.** The FEP reads the conversion dictionary from the user's own machine ROM at run time. No dictionary contents are distributed. The reader code is a project-authored platform adapter and is versioned like the other BIOS interfaces; ROM contents, dumps and analysis notes stay in private evidence only.
+- **Memory.** Once the project FEP replaces the ROM one, the RAM work areas used only by the ROM FEP are returned to DOS. This changes the VA memory layout and is specified and qualified in M21 (`docs/porting/m21-memory-layout.md` or equivalent), with the 256/384/512/640 KiB and retained-selection matrix.
+- Not changed: the commit message of kernel `b57c39a` keeps its wording (owner decision; no history rewrite).
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
