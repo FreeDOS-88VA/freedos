@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "msdos": {
+    "repository": "https://github.com/FreeDOS-88VA/MS-DOS",
+    "branch": "experiment/msdos2-va",
+    "commit": "35b183715bc8ad80a3e2bb20f431f758fab565bc",
+    "paths": [
+      "v2.0/pc88va",
+      "v2.0/bin/MSDOS.SYS",
+      "v2.0/bin/COMMAND.COM",
+      "v2.0/bin/SYSINIT.OBJ",
+      "v2.0/bin/SYSIMES.OBJ",
+      "v4.0/src/TOOLS/MASM.EXE",
+      "v4.0/src/TOOLS/LINK.EXE",
+      "LICENSE"
+    ]
+  },
+  "emu2": {
+    "repository": "https://github.com/dmsc/emu2",
+    "commit": "9d8698d06e67359bc8b230c2d19d5b1503e60819"
+  },
+  "microsoft_inputs": {
+    "MSDOS.SYS": "v2.0/bin/MSDOS.SYS",
+    "COMMAND.COM": "v2.0/bin/COMMAND.COM",
+    "SYSINIT.OBJ": "v2.0/bin/SYSINIT.OBJ",
+    "SYSIMES.OBJ": "v2.0/bin/SYSIMES.OBJ",
+    "MASM.EXE": "v4.0/src/TOOLS/MASM.EXE",
+    "LINK.EXE": "v4.0/src/TOOLS/LINK.EXE"
+  },
+  "microsoft_sha256": {
+    "MSDOS.SYS": "1edf5190671ed4edcc9e6cc095e5094749c58f1833a2e26e40ba7d3389e276d1",
+    "COMMAND.COM": "4cc71b3692b894eef9a7c8b3ac0fc63a71bdfa08175089562fdc4c7c5b038e8a",
+    "SYSINIT.OBJ": "56d9d59d8cf6dbec648c3b391d3532bf4dffa8b615a096aca76312acbeecc7aa",
+    "SYSIMES.OBJ": "336f44f68eac8061970dcb3b3c4a97558e792cdad4ebfd32720e40174b031a26",
+    "MASM.EXE": "1c6286c69b616160b8475ad17453ee872702a2c98075c2159ec792a1c745275f",
+    "LINK.EXE": "124a3c800edc16b60f696d35a9dfec798b68b78fe2ca90c5988ea76bdeab1a8a"
+  }
+}
