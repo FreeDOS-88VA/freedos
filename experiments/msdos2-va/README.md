@@ -42,6 +42,31 @@ measured at boot; backup-memory settings are not read. Device requests run on
 a private stack and clear DF on return; SYSINIT keeps the boot stack. The boot
 sector finds IO.SYS and MSDOS.SYS through the FAT.
 
+## Not included
+
+| Part | Reason |
+|---|---|
+| Sources of MSDOS.SYS, COMMAND.COM, SYSINIT and the utilities | Cannot be rebuilt from the published 2.0 tree (see above); the release binaries are used. |
+| PRINT | PRN discards output, so a print spooler has no use yet. |
+| SYS (release) | Copies only the system files and relies on the OEM boot sector; replaced by the PC-88VA SYS, which also writes the PC-88VA boot code. |
+| FORMAT.OBJ, FORMES.OBJ | OEM parts to be linked with a machine-specific module; replaced by the PC-88VA FORMAT. |
+| MASM, LINK, CREF | Development tools of the release. MASM 1.10 does not start under emu2; it was not tried on the PC-88VA. |
+| PROHST, PROFIL | Profiler that the 2.0 README says is not for end users. |
+| Documentation files (*.DOC, *.TXT of the release) | Not copied; the disk has README.TXT and LICENSE.TXT. |
+
+## Not implemented in the PC-88VA BIOS part
+
+- Japanese: no Japanese display or input (no front-end processor).
+- Keyboard: only keys with an ASCII code; function, cursor and other
+  special keys are ignored.
+- Screen: no ANSI escape sequences (the ANSI option of SKELIO is not used);
+  control codes other than CR, LF and BS are not displayed.
+- AUX and PRN: discard output; the RS-232C and printer BIOS are not used.
+- Disks: only the floppy drives A: and B: in the 2HD format with 1024-byte
+  sectors; no other formats, no hard disk. Media change is always reported
+  as unknown. A write-protected disk is reported as a write fault, not as
+  write protection (fixed only in the MS-DOS 4.0 BIOS part).
+
 ## Build
 
 Requires git, make, a C compiler and Python 3.12 on the host.

@@ -63,10 +63,38 @@ backup-memory settings. The boot sector finds IO.SYS and MSDOS.SYS through the
 FAT. FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
 2 heads); SYS makes a formatted disk bootable.
 
-Not included (IBM PC hardware specific): ANSI.SYS, DISPLAY.SYS, DRIVER.SYS,
-KEYBOARD.SYS, PRINTER.SYS, RAMDRIVE.SYS, SMARTDRV, VDISK.SYS, XMA2EMS.SYS,
-XMAEM.SYS, DISKCOMP, DISKCOPY, FDISK, GRAFTABL, GRAPHICS, KEYB, MODE, PRINT,
-DOSSHELL, SELECT, FILESYS and IFSFUNC.
+## Not included
+
+The distribution build does not build these parts. Except where noted, an
+earlier trial build of the unmodified tree assembled them, so they are
+omitted for function, not for build failures.
+
+| Part | Reason |
+|---|---|
+| IBM BIOS part of IO.SYS (MSBIO1 ... MSINIT), MSLOAD, BOOT (MSBOOT) | Replaced by the PC-88VA BIOS part and boot sector. |
+| FORMAT, SYS (IBM) | Assume 512-byte sectors and the IBM boot sector; replaced by the PC-88VA FORMAT and SYS. The IBM FORMAT did not build in the trial (it needs the BOOT message include). |
+| ANSI.SYS, DISPLAY.SYS, KEYBOARD.SYS, PRINTER.SYS, KEYB, GRAFTABL, GRAPHICS, MODE | Program the IBM video BIOS, keyboard, code pages and ports directly. |
+| FDISK, DRIVER.SYS | IBM fixed-disk partitioning and IBM diskette parameters. |
+| DISKCOPY, DISKCOMP | Assume 512-byte sectors in many places; DISKCOPY also formats tracks through generic IOCTL, which the PC-88VA driver does not implement, and calls INT 13h. Not ported. |
+| RAMDRIVE.SYS, VDISK.SYS, SMARTDRV, XMA2EMS.SYS, XMAEM.SYS | Need extended or expanded memory of IBM-compatible machines. |
+| MEMM | Expanded-memory manager; not built. |
+| PRINT | PRN discards output, so a print spooler has no use yet. |
+| DOSSHELL, SELECT | IBM text-mode shell and installer; SELECT also has damaged characters in the published sources. Not built. |
+| FILESYS, IFSFUNC | Installable file system support for networks; no file system driver to use it. |
+
+## Not implemented in the PC-88VA BIOS part
+
+- Japanese: no Japanese display or input (no front-end processor).
+- Keyboard: only keys with an ASCII code; function, cursor and other
+  special keys are ignored.
+- Screen: no ANSI escape sequences; control codes other than CR, LF and BS
+  are not displayed. Box-drawing characters of TREE and MEM appear as other
+  characters of the VA font.
+- AUX and PRN: discard output; the RS-232C and printer BIOS are not used.
+- Disks: only the floppy drives A: and B: in the 2HD format with 1024-byte
+  sectors (8 per track, 80 cylinders, 2 heads); no 2DD or other formats, no
+  hard disk. Media change is always reported as unknown, so DOS decides.
+  Generic IOCTL format and verify track are not implemented.
 
 ## Build
 
