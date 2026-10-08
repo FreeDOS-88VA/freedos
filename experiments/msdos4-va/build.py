@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Build the PC-88VA MS-DOS 4.0 experiment disk.
+"""Build the PC-88VA MS-DOS 4.0 distribution disk.
 
-MSDOS.SYS, the SYSINIT part of IO.SYS and COMMAND.COM are assembled from
-the MIT-licensed MS-DOS 4.0 sources on the pinned experiment branch of the
-MS-DOS component; the PC-88VA BIOS part replaces the IBM PC BIOS part of
-IO.SYS.  The boot sector and MEMINFO are shared with the MS-DOS 2.0
-experiment sources on the same branch.  The original BUILDIDX, BUILDMSG,
-NOSRVBLD, MASM 5.10 and LINK 3.65 run under emu2 built from its pinned
-source.
+Every program is built from the MIT-licensed MS-DOS 4.0 sources on the
+pinned release/msdos-va branch of the MS-DOS component, with the original
+tools (NMAKE, BUILDIDX, BUILDMSG, NOSRVBLD, MASM 5.10, CL, LINK 3.65,
+EXE2BIN) running under emu2 built from its pinned source.  NMAKE builds
+MSDOS.SYS, the SYSINIT objects, the utilities and COUNTRY.SYS from their
+original makefiles; the PC-88VA BIOS part of IO.SYS, the boot sector and
+FORMAT/SYS come from pc88va/ and v4.0/pc88va/.
 
-This experiment is self-contained: it uses no milestone tools.  The D88
-writer, FAT12 composer and MZ loader are maintained copies of those in
-experiments/msdos2-va/build.py.
+This experiment is self-contained: it uses no milestone tools.
 """
 import argparse
 import hashlib
@@ -37,23 +35,19 @@ RESERVED, FATS, FAT_SECTORS, ROOT_ENTRIES = 1, 2, 2, 192
 MEDIA = 0xFE
 ROOT_SECTORS = ROOT_ENTRIES * 32 // SECTOR
 FIRST_DATA = RESERVED + FATS * FAT_SECTORS + ROOT_SECTORS
-BOOT_EXTENT = 62
 SIGNATURES = (510, 1022)
-# Directory timestamps: 1988-06-17 00:00:00.
-FAT_DATE = ((1988 - 1980) << 9) | (6 << 5) | 17
-FAT_TIME = 0
 
-TOOLS = ('BUILDIDX', 'BUILDMSG', 'NOSRVBLD', 'MASM', 'LINK', 'EXE2BIN')
-TEXT = ('.ASM', '.INC', '.SKL', '.MSG', '.LNK', '.CTL')
-SYSINIT_MODULES = ('SYSINIT1', 'SYSCONF', 'SYSINIT2', 'SYSIMES')
-DOS_INC_MODULES = ('NIBDOS', 'CONST2', 'MSDATA', 'MSTABLE', 'MSDOSME')
+# Text files get CRLF line ends: NOSRVBLD and MASM read DOS text.
+TEXT = ('.ASM', '.INC', '.SKL', '.MSG', '.LNK', '.CTL', '.C', '.H', '.INI', '.BAT',
+        '.EQU', '.SW', '.DEF', '.MAK', '.TXT', '.LST', '.DAT', '.CL1')
+DEFINES = ('extasw=-DPC88VA', 'extcsw=-DPC88VA')
+SYSINIT_OBJECTS = ('SYSINIT1', 'SYSCONF', 'SYSINIT2', 'SYSIMES')
 COMMAND_MODULES = ('COMMAND1 COMMAND2 RUCODE RDATA INIT IPARSE UINIT TCODE TBATCH '
                    'TBATCH2 TFOR TCMD1A TCMD1B TCMD2A TCMD2B TENV TENV2 TMISC1 TMISC2 '
                    'TPIPE PARSE2 PATH1 PATH2 TUCODE COPY COPYPR1 COPYPR2 CPARSE TPARSE '
                    'TPRINTF TDATA TSPC').split()
-# PC88VA selects the native text BIOS for CLS in COMMAND and skips the IBM
-# BIOS probes in SYSINIT1; FREEDOS is not defined.
-DEFINES = ('-DPC88VA',)
+ERRORS = re.compile(r'error [ACLU]\d{4}|fatal error|^Stop\.|Extended Error|'
+                    r'[1-9]\d* Severe +Errors|Unresolved externals|Out of memory', re.M | re.I)
 
 
 def digest(data):
@@ -69,8 +63,14 @@ def export(component, commit, paths, dest):
 
 
 def dos_text(data):
-    """CRLF line ends, as the DOS tools expect."""
     return data.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
+
+
+def crlf_tree(top):
+    for path in sorted(top.rglob('*')):
+        name = path.name.upper()
+        if path.is_file() and (name.endswith(TEXT) or name == 'MAKEFILE'):
+            path.write_bytes(dos_text(path.read_bytes()))
 
 
 def mz_image(exe, base=None, origin=0):
@@ -101,45 +101,48 @@ def fat12_set(fat, cluster, value):
         fat[i + 1] = (fat[i + 1] & 0xF0) | ((value >> 8) & 0x0F)
 
 
-def compose(boot, files):
+def dos_name(name):
+    stem, _, ext = name.partition('.')
+    if not (1 <= len(stem) <= 8 and len(ext) <= 3) or name != name.upper():
+        raise ValueError('bad DOS name: ' + name)
+    return stem.ljust(8).encode('ascii') + ext.ljust(3).encode('ascii')
+
+
+def compose(boot, files, label, fat_date, serial):
+    """Return a raw FAT12 image: boot sector, label, files in order."""
     raw = bytearray(TOTAL * SECTOR)
     fat = bytearray(FAT_SECTORS * SECTOR)
     fat12_set(fat, 0, 0xF00 | MEDIA)
     fat12_set(fat, 1, 0xFFF)
     root = bytearray(ROOT_SECTORS * SECTOR)
-    cluster, extents = 2, {}
-    for index, (name, data, attr) in enumerate(files):
+    entries = [struct.pack('<11sB10sHHHI', label.ljust(11).encode('ascii'), 0x08, bytes(10),
+                           0, fat_date, 0, 0)]
+    cluster = 2
+    for name, data, attr in files:
         count = (len(data) + SECTOR - 1) // SECTOR
         first = cluster if count else 0
         for n in range(count):
             fat12_set(fat, cluster + n, cluster + n + 1 if n + 1 < count else 0xFFF)
             lba = FIRST_DATA + cluster + n - 2
             raw[lba * SECTOR:(lba + 1) * SECTOR] = data[n * SECTOR:(n + 1) * SECTOR].ljust(SECTOR, b'\0')
-        extents[name] = (FIRST_DATA + cluster - 2, count)
         cluster += count
-        stem, _, ext = name.partition('.')
-        entry = struct.pack('<8s3sB10sHHHI', stem.ljust(8).encode(), ext.ljust(3).encode(), attr,
-                            bytes(10), FAT_TIME, FAT_DATE, first, len(data))
-        root[index * 32:(index + 1) * 32] = entry
-    if cluster - 2 > TOTAL - FIRST_DATA:
+        entries.append(struct.pack('<11sB10sHHHI', dos_name(name), attr, bytes(10), 0, fat_date,
+                                   first, len(data)))
+    if cluster - 2 > TOTAL - FIRST_DATA or len(entries) > ROOT_ENTRIES:
         raise ValueError('files exceed the disk')
-    sector = bytearray(boot.ljust(SECTOR, b'\0'))
-    struct.pack_into('<8sHBHBHHBHHHI', sector, 3, b'MSDOS4VA', SECTOR, 1, RESERVED, FATS,
-                     ROOT_ENTRIES, TOTAL, MEDIA, FAT_SECTORS, SPT, HEADS, 0)
-    io_lba, io_count = extents['IO.SYS']
-    dos_lba, dos_count = extents['MSDOS.SYS']
-    if dos_lba != io_lba + io_count:
-        raise ValueError('IO.SYS and MSDOS.SYS must be contiguous')
-    struct.pack_into('<HHH', sector, BOOT_EXTENT, io_lba, io_count + dos_count, io_count)
-    for offset in SIGNATURES:
-        sector[offset:offset + 2] = b'\x55\xaa'
+    root[:32 * len(entries)] = b''.join(entries)
+    sector = bytearray(boot)
+    if len(sector) != SECTOR or any(sector[o:o + 2] != b'\x55\xaa' for o in SIGNATURES):
+        raise ValueError('boot sector shape')
+    struct.pack_into('<I', sector, 39, serial)
+    sector[43:54] = label.ljust(11).encode('ascii')
     raw[:SECTOR] = sector
     for n in range(FATS):
         offset = (RESERVED + n * FAT_SECTORS) * SECTOR
         raw[offset:offset + len(fat)] = fat
     offset = (RESERVED + FATS * FAT_SECTORS) * SECTOR
     raw[offset:offset + len(root)] = root
-    return bytes(raw), extents
+    return bytes(raw)
 
 
 def d88(raw, name):
@@ -160,53 +163,45 @@ def d88(raw, name):
     return bytes(header + out)
 
 
+def boot_include(boot):
+    """MASM source defining BOOTCODE, the 1024-byte boot sector."""
+    lines = ['BOOTCODE LABEL BYTE']
+    lines += ['        DB      ' + ','.join('%03XH' % b for b in boot[i:i + 16])
+              for i in range(0, len(boot), 16)]
+    return ('\r\n'.join(lines) + '\r\n').encode('ascii')
+
+
 class Dos:
-    """Run original DOS build tools under emu2 in per-directory work trees."""
+    """Run DOS tools under emu2 and fail on any reported error."""
 
-    def __init__(self, emu, logs):
-        self.emu, self.logs, self.step = emu, logs, 0
+    def __init__(self, emu, logs, drive_root):
+        self.emu, self.logs, self.root, self.step = emu, logs, drive_root, 0
 
-    def run(self, work, tool, *arguments):
+    def run(self, cwd, program, *arguments, env=()):
         self.step += 1
-        log = self.logs / '{:03d}-{}-{}.log'.format(self.step, work.name, tool.split('.')[0])
-        env = {k: v for k, v in os.environ.items() if not k.startswith('EMU2_')}
-        env.update(EMU2_DRIVE_C=str(work), EMU2_DEFAULT_DRIVE='C:', EMU2_CWD='C:\\',
-                   EMU2_DOSVER='4.00')
+        log = self.logs / '{:03d}-{}-{}.log'.format(
+            self.step, cwd.name.lower(), Path(program).stem.lower())
+        dos_cwd = ('D:\\' + str(cwd.relative_to(self.root)).replace('/', '\\')).upper()
+        host = {k: v for k, v in os.environ.items() if not k.startswith('EMU2_')}
+        host.update(EMU2_DRIVE_D=str(self.root), EMU2_DEFAULT_DRIVE='D:', EMU2_CWD=dos_cwd,
+                    EMU2_DOSVER='4.00')
+        command = [str(self.emu), str(program), *arguments]
+        if env:
+            command += ['--', *env]
         with log.open('wb') as handle:
-            subprocess.run([str(self.emu), str(work / tool), *arguments], cwd=work, env=env,
-                           stdout=handle, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
-                           check=True, timeout=300)
+            subprocess.run(command, cwd=cwd, env=host, stdout=handle, stderr=subprocess.STDOUT,
+                           stdin=subprocess.DEVNULL, check=True, timeout=3600)
         text = log.read_bytes().decode('latin-1')
-        if (any(int(n) for n in re.findall(r'(\d+) Severe', text)) or
-                re.search(r'error [AL]\d|^Error', text, re.M)):
+        if ERRORS.search(text):
             raise SystemExit('tool reported errors, see ' + str(log))
         return text
 
-    def masm(self, work, module, defines=()):
-        self.run(work, 'MASM.EXE', '-Mx', '-t', *defines, module + '.ASM;')
-        if not (work / (module.lower() + '.obj')).is_file():
-            raise SystemExit('assembler output missing: ' + module)
 
-
-def layer(work, source, directories, tools, message):
-    """Overlay source directories in order; later ones win, as with -I. first."""
-    work.mkdir(parents=True)
-    for directory in directories:
-        for path in sorted((source / directory).iterdir()):
-            if path.is_file():
-                data = path.read_bytes()
-                name = path.name.upper()
-                (work / name).write_bytes(dos_text(data) if name.endswith(TEXT) else data)
-    for tool, data in tools.items():
-        (work / (tool + '.EXE')).write_bytes(data)
-    (work / 'USA-MS.MSG').write_bytes(dos_text(message))
-
-
-def link_response(modules, output, extra=''):
-    text = '+\r\n'.join(m + '.OBJ' for m in modules) + '\r\n' + output + '\r\n' + extra + ';\r\n'
-    if any(len(line) > 127 for line in text.splitlines()):
-        raise ValueError('LINK response line exceeds DOS buffer')
-    return text.encode('ascii')
+def expect(path):
+    for candidate in path.parent.iterdir():
+        if candidate.name.lower() == path.name.lower():
+            return candidate.read_bytes()
+    raise SystemExit('missing build output: ' + str(path))
 
 
 def main():
@@ -222,103 +217,118 @@ def main():
     logs.mkdir()
 
     msdos = lock['msdos']
-    archive_digest = export(ROOT / 'components/msdos', msdos['commit'], msdos['paths'], out / 'msdos')
+    tree = out / 'tree'
+    archive_digest = export(ROOT / 'components/msdos', msdos['commit'], msdos['paths'], tree)
     emu2_src = out / 'emu2'
     export(ROOT / 'components/emu2', lock['emu2']['commit'], ['.'], emu2_src)
     with (logs / 'emu2-build.log').open('wb') as log:
         subprocess.run(['make', '-j2'], cwd=emu2_src, stdout=log, stderr=subprocess.STDOUT, check=True)
-    dos = Dos(emu2_src / 'emu2', logs)
+    root = tree / 'v4.0'
+    src = root / 'src'
+    tools = src / 'TOOLS'
+    for name, expected in lock['tool_sha256'].items():
+        if digest((tools / name).read_bytes()) != expected:
+            raise SystemExit('tool digest mismatch: ' + name)
+    crlf_tree(tree)
+    dos = Dos(emu2_src / 'emu2', logs, root)
 
-    source = out / 'msdos/v4.0/src'
-    tools = {}
-    for tool in TOOLS:
-        data = (source / 'TOOLS' / (tool + '.EXE')).read_bytes()
-        if digest(data) != lock['tool_sha256'][tool]:
-            raise SystemExit('tool digest mismatch: ' + tool)
-        tools[tool] = data
-    message = (source / 'MESSAGES/USA-MS.MSG').read_bytes()
-    work = out / 'work'
-    inc, dosdir, bios, cmd, va = (work / n for n in ('inc', 'dos', 'bios', 'cmd', 'va'))
-    layer(inc, source, ('DOS', 'INC'), tools, message)
-    layer(dosdir, source, ('INC', 'DOS'), tools, message)
-    layer(bios, source, ('DOS', 'INC', 'BIOS'), tools, message)
-    layer(cmd, source, ('INC', 'CMD/COMMAND'), tools, message)
-    layer(va, out / 'msdos/v4.0', ('pc88va',), tools, message)
-    for name in ('VABOOT.ASM', 'MEMINFO.ASM'):
-        (va / name).write_bytes(dos_text((out / 'msdos/v2.0/pc88va' / name).read_bytes()))
-
-    # MSDOS.SYS
-    for directory in (inc, dosdir, bios, cmd):
-        dos.run(directory, 'BUILDIDX.EXE', 'USA-MS.MSG')
-    dos.run(dosdir, 'NOSRVBLD.EXE', 'MSDOS.SKL', 'USA-MS.MSG')
-    for path in dosdir.glob('msdos.cl*'):
-        shutil.copy(path, inc)
-    for module in DOS_INC_MODULES:
-        dos.masm(inc, module)
-    lnk = (source / 'DOS/MSDOS.LNK').read_text().splitlines()
-    dos_modules = [Path(line.strip().rstrip('+').strip().replace('\\', '/')).stem.upper()
-                   for line in lnk if line.strip().rstrip('+').strip().lower().endswith('.obj')]
-    for module in dos_modules:
-        if module in DOS_INC_MODULES:
-            shutil.copy(inc / (module.lower() + '.obj'), dosdir)
-        else:
-            dos.masm(dosdir, module)
-    (dosdir / 'MSDOS.LNK').write_bytes(link_response(dos_modules, 'MSDOS.EXE'))
-    dos.run(dosdir, 'LINK.EXE', '@MSDOS.LNK')
-    dos.run(dosdir, 'EXE2BIN.EXE', 'MSDOS.EXE', 'MSDOS.SYS')
-    msdos_sys = (dosdir / 'msdos.sys').read_bytes()
-
-    # IO.SYS: VA BIOS part + SYSINIT
-    dos.run(bios, 'NOSRVBLD.EXE', 'MSBIO.SKL', 'USA-MS.MSG')
-    for module in SYSINIT_MODULES:
-        dos.masm(bios, module, DEFINES)
-        shutil.copy(bios / (module.lower() + '.obj'), va)
-    for module in ('VAIO', 'VABOOT', 'MEMINFO'):
-        dos.masm(va, module)
-    (va / 'IO.LNK').write_bytes(link_response(('VAIO',) + SYSINIT_MODULES, 'IO.EXE'))
-    dos.run(va, 'LINK.EXE', '@IO.LNK')
-    dos.run(va, 'LINK.EXE', 'VABOOT,VABOOT.EXE;')
-    dos.run(va, 'LINK.EXE', 'MEMINFO,MEMINFO.EXE;')
-    iosys = mz_image((va / 'io.exe').read_bytes(), base=BIOSSEG)
-    boot = mz_image((va / 'vaboot.exe').read_bytes())
-    if len(boot) > min(SIGNATURES):
-        raise SystemExit('boot sector code overlaps the signature')
-    meminfo = mz_image((va / 'meminfo.exe').read_bytes(), origin=0x100)
-
-    # COMMAND.COM
-    dos.run(cmd, 'BUILDMSG.EXE', 'USA-MS', 'COMMAND.SKL')
+    # Bootstrap COMMAND.COM: NMAKE needs a command interpreter for COPY and
+    # DEL.  Assemble it module by module as in the 4.0 makefile.
+    boot_cmd = out / 'bootstrap-command'
+    shutil.copytree(src / 'CMD/COMMAND', boot_cmd)
+    for path in (src / 'INC').iterdir():
+        if path.is_file() and not (boot_cmd / path.name).exists():
+            shutil.copy(path, boot_cmd / path.name)
+    for tool in ('BUILDIDX.EXE', 'BUILDMSG.EXE', 'MASM.EXE', 'LINK.EXE', 'EXE2BIN.EXE'):
+        shutil.copy(tools / tool, boot_cmd)
+    shutil.copy(src / 'MESSAGES/USA-MS.MSG', boot_cmd)
+    dos.root = out
+    dos.run(boot_cmd, boot_cmd / 'BUILDIDX.EXE', 'USA-MS.MSG')
+    dos.run(boot_cmd, boot_cmd / 'BUILDMSG.EXE', 'USA-MS', 'COMMAND.SKL')
     for module in COMMAND_MODULES:
-        dos.masm(cmd, module, DEFINES)
-    (cmd / 'CMD.LNK').write_bytes(link_response(COMMAND_MODULES, 'COMMAND.EXE'))
-    dos.run(cmd, 'LINK.EXE', '@CMD.LNK')
-    dos.run(cmd, 'EXE2BIN.EXE', 'COMMAND.EXE', 'COMMAND.COM')
-    command = (cmd / 'command.com').read_bytes()
+        dos.run(boot_cmd, boot_cmd / 'MASM.EXE', '-Mx', '-t', '-DPC88VA', module + '.ASM;')
+    (boot_cmd / 'CMD.LNK').write_bytes(('+\r\n'.join(m + '.OBJ' for m in COMMAND_MODULES)
+                                        + ',COMMAND.EXE,,;\r\n').encode('ascii'))
+    dos.run(boot_cmd, boot_cmd / 'LINK.EXE', '@CMD.LNK')
+    dos.run(boot_cmd, boot_cmd / 'EXE2BIN.EXE', 'COMMAND.EXE', 'COMMAND.COM')
+    bootstrap_command = expect(boot_cmd / 'COMMAND.COM')
+    (tools / 'COMMAND.COM').write_bytes(bootstrap_command)
+    dos.root = root
 
-    autoexec = b'MEMINFO > MEMINFO.TXT\r\nMEMINFO\r\n'
+    env = ('PATH=D:\\SRC\\TOOLS', 'COMSPEC=D:\\SRC\\TOOLS\\COMMAND.COM', 'INIT=D:\\SRC\\TOOLS',
+           'INCLUDE=D:\\SRC\\TOOLS\\BLD\\INC', 'LIB=D:\\SRC\\TOOLS\\BLD\\LIB', 'COUNTRY=usa-ms')
+
+    def nmake(directory, *targets):
+        return dos.run(src / directory, tools / 'NMAKE.EXE', *DEFINES, *targets, env=env)
+
+    # Top-level makefile order.  The DOS makefile builds INC through
+    # "cd ..\\inc", which does not carry across emu2 processes, so make the
+    # message include it needs, then INC, then the rest of DOS.
+    nmake('MESSAGES')
+    nmake('MAPPER')
+    nmake('DOS', 'msdos.cl1')
+    nmake('INC')
+    nmake('DOS')
+    nmake('BIOS', 'msbio.cl1', *(m.lower() + '.obj' for m in SYSINIT_OBJECTS))
+    built = {}
+    for name, (directory, product) in lock['programs'].items():
+        nmake(directory)
+        built[name] = expect(src / directory / product)
+    nmake('CMD/COMMAND')
+    msdos_sys = expect(src / 'DOS/msdos.sys')
+    command = expect(src / 'CMD/COMMAND/command.com')
+    if command != bootstrap_command:
+        raise SystemExit('NMAKE COMMAND.COM differs from the bootstrap build')
+
+    # PC-88VA parts.
+    va = out / 'va'
+    va.mkdir()
+    for path in sorted((tree / 'pc88va').iterdir()) + sorted((root / 'pc88va').iterdir()):
+        shutil.copy(path, va / path.name.upper())
+    for module in SYSINIT_OBJECTS:
+        shutil.copy(src / 'BIOS' / (module.lower() + '.obj'), va / (module + '.OBJ'))
+    for tool in ('MASM.EXE', 'LINK.EXE'):
+        shutil.copy(tools / tool, va)
+    dos.root = out
+    dos.run(va, va / 'MASM.EXE', 'VABOOT;')
+    dos.run(va, va / 'LINK.EXE', 'VABOOT,VABOOT.EXE;')
+    boot = mz_image(expect(va / 'VABOOT.EXE'))
+    (va / 'VABOOT.INC').write_bytes(boot_include(boot))
+    for module in ('VAIO', 'VAFORMAT', 'VASYS'):
+        dos.run(va, va / 'MASM.EXE', module + ';')
+    (va / 'IO.LNK').write_bytes(('VAIO+' + '+'.join(SYSINIT_OBJECTS) + ',IO.EXE,IO.MAP;\r\n')
+                                .encode('ascii'))
+    dos.run(va, va / 'LINK.EXE', '@IO.LNK')
+    dos.run(va, va / 'LINK.EXE', 'VAFORMAT,VAFORMAT.EXE;')
+    dos.run(va, va / 'LINK.EXE', 'VASYS,VASYS.EXE;')
+    iosys = mz_image(expect(va / 'IO.EXE'), base=BIOSSEG)
+    built['FORMAT.COM'] = mz_image(expect(va / 'VAFORMAT.EXE'), origin=0x100)
+    built['SYS.COM'] = mz_image(expect(va / 'VASYS.EXE'), origin=0x100)
+
+    disk = lock['disk']
+    fat_date = ((disk['date'][0] - 1980) << 9) | (disk['date'][1] << 5) | disk['date'][2]
+    text = {name: dos_text((HERE / 'disk' / name).read_bytes()) for name in disk['text_files']}
+    text['LICENSE.TXT'] = dos_text((tree / 'LICENSE').read_bytes())
     files = [('IO.SYS', iosys, 0x07), ('MSDOS.SYS', msdos_sys, 0x07),
-             ('COMMAND.COM', command, 0x20), ('AUTOEXEC.BAT', autoexec, 0x20),
-             ('MEMINFO.COM', meminfo, 0x20)]
-    images = {}
-    for variant, config in lock['configurations'].items():
-        extra = [('CONFIG.SYS', config.encode('ascii'), 0x20)] if config else []
-        raw, extents = compose(boot, files + extra)
-        image = d88(raw, 'MSDOS4-PC88VA')
-        name = 'msdos4-va-%s.d88' % variant
-        (out / name).write_bytes(image)
-        images[name] = digest(image)
+             ('COMMAND.COM', command, 0x20)]
+    files += [(name, text[name], 0x20) for name in sorted(text)]
+    files += [(name, built[name], 0x20) for name in sorted(built)]
+    serial = int(disk['serial'].replace('-', ''), 16)
+    raw = compose(boot, files, disk['label'], fat_date, serial)
+    image = d88(raw, disk['d88_name'])
+    (out / disk['image']).write_bytes(image)
     record = {
-        'experiment': 'msdos4-va',
+        'distribution': 'msdos4-va',
         'msdos_commit': msdos['commit'],
         'msdos_archive_sha256': archive_digest,
         'emu2_commit': lock['emu2']['commit'],
         'tool_sha256': lock['tool_sha256'],
-        'files': {name: {'sha256': digest(data), 'size': len(data), 'first_lba': extents[name][0],
-                         'sectors': extents[name][1]} for name, data, _ in files},
         'boot_sha256': digest(boot),
-        'images': images,
+        'files': {name: {'sha256': digest(data), 'size': len(data)} for name, data, _ in files},
+        'image': {'name': disk['image'], 'sha256': digest(image), 'size': len(image)},
     }
     (out / 'build-record.json').write_text(json.dumps(record, indent=2) + '\n')
-    print(json.dumps(images))
+    print(json.dumps(record['image']))
 
 
 if __name__ == '__main__':

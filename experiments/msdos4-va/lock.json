@@ -1,25 +1,48 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "msdos": {
     "repository": "https://github.com/FreeDOS-88VA/MS-DOS",
-    "branch": "experiment/msdos4-va",
-    "commit": "b8748a1106185ecfdc6ead5032b35b6f06b8cf38",
+    "branch": "release/msdos-va",
+    "commit": "9baf3ab6f0472b145132dd5ec25c2008b5244e1e",
     "paths": [
+      "LICENSE",
+      "pc88va",
       "v4.0/pc88va",
+      "v4.0/src/TOOLS",
+      "v4.0/src/MESSAGES",
+      "v4.0/src/MAPPER",
       "v4.0/src/INC",
+      "v4.0/src/H",
+      "v4.0/src/LIB",
       "v4.0/src/DOS",
       "v4.0/src/BIOS",
+      "v4.0/src/CMD/APPEND",
+      "v4.0/src/CMD/ASSIGN",
+      "v4.0/src/CMD/ATTRIB",
+      "v4.0/src/CMD/BACKUP",
+      "v4.0/src/CMD/CHKDSK",
       "v4.0/src/CMD/COMMAND",
-      "v4.0/src/MESSAGES/USA-MS.MSG",
-      "v4.0/src/TOOLS/BUILDIDX.EXE",
-      "v4.0/src/TOOLS/BUILDMSG.EXE",
-      "v4.0/src/TOOLS/NOSRVBLD.EXE",
-      "v4.0/src/TOOLS/MASM.EXE",
-      "v4.0/src/TOOLS/LINK.EXE",
-      "v4.0/src/TOOLS/EXE2BIN.EXE",
-      "v2.0/pc88va/VABOOT.ASM",
-      "v2.0/pc88va/MEMINFO.ASM",
-      "LICENSE"
+      "v4.0/src/CMD/COMP",
+      "v4.0/src/CMD/DEBUG",
+      "v4.0/src/CMD/EDLIN",
+      "v4.0/src/CMD/EXE2BIN",
+      "v4.0/src/CMD/FASTOPEN",
+      "v4.0/src/CMD/FC",
+      "v4.0/src/CMD/FIND",
+      "v4.0/src/CMD/JOIN",
+      "v4.0/src/CMD/LABEL",
+      "v4.0/src/CMD/MEM",
+      "v4.0/src/CMD/MORE",
+      "v4.0/src/CMD/NLSFUNC",
+      "v4.0/src/CMD/RECOVER",
+      "v4.0/src/CMD/REPLACE",
+      "v4.0/src/CMD/RESTORE",
+      "v4.0/src/CMD/SHARE",
+      "v4.0/src/CMD/SORT",
+      "v4.0/src/CMD/SUBST",
+      "v4.0/src/CMD/TREE",
+      "v4.0/src/CMD/XCOPY",
+      "v4.0/src/DEV/COUNTRY"
     ]
   },
   "emu2": {
@@ -27,15 +50,208 @@
     "commit": "9d8698d06e67359bc8b230c2d19d5b1503e60819"
   },
   "tool_sha256": {
-    "BUILDIDX": "10e6fb22df1521a2b200e708cb4a8e8d1748cc68d1c4ed1e65531596f1b11f0d",
-    "BUILDMSG": "0cdcb1e36d9017f7f0e66fd4c539eb34ddeb74073e74f50733943a54cf7c707c",
-    "NOSRVBLD": "eacb1dde40274dd8c6ba4fd5b7c08e44e720fa2b32b147d4012343e68215f80e",
-    "MASM": "1c6286c69b616160b8475ad17453ee872702a2c98075c2159ec792a1c745275f",
-    "LINK": "124a3c800edc16b60f696d35a9dfec798b68b78fe2ca90c5988ea76bdeab1a8a",
-    "EXE2BIN": "a66a3875d7f310d95312651f38d0b43246d3bacfa720f28c49445fcc10bbfa8f"
+    "ASC2HLP.EXE": "5d8afb2d23a13e93b321af122dff443ee25ca5fedeb5feeb1a373b9b6e511812",
+    "ATTRIB.EXE": "7fc2696a3380b98670cdde913e3d81eaddaab6db8661b8371b5601af269e7651",
+    "BLD/INC/ASSERT.H": "4ded40835050eb5ec16e8f8d45c46c235d17d93f28f91e944130c7b99ac280f1",
+    "BLD/INC/BIOS.H": "89153ce0f56d360c018af7dd2036d38b8d723dc77b01e35f43571408b431ad0c",
+    "BLD/INC/CONIO.H": "bd992d2e2f6133eb6383dd69e18722b8a96fe64d7bcac378493c5676eacdde98",
+    "BLD/INC/CTYPE.H": "70f06f727032405dc6a150d9994bceed16c20dfdefebf05621537082cd693a34",
+    "BLD/INC/DIRECT.H": "cd0521ff760aa0071fddb1f67ef20df050caebe0f0ece117a376afe33df10748",
+    "BLD/INC/DOS.H": "9e9f6a4aaccebc7e5b06aec492b39eb24b27286b651372d19ff931bddd867707",
+    "BLD/INC/ERRNO.H": "e1c43fcb2ae6ef855c9a54c65aed9cf06cd521e44d0470b19105cd54c5c89216",
+    "BLD/INC/FCNTL.H": "7df7ed093daa2e6a91d6072bdb10616d3c16a1a895aa82523afb249540b07c51",
+    "BLD/INC/FLOAT.H": "255d5b4c34dfd9440d111b15acbd65fde913e31fd97bed2d9a1426f45e0230f9",
+    "BLD/INC/GRAPH.H": "5904565b68e520b8f64d70c9f289b87a63b7cddc50276c27f5adf1a235753c2e",
+    "BLD/INC/IO.H": "514b4095c7d3cd370169bb1fe0e50c3c3a3695ea40edab0e524eb3fd1ec53467",
+    "BLD/INC/LIMITS.H": "7ff78b457d63a96c016d7f431560cd5046412270a429361e04f40d3febcb89c3",
+    "BLD/INC/MALLOC.H": "73631695ee7ee28fae982a7e0d80192e8ad063b9e370671288d1b657651721e1",
+    "BLD/INC/MATH.H": "bff4866d697796b643e85f1e83869d204c6feb3426e472cea2cae01f20189157",
+    "BLD/INC/MEMORY.H": "55711253b29758819da849f30d0c9e69f3388fe00e685063a8da2c9269834fd9",
+    "BLD/INC/PROCESS.H": "be5b37fb74d055d38888f6c0e410e9aea659f8077f1713feb7b0868671f59c58",
+    "BLD/INC/SEARCH.H": "47c3f32afef98a94a243f1791d629582d0fa8a79dd9554f2f489482022b3d138",
+    "BLD/INC/SETJMP.H": "28849f94840b09d5b41c4d66dfa54eeda34987e64e989693ec10aca8de6c8463",
+    "BLD/INC/SHARE.H": "654d0947374bbed1e250c6a42583039c76bae85be288532c9067ebcef72c10e5",
+    "BLD/INC/SIGNAL.H": "d16f94694e3da2249eb65bebc677187185bc613658cd1f031605ace61cc4f839",
+    "BLD/INC/STDARG.H": "6225bde6e8b0f94c1fdfb91104adb04814ba6faa812b121e456e9f03f56c90e4",
+    "BLD/INC/STDDEF.H": "cd0e5227826164d5e71e3af5e3f6e0b0fec1035f8693c382d9de9a9879f49217",
+    "BLD/INC/STDIO.H": "c59530359c3724f956e60eb018c0879c8fc81f99723bb7005e450f08d6458a15",
+    "BLD/INC/STDLIB.H": "f645286d3ea232ba8d77ece58192d8a2c28c5e5c88575c9488787469203cfc9e",
+    "BLD/INC/STRING.H": "ce145da80a8f5dd87dbef199584d2a12d93148093a5c5e0af328e5bb43c873ef",
+    "BLD/INC/SYS/LOCKING.H": "6e33a42bd0f6171602f428e2f7c26f03a3e4bd90d56e912368c659471a423c7e",
+    "BLD/INC/SYS/STAT.H": "5a0afb2f522911ea896b64ca0d5ef16ef4844450f637a81b21b55a7d9b30f461",
+    "BLD/INC/SYS/TIMEB.H": "c3b5bfdf770c8eef93f35fcaeedcc37ce55ff3ba2c6129e3d6a10d4395589dd6",
+    "BLD/INC/SYS/TYPES.H": "958d5549057b1515be9d3de8cd7af00252773de43aa99f43a8fe29e2403b5349",
+    "BLD/INC/SYS/UTIME.H": "1ace8505628610dad52c0f91e88cce91d6fe114fb300c068094f2cf10b56117d",
+    "BLD/INC/TIME.H": "b08ec495aeae36dbf6cb3ecdf80d6e8e6549095940466c6e32f8adacfa953d20",
+    "BLD/INC/VARARGS.H": "83a3b3abe0cb4940183efdfee1181c6cd8d6174a0695a02dd85124e2e25e9aa9",
+    "BLD/LIB/BINMODE.OBJ": "30c5cd37a76033a243029f1f6b933b911bdc50425914be251030324f748d853d",
+    "BLD/LIB/CLIBCE.LIB": "30d0bbf9d097b1a3787ed674ef2750eef75d07cef1823f425ada9c0dc92ea5af",
+    "BLD/LIB/CLIBCR.LIB": "adedef4ea1deef051c56d9cf4863fcdc2a3722eddc3602d0d73df03b96d4ed0d",
+    "BLD/LIB/CLIBFP.LIB": "412c4bf1866549e0ac0dc8bbe7e33b95751c58e50a1f987f4aa66ffa2ce32178",
+    "BLD/LIB/CVARSTCK.OBJ": "4a91fd60365061e64f243abcd77cf96eea085c6228b077014223eaac12d56f7e",
+    "BLD/LIB/EM.LIB": "77620fa639ac91fad940c3539a66f47adbbb124958b38e540d386de79f582403",
+    "BLD/LIB/GRAPHICS.LIB": "4a4fc3a026bf99d503c77bc8208cf3a06bc57188df4540d705ff57f789189fd0",
+    "BLD/LIB/LIBH.LIB": "6729e396014d37921b0b331cd0f9a3a821abb725fd2ee0e795d71b0e4b627e9c",
+    "BLD/LIB/LLIBCE.LIB": "5a1b1f376b59a029fd60dcdb3bcb1f1f350786e1442b09529590aac0c81f156f",
+    "BLD/LIB/LLIBCR.LIB": "7961eafce689dbf17acc3fd6fe34be6bc000f60d0f02fb1af2602b09112f3d2e",
+    "BLD/LIB/LLIBFP.LIB": "35769669c1330a4c854ca1c265b78cc25a1d5c2489b0515a89c877d37b68d008",
+    "BLD/LIB/LVARSTCK.OBJ": "670a8a7ee92a7cc81d2a7282cb3b756ec207d994aee6cc214f795f794844a191",
+    "BLD/LIB/MLIBCE.LIB": "fd7775a15c5b94361dc59ad93f1d79f2eedb0a90cefc4c47c3483dc4eddbcad6",
+    "BLD/LIB/MLIBCR.LIB": "a8c6bf65551559a795f3bdcef3f70178086bf944296413716e48cba95814b9cb",
+    "BLD/LIB/MLIBFP.LIB": "a6aed77cab170658aa7010b297008621e8f4a047553f3e43caaa00fa8b423314",
+    "BLD/LIB/MVARSTCK.OBJ": "f4c9daffeafd50af0e26e1f8cae176174e075fc617a2f574463fbc9e79867b9d",
+    "BLD/LIB/SETARGV.OBJ": "fadc39236423ad7d6c86a5a6c7c1085c8e619fd5876af0b4ad2eebc7e0d09751",
+    "BLD/LIB/SLIBCE.LIB": "d077b91d63d051d3333ca53f81cb15b0597cfdb6ec8a7fadc60f76ab6883e24f",
+    "BLD/LIB/SLIBCR.LIB": "ce2dc6d740ae477135e2d9f11802c2357914994835e82a165423b43ccd30728f",
+    "BLD/LIB/SLIBFP.LIB": "7a712089189bc34d66e579fc76be411bcd24a39863e6e8fb7203b71a1fcfdc9e",
+    "BLD/LIB/SVARSTCK.OBJ": "8b882552be5f0d4dea0608a8da96021245589fb10bea5a473300a0b5e345d36a",
+    "BUILDIDX.EXE": "10e6fb22df1521a2b200e708cb4a8e8d1748cc68d1c4ed1e65531596f1b11f0d",
+    "BUILDMSG.EXE": "0cdcb1e36d9017f7f0e66fd4c539eb34ddeb74073e74f50733943a54cf7c707c",
+    "C1.ERR": "37a2ac69c89d1e65c6596cfb3860eee33009b47c1c4ed1360a87a8a7ad78cace",
+    "C1.EXE": "8d33c6d87aa74b042b7d7cb01a23241c4cc3b1b8b446b8f1548bd167e3c7bf62",
+    "C1L.EXE": "bdd8189be005009331ff61dd3cb7a0ce9b246ea522dd8ab2c83a8339e5c30f09",
+    "C2.EXE": "a513c98bc2ce11bd00901b560252b5727ab9b6bacd9319b9eaba08f9e314b99b",
+    "C23.ERR": "4f0ab17a19cee78a46644c3493570c4f9b3cbbdb501672814e4bfe00041e0648",
+    "C3.EXE": "c1269628534d5deb48171ba9e42f761dcb1c28a0087c73780db0ee2e4352e6fa",
+    "CL.ERR": "ce4269dfd6cab37278cfa18f071fb95f355dbee6fbcb6e3f6092688867c0d458",
+    "CL.EXE": "cad40cef732beea3455225fbd62286c664166db7c3f87e2402e22b2e3f107771",
+    "CL.HLP": "f9678ef1846cc4b102b349fff7c72b6d069cea0b542ba22a9fcf3321565a8f25",
+    "COMPRESS.COM": "d0deb39a5d1946fe54a6b0b4cc91fbfc9547703ae1408dc9ce04f876d5dbe8f7",
+    "CONVERT.EXE": "26176c60027009f40d51f9ed1271779a3d2953b88daf559badaf7fb20d5ec03a",
+    "DBOF.EXE": "7f853d1db3947cee6612d5a46e262bff20cfaa8583fdb72bf9c158f56336de4b",
+    "EXE2BIN.EXE": "a66a3875d7f310d95312651f38d0b43246d3bacfa720f28c49445fcc10bbfa8f",
+    "EXEC.EXE": "f1ba635fda038d541645318de86094e04e69e3bdc4c79896b02b9758666b57de",
+    "EXEFIX.EXE": "6ade9f789d8f7c6d6834028eaaa0588010581c96062eadb70e859e7dbe65f97b",
+    "EXEMOD.EXE": "efe11a2f61d257c2737ca0ab2b731fd9e2ddcf0f06bb79e77aa6cefdb4c0c399",
+    "EXEPACK.EXE": "568554322d29e46f79c0c760ac2391cb0689dc7acb9aed79a428194ec6fb83e7",
+    "LIB.EXE": "21094b0f11ea0567e4eb71182b2749ada558bc3c9e9e8f6ef7c149a0e67b7c6f",
+    "LINK.EXE": "124a3c800edc16b60f696d35a9dfec798b68b78fe2ca90c5988ea76bdeab1a8a",
+    "MASM.EXE": "1c6286c69b616160b8475ad17453ee872702a2c98075c2159ec792a1c745275f",
+    "MENUBLD.EXE": "2a81faf702fb1fc50e49fe80d0f3c5b00509232364823e0c39a47b1a34f3c0a3",
+    "NMAKE.EXE": "229f7e7f0aea1a2204e376b3ec18cae2d014cd2e59df05451a9e8837cecfde7d",
+    "NOSRVBLD.EXE": "eacb1dde40274dd8c6ba4fd5b7c08e44e720fa2b32b147d4012343e68215f80e",
+    "TOOLS.INI": "49b3152869175538b2f02bf95f6d03fb5e34bcd72ad8828da3561628241d1007"
   },
-  "configurations": {
-    "default": "",
-    "matched": "FILES=16\r\nBUFFERS=6\r\nSTACKS=0,0\r\nLASTDRIVE=E\r\n"
+  "programs": {
+    "APPEND.EXE": [
+      "CMD/APPEND",
+      "append.exe"
+    ],
+    "ASSIGN.COM": [
+      "CMD/ASSIGN",
+      "assign.com"
+    ],
+    "ATTRIB.EXE": [
+      "CMD/ATTRIB",
+      "attrib.exe"
+    ],
+    "BACKUP.COM": [
+      "CMD/BACKUP",
+      "backup.com"
+    ],
+    "CHKDSK.COM": [
+      "CMD/CHKDSK",
+      "chkdsk.com"
+    ],
+    "COMP.COM": [
+      "CMD/COMP",
+      "comp.com"
+    ],
+    "DEBUG.COM": [
+      "CMD/DEBUG",
+      "debug.com"
+    ],
+    "EDLIN.COM": [
+      "CMD/EDLIN",
+      "edlin.com"
+    ],
+    "EXE2BIN.EXE": [
+      "CMD/EXE2BIN",
+      "exe2bin.exe"
+    ],
+    "FASTOPEN.EXE": [
+      "CMD/FASTOPEN",
+      "fastopen.exe"
+    ],
+    "FC.EXE": [
+      "CMD/FC",
+      "fc.exe"
+    ],
+    "FIND.EXE": [
+      "CMD/FIND",
+      "find.exe"
+    ],
+    "JOIN.EXE": [
+      "CMD/JOIN",
+      "join.exe"
+    ],
+    "LABEL.COM": [
+      "CMD/LABEL",
+      "label.com"
+    ],
+    "MEM.EXE": [
+      "CMD/MEM",
+      "mem.exe"
+    ],
+    "MORE.COM": [
+      "CMD/MORE",
+      "more.com"
+    ],
+    "NLSFUNC.EXE": [
+      "CMD/NLSFUNC",
+      "nlsfunc.exe"
+    ],
+    "RECOVER.COM": [
+      "CMD/RECOVER",
+      "recover.com"
+    ],
+    "REPLACE.EXE": [
+      "CMD/REPLACE",
+      "replace.exe"
+    ],
+    "RESTORE.COM": [
+      "CMD/RESTORE",
+      "restore.com"
+    ],
+    "SHARE.EXE": [
+      "CMD/SHARE",
+      "share.exe"
+    ],
+    "SORT.EXE": [
+      "CMD/SORT",
+      "sort.exe"
+    ],
+    "SUBST.EXE": [
+      "CMD/SUBST",
+      "subst.exe"
+    ],
+    "TREE.COM": [
+      "CMD/TREE",
+      "tree.com"
+    ],
+    "XCOPY.EXE": [
+      "CMD/XCOPY",
+      "xcopy.exe"
+    ],
+    "COUNTRY.SYS": [
+      "DEV/COUNTRY",
+      "country.sys"
+    ]
+  },
+  "disk": {
+    "image": "msdos4-pc88va-2hd.d88",
+    "d88_name": "MSDOS4-PC88VA",
+    "label": "MSDOS4-VA",
+    "date": [
+      1988,
+      6,
+      17
+    ],
+    "text_files": [
+      "AUTOEXEC.BAT",
+      "CONFIG.SYS",
+      "README.TXT"
+    ],
+    "serial": "1988-0617"
   }
 }

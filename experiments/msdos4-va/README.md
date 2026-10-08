@@ -1,90 +1,88 @@
-# Experiment: MS-DOS 4.0 on the PC-88VA
+# MS-DOS 4.0 for the PC-88VA (English distribution disk)
 
-This experiment boots Microsoft MS-DOS 4.0 (the MIT-licensed release in
-`microsoft/MS-DOS`) on the PC-88VA to compare its conventional-memory use
-with the FreeDOS port. It is not a milestone, not a distribution and not part
-of any milestone build. Results are emulator-only; hardware is NOT RUN.
+This directory builds a bootable PC-88VA 2HD disk with Microsoft MS-DOS 4.0,
+assembled and compiled entirely from the MIT-licensed source release
+(`microsoft/MS-DOS`) plus a PC-88VA BIOS part. It is a separate experiment of
+the FreeDOS-88VA project, not a FreeDOS milestone and not part of any
+milestone build. It is unofficial and not supported by Microsoft or NEC.
 
-## What is built
+Validation: emulator only (VAEG). Hardware is NOT RUN.
 
-Everything is assembled from source with the original MS-DOS 4.0 tools
-(BUILDIDX, BUILDMSG, NOSRVBLD, MASM 5.10, LINK 3.65, EXE2BIN) running under
-emu2 built from its pinned source:
+## Sources
 
-| File | Source |
+All sources are on the `release/msdos-va` branch of
+[FreeDOS-88VA/MS-DOS](https://github.com/FreeDOS-88VA/MS-DOS/tree/release/msdos-va);
+`lock.json` pins its commit, the emu2 commit and the SHA-256 of every file in
+`v4.0/src/TOOLS`.
+
+| Part | Source |
 |---|---|
-| MSDOS.SYS | `v4.0/src/DOS` and `v4.0/src/INC`, unchanged, linked as in `MSDOS.LNK` |
-| IO.SYS | `v4.0/pc88va/VAIO.ASM` (project-authored BIOS part) + `v4.0/src/BIOS` SYSINIT1, SYSCONF, SYSINIT2, SYSIMES |
-| COMMAND.COM | `v4.0/src/CMD/COMMAND` with `PC88VA` defined (CLS uses the VA text BIOS instead of IBM INT 10h) |
-| Boot sector, MEMINFO.COM | `v2.0/pc88va/VABOOT.ASM` and `MEMINFO.ASM`, shared with the MS-DOS 2.0 experiment |
+| MSDOS.SYS, COMMAND.COM, utilities, COUNTRY.SYS | `v4.0/src`, built by the original makefiles |
+| IO.SYS | `v4.0/pc88va/VAIO.ASM` (PC-88VA BIOS part) + `v4.0/src/BIOS` SYSINIT1, SYSCONF, SYSINIT2, SYSIMES |
+| Boot sector, FORMAT, SYS | `pc88va/VABOOT.ASM`, `VAFORMAT.ASM`, `VASYS.ASM` (shared with the MS-DOS 2.0 disk) |
 
-The sources are on the `experiment/msdos4-va` branch of
-[FreeDOS-88VA/MS-DOS](https://github.com/FreeDOS-88VA/MS-DOS/tree/experiment/msdos4-va);
-`lock.json` pins its commit, the emu2 commit and the SHA-256 of every tool.
-The IBM PC BIOS part of IO.SYS (MSBIO1 ... MSINIT) and its loader MSLOAD are
-not used: the boot sector loads IO.SYS and MSDOS.SYS as in the 2.0
-experiment. The build overlays the INC, DOS and BIOS directories per
-assembly unit in the original include order and gives the tools CRLF text;
-NOSRVBLD does not accept LF-only message skeletons.
+The build runs the original NMAKE, BUILDIDX, BUILDMSG, NOSRVBLD, MASM 5.10,
+CL 5.10, LINK 3.65 and EXE2BIN from `v4.0/src/TOOLS` under emu2 built from its
+pinned source, with `PC88VA` defined for assembler and compiler. NMAKE needs a
+command interpreter, so COMMAND.COM is first assembled module by module and
+the NMAKE-built COMMAND.COM must equal it.
 
-## PC-88VA changes
+## Changes for the PC-88VA
 
-`v4.0/pc88va/VAIO.ASM` is the 2.0 experiment BIOS (INT 83h console, primitive
-INT 82h keyboard queue, INT 80h 2HD floppy drives A: and B:, boot-time memory
-measurement, private request stack, DF cleared on return, boot stack kept
-during initialization) with what the 4.0 SYSINIT needs from the BIOS part:
-its public variables (hardware-stack, MULTITRACK, 3.5-inch drive and
-keyboard-function flags, all unused here), an extended BPB and the `CLOCK$`
-name. DOS 4.0 points INT 2Ah-3Fh at its own handlers; `RE_INIT` gives INT 33h
-back to the ROM mouse BIOS.
+In `v4.0/src`, every change is conditional on `PC88VA` except one comment fix:
 
-With `PC88VA` defined, `SYSINIT1.ASM` skips three IBM PC dependencies whose
-interrupt numbers and ports mean something else on the PC-88VA: the INT 15h
-(AH=C0h) and INT 11h configuration probes, the INT 15h (AH=88h) extended
-memory query and the shared-interrupt rearm writes to ports 2F2h-2F7h and
-6F2h-6F7h. The default model byte 0FFh is kept, so no hardware stacks are
-installed unless `STACKS=` is given. MSDOS.SYS is unchanged.
+- `BIOS/SYSINIT1.ASM`: skip the IBM INT 11h/15h configuration probes, the
+  INT 15h extended-memory query and the shared-interrupt rearm port writes.
+- `CMD/APPEND`, `CHKDSK`, `DEBUG`, `MORE`, `SHARE`, `MEM`: do not call
+  INT 10h, 12h or 15h, which are hardware interrupt vectors on the PC-88VA.
+- `CMD/CHKDSK`, `CMD/RECOVER`: accept 1024-byte sectors and derive the
+  directory entries per sector from the sector size.
+- `CMD/COMMAND`: CLS uses the VA text BIOS (existing `PC88VA` option).
+- `MAPPER/GETMSG.ASM`: one comment line held 66 U+FFFD characters from a
+  character-set conversion and exceeded the MASM line limit.
+
+MSDOS.SYS is built from unchanged sources.
+
+The PC-88VA BIOS part provides CON (ROM text BIOS, primitive keyboard queue),
+CLOCK$ (calendar clock), AUX/PRN (discarded), and the A:/B: 2HD drives through
+the ROM floppy BIOS, with DOS 4 generic IOCTL (device parameters, track
+read/write, media ID). It measures conventional memory at boot and ignores
+backup-memory settings. The boot sector finds IO.SYS and MSDOS.SYS through the
+FAT. FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
+2 heads); SYS makes a formatted disk bootable.
+
+Not included (IBM PC hardware specific): ANSI.SYS, DISPLAY.SYS, DRIVER.SYS,
+KEYBOARD.SYS, PRINTER.SYS, RAMDRIVE.SYS, SMARTDRV, VDISK.SYS, XMA2EMS.SYS,
+XMAEM.SYS, DISKCOMP, DISKCOPY, FDISK, GRAFTABL, GRAPHICS, KEYB, MODE, PRINT,
+DOSSHELL, SELECT, FILESYS and IFSFUNC.
 
 ## Build
 
 Requires git, make, a C compiler and Python 3.12 on the host.
 
 ```sh
-git -C components/msdos fetch origin experiment/msdos4-va
-python3 -B experiments/msdos4-va/build.py --output build/exp-msdos4-va
-python3 -B experiments/msdos4-va/readfile.py IMAGE.d88 MEMINFO.TXT
+git submodule update --init components/msdos components/emu2
+git -C components/msdos fetch origin release/msdos-va
+python3 -B experiments/msdos4-va/build.py --output build/msdos4-va
 ```
 
-Two disks are produced: `default` without CONFIG.SYS and `matched` with the
-FreeDOS M20 settings `FILES=16`, `BUFFERS=6` (the effective FreeDOS value),
-`STACKS=0,0` and `LASTDRIVE=E`. Two independent builds produce the same D88
-bytes. Both disks boot to `A>` after AUTOEXEC.BAT runs
-`MEMINFO > MEMINFO.TXT` and `MEMINFO`.
+The disk is `build/msdos4-va/msdos4-pc88va-2hd.d88`; `build-record.json`
+lists the source and file digests. Two independent builds produce the same
+D88 bytes.
 
-## Result (VAEG, VA and VA2, 640 KiB, no backup memory)
+## Verification (VAEG)
 
-Both models give the same layout for each disk:
+With the distribution CONFIG.SYS (`FILES=20`, `BUFFERS=10`, `LASTDRIVE=E`),
+MEM reports 533,200 bytes as the largest executable program on the PC-88VA and
+PC-88VA2 with 640 KiB. On the VA2 it reports 402,128, 271,056 and 139,984
+bytes with 512, 384 and 256 KiB, and 512 KiB is detected with a stale 640 KiB
+setting in backup memory. Each run wrote and compared a file.
 
-| Start | Contents | default | matched |
-|---|---|---:|---:|
-| 10000h | IO.SYS resident BIOS part, including the 512-byte request stack | 1,504 | 1,504 |
-| 105E0h | MSDOS.SYS code and data, up to the first MCB at 193E0h | 36,352 | 36,352 |
-| 193F0h | System block (owner 0008h: buffers, files, FCBs, current directories) | 16,640 | 7,712 |
-| | COMMAND.COM resident part | 5,696 | 5,696 |
-| | COMMAND.COM second block (3 paragraphs) | 48 | 48 |
-| | COMMAND.COM environment | 160 | 160 |
-| | First program, memory block to A0000h | **529,280** | **538,208** |
+Exercised on the VA2: boot through the FAT, DATE and TIME from the calendar,
+FORMAT B: /S and booting the result, SYS, LABEL, VOL, CHKDSK (A: and B:),
+MEM /PROGRAM and /DEBUG, DIR, COPY, XCOPY, MD, TREE, ATTRIB, FC, COMP, FIND,
+SORT, MORE, REPLACE, SUBST, JOIN, ASSIGN, APPEND, FASTOPEN, SHARE, NLSFUNC,
+CHCP, BACKUP and RESTORE round trip, RECOVER, DEBUG, EDLIN and EXE2BIN.
 
-Each block is preceded by its 16-byte MCB. The first program starts at
-1EC80h (default) or 1C9A0h (matched).
-
-For comparison, FreeDOS M20 (release candidate 5) on the VA2 with 640 KiB
-reports 507,216 bytes for the largest executable program with the swapping
-FreeCOM, and 506,352 bytes free with the MS-DOS 4 COMMAND.COM shell. This
-MS-DOS 4.0 configuration has no Japanese console, ANSI escape sequences,
-AUX/PRN output or calendar clock.
-
-Verified in VAEG: boot, AUTOEXEC.BAT, keyboard commands (`DIR`, `COPY`),
-redirected file creation and readback on the VA and the VA2 for both disks.
-Not run: 512, 384 and 256 KiB, drive B:, CONFIG.SYS options beyond the
-matched set, hardware.
+Not run: hardware, other utilities' less common options, drive B: as the boot
+drive, CONFIG.SYS options beyond those above.

@@ -1,0 +1,4 @@
+@ECHO OFF
+PATH A:\
+PROMPT $P$G
+VER
