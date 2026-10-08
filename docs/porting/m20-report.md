@@ -768,6 +768,8 @@ and the component tests (only pre-existing failures) pass. Not run: F5/F8,
 the utilities and archiver disks with this system disk, non-default
 `PC88VA_LOADSEG`, hardware.
 
+Owner decision (M20.1): M20.1 is released as the latest release and replaces the archived M20 disks under `images/milestones/m20/`; qualified implementation `0012847b5bbe742eba392df1b63842899f6f7794` (CI run 37781394670). The M20 (release candidate 5) disks remain available at tag `m20`.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
