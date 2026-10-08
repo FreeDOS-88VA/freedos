@@ -132,7 +132,7 @@ drive, CONFIG.SYS options beyond those above. Hardware: see below.
 
 HARDWARE PASS for this scope only, reported by the owner on 2026-10-08: the
 released D88 (SHA-256 `9e4baf0e4098d2c6c2e3810fec0a524f1f7a2540ddc9e183241d1cd2941faa2e`) written to a
-real 2HD diskette booted on a PC-88VA2 with 640 KiB installed and 640 KiB
+real 2HD diskette booted from drive A: on a PC-88VA2 with 640 KiB installed and 640 KiB
 retained in backup memory, and `DIR` and `CHKDSK` ran. Everything else is
 NOT RUN on hardware: the PC-88VA, other memory sizes, other commands,
 writing to disks, FORMAT and SYS.
