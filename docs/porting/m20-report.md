@@ -735,6 +735,39 @@ Owner decisions after the ROM-service review:
 
 Owner decision: release candidate 5 is the M20 distribution. Its disks are archived under `images/milestones/m20/` and are byte-identical to the `m20-rc.5` assets; qualified implementation `ac45fd4d873079a5b179447c80d665d9a90b0bce`. The M20 memory layout contract is [m20-memory-layout.md](m20-memory-layout.md), which supersedes the M17 contract for M20 and lists every change from it. Remaining ROM-service measurements (printer, RS-232C, fancy font, ADPCM, sound playback, sprite) were completed in private evidence; none of them writes kernel memory. Not run: F5/F8 with the final system disk, the data disks with the final system disk, hardware.
 
+## M20.1: floppy transfers a track at a time
+
+The owner reported that the disks are slow on a real PC-88VA2. FDC traces in
+VAEG showed one firmware call per sector everywhere: the loader read
+LOADER.BIN, the FAT, the root directory and KERNEL.SYS a sector at a time; the
+kernel adapter split every request into single sectors through its scratch
+buffer and selected the disk mode before each one; the common driver wrote one
+sector per call; and every uncertain media check probed the 2D, 2DD and 2HC
+modes (with recalibrations) before 2HD. On a real drive each single-sector
+call waits about one revolution.
+
+Kernel component (branch `m20/pc88va`): `49128d3` one ROM call per
+`fl_read`/`fl_write` request directly to the validated caller buffer;
+`f260ce2` probe the last recognized profile first and read once per mode;
+`8b98e6a` write a track per call in the common driver (owner decision (a): on
+an error `r_count` covers the completed calls, as on the PC; writes keep a
+single attempt); `53529c2` loader disk request version 2 (runs within one track
+and 64 KiB page; stage 2 reads whole sectors directly into staging); `1b2666b`
+and the M08 test updates. The firmware callback in `config/m20/loader.json`
+reads `RD_RUN` sectors and returns the sector count. The layout contract
+changes are in [m20-memory-layout.md](m20-memory-layout.md) section 7: the
+resident kernel grows by 224 bytes; INIT, staging and carrier are unchanged.
+
+VAEG, same DIR/COPY commands: FDC reads 356 to 98, writes 131 to 45,
+recalibrations 93 to 39, identical screen output and copied data. Startup,
+MZ execution and file write/copy pass on VA2/VA 640 KiB, VA2 512 KiB with a
+retained 640 KiB selection, VA 384 KiB and VA2 256 KiB; MEM with swapped
+FreeCOM reports 506,976 bytes (M20: 507,216); menu choice 2 and a B: disk
+swap pass. Two independent builds are identical; M20 host tests, acceptance
+and the component tests (only pre-existing failures) pass. Not run: F5/F8,
+the utilities and archiver disks with this system disk, non-default
+`PC88VA_LOADSEG`, hardware.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot

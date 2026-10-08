@@ -131,6 +131,49 @@ Not a kernel layout change, but it determines DOS-free memory:
   pipes run without swapping.
 - Menu choice 2 loads MS-DOS 4.0 COMMAND.COM (about 6.4 KB resident).
 
+### 7. Floppy transfers (M20.1)
+
+M20.1 changes how disk data moves, not where anything is placed:
+
+- The resident `fl_read` and `fl_write` adapters validate the request as
+  before, require it to stay within one track (the common driver already ends
+  each request at the track end) and transfer it with one ROM call directly
+  to or from the validated caller buffer, after one disk-mode selection. The
+  resident 1,024-byte scratch buffer remains for `fl_verify` and probes.
+- The common driver writes a track per call on the PC-88VA, as on the PC; on
+  an error `r_count` covers the completed calls, and writes still use a
+  single attempt.
+- Media recognition probes the profile last recognized on the unit first and
+  reads the boot sector once per disk mode.
+- The loader uses disk request version 2 (`loader-abi.md`): the shared core
+  passes the firmware callback runs of sectors within one track and one 64 KiB
+  physical page, and stage 2 reads whole sectors of KERNEL.SYS directly into
+  staging; the final partial sector keeps the scratch copy and byte check.
+  Staging, scratch, carrier and INIT addresses are unchanged.
+
+The resident kernel grows by 224 bytes (larger shared disk core and the
+direct transfer routine), which moves the resident assembly and kernel work
+up by the same amount.
+
+## M20.1 build layout
+
+M20.1 system disk, VAEG VA2, 640 KiB installed, startup display and `MEM`:
+
+| Item | Value |
+| --- | --- |
+| Kernel loaded | 10000h (`PC88VA_LOADSEG=1000h`) |
+| Kernel low (resident and work) | 10000h-22D80h |
+| Kernel work | 21050h-22D80h |
+| DOS free begins | 22D90h |
+| Resident assembly | 205E0h |
+| INIT | 99080h, 16,251 bytes; stack 9D000h-9E000h (unchanged) |
+| Staging, carrier | 87000h; scratch 97000h; ring 98000h; bridge stack top 9FFF0h (unchanged) |
+
+`MEM` at the prompt reports 506,976 bytes as the largest executable program
+with FreeCOM swapped (M20: 507,216) and 506,032 bytes with MS-DOS 4
+COMMAND.COM. At 256 KiB the INIT, staging and carrier addresses follow the
+measured top as in M20 (INIT 39080h, carrier 27000h).
+
 ## M20 release build layout
 
 Release candidate 5 system disk, VAEG VA2, 640 KiB installed, startup display
@@ -166,12 +209,26 @@ Not run for the final layout: F5/F8 startup keys, the utilities and archiver
 disks with the final system disk, non-default `PC88VA_LOADSEG` values.
 Hardware: NOT RUN by the project (DEFERRED HARDWARE VALIDATION).
 
+M20.1 (VAEG, private evidence): VA2 and VA at 640 KiB, VA2 at 512 KiB with a
+retained 640 KiB selection, VA at 384 KiB and VA2 at 256 KiB (startup, shell,
+MZ execution, file write and copy); MEM with swapped FreeCOM; menu choice 2
+(MS-DOS 4 COMMAND.COM); replacing the B: disk during a session; floppy
+command counts against M20 for the same commands (reads 356 to 98, writes 131
+to 45, recalibrations 93 to 39) with identical results. HOST: as above, plus
+the component loader and adapter tests (only the failures that predate M20.1
+remain). Not run for M20.1: F5/F8, the utilities and archiver disks,
+non-default `PC88VA_LOADSEG`, hardware.
+
 ## Source and record map
 
 - [M20 report](m20-report.md) and [release notes](../releases/m20.md)
 - [Build tools](../../tools/m20/README.md), [carrier builder](../../tools/m20/build_compressed_kernel.py),
   [linked-placement verifier](../../tools/m20/verify_m13_linked_placement.py)
 - [Loader profile](../../config/m20/loader.json), [CONFIG.SYS](../../config/m20/CONFIG.SYS)
+- Kernel component (M20.1 floppy transfers): `pc88va/kernel/m13_platform.asm`
+  (`pc88va_fl_direct`), `kernel/dsk.c` (`LBA_Transfer`, `getbpb`),
+  `pc88va/boot/disk_read.inc`, `pc88va/boot/file_load.inc`,
+  `pc88va/boot/loader-abi.md`
 - Kernel component: `pc88va/kernel/machine_services.asm`,
   `pc88va/kernel/m13_segments.inc`, `kernel/segs.inc`, `kernel/main.c`
   (`setup_int_vectors`), `kernel/kernel.asm`, `hdr/mcb.h`
