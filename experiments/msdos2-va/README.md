@@ -38,10 +38,14 @@ PRINT is not included because PRN output is discarded.
 CON uses the ROM text BIOS and the primitive keyboard queue (ASCII keys only);
 CLOCK reads and sets the calendar clock; AUX and PRN discard output; drives
 A: and B: are the 2HD floppy drives (1024-byte sectors, 8 per track, 80
-cylinders, 2 heads) through the ROM floppy BIOS. Conventional memory is
+cylinders, 2 heads) through the ROM floppy BIOS; the sectors of one track move in one ROM
+call, ROM status codes map to DOS errors, and media check reports "not
+changed" when the ROM says the drive door has not opened since the last
+check (otherwise "don't know"). Conventional memory is
 measured at boot; backup-memory settings are not read. Device requests run on
 a private stack and clear DF on return; SYSINIT keeps the boot stack. The boot
-sector finds IO.SYS and MSDOS.SYS through the FAT.
+sector finds IO.SYS and MSDOS.SYS through the FAT and reads runs of consecutive
+clusters a track at a time.
 
 ## Not included
 
@@ -64,9 +68,7 @@ sector finds IO.SYS and MSDOS.SYS through the FAT.
   control codes other than CR, LF and BS are not displayed.
 - AUX and PRN: discard output; the RS-232C and printer BIOS are not used.
 - Disks: only the floppy drives A: and B: in the 2HD format with 1024-byte
-  sectors; no other formats, no hard disk. Media change is always reported
-  as unknown. A write-protected disk is reported as a write fault, not as
-  write protection (fixed only in the MS-DOS 4.0 BIOS part).
+  sectors; no other formats, no hard disk.
 
 ## Build
 
@@ -85,8 +87,8 @@ D88 bytes. `readfile.py IMAGE NAME` copies a root-directory file out of a D88.
 ## Verification (VAEG)
 
 With the distribution CONFIG.SYS (`FILES=20`, `BUFFERS=10`), CHKDSK reports
-558,016 bytes free on the PC-88VA and PC-88VA2 with 640 KiB, and on the VA2
-426,944, 295,872 and 164,800 bytes with 512, 384 and 256 KiB.
+557,824 bytes free on the PC-88VA and PC-88VA2 with 640 KiB, and on the VA2
+426,752, 295,680 and 164,608 bytes with 512, 384 and 256 KiB.
 
 Exercised on the VA2: boot through the FAT, DATE from the calendar, MEMINFO,
 CHKDSK (A: and B:), FORMAT B: /S /V and booting the result, DISKCOPY (the copy
@@ -98,7 +100,8 @@ see below.
 
 ## Hardware report
 
-HARDWARE PASS for this scope only, reported by the owner on 2026-10-08: the
+HARDWARE PASS for this scope only, reported by the owner on 2026-10-08 for
+preview 1 (`msdos2-va.1`, before the track-at-a-time disk transfer): the
 released D88 (SHA-256 `fc43456358773809d105a902b5fcd9a7ecd166f6a5b671176ba0194a43f9056e`) written to a
 real 2HD diskette booted from drive A: on a PC-88VA2 with 640 KiB installed and 640 KiB
 retained in backup memory, and `DIR` and `CHKDSK` ran. Everything else is

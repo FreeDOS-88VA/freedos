@@ -58,10 +58,12 @@ MSDOS.SYS is built from unchanged sources.
 
 The PC-88VA BIOS part provides CON (ROM text BIOS, primitive keyboard queue),
 CLOCK$ (calendar clock), AUX/PRN (discarded), and the A:/B: 2HD drives through
-the ROM floppy BIOS, with DOS 4 generic IOCTL (device parameters, track
+the ROM floppy BIOS: the sectors of one track move in one ROM call, and media
+check reports "not changed" when the ROM says the drive door has not opened
+since the last check (otherwise "don't know"). It has DOS 4 generic IOCTL (device parameters, track
 read/write, media ID). It measures conventional memory at boot and ignores
 backup-memory settings. The boot sector finds IO.SYS and MSDOS.SYS through the
-FAT. FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
+FAT and reads runs of consecutive clusters a track at a time. FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
 2 heads); SYS makes a formatted disk bootable.
 
 ## Not included
@@ -94,8 +96,7 @@ omitted for function, not for build failures.
 - AUX and PRN: discard output; the RS-232C and printer BIOS are not used.
 - Disks: only the floppy drives A: and B: in the 2HD format with 1024-byte
   sectors (8 per track, 80 cylinders, 2 heads); no 2DD or other formats, no
-  hard disk. Media change is always reported as unknown, so DOS decides.
-  Generic IOCTL format and verify track are not implemented.
+  hard disk. Generic IOCTL format and verify track are not implemented.
 
 ## Build
 
@@ -114,8 +115,8 @@ D88 bytes.
 ## Verification (VAEG)
 
 With the distribution CONFIG.SYS (`FILES=20`, `BUFFERS=10`, `LASTDRIVE=E`),
-MEM reports 533,200 bytes as the largest executable program on the PC-88VA and
-PC-88VA2 with 640 KiB. On the VA2 it reports 402,128, 271,056 and 139,984
+MEM reports 533,056 bytes as the largest executable program on the PC-88VA and
+PC-88VA2 with 640 KiB. On the VA2 it reports 401,984, 270,912 and 139,840
 bytes with 512, 384 and 256 KiB, and 512 KiB is detected with a stale 640 KiB
 setting in backup memory. Each run wrote and compared a file.
 
@@ -130,7 +131,8 @@ drive, CONFIG.SYS options beyond those above. Hardware: see below.
 
 ## Hardware report
 
-HARDWARE PASS for this scope only, reported by the owner on 2026-10-08: the
+HARDWARE PASS for this scope only, reported by the owner on 2026-10-08 for
+preview 1 (`msdos4-va.1`, before the track-at-a-time disk transfer): the
 released D88 (SHA-256 `9e4baf0e4098d2c6c2e3810fec0a524f1f7a2540ddc9e183241d1cd2941faa2e`) written to a
 real 2HD diskette booted from drive A: on a PC-88VA2 with 640 KiB installed and 640 KiB
 retained in backup memory, and `DIR` and `CHKDSK` ran. Everything else is
