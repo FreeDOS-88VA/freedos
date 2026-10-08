@@ -1,8 +1,9 @@
 # MS-DOS 4.0 for the PC-88VA (English distribution disk)
 
 This directory builds a bootable PC-88VA 2HD disk with Microsoft MS-DOS 4.0,
-assembled and compiled entirely from the MIT-licensed source release
-(`microsoft/MS-DOS`) plus a PC-88VA BIOS part. It is a separate experiment of
+assembled and compiled from the MIT-licensed source release
+(`microsoft/MS-DOS`) plus a PC-88VA BIOS part. Two prebuilt libraries of that
+release, which has no source for them, are linked in (see below). It is a separate experiment of
 the FreeDOS-88VA project, not a FreeDOS milestone and not part of any
 milestone build. It is unofficial and not supported by Microsoft or NEC.
 
@@ -20,6 +21,17 @@ All sources are on the `release/msdos-va` branch of
 | MSDOS.SYS, COMMAND.COM, utilities, COUNTRY.SYS | `v4.0/src`, built by the original makefiles |
 | IO.SYS | `v4.0/pc88va/VAIO.ASM` (PC-88VA BIOS part) + `v4.0/src/BIOS` SYSINIT1, SYSCONF, SYSINIT2, SYSIMES |
 | Boot sector, FORMAT, SYS | `pc88va/VABOOT.ASM`, `VAFORMAT.ASM`, `VASYS.ASM` (shared with the MS-DOS 2.0 disk) |
+
+Prebuilt libraries linked without source in the release:
+
+- `v4.0/src/INC/COMSUBS.LIB` (common routines: case mapping, DBCS checks,
+  argument parsing, messages) in BACKUP, RESTORE, JOIN, REPLACE and SUBST;
+- `v4.0/src/LIB/MEM.LIB` (a Microsoft C run-time library) in MEM.
+
+As with any C compiler, the C utilities also link the Microsoft C 5.10
+run-time libraries in `v4.0/src/TOOLS/BLD/LIB`, and the tools themselves are
+the binaries in `v4.0/src/TOOLS`. Everything else on the disk is built from
+source.
 
 The build runs the original NMAKE, BUILDIDX, BUILDMSG, NOSRVBLD, MASM 5.10,
 CL 5.10, LINK 3.65 and EXE2BIN from `v4.0/src/TOOLS` under emu2 built from its
