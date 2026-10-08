@@ -1,90 +1,70 @@
-# Experiment: MS-DOS 2.0 on the PC-88VA
+# MS-DOS 2.0 for the PC-88VA (English distribution disk)
 
-This experiment boots Microsoft MS-DOS 2.0 (the MIT-licensed release in
-`microsoft/MS-DOS`) on the PC-88VA to compare its conventional-memory use
-with the FreeDOS port. It is not a milestone, not a distribution and not part
-of any milestone build. Results are emulator-only; hardware is NOT RUN.
+This directory builds a bootable PC-88VA 2HD disk with Microsoft MS-DOS 2.0
+(the MIT-licensed release in `microsoft/MS-DOS`) and a PC-88VA BIOS part. It
+is a separate experiment of the FreeDOS-88VA project, not a FreeDOS milestone
+and not part of any milestone build. It is unofficial and not supported by
+Microsoft or NEC.
+
+Validation: emulator only (VAEG). Hardware is NOT RUN.
 
 ## What is built
 
-| File | Source |
+| Part | Source |
 |---|---|
-| Boot sector | `v2.0/pc88va/VABOOT.ASM` (project-authored) |
-| IO.SYS | `v2.0/pc88va/VAIO.ASM` (derived from `v2.0/source/SKELIO.ASM`), linked with the Microsoft-supplied `v2.0/bin/SYSINIT.OBJ` and `SYSIMES.OBJ` |
-| MSDOS.SYS, COMMAND.COM | Microsoft-supplied `v2.0/bin` binaries of the same release |
-| MEMINFO.COM | `v2.0/pc88va/MEMINFO.ASM` (project-authored) |
+| IO.SYS | `v2.0/pc88va/VAIO.ASM` (PC-88VA BIOS part, derived from `SKELIO.ASM`) linked with the Microsoft-supplied `v2.0/bin/SYSINIT.OBJ` and `SYSIMES.OBJ` |
+| Boot sector, FORMAT, SYS | `pc88va/VABOOT.ASM`, `VAFORMAT.ASM`, `VASYS.ASM` (shared with the MS-DOS 4.0 disk) |
+| MEMINFO | `pc88va/MEMINFO.ASM` (memory layout report; DOS 2.0 has no MEM) |
+| MSDOS.SYS, COMMAND.COM, CHKDSK, DEBUG, DISKCOPY, EDLIN, EXE2BIN, FC, FIND, MORE, RECOVER, SORT | Microsoft-supplied `v2.0/bin` binaries |
 
-The project sources live on the `experiment/msdos2-va` branch of
-[FreeDOS-88VA/MS-DOS](https://github.com/FreeDOS-88VA/MS-DOS/tree/experiment/msdos2-va);
+The project sources are on the `release/msdos-va` branch of
+[FreeDOS-88VA/MS-DOS](https://github.com/FreeDOS-88VA/MS-DOS/tree/release/msdos-va);
 `lock.json` pins its commit, the emu2 commit and the SHA-256 of every
 Microsoft-supplied input. MASM 5.10 and LINK 3.65 from `v4.0/src/TOOLS` run
-under emu2 built from source.
+under emu2 built from its pinned source.
 
-The published 2.0 source tree cannot rebuild MSDOS.SYS or COMMAND.COM: the
-DOS character I/O module `IO.ASM` included by `STDIO.ASM` is missing, the
-`context` macro used by several modules is undefined, and some modules
-reference 2.11-era symbols. The source `SYSINIT.ASM` is likewise a later
-revision than the shipped `SYSINIT.OBJ`. The experiment therefore uses the
-release binaries for the machine-independent parts, as the 2.0 README
-describes for OEMs, and builds only the PC-88VA parts from source.
+The published 2.0 source tree cannot rebuild MSDOS.SYS, COMMAND.COM or the
+utilities: `IO.ASM` included by `STDIO.ASM` is missing, the `context` macro
+is undefined, some modules use 2.11-era symbols, CHKDSK and PRINT do not
+assemble, and the utilities that do assemble differ from the release
+binaries. With the owner's approval, the disk therefore uses the release
+binaries for these parts, as the 2.0 README describes for OEMs. They contain
+no IBM PC BIOS calls. SYS and FORMAT are replaced by the PC-88VA programs;
+PRINT is not included because PRN output is discarded.
 
 ## PC-88VA BIOS part
 
-- Console output uses the ROM text BIOS (INT 83h); CR, LF, BS and printable
-  ASCII are passed, other control codes are dropped.
-- Keyboard input reads the primitive KB queue (INT 82h, functions 0Ah and
-  09h), which bypasses the ROM Japanese front-end processor; the standard
-  functions 00h/01h called into an uninitialized front-end pointer.
-- Drives A: and B: use the ROM floppy BIOS (INT 80h) with the same 2HD
-  1024-byte format as the FreeDOS disks.
-- Conventional memory is measured at boot in 64 KiB steps; backup-memory
-  settings are not read.
-- AUX and PRN discard output; CLOCK keeps the last date and time set.
-- IO.SYS is loaded at 1000:0000, the same base as the FreeDOS kernel, and
-  nothing is placed below it.
-
-Three integration defects were found and fixed: the ROM 1.0 text BIOS can
-return with DF set (DOS string instructions then ran backwards); the DOS 2.0
-stack is too shallow for the ROM services (requests now run on a private
-512-byte stack); and SYSINIT keeps using the stack it inherits while it moves
-MSDOS.SYS over the IO.SYS initialization code, so that stack must lie outside
-IO.SYS (the boot stack at 3000:1000 is kept).
+CON uses the ROM text BIOS and the primitive keyboard queue (ASCII keys only);
+CLOCK reads and sets the calendar clock; AUX and PRN discard output; drives
+A: and B: are the 2HD floppy drives (1024-byte sectors, 8 per track, 80
+cylinders, 2 heads) through the ROM floppy BIOS. Conventional memory is
+measured at boot; backup-memory settings are not read. Device requests run on
+a private stack and clear DF on return; SYSINIT keeps the boot stack. The boot
+sector finds IO.SYS and MSDOS.SYS through the FAT.
 
 ## Build
 
-Requires git, make, a C compiler and Python 3.12 on the host (no
-milestone container or toolchain is used).
+Requires git, make, a C compiler and Python 3.12 on the host.
 
 ```sh
-git -C components/msdos fetch origin experiment/msdos2-va
-python3 -B experiments/msdos2-va/build.py --output build/exp-msdos2-va
-python3 -B experiments/msdos2-va/readfile.py IMAGE.d88 MEMINFO.TXT
+git submodule update --init components/msdos components/emu2
+git -C components/msdos fetch origin release/msdos-va
+python3 -B experiments/msdos2-va/build.py --output build/msdos2-va
 ```
 
-Two independent builds produce the same D88 bytes. The disk boots to
-`A>` after AUTOEXEC.BAT runs `MEMINFO > MEMINFO.TXT` and `MEMINFO`.
+The disk is `build/msdos2-va/msdos2-pc88va-2hd.d88`; `build-record.json`
+lists the source and file digests. Two independent builds produce the same
+D88 bytes. `readfile.py IMAGE NAME` copies a root-directory file out of a D88.
 
-## Result (VAEG, VA and VA2, 640 KiB, no backup memory)
+## Verification (VAEG)
 
-Both models give the same layout:
+With the distribution CONFIG.SYS (`FILES=20`, `BUFFERS=10`), CHKDSK reports
+558,016 bytes free on the PC-88VA and PC-88VA2 with 640 KiB, and on the VA2
+426,944, 295,872 and 164,800 bytes with 512, 384 and 256 KiB.
 
-| Start | Contents | Bytes |
-|---|---|---:|
-| 10000h | IO.SYS resident part, including the 512-byte request stack | 1,392 |
-| 10570h | MSDOS.SYS code, data, buffers and file tables, up to the first MCB at 148C0h | 17,232 |
-| 148D0h | System block (owner 0008h) | 1,168 |
-| 14D70h | COMMAND.COM resident part | 2,752 |
-| 15840h | COMMAND.COM environment | 160 |
-| 15960h | First program (PSP 1596h), memory block to A0000h | 566,944 |
+Exercised on the VA2: boot through the FAT, DATE from the calendar, MEMINFO,
+CHKDSK (A: and B:), FORMAT B: /S /V and booting the result, DISKCOPY (the copy
+is identical), RECOVER, DEBUG, EDLIN, FC, FIND, SORT, MORE, EXE2BIN, COPY and
+DIR.
 
-Each block is preceded by its 16-byte MCB.
-
-For comparison, FreeDOS M20 (release candidate 5) on the VA2 with 640 KiB
-reports 507,216 bytes for the largest executable program with the swapping
-FreeCOM. The MS-DOS 2.0 configuration is much smaller in function: default
-BUFFERS=2 and FILES=8, no CONFIG.SYS, no Japanese console, no ANSI escape
-sequences, stub AUX/PRN and a clock that does not read the calendar.
-
-Verified in VAEG: boot, AUTOEXEC.BAT, keyboard commands (`DIR`, `COPY`),
-redirected file creation and readback on the VA and the VA2. Not run:
-512, 384 and 256 KiB, drive B:, hardware.
+Not run: hardware, drive B: as the boot drive, less common options.
