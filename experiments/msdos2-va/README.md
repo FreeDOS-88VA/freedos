@@ -6,7 +6,8 @@ is a separate experiment of the FreeDOS-88VA project, not a FreeDOS milestone
 and not part of any milestone build. It is unofficial and not supported by
 Microsoft or NEC.
 
-Validation: emulator only (VAEG). Hardware is NOT RUN.
+Validation: VAEG emulator (see Verification). Hardware: owner report on a
+PC-88VA2 (see Hardware report); everything else on hardware is NOT RUN.
 
 ## What is built
 
@@ -92,4 +93,14 @@ CHKDSK (A: and B:), FORMAT B: /S /V and booting the result, DISKCOPY (the copy
 is identical), RECOVER, DEBUG, EDLIN, FC, FIND, SORT, MORE, EXE2BIN, COPY and
 DIR.
 
-Not run: hardware, drive B: as the boot drive, less common options.
+Not run in VAEG: drive B: as the boot drive, less common options. Hardware:
+see below.
+
+## Hardware report
+
+HARDWARE PASS for this scope only, reported by the owner on 2026-10-08: the
+released D88 (SHA-256 `fc43456358773809d105a902b5fcd9a7ecd166f6a5b671176ba0194a43f9056e`) written to a
+real 2HD diskette booted on a PC-88VA2 with 640 KiB installed and 640 KiB
+retained in backup memory, and `DIR` and `CHKDSK` ran. Everything else is
+NOT RUN on hardware: the PC-88VA, other memory sizes, other commands,
+writing to disks, FORMAT and SYS.

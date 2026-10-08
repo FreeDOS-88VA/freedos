@@ -7,7 +7,8 @@ release, which has no source for them, are linked in (see below). It is a separa
 the FreeDOS-88VA project, not a FreeDOS milestone and not part of any
 milestone build. It is unofficial and not supported by Microsoft or NEC.
 
-Validation: emulator only (VAEG). Hardware is NOT RUN.
+Validation: VAEG emulator (see Verification). Hardware: owner report on a
+PC-88VA2 (see Hardware report); everything else on hardware is NOT RUN.
 
 ## Sources
 
@@ -124,5 +125,14 @@ MEM /PROGRAM and /DEBUG, DIR, COPY, XCOPY, MD, TREE, ATTRIB, FC, COMP, FIND,
 SORT, MORE, REPLACE, SUBST, JOIN, ASSIGN, APPEND, FASTOPEN, SHARE, NLSFUNC,
 CHCP, BACKUP and RESTORE round trip, RECOVER, DEBUG, EDLIN and EXE2BIN.
 
-Not run: hardware, other utilities' less common options, drive B: as the boot
-drive, CONFIG.SYS options beyond those above.
+Not run in VAEG: other utilities' less common options, drive B: as the boot
+drive, CONFIG.SYS options beyond those above. Hardware: see below.
+
+## Hardware report
+
+HARDWARE PASS for this scope only, reported by the owner on 2026-10-08: the
+released D88 (SHA-256 `9e4baf0e4098d2c6c2e3810fec0a524f1f7a2540ddc9e183241d1cd2941faa2e`) written to a
+real 2HD diskette booted on a PC-88VA2 with 640 KiB installed and 640 KiB
+retained in backup memory, and `DIR` and `CHKDSK` ran. Everything else is
+NOT RUN on hardware: the PC-88VA, other memory sizes, other commands,
+writing to disks, FORMAT and SYS.
