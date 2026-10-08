@@ -26,6 +26,27 @@ history, its pins and acceptance records remain unchanged. Do not push
 directly to an upstream or `lpproj` branch. Preserve provenance and exact
 source SHAs in the parent metadata.
 
+## Announcements and experiments
+
+Publish project news and release announcements in the organization profile,
+`profile/README.md` of `FreeDOS-88VA/.github`, shown at
+`https://github.com/FreeDOS-88VA`. Keep its News section newest first, with
+absolute URLs, and announce releases of every project repository there,
+including those outside the parent (for example the PC-88VA MS-DOS 2.0/4.0
+disks in `FreeDOS-88VA/MS-DOS`). The parent README describes this repository
+and links to the organization page; do not keep a separate news list in it.
+Commit and push profile changes in that repository, never by copying files
+into the parent.
+
+`experiments/` holds self-contained builds that are not milestones, such as
+`experiments/msdos2-va` and `experiments/msdos4-va`. They must not use or be
+used by milestone `tools`, `config` or `tests`, and do not change milestone
+acceptance. Their component sources live on component branches pinned in
+their own `lock.json`, not in the parent gitlinks. Apply the same public-input,
+reproducibility and evidence-label rules to their published disks; they are
+released from their component repository, not archived under
+`images/milestones/`.
+
 ## M20 baseline: FreeDOS 1.4 release
 
 M20 restarts the port on the FreeDOS 1.4 release components:

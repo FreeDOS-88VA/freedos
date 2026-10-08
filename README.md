@@ -2,12 +2,6 @@
 
 Experimental FreeDOS port for NEC PC-88VA/VA2, built reproducibly from public sources. Organization overview: [FreeDOS-88VA](https://github.com/FreeDOS-88VA).
 
-## News
-
-- 2026-10-08: Released English MS-DOS 2.0 and 4.0 disks for the PC-88VA, built from the MIT-licensed Microsoft MS-DOS sources (prereleases, emulator validation only; hardware NOT RUN). Build recipes: [experiments/msdos4-va](experiments/msdos4-va/README.md), [experiments/msdos2-va](experiments/msdos2-va/README.md).
-  - MS-DOS 4.0: https://github.com/FreeDOS-88VA/MS-DOS/releases/tag/msdos4-va.1
-  - MS-DOS 2.0: https://github.com/FreeDOS-88VA/MS-DOS/releases/tag/msdos2-va.1
-
 ## Latest: M20 (emulator validation only)
 
 **M20 restarts the port on the FreeDOS 1.4 release sources** (kernel `ke2043`, FreeCOM `com086`) with selectively imported changes. It is the M20 release (designated from release candidate 5), validated **on emulators only (エミュレータ検証のみ)**: **HOST PASS** for the reproducible public build and **VAEG PASS** for the bounded VA/VA2 checks. **Hardware is NOT RUN** and no `HARDWARE PASS` is claimed.
