@@ -181,8 +181,8 @@
   "validation": {
     "host": "HOST PASS",
     "vaeg": "VAEG PASS (bounded scope below)",
-    "hardware": "NOT RUN",
-    "hardware_status": "DEFERRED HARDWARE VALIDATION",
+    "hardware": "HARDWARE PASS (owner report, bounded scope below)",
+    "hardware_status": "DEFERRED HARDWARE VALIDATION beyond the owner-reported scope",
     "scope": [
       "M20.1 system disk (ac6cb57a...) on VAEG: startup, FreeCOM through KSSF, MZ execution (MEM) and file write/copy on VA2 and VA at 640 KiB, VA2 at 512 KiB installed with a retained 640 KiB selection, VA at 384 KiB and VA2 at 256 KiB; MEM with swapped FreeCOM; MS-DOS 4 COMMAND.COM through menu choice 2 on VA2 640 KiB with file write/readback; replacing the B: disk during a session.",
       "M20.1 floppy transfers on VAEG VA2 640 KiB, same DIR/COPY commands as M20: FDC reads 356 to 98, writes 131 to 45, recalibrations 93 to 39, identical screen output and copied data. Component loader and adapter tests pass except failures that predate M20.1.",
@@ -194,13 +194,37 @@
       "UNDELETE, SWSUBST and SHARE are not ported; FAT32 and Japanese support are not included.",
       "Kernel configuration-source defect (F5/F8 timing) exists in the stable M18 and M19 Preview 1 kernels; only M20 carries the fix.",
       "The M20 PC regression beyond scratch boot smoke tests was not run.",
-      "Hardware qualification NOT RUN by the project for M20.1; no HARDWARE PASS is claimed. Earlier owner reports (release candidate 1 on a PC-88VA2 with 640 KB: boot, commands and file write) are not a hardware pass and do not cover M20.1.",
+      "Hardware: the owner reports that the M20.1 system disk boots from A: on a real PC-88VA2 with 640 KB (installed and retained) and runs DIR and CHKDSK, with noticeably faster disk access than M20 (HARDWARE PASS for that scope only). Everything else is NOT RUN on hardware by the project.",
       "FreeCOM swaps for commands typed at the prompt; batch files, redirection and pipes run without swapping. Nested KSSF and secondary-shell swapping are not qualified.",
       "The M19 kswap fix series and the no-swap fallback for redirection/batch are owner-approved exceptions to the no-upstream-repair rule; upstream issue FDOS/freecom#189.",
       "MS-DOS 4 COMMAND.COM (Microsoft MIT source) is the M19 Preview 1 build; tested at 640 KiB (and 256 KiB with release candidate 3).",
       "MEM counts the VA firmware area below 10000h as SYSTEM; MEM reports no extended memory (no INT 15h on PC-88VA).",
       "The advanced graphics (INT 87h) and animation (INT 88h) BIOS, and the V1/V2 supervisor vectors INT 90h/95h, are not available under FreeDOS on PC-88VA (they return CF=1); their RAM use conflicts with the kernel placement."
-    ]
+    ],
+    "hardware_report": {
+      "reported_by": "owner",
+      "date": "2026-10-09",
+      "system_d88_sha256": "ac6cb57a6b09d1793faa978c13c1dd42ec910727f75351271d6740dfaf88e35e",
+      "machine": "PC-88VA2",
+      "installed_kib": 640,
+      "retained_backup_kib": 640,
+      "boot_drive": "A:",
+      "scope": [
+        "boot",
+        "DIR",
+        "CHKDSK"
+      ],
+      "observation": "disk access noticeably faster than M20 (not measured)",
+      "not_run": [
+        "PC-88VA (first model)",
+        "other memory sizes",
+        "other commands",
+        "disk writes",
+        "menu choice 2 (MS-DOS 4 COMMAND.COM)",
+        "utilities and archiver disks",
+        "F5/F8"
+      ]
+    }
   },
   "licenses": {
     "parent": [

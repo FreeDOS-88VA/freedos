@@ -6,8 +6,9 @@ is a separate experiment of the FreeDOS-88VA project, not a FreeDOS milestone
 and not part of any milestone build. It is unofficial and not supported by
 Microsoft or NEC.
 
-Validation: VAEG emulator (see Verification). Hardware: owner report on a
-PC-88VA2 (see Hardware report); everything else on hardware is NOT RUN.
+Validation: VAEG emulator (see Verification). Hardware: owner reports for
+preview 1 and preview 2 on a PC-88VA2 (see Hardware report); everything else
+on hardware is NOT RUN.
 
 ## What is built
 
@@ -99,6 +100,16 @@ Not run in VAEG: drive B: as the boot drive, less common options. Hardware:
 see below.
 
 ## Hardware report
+
+HARDWARE PASS for this scope only, reported by the owner on 2026-10-09 for
+preview 2 (`msdos2-va.2`, D88 SHA-256 `d8687a3c85234c45bacc8516c302f8a3ddcddd7f34173abae5eea07c91a8558e`): written to a real
+2HD diskette, it booted from drive A: on a PC-88VA2 with 640 KiB installed and
+640 KiB retained in backup memory, and `DIR` and `CHKDSK` ran. The owner
+reports that disk access is noticeably faster than with preview 1 (not
+measured). Everything else is NOT RUN on hardware: the PC-88VA, other memory
+sizes, other commands, writing to disks, FORMAT and SYS.
+
+Earlier report:
 
 HARDWARE PASS for this scope only, reported by the owner on 2026-10-08 for
 preview 1 (`msdos2-va.1`, before the track-at-a-time disk transfer): the

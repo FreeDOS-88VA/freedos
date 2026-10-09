@@ -7,8 +7,9 @@ release, which has no source for them, are linked in (see below). It is a separa
 the FreeDOS-88VA project, not a FreeDOS milestone and not part of any
 milestone build. It is unofficial and not supported by Microsoft or NEC.
 
-Validation: VAEG emulator (see Verification). Hardware: owner report on a
-PC-88VA2 (see Hardware report); everything else on hardware is NOT RUN.
+Validation: VAEG emulator (see Verification). Hardware: owner reports for
+preview 1 and preview 2 on a PC-88VA2 (see Hardware report); everything else
+on hardware is NOT RUN.
 
 ## Sources
 
@@ -130,6 +131,16 @@ Not run in VAEG: other utilities' less common options, drive B: as the boot
 drive, CONFIG.SYS options beyond those above. Hardware: see below.
 
 ## Hardware report
+
+HARDWARE PASS for this scope only, reported by the owner on 2026-10-09 for
+preview 2 (`msdos4-va.2`, D88 SHA-256 `7c4b141d31e0034120e0b07eb93b9bea808e1c54822e48e15189cc7398385db0`): written to a real
+2HD diskette, it booted from drive A: on a PC-88VA2 with 640 KiB installed and
+640 KiB retained in backup memory, and `DIR` and `CHKDSK` ran. The owner
+reports that disk access is noticeably faster than with preview 1 (not
+measured). Everything else is NOT RUN on hardware: the PC-88VA, other memory
+sizes, other commands, writing to disks, FORMAT and SYS.
+
+Earlier report:
 
 HARDWARE PASS for this scope only, reported by the owner on 2026-10-08 for
 preview 1 (`msdos4-va.1`, before the track-at-a-time disk transfer): the

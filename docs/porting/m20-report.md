@@ -770,6 +770,8 @@ the utilities and archiver disks with this system disk, non-default
 
 Owner decision (M20.1): M20.1 is released as the latest release and replaces the archived M20 disks under `images/milestones/m20/`; qualified implementation `0012847b5bbe742eba392df1b63842899f6f7794` (CI run 37781394670). The M20 (release candidate 5) disks remain available at tag `m20`.
 
+Hardware report (owner, 2026-10-09): the M20.1 system disk (`ac6cb57a...`) boots from A: on a real PC-88VA2 with 640 KB installed and retained, and `DIR` and `CHKDSK` run; disk access is noticeably faster than with M20 (not measured). HARDWARE PASS for that scope only; everything else on hardware remains NOT RUN.
+
 ## Unrun gates
 
 Not yet run: hardware (**NOT RUN**); PC regression beyond the scratch boot
