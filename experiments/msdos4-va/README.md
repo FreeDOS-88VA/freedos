@@ -80,7 +80,7 @@ check reports "not changed" when the ROM says the drive door has not opened
 since the last check (otherwise "don't know"). It has DOS 4 generic IOCTL (device parameters, track
 read/write, media ID). It measures conventional memory at boot and ignores
 backup-memory settings. The boot sector finds IO.SYS and MSDOS.SYS through the
-FAT and reads runs of consecutive clusters a track at a time. KEY lists, sets, saves and loads the function-key definitions. FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
+FAT and reads runs of consecutive clusters a track at a time. KEY lists, sets, saves and loads the function-key definitions. JFP turns ROM Japanese input on and off. FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
 2 heads); SYS makes a formatted disk bootable.
 
 ## Not included
@@ -105,7 +105,11 @@ omitted for function, not for build failures.
 ## Not implemented in the PC-88VA BIOS part
 
 - Japanese: Shift-JIS and half-width kana are displayed; Japanese file
-  names work; no Japanese input yet (no front-end processor).
+  names work. Japanese input uses the ROM front-end processor after
+  `JFP ROM` (ROM dictionary; `JFP ON` needs the default dictionary files,
+  which are not on the disk) and `JFP OFF` returns to plain input; ZENKAKU
+  toggles kana input, HENKAN converts, KETTEI confirms. Learning into
+  dictionary files is untested.
 - Keyboard: function, editing and cursor keys send the NEC MS-DOS codes
   (F1-F10 = ESC S ... ESC Z); KEY has no full-screen menu and its file
   format is not NEC's KEY.TBL.
