@@ -52,6 +52,15 @@ In `v4.0/src`, every change is conditional on `PC88VA` except one comment fix:
 - `CMD/CHKDSK`, `CMD/RECOVER`: accept 1024-byte sectors and derive the
   directory entries per sector from the sector size.
 - `CMD/COMMAND`: CLS uses the VA text BIOS (existing `PC88VA` option).
+  The boot shell prints the sign-on `日本語MS-DOS version 4.00 Release
+  <date> (<track>, <commit>)`, `for NEC PC-88VA Series Personal Computer`,
+  `Ported by Nakata Maho`; the builder writes the identity into
+  `CMD/COMMAND/VAREL.INC` (track `main` for `release/msdos-va` unless the
+  lock declares `msdos.track`; date from `msdos.release_date` or the commit
+  date in Japan time).
+- `INC/DBCS.SW`, `DOS/DOSMES.ASM`: Shift-JIS (DBCS) kernel paths, Japan/932
+  country defaults; `CMD/SHARE/SHARELNK.ASM`: one symbol alias needed by the
+  DBCS kernel objects SHARE links.
 - `DOS/MSSW.ASM`, `DOS/DOSMES.ASM`: the line editor uses the NEC MS-DOS
   keys: ESC is the lead-in for the template functions (ESC S/T/U/V/W/E/J/
   P/Q/Z, ESC D), Ctrl-X cancels the line, Ctrl-P or Ctrl-N toggles printer
@@ -59,7 +68,7 @@ In `v4.0/src`, every change is conditional on `PC88VA` except one comment fix:
 - `MAPPER/GETMSG.ASM`: one comment line held 66 U+FFFD characters from a
   character-set conversion and exceeded the MASM line limit.
 
-MSDOS.SYS differs from the IBM build only in the line-editor keys above.
+MSDOS.SYS differs from the IBM build in the line-editor keys and the DBCS support above.
 
 The PC-88VA BIOS part provides CON (ROM text BIOS, primitive keyboard queue;
 NEC MS-DOS function and editing keys, the function-key label line on row 25
@@ -95,12 +104,17 @@ omitted for function, not for build failures.
 
 ## Not implemented in the PC-88VA BIOS part
 
-- Japanese: no Japanese display or input (no front-end processor).
+- Japanese: Shift-JIS and half-width kana are displayed; Japanese file
+  names work; no Japanese input yet (no front-end processor).
 - Keyboard: function, editing and cursor keys send the NEC MS-DOS codes
   (F1-F10 = ESC S ... ESC Z); KEY has no full-screen menu and its file
   format is not NEC's KEY.TBL.
-- Screen: 80x25 with the label line; no other escape sequences; control
-  codes other than CR, LF and BS are not displayed. Box-drawing characters of TREE and MEM appear as other
+- Screen: 80x25 with the label line; NEC MS-DOS escape sequences and
+  control codes (cursor addressing and movement, erase, insert/delete
+  line, colors, reverse, underline, blink, ESC)3 graph mode, column-80
+  pending wrap); not the 20-row mode ESC[>3h. ROM auto-scroll is off for
+  the text area, so programs writing through INT 83h directly do not
+  scroll at the bottom. Box-drawing characters of TREE and MEM appear as other
   characters of the VA font.
 - AUX and PRN: discard output; the RS-232C and printer BIOS are not used.
 - Disks: only the floppy drives A: and B: in the 2HD format with 1024-byte
