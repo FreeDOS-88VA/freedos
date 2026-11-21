@@ -52,19 +52,26 @@ In `v4.0/src`, every change is conditional on `PC88VA` except one comment fix:
 - `CMD/CHKDSK`, `CMD/RECOVER`: accept 1024-byte sectors and derive the
   directory entries per sector from the sector size.
 - `CMD/COMMAND`: CLS uses the VA text BIOS (existing `PC88VA` option).
+- `DOS/MSSW.ASM`, `DOS/DOSMES.ASM`: the line editor uses the NEC MS-DOS
+  keys: ESC is the lead-in for the template functions (ESC S/T/U/V/W/E/J/
+  P/Q/Z, ESC D), Ctrl-X cancels the line, Ctrl-P or Ctrl-N toggles printer
+  echo.
 - `MAPPER/GETMSG.ASM`: one comment line held 66 U+FFFD characters from a
   character-set conversion and exceeded the MASM line limit.
 
-MSDOS.SYS is built from unchanged sources.
+MSDOS.SYS differs from the IBM build only in the line-editor keys above.
 
-The PC-88VA BIOS part provides CON (ROM text BIOS, primitive keyboard queue),
+The PC-88VA BIOS part provides CON (ROM text BIOS, primitive keyboard queue;
+NEC MS-DOS function and editing keys, the function-key label line on row 25
+drawn by the ROM, ESC[>1h/ESC[>1l, ESC[2J and ESC[H; INT DCh CL=0Ch/0Dh to
+read and write the key definitions),
 CLOCK$ (calendar clock), AUX/PRN (discarded), and the A:/B: 2HD drives through
 the ROM floppy BIOS: the sectors of one track move in one ROM call, and media
 check reports "not changed" when the ROM says the drive door has not opened
 since the last check (otherwise "don't know"). It has DOS 4 generic IOCTL (device parameters, track
 read/write, media ID). It measures conventional memory at boot and ignores
 backup-memory settings. The boot sector finds IO.SYS and MSDOS.SYS through the
-FAT and reads runs of consecutive clusters a track at a time. FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
+FAT and reads runs of consecutive clusters a track at a time. KEY lists, sets, saves and loads the function-key definitions. FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
 2 heads); SYS makes a formatted disk bootable.
 
 ## Not included
@@ -89,10 +96,11 @@ omitted for function, not for build failures.
 ## Not implemented in the PC-88VA BIOS part
 
 - Japanese: no Japanese display or input (no front-end processor).
-- Keyboard: only keys with an ASCII code; function, cursor and other
-  special keys are ignored.
-- Screen: no ANSI escape sequences; control codes other than CR, LF and BS
-  are not displayed. Box-drawing characters of TREE and MEM appear as other
+- Keyboard: function, editing and cursor keys send the NEC MS-DOS codes
+  (F1-F10 = ESC S ... ESC Z); KEY has no full-screen menu and its file
+  format is not NEC's KEY.TBL.
+- Screen: 80x25 with the label line; no other escape sequences; control
+  codes other than CR, LF and BS are not displayed. Box-drawing characters of TREE and MEM appear as other
   characters of the VA font.
 - AUX and PRN: discard output; the RS-232C and printer BIOS are not used.
 - Disks: only the floppy drives A: and B: in the 2HD format with 1024-byte

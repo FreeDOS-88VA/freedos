@@ -3,7 +3,7 @@
   "msdos": {
     "repository": "https://github.com/FreeDOS-88VA/MS-DOS",
     "branch": "release/msdos-va",
-    "commit": "f8cd7e812a2408f8dd1fe4f83687920017affb1e",
+    "commit": "62fc532820ac373bbd78489e1aa7485371ce4c88",
     "paths": [
       "LICENSE",
       "pc88va",
