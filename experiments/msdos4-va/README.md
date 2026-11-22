@@ -81,7 +81,7 @@ since the last check (otherwise "don't know"). It has DOS 4 generic IOCTL (devic
 read/write, media ID). It measures conventional memory at boot and ignores
 backup-memory settings. The boot sector finds IO.SYS and MSDOS.SYS through the
 FAT and reads runs of consecutive clusters a track at a time. KEY lists, sets, saves and loads the function-key definitions. JFP selects Japanese input (project front end, ROM front end or off) and edits the user dictionary. DISKCOPY copies 2D, 2DD and 2HD floppies track by track through the ROM floppy BIOS (one or two drives, formats the target, /V verifies). FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
-2 heads); SYS makes a formatted disk bootable.
+2 heads); `FORMAT C:` or `FORMAT /H0|/H1` formats a SASI hard disk in the NEC PC-88VA layout (the same as PC-Engine HDFORM); SYS makes a formatted floppy or SASI disk bootable (`SYS C:`, `FORMAT /H0 /S`). SASI hard disks (5-40 MB) in the NEC layout, and FreeDOS-88VA native-prefix volumes, appear as C: and D:; with fixed-disk boot enabled in the VA setup, the PC-88VA boots MS-DOS from SASI target 0.
 
 ## Not included
 
@@ -123,9 +123,11 @@ omitted for function, not for build failures.
   scroll at the bottom. Box-drawing characters of TREE and MEM appear as other
   characters of the VA font.
 - AUX and PRN: discard output; the RS-232C and printer BIOS are not used.
-- Disks: only the floppy drives A: and B: in the 2HD format with 1024-byte
-  sectors (8 per track, 80 cylinders, 2 heads); no 2DD or other formats, no
-  hard disk. Generic IOCTL format and verify track are not implemented.
+- Disks: DOS mounts the floppy drives A: and B: only in the 2HD format
+  with 1024-byte sectors (8 per track, 80 cylinders, 2 heads); DISKCOPY
+  copies other floppy formats without mounting them. SASI hard disks use
+  the NEC single-volume layout (no partition table). Generic IOCTL format
+  and verify track are not implemented.
 
 ## Build
 
