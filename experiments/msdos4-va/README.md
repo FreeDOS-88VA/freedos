@@ -142,6 +142,11 @@ git -C components/msdos fetch origin release/msdos-va
 python3 -B experiments/msdos4-va/build.py --output build/msdos4-va
 ```
 
+`--messages ja` builds the Japanese edition: the kernel, COMMAND, the
+utilities and the PC-88VA commands show project-written Japanese messages
+(`v4.0/src/MESSAGES/JPN-MS.tsv`, `JPN-ASM.tsv`); answer keys stay ASCII.
+The default `--messages en` keeps the English messages.
+
 The disk is `build/msdos4-va/msdos4-pc88va-2hd.d88`; `build-record.json`
 lists the source and file digests. Two independent builds produce the same
 D88 bytes.
