@@ -98,7 +98,7 @@ omitted for function, not for build failures.
 | Microsoft DISKCOPY, DISKCOMP | Not ported. The Microsoft DISKCOPY assumes 512-byte sectors in many places, uses generic format IOCTL and calls INT 13h. The distribution instead ships the ROM BIOS implementation from `pc88va/VADCOPY.ASM` as `DISKCOPY.COM`. |
 | RAMDRIVE.SYS, VDISK.SYS, SMARTDRV, XMA2EMS.SYS, XMAEM.SYS | Need extended or expanded memory of IBM-compatible machines. |
 | MEMM | Expanded-memory manager; not built. |
-| PRINT | PRN discards output, so a print spooler has no use yet. |
+| PRINT | The resident spooler depends on IBM printer interrupt (INT 17h) behaviour; the VA PRN driver alone does not port it. |
 | DOSSHELL, SELECT | IBM text-mode shell and installer; SELECT also has damaged characters in the published sources. Not built. |
 | FILESYS, IFSFUNC | Installable file system support for networks; no file system driver to use it. |
 
@@ -122,7 +122,10 @@ omitted for function, not for build failures.
   the text area, so programs writing through INT 83h directly do not
   scroll at the bottom. Box-drawing characters of TREE and MEM appear as other
   characters of the VA font.
-- AUX and PRN: discard output; the RS-232C and printer BIOS are not used.
+- AUX/COM1 and PRN/LPT1 use the ROM communication and printer BIOS: AUX is
+  9600 8N1 at boot and `SPEED baud` changes the rate; PRN converts Shift-JIS
+  to the printer's JIS kanji mode. Physical serial and printer operation
+  are unverified (tested on vaeg with its printer and serial file backends).
 - Disks: DOS mounts the floppy drives A: and B: only in the 2HD format
   with 1024-byte sectors (8 per track, 80 cylinders, 2 heads); DISKCOPY
   copies other floppy formats without mounting them. SASI hard disks use
