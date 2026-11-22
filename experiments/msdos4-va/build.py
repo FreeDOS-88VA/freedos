@@ -13,6 +13,7 @@ FORMAT/SYS/KEY come from pc88va/ and v4.0/pc88va/.
 This experiment is self-contained: it uses no milestone tools.
 """
 import argparse
+from datetime import datetime, timedelta, timezone
 import hashlib
 import io
 import json
@@ -60,6 +61,38 @@ def export(component, commit, paths, dest):
     with tarfile.open(fileobj=io.BytesIO(data)) as archive:
         archive.extractall(dest, filter='data')
     return digest(data)
+
+
+def release_identity(component, msdos):
+    """Use the declared track and the exact commit exported by the lock."""
+    track = msdos.get('track', 'main' if msdos.get('branch') == 'release/msdos-va' else None)
+    if not isinstance(track, str) or len(track) > 25 or not re.fullmatch(
+            r'main|[a-z](?:0|[1-9][0-9]*)(?:\.[1-9][0-9]*)*(?:[a-z](?:[1-9][0-9]*)?)?', track):
+        raise SystemExit('msdos.track must be main or a canonical lowercase milestone (max 25 characters)')
+
+    commit = msdos['commit']
+    if not isinstance(commit, str) or not re.fullmatch(r'[0-9a-f]{40}', commit):
+        raise SystemExit('msdos.commit must be a full lowercase Git commit ID')
+    oid, timestamp = subprocess.check_output(
+        ['git', '-C', str(component), 'show', '-s', '--no-notes', '--no-show-signature',
+         '--format=%H%n%ct', commit, '--'],
+        text=True).splitlines()
+    if oid != commit:
+        raise SystemExit('msdos.commit does not name the commit itself')
+
+    if 'release_date' in msdos:
+        date = msdos['release_date']
+        try:
+            if not isinstance(date, str) or not re.fullmatch(r'[0-9]{8}', date):
+                raise ValueError
+            datetime.strptime(date, '%Y%m%d')
+        except ValueError:
+            raise SystemExit('msdos.release_date must be a valid YYYYMMDD date') from None
+        date_source = 'lock'
+    else:
+        date = datetime.fromtimestamp(int(timestamp), timezone(timedelta(hours=9))).strftime('%Y%m%d')
+        date_source = 'commit-jst'
+    return {'date': date, 'date_source': date_source, 'track': track, 'short_commit': commit[:8]}
 
 
 def dos_text(data):
@@ -217,8 +250,14 @@ def main():
     logs.mkdir()
 
     msdos = lock['msdos']
+    component = ROOT / 'components/msdos'
+    identity = release_identity(component, msdos)
     tree = out / 'tree'
-    archive_digest = export(ROOT / 'components/msdos', msdos['commit'], msdos['paths'], tree)
+    archive_digest = export(component, msdos['commit'], msdos['paths'], tree)
+    include = tree / 'v4.0/src/CMD/COMMAND/VAREL.INC'
+    if not include.is_file():
+        raise SystemExit('the pinned MS-DOS source does not include the R1 boot banner')
+    include.write_bytes("\tDB\t'Release {date} ({track}, {short_commit})'\n".format(**identity).encode('ascii'))
     emu2_src = out / 'emu2'
     export(ROOT / 'components/emu2', lock['emu2']['commit'], ['.'], emu2_src)
     with (logs / 'emu2-build.log').open('wb') as log:
@@ -322,6 +361,7 @@ def main():
     record = {
         'distribution': 'msdos4-va',
         'msdos_commit': msdos['commit'],
+        'msdos_release': identity,
         'msdos_archive_sha256': archive_digest,
         'emu2_commit': lock['emu2']['commit'],
         'tool_sha256': lock['tool_sha256'],
