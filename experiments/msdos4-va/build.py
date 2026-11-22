@@ -240,7 +240,7 @@ def expect(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--messages', choices=('en', 'ja'), default='en')
+    parser.add_argument('--messages', choices=('en', 'ja'), default='ja')
     args = parser.parse_args()
     lock = json.loads((HERE / 'lock.json').read_text())
     out = args.output.resolve()
@@ -386,6 +386,7 @@ def main():
         'msdos_commit': msdos['commit'],
         'msdos_release': identity,
         'msdos_archive_sha256': archive_digest,
+        'messages': args.messages,
         'emu2_commit': lock['emu2']['commit'],
         'tool_sha256': lock['tool_sha256'],
         'boot_sha256': digest(boot),
