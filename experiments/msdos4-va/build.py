@@ -333,7 +333,7 @@ def main():
     dos.run(va, va / 'LINK.EXE', 'VABOOT,VABOOT.EXE;')
     boot = mz_image(expect(va / 'VABOOT.EXE'))
     (va / 'VABOOT.INC').write_bytes(boot_include(boot))
-    for module in ('VAIO', 'VAFORMAT', 'VASYS', 'VAKEY', 'VAJFP'):
+    for module in ('VAIO', 'VAFORMAT', 'VASYS', 'VAKEY', 'VAJFP', 'VADCOPY'):
         dos.run(va, va / 'MASM.EXE', module + ';')
     (va / 'IO.LNK').write_bytes(('VAIO+' + '+'.join(SYSINIT_OBJECTS) + ',IO.EXE,IO.MAP;\r\n')
                                 .encode('ascii'))
@@ -342,10 +342,12 @@ def main():
     dos.run(va, va / 'LINK.EXE', 'VASYS,VASYS.EXE;')
     dos.run(va, va / 'LINK.EXE', 'VAKEY,VAKEY.EXE;')
     dos.run(va, va / 'LINK.EXE', 'VAJFP,VAJFP.EXE;')
+    dos.run(va, va / 'LINK.EXE', 'VADCOPY,VADCOPY.EXE;')
     iosys = mz_image(expect(va / 'IO.EXE'), base=BIOSSEG)
     built['FORMAT.COM'] = mz_image(expect(va / 'VAFORMAT.EXE'), origin=0x100)
     built['SYS.COM'] = mz_image(expect(va / 'VASYS.EXE'), origin=0x100)
     built['JFP.COM'] = mz_image(expect(va / 'VAJFP.EXE'), origin=0x100)
+    built['DISKCOPY.COM'] = mz_image(expect(va / 'VADCOPY.EXE'), origin=0x100)
     built['KEY.COM'] = mz_image(expect(va / 'VAKEY.EXE'), origin=0x100)
 
     disk = lock['disk']
