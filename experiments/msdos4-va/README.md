@@ -80,8 +80,8 @@ check reports "not changed" when the ROM says the drive door has not opened
 since the last check (otherwise "don't know"). It has DOS 4 generic IOCTL (device parameters, track
 read/write, media ID). It measures conventional memory at boot and ignores
 backup-memory settings. The boot sector finds IO.SYS and MSDOS.SYS through the
-FAT and reads runs of consecutive clusters a track at a time. KEY lists, sets, saves and loads the function-key definitions. FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
-2 heads); SYS makes a formatted disk bootable.
+FAT and reads runs of consecutive clusters a track at a time. KEY lists, sets, saves and loads the function-key definitions. JFP selects Japanese input (project front end, ROM front end or off) and edits the user dictionary. DISKCOPY copies 2D, 2DD and 2HD floppies track by track through the ROM floppy BIOS (one or two drives, formats the target, /V verifies). FORMAT formats 2HD disks (1024-byte sectors, 8 per track, 80 cylinders,
+2 heads); `FORMAT C:` or `FORMAT /H0|/H1` formats a SASI hard disk in the NEC PC-88VA layout (the same as PC-Engine HDFORM); SYS makes a formatted floppy or SASI disk bootable (`SYS C:`, `FORMAT /H0 /S`). SASI hard disks (5-40 MB) in the NEC layout, and FreeDOS-88VA native-prefix volumes, appear as C: and D:; with fixed-disk boot enabled in the VA setup, the PC-88VA boots MS-DOS from SASI target 0.
 
 ## Not included
 
@@ -95,17 +95,23 @@ omitted for function, not for build failures.
 | FORMAT, SYS (IBM) | Assume 512-byte sectors and the IBM boot sector; replaced by the PC-88VA FORMAT and SYS. The IBM FORMAT did not build in the trial (it needs the BOOT message include). |
 | ANSI.SYS, DISPLAY.SYS, KEYBOARD.SYS, PRINTER.SYS, KEYB, GRAFTABL, GRAPHICS, MODE | Program the IBM video BIOS, keyboard, code pages and ports directly. |
 | FDISK, DRIVER.SYS | IBM fixed-disk partitioning and IBM diskette parameters. |
-| DISKCOPY, DISKCOMP | Assume 512-byte sectors in many places; DISKCOPY also formats tracks through generic IOCTL, which the PC-88VA driver does not implement, and calls INT 13h. Not ported. |
+| Microsoft DISKCOPY, DISKCOMP | Not ported. The Microsoft DISKCOPY assumes 512-byte sectors in many places, uses generic format IOCTL and calls INT 13h. The distribution instead ships the ROM BIOS implementation from `pc88va/VADCOPY.ASM` as `DISKCOPY.COM`. |
 | RAMDRIVE.SYS, VDISK.SYS, SMARTDRV, XMA2EMS.SYS, XMAEM.SYS | Need extended or expanded memory of IBM-compatible machines. |
 | MEMM | Expanded-memory manager; not built. |
-| PRINT | PRN discards output, so a print spooler has no use yet. |
+| PRINT | The resident spooler depends on IBM printer interrupt (INT 17h) behaviour; the VA PRN driver alone does not port it. |
 | DOSSHELL, SELECT | IBM text-mode shell and installer; SELECT also has damaged characters in the published sources. Not built. |
 | FILESYS, IFSFUNC | Installable file system support for networks; no file system driver to use it. |
 
 ## Not implemented in the PC-88VA BIOS part
 
 - Japanese: Shift-JIS and half-width kana are displayed; Japanese file
-  names work; no Japanese input yet (no front-end processor).
+  names work. `JFP ON` (or `JFP FEP`) starts the project front end: ZENKAKU
+  toggles romaji/kana input, HENKAN converts through the ROM dictionary,
+  F7 gives katakana, KETTEI or Return confirms; it does not learn.
+  `JFP ADD reading word`, `JFP DEL` and `JFP LIST` keep up to 8 user words
+  in `A:\JFPUSER.DIC` (run `JFP ON` again after editing). `JFP ROM` uses
+  the ROM front-end processor instead and `JFP OFF` returns to plain
+  input. Learning into ROM dictionary files is untested.
 - Keyboard: function, editing and cursor keys send the NEC MS-DOS codes
   (F1-F10 = ESC S ... ESC Z); KEY has no full-screen menu and its file
   format is not NEC's KEY.TBL.
@@ -116,10 +122,15 @@ omitted for function, not for build failures.
   the text area, so programs writing through INT 83h directly do not
   scroll at the bottom. Box-drawing characters of TREE and MEM appear as other
   characters of the VA font.
-- AUX and PRN: discard output; the RS-232C and printer BIOS are not used.
-- Disks: only the floppy drives A: and B: in the 2HD format with 1024-byte
-  sectors (8 per track, 80 cylinders, 2 heads); no 2DD or other formats, no
-  hard disk. Generic IOCTL format and verify track are not implemented.
+- AUX/COM1 and PRN/LPT1 use the ROM communication and printer BIOS: AUX is
+  9600 8N1 at boot and `SPEED baud` changes the rate; PRN converts Shift-JIS
+  to the printer's JIS kanji mode. Physical serial and printer operation
+  are unverified (tested on vaeg with its printer and serial file backends).
+- Disks: DOS mounts the floppy drives A: and B: only in the 2HD format
+  with 1024-byte sectors (8 per track, 80 cylinders, 2 heads); DISKCOPY
+  copies other floppy formats without mounting them. SASI hard disks use
+  the NEC single-volume layout (no partition table). Generic IOCTL format
+  and verify track are not implemented.
 
 ## Build
 
@@ -130,6 +141,12 @@ git submodule update --init components/msdos components/emu2
 git -C components/msdos fetch origin release/msdos-va
 python3 -B experiments/msdos4-va/build.py --output build/msdos4-va
 ```
+
+The default `--messages ja` builds the published Japanese edition: the
+kernel, COMMAND, the utilities and the PC-88VA commands show
+project-written Japanese messages (`v4.0/src/MESSAGES/JPN-MS.tsv`,
+`JPN-ASM.tsv`); answer keys stay ASCII. `--messages en` builds the English
+edition. `build-record.json` records the choice.
 
 The disk is `build/msdos4-va/msdos4-pc88va-2hd.d88`; `build-record.json`
 lists the source and file digests. Two independent builds produce the same

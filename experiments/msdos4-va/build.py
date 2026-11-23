@@ -196,9 +196,9 @@ def d88(raw, name):
     return bytes(header + out)
 
 
-def boot_include(boot):
+def boot_include(boot, label="BOOTCODE"):
     """MASM source defining BOOTCODE, the 1024-byte boot sector."""
-    lines = ['BOOTCODE LABEL BYTE']
+    lines = [f'{label} LABEL BYTE']
     lines += ['        DB      ' + ','.join('%03XH' % b for b in boot[i:i + 16])
               for i in range(0, len(boot), 16)]
     return ('\r\n'.join(lines) + '\r\n').encode('ascii')
@@ -240,6 +240,7 @@ def expect(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--messages', choices=('en', 'ja'), default='ja')
     args = parser.parse_args()
     lock = json.loads((HERE / 'lock.json').read_text())
     out = args.output.resolve()
@@ -268,6 +269,13 @@ def main():
     for name, expected in lock['tool_sha256'].items():
         if digest((tools / name).read_bytes()) != expected:
             raise SystemExit('tool digest mismatch: ' + name)
+    message = 'USA-MS'
+    if args.messages == 'ja':
+        with (logs / 'localize.log').open('wb') as log:
+            subprocess.run(['python3', '-B', str(src / 'MESSAGES/localize.py'),
+                            '--export-tree', str(tree)],
+                           stdout=log, stderr=subprocess.STDOUT, check=True)
+        message = 'JPN-MS'
     crlf_tree(tree)
     dos = Dos(emu2_src / 'emu2', logs, root)
 
@@ -280,10 +288,10 @@ def main():
             shutil.copy(path, boot_cmd / path.name)
     for tool in ('BUILDIDX.EXE', 'BUILDMSG.EXE', 'MASM.EXE', 'LINK.EXE', 'EXE2BIN.EXE'):
         shutil.copy(tools / tool, boot_cmd)
-    shutil.copy(src / 'MESSAGES/USA-MS.MSG', boot_cmd)
+    shutil.copy(src / 'MESSAGES' / (message + '.MSG'), boot_cmd)
     dos.root = out
-    dos.run(boot_cmd, boot_cmd / 'BUILDIDX.EXE', 'USA-MS.MSG')
-    dos.run(boot_cmd, boot_cmd / 'BUILDMSG.EXE', 'USA-MS', 'COMMAND.SKL')
+    dos.run(boot_cmd, boot_cmd / 'BUILDIDX.EXE', message + '.MSG')
+    dos.run(boot_cmd, boot_cmd / 'BUILDMSG.EXE', message, 'COMMAND.SKL')
     for module in COMMAND_MODULES:
         dos.run(boot_cmd, boot_cmd / 'MASM.EXE', '-Mx', '-t', '-DPC88VA', module + '.ASM;')
     (boot_cmd / 'CMD.LNK').write_bytes(('+\r\n'.join(m + '.OBJ' for m in COMMAND_MODULES)
@@ -295,7 +303,7 @@ def main():
     dos.root = root
 
     env = ('PATH=D:\\SRC\\TOOLS', 'COMSPEC=D:\\SRC\\TOOLS\\COMMAND.COM', 'INIT=D:\\SRC\\TOOLS',
-           'INCLUDE=D:\\SRC\\TOOLS\\BLD\\INC', 'LIB=D:\\SRC\\TOOLS\\BLD\\LIB', 'COUNTRY=usa-ms')
+           'INCLUDE=D:\\SRC\\TOOLS\\BLD\\INC', 'LIB=D:\\SRC\\TOOLS\\BLD\\LIB', 'COUNTRY=' + message.lower())
 
     def nmake(directory, *targets):
         return dos.run(src / directory, tools / 'NMAKE.EXE', *DEFINES, *targets, env=env)
@@ -303,7 +311,10 @@ def main():
     # Top-level makefile order.  The DOS makefile builds INC through
     # "cd ..\\inc", which does not carry across emu2 processes, so make the
     # message include it needs, then INC, then the rest of DOS.
-    nmake('MESSAGES')
+    if args.messages == 'ja':
+        nmake('MESSAGES', 'country=jpn-ms')
+    else:
+        nmake('MESSAGES')
     nmake('MAPPER')
     nmake('DOS', 'msdos.cl1')
     nmake('INC')
@@ -329,11 +340,17 @@ def main():
     for tool in ('MASM.EXE', 'LINK.EXE'):
         shutil.copy(tools / tool, va)
     dos.root = out
+    dos.run(va, va / 'MASM.EXE', 'VAHDBOOT;')
+    dos.run(va, va / 'LINK.EXE', 'VAHDBOOT,VAHDBOOT.EXE;')
+    hdboot = mz_image(expect(va / 'VAHDBOOT.EXE'))
+    if len(hdboot) != 1024:
+        raise SystemExit('VAHDBOOT must occupy four SASI blocks')
+    (va / 'VAHDBOOT.INC').write_bytes(boot_include(hdboot, 'HDBOOTCODE'))
     dos.run(va, va / 'MASM.EXE', 'VABOOT;')
     dos.run(va, va / 'LINK.EXE', 'VABOOT,VABOOT.EXE;')
     boot = mz_image(expect(va / 'VABOOT.EXE'))
     (va / 'VABOOT.INC').write_bytes(boot_include(boot))
-    for module in ('VAIO', 'VAFORMAT', 'VASYS', 'VAKEY'):
+    for module in ('VAIO', 'VAFORMAT', 'VASYS', 'VAKEY', 'VAJFP', 'VADCOPY', 'VASPEED'):
         dos.run(va, va / 'MASM.EXE', module + ';')
     (va / 'IO.LNK').write_bytes(('VAIO+' + '+'.join(SYSINIT_OBJECTS) + ',IO.EXE,IO.MAP;\r\n')
                                 .encode('ascii'))
@@ -341,9 +358,15 @@ def main():
     dos.run(va, va / 'LINK.EXE', 'VAFORMAT,VAFORMAT.EXE;')
     dos.run(va, va / 'LINK.EXE', 'VASYS,VASYS.EXE;')
     dos.run(va, va / 'LINK.EXE', 'VAKEY,VAKEY.EXE;')
+    dos.run(va, va / 'LINK.EXE', 'VAJFP,VAJFP.EXE;')
+    dos.run(va, va / 'LINK.EXE', 'VADCOPY,VADCOPY.EXE;')
+    dos.run(va, va / 'LINK.EXE', 'VASPEED,VASPEED.EXE;')
     iosys = mz_image(expect(va / 'IO.EXE'), base=BIOSSEG)
     built['FORMAT.COM'] = mz_image(expect(va / 'VAFORMAT.EXE'), origin=0x100)
     built['SYS.COM'] = mz_image(expect(va / 'VASYS.EXE'), origin=0x100)
+    built['JFP.COM'] = mz_image(expect(va / 'VAJFP.EXE'), origin=0x100)
+    built['DISKCOPY.COM'] = mz_image(expect(va / 'VADCOPY.EXE'), origin=0x100)
+    built['SPEED.COM'] = mz_image(expect(va / 'VASPEED.EXE'), origin=0x100)
     built['KEY.COM'] = mz_image(expect(va / 'VAKEY.EXE'), origin=0x100)
 
     disk = lock['disk']
@@ -363,6 +386,7 @@ def main():
         'msdos_commit': msdos['commit'],
         'msdos_release': identity,
         'msdos_archive_sha256': archive_digest,
+        'messages': args.messages,
         'emu2_commit': lock['emu2']['commit'],
         'tool_sha256': lock['tool_sha256'],
         'boot_sha256': digest(boot),
